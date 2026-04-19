@@ -8,7 +8,7 @@ export default function Home() {
         Turn property notes into polished marketing copy — in seconds.
       </p>
       <a href="/signup" style={{background:'#1D9E75',color:'#fff',padding:'12px 32px',borderRadius:'8px',textDecoration:'none',fontWeight:'500'}}>
-        Get started free
+        Get started for free
       </a>
     </main>
   )
