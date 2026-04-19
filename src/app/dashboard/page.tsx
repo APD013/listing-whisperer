@@ -12,18 +12,21 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('mls_standard')
 
   const generate = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property: form })
-      })
-      const data = await res.json()
-      if (data.outputs) setOutputs(data.outputs)
-    } catch(e) {}
-    setLoading(false)
+  setLoading(true)
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ property: form })
+    })
+    const data = await res.json()
+    if (data.outputs) setOutputs(data.outputs)
+    else alert('Error: ' + JSON.stringify(data))
+  } catch(e: any) {
+    alert('Fetch error: ' + e.message)
   }
+  setLoading(false)
+}
 
   const tabs = [
     { key: 'mls_standard', label: 'MLS' },
