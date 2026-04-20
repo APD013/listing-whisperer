@@ -1,4 +1,4 @@
-import SampleOutputs from './components/SampleOutputs'
+
 
 export default function Home() {
   return (
