@@ -39,6 +39,7 @@ export default function PricingPage() {
             <p className="text-3xl font-bold mb-4">$0</p>
             <ul className="text-sm text-gray-600 space-y-2 mb-6">
               <li>✅ 3 free listings</li>
+              <li>✅ 3 free rewrites</li>
               <li>✅ All copy formats</li>
               <li>✅ MLS, Instagram, Email & more</li>
             </ul>
@@ -57,6 +58,7 @@ export default function PricingPage() {
             <p className="text-3xl font-bold mb-4">$29<span className="text-lg font-normal">/mo</span></p>
             <ul className="text-sm text-green-100 space-y-2 mb-6">
               <li>✅ Unlimited listings</li>
+              <li>✅ Unlimited rewrites</li>
               <li>✅ All copy formats</li>
               <li>✅ MLS, Instagram, Email & more</li>
               <li>✅ Priority support</li>
