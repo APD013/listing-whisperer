@@ -17,12 +17,23 @@ export default function RewritePage() {
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('standard')
   const [showExample, setShowExample] = useState(false)
+  const [rewritesUsed, setRewritesUsed] = useState(0)
+  const [plan, setPlan] = useState('starter')
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('rewrites_used, plan')
+        .eq('id', user.id)
+        .single()
+      if (profile) {
+        setRewritesUsed(profile.rewrites_used || 0)
+        setPlan(profile.plan || 'starter')
+      }
     }
     getUser()
   }, [])
@@ -34,12 +45,17 @@ export default function RewritePage() {
       const res = await fetch('/api/rewrite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listing, style })
+        body: JSON.stringify({ listing, style, userId })
       })
       const data = await res.json()
+      if (data.error === 'REWRITE_LIMIT_REACHED') {
+        router.push('/pricing')
+        return
+      }
       if (data.outputs) {
         setOutputs(data.outputs)
         setActiveTab('standard')
+        setRewritesUsed(prev => prev + 1)
       } else {
         alert('Error: ' + JSON.stringify(data))
       }
@@ -65,7 +81,12 @@ export default function RewritePage() {
         <div style={{fontSize:'16px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{display:'flex',gap:'12px'}}>
           <a href="/dashboard" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>← New Listing</a>
-          <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
+          {plan === 'starter' && (
+          <span style={{fontSize:'12px',fontWeight:'bold',color: rewritesUsed >= 2 ? 'red' : '#666'}}>
+            {3 - rewritesUsed} rewrites left
+          </span>
+        )}
+        <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
         </div>
       </div>
 

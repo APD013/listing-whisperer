@@ -1,8 +1,27 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: Request) {
   try {
-    const { listing, style } = await request.json()
+    const { listing, style, userId } = await request.json()
+
+    // Check rewrite limit for free users
+    if (userId) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('rewrites_used, plan')
+        .eq('id', userId)
+        .single()
+
+      if (profile?.plan === 'starter' && (profile?.rewrites_used || 0) >= 3) {
+        return NextResponse.json({ error: 'REWRITE_LIMIT_REACHED' }, { status: 403 })
+      }
+    }
 
     const prompt = `You are an expert real estate copywriter. Rewrite the following listing description in a more compelling, polished way. Respond ONLY with valid JSON, no markdown, no backticks.
 
@@ -12,7 +31,7 @@ ${listing}
 Rewrite style: ${style || 'Professional and compelling'}
 
 Return exactly this JSON:
-{"standard":"Rewritten standard MLS version (150-200 words)","luxury":"Luxury/aspirational rewrite (150-200 words)","short":"Short punchy version (50-75 words)","social":"Instagram caption version with hashtags","headline":"5 headline options separated by ---","improvements":"3 specific improvements you made, as a bullet list"}`
+{"standard":"Rewritten standard MLS version (150-200 words)","luxury":"Luxury/aspirational rewrite (150-200 words)","short":"Short punchy version (50-75 words)","social":"Instagram caption version with hashtags","headline":"5 headline options separated by ---","improvements":"• Improvement 1\n• Improvement 2\n• Improvement 3"}`
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -38,6 +57,21 @@ Return exactly this JSON:
 
     try {
       const outputs = JSON.parse(text.replace(/```json|```/g, '').trim())
+
+      // Increment rewrites_used
+      if (userId) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('rewrites_used')
+          .eq('id', userId)
+          .single()
+
+        await supabase
+          .from('profiles')
+          .update({ rewrites_used: (profile?.rewrites_used || 0) + 1 })
+          .eq('id', userId)
+      }
+
       return NextResponse.json({ outputs })
     } catch(e) {
       return NextResponse.json({ error: 'Parse error: ' + text.substring(0, 200) }, { status: 500 })
