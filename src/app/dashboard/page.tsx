@@ -25,6 +25,9 @@ export default function Dashboard() {
   const [pastListings, setPastListings] = useState<any[]>([])
   const [emailCopy, setEmailCopy] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [importUrl, setImportUrl] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [showImport, setShowImport] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
@@ -95,6 +98,39 @@ export default function Dashboard() {
     setLoading(false)
   }
 
+  const handleImport = async () => {
+    if (!importUrl.trim()) return
+    setImporting(true)
+    try {
+      const res = await fetch('/api/import-listing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: importUrl })
+      })
+      const data = await res.json()
+      if (data.listing) {
+        setForm({
+          ...form,
+          type: data.listing.type || form.type,
+          beds: data.listing.beds || form.beds,
+          sqft: data.listing.sqft || form.sqft,
+          price: data.listing.price || form.price,
+          neighborhood: data.listing.neighborhood || form.neighborhood,
+          features: data.listing.features || form.features,
+          notes: data.listing.notes || form.notes,
+        })
+        setShowImport(false)
+        setImportUrl('')
+        alert('✅ Listing details imported! Review and edit before generating.')
+      } else {
+        alert('Could not import that URL. Try a Zillow or Redfin listing page.')
+      }
+    } catch(e: any) {
+      alert('Import error: ' + e.message)
+    }
+    setImporting(false)
+  }
+
   const handleCopy = () => {
     navigator.clipboard.writeText(outputs[activeTab] || '')
     setCopied(true)
@@ -149,7 +185,33 @@ export default function Dashboard() {
 
         {/* FORM */}
         <div style={{background:'#fff',borderRadius:'16px',border:'1px solid #eee',padding:'1.5rem',marginBottom:'1.5rem',boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
-          <h1 style={{fontSize:'1.25rem',fontWeight:'600',marginBottom:'0.25rem'}}>New listing</h1>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.25rem'}}>
+            <h1 style={{fontSize:'1.25rem',fontWeight:'600',margin:'0'}}>New listing</h1>
+            <button onClick={() => setShowImport(!showImport)}
+              style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
+              🔗 Import from URL
+            </button>
+          </div>
+
+          {showImport && (
+            <div style={{background:'#f0fdf8',borderRadius:'10px',padding:'1rem',marginBottom:'1rem',border:'1px solid #bbf0d9'}}>
+              <p style={{fontSize:'13px',color:'#085041',fontWeight:'500',marginBottom:'8px'}}>Paste a Zillow, Redfin, or listing URL:</p>
+              <div style={{display:'flex',gap:'8px'}}>
+                <input
+                  placeholder="https://www.zillow.com/homedetails/..."
+                  value={importUrl}
+                  onChange={e => setImportUrl(e.target.value)}
+                  style={{flex:1,padding:'8px',border:'1px solid #bbf0d9',borderRadius:'8px',fontSize:'13px'}}
+                />
+                <button onClick={handleImport} disabled={importing}
+                  style={{padding:'8px 16px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',fontSize:'13px',fontWeight:'500',whiteSpace:'nowrap'}}>
+                  {importing ? 'Importing...' : 'Import'}
+                </button>
+              </div>
+              <p style={{fontSize:'11px',color:'#666',marginTop:'6px',margin:'6px 0 0'}}>Works with Zillow, Redfin, Realtor.com and most public listing pages</p>
+            </div>
+          )}
+
           <p style={{fontSize:'13px',color:'#666',marginBottom:'1.25rem'}}>Fill in the details and generate all your marketing copy.</p>
 
           <div style={{marginBottom:'1rem'}}>
