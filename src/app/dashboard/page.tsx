@@ -189,26 +189,33 @@ export default function Dashboard() {
             <h1 style={{fontSize:'1.25rem',fontWeight:'600',margin:'0'}}>New listing</h1>
             <button onClick={() => setShowImport(!showImport)}
               style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
-              🔗 Import from URL
+              📋 Paste Listing Details
             </button>
           </div>
 
           {showImport && (
             <div style={{background:'#f0fdf8',borderRadius:'10px',padding:'1rem',marginBottom:'1rem',border:'1px solid #bbf0d9'}}>
-              <p style={{fontSize:'13px',color:'#085041',fontWeight:'500',marginBottom:'8px'}}>Paste a Zillow, Redfin, or listing URL:</p>
-              <div style={{display:'flex',gap:'8px'}}>
-                <input
-                  placeholder="https://www.zillow.com/homedetails/..."
-                  value={importUrl}
-                  onChange={e => setImportUrl(e.target.value)}
-                  style={{flex:1,padding:'8px',border:'1px solid #bbf0d9',borderRadius:'8px',fontSize:'13px'}}
-                />
-                <button onClick={handleImport} disabled={importing}
-                  style={{padding:'8px 16px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',fontSize:'13px',fontWeight:'500',whiteSpace:'nowrap'}}>
-                  {importing ? 'Importing...' : 'Import'}
-                </button>
+              <p style={{fontSize:'13px',color:'#085041',fontWeight:'500',marginBottom:'4px'}}>📋 How to use this:</p>
+              <ol style={{fontSize:'12px',color:'#444',lineHeight:'2',marginBottom:'10px',paddingLeft:'16px'}}>
+                <li>Open a listing on Zillow, Redfin, or Realtor.com</li>
+                <li>Copy <strong>only the listing details</strong> — beds, baths, price, sq ft, address, and features</li>
+                <li>Do NOT copy the whole page — just the property facts section</li>
+                <li>Paste below and we'll fill the form automatically</li>
+              </ol>
+              <div style={{background:'#fffbe6',border:'1px solid #ffe58f',borderRadius:'8px',padding:'8px 12px',marginBottom:'10px',fontSize:'12px',color:'#666'}}>
+                💡 <strong>Tip:</strong> The more specific your paste, the better the results. Include price, beds/baths, sq ft, address, and key features only.
               </div>
-              <p style={{fontSize:'11px',color:'#666',marginTop:'6px',margin:'6px 0 0'}}>Works with Zillow, Redfin, Realtor.com and most public listing pages</p>
+              <textarea
+                placeholder="Paste copied listing text here... e.g. '3 bed / 2 bath, 1,850 sq ft, $899,000, Newport Beach CA. Features: ocean views, chef kitchen, spa bath. Built 2018...'"
+                value={importUrl}
+                onChange={e => setImportUrl(e.target.value)}
+                style={{width:'100%',padding:'8px',border:'1px solid #bbf0d9',borderRadius:'8px',fontSize:'13px',minHeight:'100px',resize:'vertical',boxSizing:'border-box',marginBottom:'8px'}}
+              />
+              <button onClick={handleImport} disabled={importing}
+                style={{width:'100%',padding:'10px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',fontSize:'13px',fontWeight:'500'}}>
+                {importing ? 'Extracting details...' : '✨ Extract & Fill Form'}
+              </button>
+              <p style={{fontSize:'11px',color:'#888',marginTop:'6px'}}>⚠️ Note: Real estate sites like Zillow block direct URL imports, so paste the text instead — it works better!</p>
             </div>
           )}
 
