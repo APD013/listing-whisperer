@@ -116,7 +116,8 @@ export default function Dashboard() {
               {remaining === 1 ? '1 listing left' : `${remaining} free listings remaining`}
             </span>
           )}
-          <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
+          <a href="/rewrite" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>✨ Rewrite a Listing</a>
+<a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
         </div>
       </div>
 
