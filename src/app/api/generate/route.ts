@@ -21,12 +21,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'LIMIT_REACHED' }, { status: 403 })
     }
 
+    // Get brand voice
+    let brandVoiceText = ''
+    if (userId) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('brand_voice')
+        .eq('id', userId)
+        .single()
+      if (profile?.brand_voice) {
+        try {
+          const bv = JSON.parse(profile.brand_voice)
+          if (bv.agentName) brandVoiceText += `Agent: ${bv.agentName}\n`
+          if (bv.brokerage) brandVoiceText += `Brokerage: ${bv.brokerage}\n`
+          if (bv.phone) brandVoiceText += `Phone: ${bv.phone}\n`
+          if (bv.website) brandVoiceText += `Website: ${bv.website}\n`
+          if (bv.preferredTone) brandVoiceText += `Preferred tone: ${bv.preferredTone}\n`
+          if (bv.targetBuyers) brandVoiceText += `Target buyers: ${bv.targetBuyers}\n`
+          if (bv.uniqueStyle) brandVoiceText += `Writing style: ${bv.uniqueStyle}\n`
+          if (bv.ctaStyle) brandVoiceText += `CTA style: ${bv.ctaStyle}\n`
+          if (bv.avoidWords) brandVoiceText += `Words to avoid: ${bv.avoidWords}\n`
+        } catch(e) {}
+      }
+    }
+
     const prompt = `You are a real estate copywriter. Generate marketing copy. Respond ONLY with valid JSON, no markdown, no backticks.
 
 Property: ${property.type}, ${property.beds}, ${property.sqft} sq ft, ${property.neighborhood}${property.price ? ', ' + property.price : ''}
 Tone: ${property.tone} | Target: ${property.buyer}
 Features: ${property.features}
 Notes: ${property.notes || 'none'}
+${brandVoiceText ? `\nAgent Brand Voice:\n${brandVoiceText}` : ''}
 
 Return exactly this JSON:
 {"mls_standard":"150-200 word MLS description","mls_luxury":"150-200 word luxury MLS description","instagram":"3 caption options separated by ---","facebook":"Facebook post","email":"Subject: line then body","openhouse":"Open house announcement","video":"30-sec video script","seo":"SEO title and meta"}`
