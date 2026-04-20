@@ -1,8 +1,25 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: Request) {
   try {
-    const { property } = await request.json()
+    const { property, userId } = await request.json()
+
+    // Check usage limit
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('listings_used, plan')
+      .eq('id', userId)
+      .single()
+
+    if (profile?.plan === 'starter' && profile?.listings_used >= 3) {
+      return NextResponse.json({ error: 'LIMIT_REACHED' }, { status: 403 })
+    }
 
     const prompt = `You are a real estate copywriter. Generate marketing copy. Respond ONLY with valid JSON, no markdown, no backticks.
 
@@ -38,6 +55,30 @@ Return exactly this JSON:
     
     try {
       const outputs = JSON.parse(text.replace(/```json|```/g, '').trim())
+
+      // Save listing to Supabase
+      if (userId) {
+        await supabase.from('listings').insert({
+          user_id: userId,
+          property_type: property.type,
+          beds_baths: property.beds,
+          sqft: property.sqft,
+          price: property.price,
+          neighborhood: property.neighborhood,
+          features: property.features,
+          tone: property.tone,
+          target_buyer: property.buyer,
+          notes: property.notes,
+          outputs: outputs
+        })
+
+        // Increment listings_used
+        await supabase
+          .from('profiles')
+          .update({ listings_used: (profile?.listings_used || 0) + 1 })
+          .eq('id', userId)
+      }
+
       return NextResponse.json({ outputs })
     } catch(e) {
       return NextResponse.json({ error: 'Parse error: ' + text.substring(0, 200) }, { status: 500 })
