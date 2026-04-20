@@ -117,7 +117,8 @@ export default function Home() {
       {/* SAMPLE OUTPUTS */}
       <section id="examples" style={{padding:'4rem 2rem',maxWidth:'800px',margin:'0 auto'}}>
         <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>See real outputs</h2>
-        <p style={{textAlign:'center',color:'#666',marginBottom:'2rem'}}>One set of notes. Three formats. Ready to use.</p>
+        <p style={{textAlign:'center',color:'#666',marginBottom:'0.5rem'}}>One set of property notes. Three formats. Ready to copy and paste.</p>
+        <p style={{textAlign:'center',fontSize:'13px',color:'#1D9E75',fontWeight:'600',marginBottom:'2rem'}}>👇 Click each tab to see the actual output</p>
         <div style={{display:'flex',gap:'8px',justifyContent:'center',marginBottom:'1.5rem',flexWrap:'wrap'}}>
           {[{key:'mls',label:'MLS Description'},{key:'instagram',label:'Instagram'},{key:'email',label:'Email Blast'}].map(t => (
             <button key={t.key} onClick={() => setActiveOutput(t.key)}
