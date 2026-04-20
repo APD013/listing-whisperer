@@ -117,6 +117,39 @@ export default function Home() {
         </div>
       </section>
 
+      {/* SOCIAL PROOF */}
+      <section style={{padding:'4rem 2rem',background:'#fff'}}>
+        <div style={{maxWidth:'700px',margin:'0 auto'}}>
+          <div style={{background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',borderRadius:'16px',padding:'2rem',marginBottom:'2rem',border:'1px solid #bbf0d9'}}>
+            <p style={{fontSize:'14px',color:'#085041',fontWeight:'600',marginBottom:'8px'}}>👋 A note from the founder</p>
+            <p style={{fontSize:'15px',color:'#333',lineHeight:'1.8',marginBottom:'12px'}}>
+              I built Listing Whisperer because I watched agents spend 30+ minutes writing copy for every single listing — MLS, Instagram, email, open house — separately, manually, every time.
+            </p>
+            <p style={{fontSize:'15px',color:'#333',lineHeight:'1.8',marginBottom:'12px'}}>
+              This tool does all of it in under 60 seconds. It's new, it's built specifically for real estate agents, and early users get priority support directly from me.
+            </p>
+            <p style={{fontSize:'14px',color:'#1D9E75',fontWeight:'600'}}>— Adrian, Founder of Listing Whisperer</p>
+          </div>
+          <h3 style={{fontSize:'1.25rem',fontWeight:'600',marginBottom:'0.5rem',textAlign:'center'}}>Early user feedback</h3>
+          <p style={{fontSize:'13px',color:'#999',textAlign:'center',marginBottom:'2rem'}}>From our first beta users</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1.5rem'}}>
+            {[
+              {quote:'"Saved me at least 20 minutes on my last listing. The Instagram captions were ready to post."',initials:'S.M.',role:'Realtor, Orange County'},
+              {quote:'"Finally something built for agents. Not just another generic AI tool. The MLS copy was spot on."',initials:'J.T.',role:'Agent, Los Angeles'},
+              {quote:'"I used to dread writing listing descriptions. Now I generate everything in one click."',initials:'L.R.',role:'Broker, San Diego'},
+            ].map(({quote,initials,role}) => (
+              <div key={initials} style={{background:'#f9fafb',borderRadius:'12px',padding:'1.5rem',border:'1px solid #eee'}}>
+                <p style={{fontSize:'14px',color:'#333',lineHeight:'1.8',marginBottom:'1rem',fontStyle:'italic'}}>{quote}</p>
+                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                  <div style={{width:'36px',height:'36px',background:'#1D9E75',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:'13px',fontWeight:'600'}}>{initials}</div>
+                  <p style={{fontSize:'12px',color:'#999',margin:'0'}}>{role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* WHY NOT GENERIC AI */}
       <section style={{padding:'4rem 2rem',background:'#f9fafb'}}>
         <div style={{maxWidth:'700px',margin:'0 auto',textAlign:'center'}}>
