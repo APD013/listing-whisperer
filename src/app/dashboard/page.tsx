@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [plan, setPlan] = useState('starter')
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
-    neighborhood: '', features: '', tone: 'Warm & inviting',
+    neighborhood: '', features: '', tone: 'Warm & inviting', name: '',
     buyer: 'Move-up families', notes: ''
   })
   const [outputs, setOutputs] = useState<any>(null)
@@ -131,6 +131,11 @@ export default function Dashboard() {
       )}
 
       <h1 style={{fontSize:'1.25rem',fontWeight:'500',marginBottom:'0.25rem'}}>New listing</h1>
+      <div style={{marginBottom:'1rem'}}>
+        <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px'}}>Listing nickname (optional)</label>
+        <input placeholder="e.g. Johnson listing, 123 Main St" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}
+          style={{width:'100%',padding:'8px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'13px'}}/>
+      </div>
       <p style={{fontSize:'13px',color:'#666',marginBottom:'1.5rem'}}>Fill in the details and generate all your marketing copy.</p>
 
       <div style={{background:'#fff',border:'1px solid #eee',borderRadius:'12px',padding:'1.25rem',marginBottom:'1rem'}}>
