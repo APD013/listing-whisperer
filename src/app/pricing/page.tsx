@@ -13,7 +13,7 @@ export default function PricingPage() {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: 'price_1RO92kKzAxeqVLKn5eQREGy5' }),
+        body: JSON.stringify({ priceId: 'price_1TO92kKzAxeqVLKn5eQREGy5' }),
       })
       const data = await res.json()
       if (data.url) {
