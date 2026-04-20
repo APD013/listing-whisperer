@@ -1,5 +1,11 @@
 'use client'
 import { useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -9,17 +15,11 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     setLoading(true)
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      })
-      const data = await res.json()
-      if (data.error) setMessage(data.error)
-      else window.location.href = '/dashboard'
-    } catch(e) {
-      setMessage('Something went wrong, try again.')
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      setMessage(error.message)
+    } else {
+      window.location.href = '/dashboard'
     }
     setLoading(false)
   }
@@ -33,7 +33,7 @@ export default function LoginPage() {
           style={{width:'100%',padding:'10px',border:'1px solid #ddd',borderRadius:'8px',marginBottom:'10px',fontSize:'14px'}}/>
         <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)}
           style={{width:'100%',padding:'10px',border:'1px solid #ddd',borderRadius:'8px',marginBottom:'16px',fontSize:'14px'}}/>
-        {message && <p style={{fontSize:'13px',marginBottom:'10px',color:message.includes('error')?'red':'green'}}>{message}</p>}
+        {message && <p style={{fontSize:'13px',marginBottom:'10px',color:'red'}}>{message}</p>}
         <button onClick={handleLogin} disabled={loading}
           style={{width:'100%',padding:'12px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:'500',cursor:'pointer'}}>
           {loading ? 'Signing in...' : 'Sign in'}
