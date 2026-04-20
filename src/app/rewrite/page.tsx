@@ -150,10 +150,20 @@ export default function RewritePage() {
         </div>
       </div>
 
-      <button onClick={rewrite} disabled={loading}
-        style={{width:'100%',padding:'13px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'600',cursor:'pointer',marginBottom:'1.5rem'}}>
-        {loading ? 'Rewriting your listing...' : '✨ Make This Listing Shine'}
-      </button>
+      {plan === 'starter' && rewritesUsed >= 3 ? (
+        <div style={{background:'#FFF3CD',border:'1px solid #FFCC00',borderRadius:'12px',padding:'1.5rem',marginBottom:'1.5rem',textAlign:'center'}}>
+          <p style={{fontWeight:'600',fontSize:'15px',margin:'0 0 8px'}}>You've used all 3 free rewrites!</p>
+          <p style={{fontSize:'13px',color:'#666',margin:'0 0 12px'}}>Upgrade to Pro for unlimited rewrites, full marketing kits, and saved listing history.</p>
+          <a href="/pricing" style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'10px 24px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',fontSize:'14px'}}>
+            Upgrade to Pro — $29/mo
+          </a>
+        </div>
+      ) : (
+        <button onClick={rewrite} disabled={loading}
+          style={{width:'100%',padding:'13px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'600',cursor:'pointer',marginBottom:'1.5rem'}}>
+          {loading ? 'Rewriting your listing...' : '✨ Make This Listing Shine'}
+        </button>
+      )}
 
       {outputs && (
         <div>
