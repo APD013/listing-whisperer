@@ -11,6 +11,7 @@ const supabase = createClient(
 export default function Dashboard() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
   const [listingsUsed, setListingsUsed] = useState(0)
   const [plan, setPlan] = useState('starter')
   const [form, setForm] = useState({
@@ -22,12 +23,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('mls_standard')
   const [pastListings, setPastListings] = useState<any[]>([])
+  const [emailCopy, setEmailCopy] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      setUserEmail(user.email || null)
 
       const { data: profile } = await supabase
         .from('profiles')
@@ -61,7 +64,7 @@ export default function Dashboard() {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property: form, userId })
+        body: JSON.stringify({ property: form, userId, userEmail, sendEmail: plan === 'pro' && emailCopy })
       })
       const data = await res.json()
       if (data.error === 'LIMIT_REACHED') {
@@ -86,6 +89,8 @@ export default function Dashboard() {
     setLoading(false)
   }
 
+  const remaining = 3 - listingsUsed
+
   const tabs = [
     { key: 'mls_standard', label: 'MLS' },
     { key: 'mls_luxury', label: 'Luxury MLS' },
@@ -102,9 +107,13 @@ export default function Dashboard() {
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'2rem'}}>
         <div style={{fontSize:'16px',fontWeight:'500'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
-          {plan === 'starter' && (
-            <span style={{fontSize:'12px',color:'#666'}}>
-              {3 - listingsUsed} free listing{3 - listingsUsed !== 1 ? 's' : ''} remaining
+          {plan === 'starter' && remaining > 0 && (
+            <span style={{
+              fontSize:'12px',
+              fontWeight:'bold',
+              color: remaining === 1 ? 'red' : '#666'
+            }}>
+              {remaining === 1 ? '1 listing left' : `${remaining} free listings remaining`}
             </span>
           )}
           <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
@@ -187,6 +196,16 @@ export default function Dashboard() {
             style={{width:'100%',padding:'8px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'13px',minHeight:'80px',resize:'vertical'}}/>
         </div>
       </div>
+
+      {plan === 'pro' && (
+        <div style={{background:'#fff',border:'1px solid #eee',borderRadius:'12px',padding:'1rem',marginBottom:'1rem',display:'flex',alignItems:'center',gap:'10px'}}>
+          <input type="checkbox" id="emailCopy" checked={emailCopy} onChange={e => setEmailCopy(e.target.checked)}
+            style={{width:'16px',height:'16px',cursor:'pointer'}}/>
+          <label htmlFor="emailCopy" style={{fontSize:'13px',color:'#333',cursor:'pointer'}}>
+            Email me all generated copy at <strong>{userEmail}</strong>
+          </label>
+        </div>
+      )}
 
       <button onClick={generate} disabled={loading || (plan === 'starter' && listingsUsed >= 3)}
         style={{width:'100%',padding:'12px',background: plan === 'starter' && listingsUsed >= 3 ? '#ccc' : '#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:'500',cursor:'pointer',marginBottom:'1.5rem'}}>
