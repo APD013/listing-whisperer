@@ -1,7 +1,18 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+import { useRouter } from 'next/navigation'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export default function Dashboard() {
+  const router = useRouter()
+  const [userId, setUserId] = useState<string | null>(null)
+  const [listingsUsed, setListingsUsed] = useState(0)
+  const [plan, setPlan] = useState('starter')
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
     neighborhood: '', features: '', tone: 'Warm & inviting',
@@ -10,23 +21,70 @@ export default function Dashboard() {
   const [outputs, setOutputs] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('mls_standard')
+  const [pastListings, setPastListings] = useState<any[]>([])
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login'); return }
+      setUserId(user.id)
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('listings_used, plan')
+        .eq('id', user.id)
+        .single()
+
+      if (profile) {
+        setListingsUsed(profile.listings_used || 0)
+        setPlan(profile.plan || 'starter')
+      }
+
+      const { data: listings } = await supabase
+        .from('listings')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (listings) setPastListings(listings)
+    }
+    getUser()
+  }, [])
 
   const generate = async () => {
-  setLoading(true)
-  try {
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ property: form })
-    })
-    const data = await res.json()
-    if (data.outputs) setOutputs(data.outputs)
-    else alert('Error: ' + JSON.stringify(data))
-  } catch(e: any) {
-    alert('Fetch error: ' + e.message)
+    if (plan === 'starter' && listingsUsed >= 3) {
+      router.push('/pricing')
+      return
+    }
+    setLoading(true)
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ property: form, userId })
+      })
+      const data = await res.json()
+      if (data.error === 'LIMIT_REACHED') {
+        router.push('/pricing')
+        return
+      }
+      if (data.outputs) {
+        setOutputs(data.outputs)
+        setListingsUsed(prev => prev + 1)
+        const { data: listings } = await supabase
+          .from('listings')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+        if (listings) setPastListings(listings)
+      } else {
+        alert('Error: ' + JSON.stringify(data))
+      }
+    } catch(e: any) {
+      alert('Fetch error: ' + e.message)
+    }
+    setLoading(false)
   }
-  setLoading(false)
-}
 
   const tabs = [
     { key: 'mls_standard', label: 'MLS' },
@@ -43,8 +101,25 @@ export default function Dashboard() {
     <main style={{minHeight:'100vh',padding:'2rem',fontFamily:'sans-serif',maxWidth:'680px',margin:'0 auto'}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'2rem'}}>
         <div style={{fontSize:'16px',fontWeight:'500'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
-        <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
+        <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+          {plan === 'starter' && (
+            <span style={{fontSize:'12px',color:'#666'}}>
+              {3 - listingsUsed} free listing{3 - listingsUsed !== 1 ? 's' : ''} remaining
+            </span>
+          )}
+          <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
+        </div>
       </div>
+
+      {plan === 'starter' && listingsUsed >= 3 && (
+        <div style={{background:'#FFF3CD',border:'1px solid #FFCC00',borderRadius:'12px',padding:'1rem',marginBottom:'1rem',textAlign:'center'}}>
+          <p style={{margin:'0 0 8px',fontSize:'14px',fontWeight:'500'}}>You've used all 3 free listings!</p>
+          <button onClick={() => router.push('/pricing')}
+            style={{background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',padding:'8px 20px',cursor:'pointer',fontSize:'13px'}}>
+            Upgrade to Pro — $29/mo
+          </button>
+        </div>
+      )}
 
       <h1 style={{fontSize:'1.25rem',fontWeight:'500',marginBottom:'0.25rem'}}>New listing</h1>
       <p style={{fontSize:'13px',color:'#666',marginBottom:'1.5rem'}}>Fill in the details and generate all your marketing copy.</p>
@@ -113,13 +188,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <button onClick={generate} disabled={loading}
-        style={{width:'100%',padding:'12px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:'500',cursor:'pointer',marginBottom:'1.5rem'}}>
+      <button onClick={generate} disabled={loading || (plan === 'starter' && listingsUsed >= 3)}
+        style={{width:'100%',padding:'12px',background: plan === 'starter' && listingsUsed >= 3 ? '#ccc' : '#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:'500',cursor:'pointer',marginBottom:'1.5rem'}}>
         {loading ? 'Generating your copy...' : 'Generate all marketing copy'}
       </button>
 
       {outputs && (
-        <div>
+        <div style={{marginBottom:'2rem'}}>
           <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'1rem'}}>
             {tabs.map(t=>(
               <button key={t.key} onClick={()=>setActiveTab(t.key)}
@@ -139,6 +214,26 @@ export default function Dashboard() {
             <p style={{fontSize:'13px',lineHeight:'1.8',whiteSpace:'pre-wrap',color:'#333',marginTop:'8px'}}>
               {outputs[activeTab] || ''}
             </p>
+          </div>
+        </div>
+      )}
+
+      {pastListings.length > 0 && (
+        <div>
+          <h2 style={{fontSize:'1rem',fontWeight:'500',marginBottom:'1rem'}}>Past listings</h2>
+          <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+            {pastListings.map((listing) => (
+              <div key={listing.id} onClick={() => setOutputs(listing.outputs)}
+                style={{background:'#fff',border:'1px solid #eee',borderRadius:'12px',padding:'1rem',cursor:'pointer'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div>
+                    <p style={{margin:'0',fontSize:'13px',fontWeight:'500'}}>{listing.property_type} — {listing.neighborhood}</p>
+                    <p style={{margin:'0',fontSize:'12px',color:'#666'}}>{listing.beds_baths} · {listing.sqft} sq ft · {listing.price}</p>
+                  </div>
+                  <p style={{margin:'0',fontSize:'11px',color:'#999'}}>{new Date(listing.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
