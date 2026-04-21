@@ -155,7 +155,14 @@ export default function Dashboard() {
 
       {/* TOP NAV */}
       <div style={{background:'#fff',borderBottom:'1px solid #eee',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
+        <div style={{fontSize:'16px',fontWeight:'600'}}>
+          Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+          {plan === 'pro' && (
+            <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>
+              PRO
+            </span>
+          )}
+        </div>
         <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
           {plan === 'starter' && remaining > 0 && (
             <span style={{fontSize:'12px',fontWeight:'bold',color: remaining === 1 ? 'red' : '#666'}}>
