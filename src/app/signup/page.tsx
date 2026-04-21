@@ -1,6 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { trackSignupStarted, trackSignupCompleted, preserveUTMs } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,6 +9,7 @@ const supabase = createClient(
 )
 
 export default function SignupPage() {
+  useEffect(() => { preserveUTMs() }, [])
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
@@ -15,6 +17,7 @@ export default function SignupPage() {
   const [message, setMessage] = useState('')
 
   const handleSignup = async () => {
+    trackSignupStarted()
     setLoading(true)
     try {
       const { error } = await supabase.auth.signUp({
@@ -22,8 +25,12 @@ export default function SignupPage() {
         password,
         options: { data: { full_name: name } }
       })
-      if (error) setMessage(error.message)
-      else setMessage('Success! Check your email to confirm.')
+      if (error) {
+        setMessage(error.message)
+      } else {
+        trackSignupCompleted('new_user')
+        setMessage('Success! Check your email to confirm.')
+      }
     } catch(e) {
       setMessage('Something went wrong, try again.')
     }

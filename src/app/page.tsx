@@ -1,8 +1,13 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { trackCTAClick, trackEvent, preserveUTMs } from './lib/analytics'
 
 export default function Home() {
   const [activeOutput, setActiveOutput] = useState('mls')
+  useEffect(() => {
+    preserveUTMs()
+    trackEvent('landing_page_view')
+  }, [])
 
   const sampleOutputs: Record<string, string> = {
     mls: `Welcome to this stunning 4-bedroom, 3-bath home nestled in the heart of Newport Beach. Spanning 2,200 sq ft of thoughtfully designed living space, this residence seamlessly blends coastal elegance with modern comfort. The chef's kitchen features quartz countertops, premium stainless appliances, and a large island perfect for entertaining. Retreat to the primary suite with spa-inspired bath and private ocean-view balcony. Three-car garage, solar panels, and smart home system included. Steps from top-rated schools, dining, and the beach. Priced at $1,295,000 — this one won't last.`,
@@ -38,7 +43,7 @@ export default function Home() {
           No prompts. No ChatGPT guesswork. Just fill in your property details and get 11 ready-to-use marketing formats instantly.
         </p>
         <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'1rem'}}>
-          <a href="/signup" style={{background:'#1D9E75',color:'#fff',padding:'14px 32px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',fontSize:'16px'}}>
+          <a href="/signup" onClick={() => trackCTAClick('hero_cta', 'homepage')} style={{background:'#1D9E75',color:'#fff',padding:'14px 32px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',fontSize:'16px'}}>
             Try 3 Free Listings
           </a>
           <a href="#examples" style={{background:'#fff',color:'#111',padding:'14px 32px',borderRadius:'8px',textDecoration:'none',fontWeight:'500',fontSize:'16px',border:'1px solid #ddd'}}>
@@ -188,7 +193,7 @@ export default function Home() {
               <p style={{fontWeight:'600',marginBottom:'1rem',color:'#1D9E75'}}>✅ Listing Whisperer</p>
               <ul style={{fontSize:'14px',color:'#333',lineHeight:'2',paddingLeft:'1rem'}}>
                 <li>Built-in real estate workflow</li>
-                <li>8 formats in one click</li>
+                <li>11 formats in one click</li>
                 <li>Tone & buyer targeting</li>
                 <li>MLS-ready formatting</li>
                 <li>Saved listing history</li>
@@ -215,7 +220,7 @@ export default function Home() {
               <li>✅ MLS, Instagram, Email & more</li>
               <li>✅ No credit card required</li>
             </ul>
-            <a href="/signup" style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',border:'1px solid #ddd',color:'#333',textDecoration:'none',fontSize:'14px'}}>Get started free</a>
+            <a href="/signup" onClick={() => trackCTAClick('pricing_free_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',border:'1px solid #ddd',color:'#333',textDecoration:'none',fontSize:'14px'}}>Get started free</a>
           </div>
           <div style={{background:'#1D9E75',borderRadius:'16px',padding:'2rem',textAlign:'left',color:'#fff'}}>
             <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Pro</h3>
@@ -231,7 +236,7 @@ export default function Home() {
               <li>✅ Real estate-specific workflow</li>
               <li>✅ Priority support</li>
             </ul>
-            <a href="/signup" style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',background:'#fff',color:'#1D9E75',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>Start free trial</a>
+            <a href="/signup" onClick={() => trackCTAClick('pricing_pro_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',background:'#fff',color:'#1D9E75',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>Start free trial</a>
           </div>
         </div>
       </section>

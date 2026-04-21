@@ -1,13 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { trackUpgradeClick, trackCheckoutStarted, trackEvent } from '../lib/analytics'
 
 export default function PricingPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  useEffect(() => { trackEvent('pricing_page_view') }, [])
 
   const handleSubscribe = async () => {
+    trackCheckoutStarted('starter')
+    trackUpgradeClick('pricing_page', 'starter')
     setLoading(true)
     try {
       const res = await fetch('/api/stripe/checkout', {

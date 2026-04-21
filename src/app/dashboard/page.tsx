@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -48,6 +49,7 @@ export default function Dashboard() {
       if (profile) {
         setListingsUsed(profile.listings_used || 0)
         setPlan(profile.plan || 'starter')
+        trackDashboardView(profile.plan || 'starter')
       }
 
       const { data: listings } = await supabase
@@ -82,6 +84,7 @@ export default function Dashboard() {
         setOutputs(data.outputs)
         setActiveTab('mls_standard')
         setListingsUsed(prev => prev + 1)
+        trackListingCreated(plan, form.neighborhood)
         const { data: listings } = await supabase
           .from('listings')
           .select('*')
@@ -181,6 +184,7 @@ export default function Dashboard() {
     navigator.clipboard.writeText(outputs[activeTab] || '')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+    trackOutputCopied(activeTab, plan)
   }
 
   const remaining = 3 - listingsUsed
@@ -222,7 +226,7 @@ export default function Dashboard() {
           <a href="/launch-kit" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>🚀 Launch Kit</a>
           <a href="/settings" style={{fontSize:'13px',color:'#666',textDecoration:'none',padding:'4px 12px',borderRadius:'20px',border:'1px solid #eee'}}>⚙️ Settings</a>
           {plan === 'starter' && (
-            <a href="/pricing" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',textDecoration:'none',padding:'6px 14px',borderRadius:'20px',fontWeight:'500'}}>Upgrade</a>
+            <a href="/pricing" onClick={() => trackUpgradeClick('dashboard_nav', plan)} style={{fontSize:'13px',background:'#1D9E75',color:'#fff',textDecoration:'none',padding:'6px 14px',borderRadius:'20px',fontWeight:'500'}}>Upgrade</a>
           )}
           <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
         </div>

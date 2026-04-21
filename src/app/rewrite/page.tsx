@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { trackRewriteUsed, trackUpgradeClick, trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,6 +28,7 @@ export default function RewritePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      trackEvent('rewrite_page_view')
       const { data: profile } = await supabase
         .from('profiles')
         .select('rewrites_used, plan')
@@ -61,6 +63,7 @@ export default function RewritePage() {
         setOutputs(data.outputs)
         setActiveTab('standard')
         setRewritesUsed(prev => prev + 1)
+        trackRewriteUsed(plan)
       } else {
         alert('Error: ' + JSON.stringify(data))
       }
@@ -166,7 +169,7 @@ export default function RewritePage() {
         <div style={{background:'#FFF3CD',border:'1px solid #FFCC00',borderRadius:'12px',padding:'1.5rem',marginBottom:'1.5rem',textAlign:'center'}}>
           <p style={{fontWeight:'600',fontSize:'15px',margin:'0 0 8px'}}>You've used all 3 free rewrites!</p>
           <p style={{fontSize:'13px',color:'#666',margin:'0 0 12px'}}>Upgrade to Pro for unlimited rewrites, full marketing kits, and saved listing history.</p>
-          <a href="/pricing" style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'10px 24px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',fontSize:'14px'}}>
+          <a href="/pricing" onClick={() => trackUpgradeClick('rewrite_limit', plan)} style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'10px 24px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',fontSize:'14px'}}>
             Upgrade to Pro — $29/mo
           </a>
         </div>
