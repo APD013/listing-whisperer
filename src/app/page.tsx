@@ -35,7 +35,7 @@ export default function Home() {
           <span style={{color:'#1D9E75'}}>in under 60 seconds.</span>
         </h1>
         <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'520px',margin:'0 auto 2rem',lineHeight:'1.7'}}>
-          No prompts. No ChatGPT guesswork. Just fill in your property details and get 8 ready-to-use marketing formats instantly.
+          No prompts. No ChatGPT guesswork. Just fill in your property details and get 11 ready-to-use marketing formats instantly.
         </p>
         <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'1rem'}}>
           <a href="/signup" style={{background:'#1D9E75',color:'#fff',padding:'14px 32px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',fontSize:'16px'}}>
@@ -68,7 +68,7 @@ export default function Home() {
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'3rem',flexWrap:'wrap'}}>
-          {['8 copy formats in one click','MLS-ready formatting','Tone & buyer targeting','Saves listing history'].map(item => (
+          {['11 copy formats in one click','MLS-ready formatting','Tone & buyer targeting','Saves listing history'].map(item => (
             <span key={item} style={{color:'#fff',fontSize:'14px',fontWeight:'500'}}>✓ {item}</span>
           ))}
         </div>
@@ -211,7 +211,7 @@ export default function Home() {
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ 3 free listings</li>
               <li>✅ 3 free rewrites</li>
-              <li>✅ All 8 copy formats</li>
+              <li>✅ All 11 copy formats</li>
               <li>✅ MLS, Instagram, Email & more</li>
               <li>✅ No credit card required</li>
             </ul>
@@ -225,7 +225,7 @@ export default function Home() {
             <ul style={{fontSize:'14px',color:'#e0f7ee',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ Unlimited listings</li>
               <li>✅ Unlimited rewrites</li>
-              <li>✅ All 8 copy formats</li>
+              <li>✅ All 11 copy formats</li>
               <li>✅ Saved listing history</li>
               <li>✅ Email copy to yourself</li>
               <li>✅ Real estate-specific workflow</li>
