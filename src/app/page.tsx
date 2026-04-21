@@ -210,6 +210,7 @@ export default function Home() {
             <p style={{fontSize:'2.5rem',fontWeight:'700',marginBottom:'1.5rem'}}>$0</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ 3 free listings</li>
+              <li>✅ 3 free rewrites</li>
               <li>✅ All 8 copy formats</li>
               <li>✅ MLS, Instagram, Email & more</li>
               <li>✅ No credit card required</li>
@@ -223,6 +224,7 @@ export default function Home() {
             <p style={{fontSize:'12px',color:'#a8f0d4',marginBottom:'1.5rem'}}>Less than the cost of one hour of your time</p>
             <ul style={{fontSize:'14px',color:'#e0f7ee',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ Unlimited listings</li>
+              <li>✅ Unlimited rewrites</li>
               <li>✅ All 8 copy formats</li>
               <li>✅ Saved listing history</li>
               <li>✅ Email copy to yourself</li>
@@ -239,7 +241,7 @@ export default function Home() {
         <div style={{maxWidth:'600px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'3rem'}}>Frequently asked questions</h2>
           {[
-            {q:'Is this really free to start?',a:'Yes. You get 3 full listings completely free, no credit card required. Each listing generates all 8 formats.'},
+            {q:'Is this really free to start?',a:'Yes. You get 3 full listings and 3 listing rewrites completely free, no credit card required. Each listing generates all 8 formats.'},
             {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, and SEO copy — all from one set of notes.'},
             {q:'How is this different from generic AI tools?',a:'Listing Whisperer is purpose-built for real estate agents. It has a structured workflow, tone targeting, buyer targeting, MLS-ready formatting, and saves your listing history — no prompt engineering required.'},
             {q:'Can I cancel anytime?',a:'Yes. No contracts, no commitments. Cancel your Pro subscription anytime from your account settings.'},
