@@ -53,8 +53,8 @@ Features: ${property.features}
 Notes: ${property.notes || 'none'}
 ${brandVoiceText ? `\nAgent Brand Voice:\n${brandVoiceText}` : ''}
 
-Return exactly this JSON:
-{"mls_standard":"150-200 word MLS description","mls_luxury":"150-200 word luxury MLS description","instagram":"3 caption options separated by ---","facebook":"Facebook post","email":"Subject: line then body","openhouse":"Open house announcement","video":"30-sec video script","seo":"SEO title and meta","text_message":"2-3 SMS text message options under 160 chars each, separated by ---","flyer":"Flyer headline, subheadline, and 5 bullet points","price_drop":"Price improvement announcement for MLS, social, and email separated by ---"}`
+Return exactly this JSON with no line breaks inside values:
+{"mls_standard":"150-200 word MLS description","mls_luxury":"150-200 word luxury MLS description","instagram":"3 caption options separated by ---","facebook":"Facebook post","email":"Subject: line then email body","openhouse":"Open house announcement","video":"30-sec video script","seo":"SEO title and meta description","text_message":"2 SMS options under 160 chars each separated by ---","flyer":"Headline | Subheadline | Feature 1 | Feature 2 | Feature 3 | Feature 4 | Feature 5","price_drop":"Price drop MLS update"}`
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
