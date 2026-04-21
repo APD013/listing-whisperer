@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkRateLimit, rateLimitResponse } from '../lib/auth'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,17 +11,24 @@ export async function POST(request: Request) {
   try {
     const { listing, style, userId } = await request.json()
 
-    // Check rewrite limit for free users
-    if (userId) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('rewrites_used, plan')
-        .eq('id', userId)
-        .single()
+    // Block requests with no userId
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
-      if (profile?.plan === 'starter' && (profile?.rewrites_used || 0) >= 3) {
-        return NextResponse.json({ error: 'REWRITE_LIMIT_REACHED' }, { status: 403 })
-      }
+    // Rate limiting - max 10 rewrites per minute
+    const { allowed } = checkRateLimit(`rewrite_${userId}`, 10, 60000)
+    if (!allowed) return rateLimitResponse()
+
+    // Check rewrite limit for free users
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('rewrites_used, plan')
+      .eq('id', userId)
+      .single()
+
+    if (profile?.plan === 'starter' && (profile?.rewrites_used || 0) >= 3) {
+      return NextResponse.json({ error: 'REWRITE_LIMIT_REACHED' }, { status: 403 })
     }
 
     const prompt = `You are an expert real estate copywriter. Rewrite the following listing description in a more compelling, polished way. Respond ONLY with valid JSON, no markdown, no backticks.
@@ -59,18 +67,10 @@ Return exactly this JSON:
       const outputs = JSON.parse(text.replace(/```json|```/g, '').trim())
 
       // Increment rewrites_used
-      if (userId) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('rewrites_used')
-          .eq('id', userId)
-          .single()
-
-        await supabase
-          .from('profiles')
-          .update({ rewrites_used: (profile?.rewrites_used || 0) + 1 })
-          .eq('id', userId)
-      }
+      await supabase
+        .from('profiles')
+        .update({ rewrites_used: (profile?.rewrites_used || 0) + 1 })
+        .eq('id', userId)
 
       return NextResponse.json({ outputs })
     } catch(e) {

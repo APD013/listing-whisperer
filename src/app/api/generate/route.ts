@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkRateLimit, rateLimitResponse } from '../lib/auth'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -9,6 +10,15 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const { property, userId } = await request.json()
+
+    // Rate limiting - max 20 requests per minute per user
+    if (userId) {
+      const { allowed } = checkRateLimit(`generate_${userId}`, 20, 60000)
+      if (!allowed) return rateLimitResponse()
+    } else {
+      // Block requests with no userId
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     // Check usage limit
     const { data: profile } = await supabase
