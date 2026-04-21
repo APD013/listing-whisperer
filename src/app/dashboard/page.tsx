@@ -194,6 +194,9 @@ export default function Dashboard() {
     { key: 'openhouse', label: 'Open House', icon: '🚪' },
     { key: 'video', label: 'Video Script', icon: '🎬' },
     { key: 'seo', label: 'SEO', icon: '🔍' },
+    { key: 'text_message', label: 'Text/SMS', icon: '📱' },
+    { key: 'flyer', label: 'Flyer', icon: '📄' },
+    { key: 'price_drop', label: 'Price Drop', icon: '💰' },
   ]
 
   return (

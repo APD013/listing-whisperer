@@ -54,7 +54,7 @@ Notes: ${property.notes || 'none'}
 ${brandVoiceText ? `\nAgent Brand Voice:\n${brandVoiceText}` : ''}
 
 Return exactly this JSON:
-{"mls_standard":"150-200 word MLS description","mls_luxury":"150-200 word luxury MLS description","instagram":"3 caption options separated by ---","facebook":"Facebook post","email":"Subject: line then body","openhouse":"Open house announcement","video":"30-sec video script","seo":"SEO title and meta"}`
+{"mls_standard":"150-200 word MLS description","mls_luxury":"150-200 word luxury MLS description","instagram":"3 caption options separated by ---","facebook":"Facebook post","email":"Subject: line then body","openhouse":"Open house announcement","video":"30-sec video script","seo":"SEO title and meta","text_message":"2-3 SMS text message options under 160 chars each, separated by ---","flyer":"Flyer headline, subheadline, and 5 bullet points","price_drop":"Price improvement announcement for MLS, social, and email separated by ---"}`
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
