@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server'
+import { checkRateLimit, rateLimitResponse } from '../lib/auth'
 
 export async function POST(request: Request) {
   try {
-    const { property } = await request.json()
+    const { property, userId } = await request.json()
+
+    // Block unauthorized requests
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Rate limiting - max 5 launch kits per minute
+    const { allowed } = checkRateLimit(`launchkit_${userId}`, 5, 60000)
+    if (!allowed) return rateLimitResponse()
 
     const prompt = `You are a real estate marketing expert. Create a complete 7-day listing launch marketing plan for this property. Respond ONLY with valid JSON, no markdown, no backticks.
 

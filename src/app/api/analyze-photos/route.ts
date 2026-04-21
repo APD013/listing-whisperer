@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server'
+import { checkRateLimit, rateLimitResponse } from '../lib/auth'
 
 export async function POST(request: Request) {
   try {
-    const { images } = await request.json()
+    const { images, userId } = await request.json()
+
+    // Rate limiting - max 10 photo analyses per minute
+    if (userId) {
+      const { allowed } = checkRateLimit(`photos_${userId}`, 10, 60000)
+      if (!allowed) return rateLimitResponse()
+    }
 
     if (!images || images.length === 0) {
       return NextResponse.json({ error: 'No images provided' }, { status: 400 })
