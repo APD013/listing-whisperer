@@ -21,7 +21,6 @@ export default function RewritePage() {
   const [rewritesUsed, setRewritesUsed] = useState(0)
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
-  const [planLoaded, setPlanLoaded] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
