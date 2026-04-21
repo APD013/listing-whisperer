@@ -28,6 +28,9 @@ export default function Dashboard() {
   const [importUrl, setImportUrl] = useState('')
   const [importing, setImporting] = useState(false)
   const [showImport, setShowImport] = useState(false)
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false)
+  const [analyzingPhotos, setAnalyzingPhotos] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState<string[]>([])
 
   useEffect(() => {
     const getUser = async () => {
@@ -96,6 +99,49 @@ export default function Dashboard() {
       alert('Fetch error: ' + e.message)
     }
     setLoading(false)
+  }
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    setAnalyzingPhotos(true)
+    setShowPhotoUpload(false)
+
+    try {
+      // Convert images to base64
+      const base64Images = await Promise.all(
+        files.slice(0, 5).map(file => new Promise<string>((resolve) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result as string)
+          reader.readAsDataURL(file)
+        }))
+      )
+
+      setPhotoPreview(base64Images)
+
+      const res = await fetch('/api/analyze-photos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images: base64Images })
+      })
+
+      const data = await res.json()
+      if (data.analysis) {
+        setForm(prev => ({
+          ...prev,
+          features: data.analysis.features || prev.features,
+          type: data.analysis.property_type || prev.type,
+          notes: data.analysis.highlights || prev.notes,
+        }))
+        alert(`✅ Photos analyzed! Features auto-filled. Review and edit before generating.`)
+      } else {
+        alert('Could not analyze photos. Please try again.')
+      }
+    } catch(e: any) {
+      alert('Photo analysis error: ' + e.message)
+    }
+    setAnalyzingPhotos(false)
   }
 
   const handleImport = async () => {
@@ -195,10 +241,16 @@ export default function Dashboard() {
         <div style={{background:'#fff',borderRadius:'16px',border:'1px solid #eee',padding:'1.5rem',marginBottom:'1.5rem',boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.25rem'}}>
             <h1 style={{fontSize:'1.25rem',fontWeight:'600',margin:'0'}}>New listing</h1>
-            <button onClick={() => setShowImport(!showImport)}
-              style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
-              📋 Paste Listing Details
-            </button>
+            <div style={{display:'flex',gap:'8px'}}>
+              <button onClick={() => setShowImport(!showImport)}
+                style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
+                📋 Paste Details
+              </button>
+              <label style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
+                {analyzingPhotos ? '🔍 Analyzing...' : '📸 Upload Photos'}
+                <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} style={{display:'none'}} disabled={analyzingPhotos}/>
+              </label>
+            </div>
           </div>
 
           {showImport && (
