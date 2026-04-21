@@ -67,7 +67,14 @@ export default function SettingsPage() {
     <main style={{minHeight:'100vh',fontFamily:'sans-serif',background:'#f8fafc'}}>
       {/* NAV */}
       <div style={{background:'#fff',borderBottom:'1px solid #eee',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <div style={{fontSize:'16px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
+        <div style={{fontSize:'16px',fontWeight:'600'}}>
+  Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+  {plan === 'pro' && (
+    <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>
+      PRO
+    </span>
+  )}
+</div>
         <div style={{display:'flex',gap:'12px',alignItems:'center'}}>
           <a href="/dashboard" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>← Dashboard</a>
           <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
