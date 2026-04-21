@@ -216,6 +216,7 @@ export default function Dashboard() {
             </span>
           )}
           <a href="/rewrite" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>✨ Rewrite</a>
+          <a href="/launch-kit" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>🚀 Launch Kit</a>
           <a href="/settings" style={{fontSize:'13px',color:'#666',textDecoration:'none',padding:'4px 12px',borderRadius:'20px',border:'1px solid #eee'}}>⚙️ Settings</a>
           {plan === 'starter' && (
             <a href="/pricing" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',textDecoration:'none',padding:'6px 14px',borderRadius:'20px',fontWeight:'500'}}>Upgrade</a>
