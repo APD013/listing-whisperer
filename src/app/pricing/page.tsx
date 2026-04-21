@@ -40,7 +40,7 @@ export default function PricingPage() {
             <ul className="text-sm text-gray-600 space-y-2 mb-6">
               <li>✅ 3 free listings</li>
               <li>✅ 3 free rewrites</li>
-              <li>✅ All copy formats</li>
+              <li>✅ All 11 copy formats</li>
               <li>✅ MLS, Instagram, Email & more</li>
             </ul>
             <button
@@ -59,7 +59,7 @@ export default function PricingPage() {
             <ul className="text-sm text-green-100 space-y-2 mb-6">
               <li>✅ Unlimited listings</li>
               <li>✅ Unlimited rewrites</li>
-              <li>✅ All copy formats</li>
+              <li>✅ All 11 copy formats</li>
               <li>✅ MLS, Instagram, Email & more</li>
               <li>✅ Priority support</li>
             </ul>
