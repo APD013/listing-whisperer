@@ -19,6 +19,8 @@ export default function RewritePage() {
   const [showExample, setShowExample] = useState(false)
   const [rewritesUsed, setRewritesUsed] = useState(0)
   const [plan, setPlan] = useState('starter')
+  const [planLoaded, setPlanLoaded] = useState(false)
+  const [planLoaded, setPlanLoaded] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
@@ -33,6 +35,9 @@ export default function RewritePage() {
       if (profile) {
         setRewritesUsed(profile.rewrites_used || 0)
         setPlan(profile.plan || 'starter')
+        setPlanLoaded(true)
+      } else {
+        setPlanLoaded(true)
       }
     }
     getUser()
@@ -78,7 +83,14 @@ export default function RewritePage() {
     <main style={{minHeight:'100vh',padding:'2rem',fontFamily:'sans-serif',maxWidth:'740px',margin:'0 auto'}}>
       {/* HEADER */}
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'2rem'}}>
-        <div style={{fontSize:'16px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
+        <div style={{fontSize:'16px',fontWeight:'600'}}>
+  Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+  {planLoaded && plan === 'pro' && (
+    <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>
+      PRO
+    </span>
+  )}
+</div>
         <div style={{display:'flex',gap:'12px'}}>
           <a href="/dashboard" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>← New Listing</a>
           {plan === 'starter' && (
