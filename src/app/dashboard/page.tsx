@@ -132,9 +132,9 @@ export default function Dashboard() {
           ...prev,
           features: data.analysis.features || prev.features,
           type: data.analysis.property_type || prev.type,
-          notes: data.analysis.highlights || prev.notes,
+          notes: data.analysis.highlights || '',
         }))
-        alert(`✅ Photos analyzed! Features auto-filled. Review and edit before generating.`)
+        alert(`✅ Photos analyzed! Features and highlights auto-filled. Review and edit the fields before generating.`)
       } else {
         alert('Could not analyze photos. Please try again.')
       }
@@ -246,8 +246,8 @@ export default function Dashboard() {
                 style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
                 📋 Paste Details
               </button>
-              <label style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
-                {analyzingPhotos ? '🔍 Analyzing...' : '📸 Upload Photos'}
+              <label title="Upload 1-5 photos of the property interior/exterior. AI will detect features automatically." style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
+                {analyzingPhotos ? '🔍 Analyzing photos...' : '📸 Upload Property Photos'}
                 <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} style={{display:'none'}} disabled={analyzingPhotos}/>
               </label>
             </div>
