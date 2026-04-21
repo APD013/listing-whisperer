@@ -154,10 +154,22 @@ export default function LaunchKitPage() {
           </div>
 
           <button onClick={generate} disabled={loading}
-            style={{width:'100%',padding:'13px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'600',cursor:'pointer'}}>
-            {loading ? '🚀 Building your launch plan...' : '🚀 Generate 7-Day Launch Kit'}
+            style={{width:'100%',padding:'13px',background: loading ? '#085041' : '#1D9E75',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'600',cursor: loading ? 'not-allowed' : 'pointer',transition:'all 0.2s'}}>
+            {loading ? '⏳ Building your launch plan... this takes 20-30 seconds' : '🚀 Generate 7-Day Launch Kit'}
           </button>
         </div>
+
+        {/* LOADING BANNER */}
+        {loading && (
+          <div style={{background:'#fff',borderRadius:'16px',border:'1px solid #e5e7eb',padding:'2rem',marginBottom:'1.5rem',textAlign:'center',boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
+            <div style={{fontSize:'2rem',marginBottom:'1rem'}}>⏳</div>
+            <p style={{fontSize:'15px',fontWeight:'600',color:'#333',marginBottom:'8px'}}>Building your 7-day launch plan...</p>
+            <p style={{fontSize:'13px',color:'#666',marginBottom:'16px'}}>This usually takes 20-30 seconds. Please don't close this page!</p>
+            <div style={{background:'#f0fdf8',borderRadius:'8px',padding:'12px',border:'1px solid #bbf0d9'}}>
+              <p style={{fontSize:'12px',color:'#085041',margin:'0'}}>✨ Our AI is creating daily social posts, email sequences, and pro tips tailored to your listing...</p>
+            </div>
+          </div>
+        )}
 
         {/* RESULTS */}
         {launchPlan && (
