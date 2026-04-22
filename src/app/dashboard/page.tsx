@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [listingsUsed, setListingsUsed] = useState(0)
   const [plan, setPlan] = useState('starter')
+  const [listingCredits, setListingCredits] = useState(0)
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
     neighborhood: '', features: '', tone: 'Warm & inviting', name: '',
@@ -42,13 +43,14 @@ export default function Dashboard() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('listings_used, plan')
+        .select('listings_used, plan, listing_credits')
         .eq('id', user.id)
         .single()
 
       if (profile) {
         setListingsUsed(profile.listings_used || 0)
         setPlan(profile.plan || 'starter')
+        setListingCredits(profile.listing_credits || 0)
         trackDashboardView(profile.plan || 'starter')
       }
 
@@ -64,7 +66,7 @@ export default function Dashboard() {
   }, [])
 
   const generate = async () => {
-    if (plan === 'starter' && listingsUsed >= 3) {
+    if (plan === 'starter' && listingsUsed >= 3 && listingCredits <= 0) {
       router.push('/pricing')
       return
     }
@@ -217,9 +219,9 @@ export default function Dashboard() {
           )}
         </div>
         <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
-          {plan === 'starter' && remaining > 0 && (
-            <span style={{fontSize:'12px',fontWeight:'bold',color: remaining === 1 ? 'red' : '#666'}}>
-              {remaining === 1 ? '⚠️ 1 listing left' : `${remaining} free listings remaining`}
+          {plan === 'starter' && (
+            <span style={{fontSize:'12px',fontWeight:'bold',color: remaining <= 1 && listingCredits === 0 ? 'red' : '#666'}}>
+              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} remaining` : '⚠️ No listings left'}
             </span>
           )}
           <a href="/rewrite" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>✨ Rewrite</a>
@@ -234,7 +236,7 @@ export default function Dashboard() {
 
       <div style={{maxWidth:'720px',margin:'0 auto',padding:'2rem'}}>
 
-        {plan === 'starter' && listingsUsed >= 3 && (
+        {plan === 'starter' && listingsUsed >= 3 && listingCredits <= 0 && (
           <div style={{background:'#FFF3CD',border:'1px solid #FFCC00',borderRadius:'12px',padding:'1.25rem',marginBottom:'1.5rem',textAlign:'center'}}>
             <p style={{margin:'0 0 8px',fontSize:'14px',fontWeight:'600'}}>You've used all 3 free listings!</p>
             <p style={{fontSize:'13px',color:'#666',margin:'0 0 12px'}}>Upgrade to Pro for unlimited listings, rewrites, and full marketing kits.</p>
@@ -369,7 +371,7 @@ export default function Dashboard() {
           )}
 
           <button onClick={generate} disabled={loading || (plan === 'starter' && listingsUsed >= 3)}
-            style={{width:'100%',padding:'13px',background: plan === 'starter' && listingsUsed >= 3 ? '#ccc' : '#1D9E75',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'600',cursor: plan === 'starter' && listingsUsed >= 3 ? 'not-allowed' : 'pointer',transition:'all 0.2s'}}>
+            style={{width:'100%',padding:'13px',background: plan === 'starter' && listingsUsed >= 3 && listingCredits <= 0 ? '#ccc' : '#1D9E75',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'600',cursor: plan === 'starter' && listingsUsed >= 3 && listingCredits <= 0 ? 'not-allowed' : 'pointer',transition:'all 0.2s'}}>
             {loading ? '✨ Generating your marketing copy...' : '🚀 Generate All Marketing Copy'}
           </button>
         </div>
