@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [pastListings, setPastListings] = useState<any[]>([])
   const [emailCopy, setEmailCopy] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
   const [importUrl, setImportUrl] = useState('')
   const [importing, setImporting] = useState(false)
   const [showImport, setShowImport] = useState(false)
@@ -180,6 +181,39 @@ export default function Dashboard() {
       alert('Import error: ' + e.message)
     }
     setImporting(false)
+  }
+
+  const handleDownloadPdf = async (type: string) => {
+    setGeneratingPdf(true)
+    try {
+      const res = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          listing: {
+            type: form.type,
+            beds: form.beds,
+            sqft: form.sqft,
+            price: form.price,
+            neighborhood: form.neighborhood,
+            features: form.features,
+          },
+          outputs,
+          type
+        })
+      })
+      const html = await res.text()
+      const blob = new Blob([html], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `listing-${type}-${form.neighborhood || 'copy'}.html`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch(e: any) {
+      alert('PDF error: ' + e.message)
+    }
+    setGeneratingPdf(false)
   }
 
   const handleCopy = () => {
@@ -431,6 +465,14 @@ export default function Dashboard() {
               <a href="/rewrite" style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',textDecoration:'none',fontWeight:'500'}}>
                 ✨ Rewrite & Improve
               </a>
+              <button onClick={() => handleDownloadPdf('mls')} disabled={generatingPdf}
+                style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f8fafc',color:'#333',border:'1px solid #e5e7eb',cursor:'pointer',fontWeight:'500'}}>
+                📄 Download MLS Sheet
+              </button>
+              <button onClick={() => handleDownloadPdf('flyer')} disabled={generatingPdf}
+                style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f8fafc',color:'#333',border:'1px solid #e5e7eb',cursor:'pointer',fontWeight:'500'}}>
+                🏠 Download Flyer
+              </button>
               <button onClick={() => setOutputs(null)}
                 style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f8fafc',color:'#666',border:'1px solid #e5e7eb',cursor:'pointer'}}>
                 🔄 New Listing
