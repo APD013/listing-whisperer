@@ -7,14 +7,23 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const { priceId } = await request.json()
+    const { priceId, mode, userId } = await request.json()
+
+    // Determine if this is a subscription or one-time payment
+    const checkoutMode = mode || 'subscription'
 
     const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
+      mode: checkoutMode,
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?upgraded=true`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?${checkoutMode === 'subscription' ? 'upgraded=true' : 'credits=true'}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      metadata: {
+        userId: userId || '',
+        priceId: priceId,
+        mode: checkoutMode,
+      },
+      allow_promotion_codes: true,
     })
 
     return NextResponse.json({ url: session.url })
