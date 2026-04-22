@@ -314,24 +314,27 @@ export default function Dashboard() {
         doc.save(`MLS-Sheet-${form.neighborhood || 'listing'}.pdf`)
 
       } else if (type === 'flyer') {
-        // HEADER - green box
-        doc.setFillColor(29, 158, 117)
-        doc.roundedRect(margin, y, contentWidth, 45, 4, 4, 'F')
-
+        // HEADER - clean no background
         doc.setFontSize(22)
         doc.setFont('helvetica', 'bold')
-        doc.setTextColor(255, 255, 255)
-        addText(form.price || '', pageWidth / 2, y + 16, { align: 'center' })
+        doc.setTextColor(29, 158, 117)
+        addText(form.price || '', pageWidth / 2, y + 10, { align: 'center' })
 
-        doc.setFontSize(12)
-        doc.setFont('helvetica', 'normal')
-        addText(form.neighborhood || '', pageWidth / 2, y + 26, { align: 'center' })
+        doc.setFontSize(14)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(17, 17, 17)
+        addText(form.neighborhood || '', pageWidth / 2, y + 20, { align: 'center' })
 
         doc.setFontSize(10)
-        doc.setTextColor(168, 240, 212)
-        addText(`${form.type || ''} | ${form.beds || ''} | ${form.sqft || ''} sq ft`, pageWidth / 2, y + 36, { align: 'center' })
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(100, 100, 100)
+        addText(`${form.type || ''} | ${form.beds || ''} | ${form.sqft || ''} sq ft`, pageWidth / 2, y + 28, { align: 'center' })
 
-        y += 55
+        doc.setDrawColor(29, 158, 117)
+        doc.setLineWidth(0.8)
+        doc.line(margin, y + 32, pageWidth - margin, y + 32)
+
+        y += 42
 
         // ABOUT
         y = addSectionTitle('About This Home', y)
