@@ -38,9 +38,10 @@ export async function POST(request: Request) {
         // Find user by userId or email
         let profileId = userId
         if (!profileId && customerEmail) {
-          const { data: authUser } = await supabase.auth.admin.getUserByEmail(customerEmail)
-          if (authUser?.user) {
-            profileId = authUser.user.id
+          const { data: authUsers } = await supabase.auth.admin.listUsers()
+          const foundUser = authUsers?.users?.find((u: any) => u.email === customerEmail)
+          if (foundUser) {
+            profileId = foundUser.id
           }
         }
 
