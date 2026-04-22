@@ -86,7 +86,7 @@ export default function RewritePage() {
       {/* HEADER */}
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'2rem'}}>
         <div style={{fontSize:'16px',fontWeight:'600'}}>
-  Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+  Listing<span style={{color:'#1D9E75'}}>Whisperer</span>{planLoaded && plan === 'pro' && (<span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>PRO</span>)}
   {planLoaded && plan === 'pro' && (
     <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>
       PRO
