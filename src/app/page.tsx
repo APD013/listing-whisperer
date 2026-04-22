@@ -57,7 +57,7 @@ export default function Home() {
       <section style={{background:'#fff',padding:'1.5rem 2rem',borderBottom:'1px solid #eee'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'4rem',flexWrap:'wrap'}}>
           {[
-            {stat:'8',label:'Copy formats per listing'},
+            {stat:'11',label:'Copy formats per listing'},
             {stat:'60s',label:'Average generation time'},
             {stat:'3',label:'Free listings to start'},
             {stat:'$0',label:'No credit card needed'},
