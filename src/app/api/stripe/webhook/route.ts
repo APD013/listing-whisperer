@@ -33,27 +33,37 @@ export async function POST(request: Request) {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.userId
         const mode = session.metadata?.mode
+        const customerEmail = session.customer_details?.email
 
-        if (!userId) break
+        // Find user by userId or email
+        let profileId = userId
+        if (!profileId && customerEmail) {
+          const { data: authUser } = await supabase.auth.admin.getUserByEmail(customerEmail)
+          if (authUser?.user) {
+            profileId = authUser.user.id
+          }
+        }
+
+        if (!profileId) break
 
         if (mode === 'subscription') {
           // Upgrade user to Pro
           await supabase
             .from('profiles')
             .update({ plan: 'pro', stripe_customer_id: session.customer as string })
-            .eq('id', userId)
+            .eq('id', profileId)
         } else if (mode === 'payment') {
           // Add 1 listing credit
           const { data: profile } = await supabase
             .from('profiles')
             .select('listing_credits')
-            .eq('id', userId)
+            .eq('id', profileId)
             .single()
 
           await supabase
             .from('profiles')
             .update({ listing_credits: (profile?.listing_credits || 0) + 1 })
-            .eq('id', userId)
+            .eq('id', profileId)
         }
         break
       }
