@@ -12,6 +12,7 @@ export default function LaunchKitPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
   const [plan, setPlan] = useState('starter')
+  const [planLoaded, setPlanLoaded] = useState(false)
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
     neighborhood: '', features: '', notes: ''
@@ -31,7 +32,12 @@ export default function LaunchKitPage() {
         .select('plan')
         .eq('id', user.id)
         .single()
-      if (profile) setPlan(profile.plan || 'starter')
+      if (profile) {
+        setPlan(profile.plan || 'starter')
+        setPlanLoaded(true)
+      } else {
+        setPlanLoaded(true)
+      }
     }
     getUser()
   }, [])
@@ -46,7 +52,7 @@ export default function LaunchKitPage() {
       const res = await fetch('/api/launch-kit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property: form })
+        body: JSON.stringify({ property: form, userId })
       })
       const data = await res.json()
       if (data.plan) {
@@ -87,7 +93,7 @@ export default function LaunchKitPage() {
     <main style={{minHeight:'100vh',fontFamily:'sans-serif',background:'#f8fafc'}}>
       {/* NAV */}
       <div style={{background:'#fff',borderBottom:'1px solid #eee',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
+        <div style={{fontSize:'16px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span>{planLoaded && plan === 'pro' && (<span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>PRO</span>)}</div>
         <div style={{display:'flex',gap:'12px',alignItems:'center'}}>
           <a href="/dashboard" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>← Dashboard</a>
           <a href="/settings" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>⚙️ Settings</a>
@@ -179,7 +185,6 @@ export default function LaunchKitPage() {
               <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'500'}}>10 sections generated</span>
             </div>
 
-            {/* DAY TABS */}
             <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'1.25rem'}}>
               {tabs.map(t => (
                 <button key={t.key} onClick={() => setActiveTab(t.key)}
@@ -193,14 +198,12 @@ export default function LaunchKitPage() {
               ))}
             </div>
 
-            {/* ACTIVE TAB LABEL */}
             <div style={{marginBottom:'8px'}}>
               <span style={{fontSize:'12px',fontWeight:'600',color:'#1D9E75',textTransform:'uppercase',letterSpacing:'0.5px'}}>
                 {tabs.find(t => t.key === activeTab)?.label} — {tabs.find(t => t.key === activeTab)?.sublabel}
               </span>
             </div>
 
-            {/* OUTPUT */}
             <div style={{background:'#f8fafc',borderRadius:'12px',padding:'1.5rem',border:'1px solid #e5e7eb',position:'relative',minHeight:'120px'}}>
               <button onClick={handleCopy}
                 style={{position:'absolute',top:'12px',right:'12px',fontSize:'12px',padding:'6px 16px',borderRadius:'20px',background: copied ? '#1D9E75' : '#fff',color: copied ? '#fff' : '#333',border:'1px solid',borderColor: copied ? '#1D9E75' : '#ddd',cursor:'pointer',fontWeight:'500'}}>
@@ -211,7 +214,6 @@ export default function LaunchKitPage() {
               </p>
             </div>
 
-            {/* ACTIONS */}
             <div style={{marginTop:'1rem',display:'flex',gap:'8px',flexWrap:'wrap'}}>
               <a href="/dashboard" style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',textDecoration:'none',fontWeight:'500'}}>
                 🏠 Generate Full Copy Kit
