@@ -226,7 +226,7 @@ export default function Home() {
               MOST POPULAR
             </div>
             <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Pay Per Listing</h3>
-            <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>Perfect for occasional agents</p>
+            <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>No subscription. No commitment.</p>
             <p style={{fontSize:'2.5rem',fontWeight:'700',marginBottom:'4px'}}>$9<span style={{fontSize:'16px',fontWeight:'400'}}>/listing</span></p>
             <p style={{fontSize:'12px',color:'#999',marginBottom:'1.5rem'}}>No subscription needed</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
