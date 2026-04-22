@@ -205,35 +205,50 @@ export default function Home() {
 
       {/* PRICING */}
       <section id="pricing" style={{padding:'4rem 2rem',maxWidth:'700px',margin:'0 auto',textAlign:'center'}}>
-        <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Simple pricing</h2>
-        <p style={{color:'#666',marginBottom:'1rem'}}>One listing takes 20–30 minutes to write manually. Listing Whisperer cuts that to seconds.</p>
-        <p style={{color:'#999',fontSize:'13px',marginBottom:'3rem'}}>No credit card required to start.</p>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1.5rem'}}>
+        <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Simple, flexible pricing</h2>
+        <p style={{color:'#666',marginBottom:'0.5rem'}}>Only have one listing this month? Pay $9. Use it often? Go Pro.</p>
+        <p style={{color:'#999',fontSize:'13px',marginBottom:'3rem'}}>No credit card required to start free.</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1.5rem'}}>
           <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'1px solid #eee',textAlign:'left'}}>
             <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Free</h3>
-            <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>Perfect for trying it out</p>
+            <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>Try it out</p>
             <p style={{fontSize:'2.5rem',fontWeight:'700',marginBottom:'1.5rem'}}>$0</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
-              <li>✅ 3 free listings</li>
+              <li>✅ 2 free listings</li>
               <li>✅ 3 free rewrites</li>
               <li>✅ All 11 copy formats</li>
-              <li>✅ MLS, Instagram, Email & more</li>
               <li>✅ No credit card required</li>
             </ul>
             <a href="/signup" onClick={() => trackCTAClick('pricing_free_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',border:'1px solid #ddd',color:'#333',textDecoration:'none',fontSize:'14px'}}>Get started free</a>
+          </div>
+          <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'2px solid #1D9E75',textAlign:'left',position:'relative'}}>
+            <div style={{position:'absolute',top:'-12px',left:'50%',transform:'translateX(-50%)',background:'#1D9E75',color:'#fff',fontSize:'11px',fontWeight:'700',padding:'3px 12px',borderRadius:'20px',whiteSpace:'nowrap'}}>
+              MOST POPULAR
+            </div>
+            <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Pay Per Listing</h3>
+            <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>Perfect for occasional agents</p>
+            <p style={{fontSize:'2.5rem',fontWeight:'700',marginBottom:'4px'}}>$9<span style={{fontSize:'16px',fontWeight:'400'}}>/listing</span></p>
+            <p style={{fontSize:'12px',color:'#999',marginBottom:'1.5rem'}}>No subscription needed</p>
+            <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
+              <li>✅ 1 full listing generation</li>
+              <li>✅ All 11 copy formats</li>
+              <li>✅ Saved to your history</li>
+              <li>✅ Never expires</li>
+            </ul>
+            <a href="/pricing" onClick={() => trackCTAClick('pricing_ppl_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',background:'#1D9E75',color:'#fff',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>Buy 1 Listing — $9</a>
           </div>
           <div style={{background:'#1D9E75',borderRadius:'16px',padding:'2rem',textAlign:'left',color:'#fff'}}>
             <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Pro</h3>
             <p style={{color:'#a8f0d4',fontSize:'13px',marginBottom:'1rem'}}>For active agents</p>
             <p style={{fontSize:'2.5rem',fontWeight:'700',marginBottom:'4px'}}>$29<span style={{fontSize:'16px',fontWeight:'400'}}>/mo</span></p>
-            <p style={{fontSize:'12px',color:'#a8f0d4',marginBottom:'1.5rem'}}>Less than the cost of one hour of your time</p>
+            <p style={{fontSize:'12px',color:'#a8f0d4',marginBottom:'1.5rem'}}>Best value for 4+ listings/month</p>
             <ul style={{fontSize:'14px',color:'#e0f7ee',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ Unlimited listings</li>
               <li>✅ Unlimited rewrites</li>
               <li>✅ All 11 copy formats</li>
+              <li>✅ 7-Day Launch Kit</li>
+              <li>✅ Brand voice memory</li>
               <li>✅ Saved listing history</li>
-              <li>✅ Email copy to yourself</li>
-              <li>✅ Real estate-specific workflow</li>
               <li>✅ Priority support</li>
             </ul>
             <a href="/signup" onClick={() => trackCTAClick('pricing_pro_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',background:'#fff',color:'#1D9E75',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>Start free trial</a>
