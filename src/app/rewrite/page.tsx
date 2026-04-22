@@ -85,22 +85,15 @@ export default function RewritePage() {
     <main style={{minHeight:'100vh',padding:'2rem',fontFamily:'sans-serif',maxWidth:'740px',margin:'0 auto'}}>
       {/* HEADER */}
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'2rem'}}>
-        <div style={{fontSize:'16px',fontWeight:'600'}}>
-  Listing<span style={{color:'#1D9E75'}}>Whisperer</span>{planLoaded && plan === 'pro' && (<span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>PRO</span>)}
-  {planLoaded && plan === 'pro' && (
-    <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>
-      PRO
-    </span>
-  )}
-</div>
+        <div style={{fontSize:'16px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span>{planLoaded && plan === 'pro' && (<span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>PRO</span>)}</div>
         <div style={{display:'flex',gap:'12px'}}>
           <a href="/dashboard" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>← New Listing</a>
           {plan === 'starter' && (
-          <span style={{fontSize:'12px',fontWeight:'bold',color: rewritesUsed >= 2 ? 'red' : '#666'}}>
-            {3 - rewritesUsed} rewrites left
-          </span>
-        )}
-        <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
+            <span style={{fontSize:'12px',fontWeight:'bold',color: rewritesUsed >= 2 ? 'red' : '#666'}}>
+              {3 - rewritesUsed} rewrites left
+            </span>
+          )}
+          <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
         </div>
       </div>
 
@@ -181,7 +174,6 @@ export default function RewritePage() {
 
       {outputs && (
         <div>
-          {/* WHAT CHANGED */}
           <div style={{background:'#E1F5EE',borderRadius:'12px',padding:'1rem',marginBottom:'1rem',border:'1px solid #bbf0d9'}}>
             <p style={{fontSize:'12px',fontWeight:'700',color:'#085041',marginBottom:'6px'}}>✅ WHAT WE IMPROVED</p>
             <p style={{fontSize:'13px',color:'#333',lineHeight:'1.8',whiteSpace:'pre-wrap'}}>{outputs.improvements}</p>
@@ -209,7 +201,6 @@ export default function RewritePage() {
             </p>
           </div>
 
-          {/* FEED INTO ECOSYSTEM */}
           <div style={{background:'#fff',border:'1px solid #eee',borderRadius:'12px',padding:'1.25rem'}}>
             <p style={{fontSize:'13px',fontWeight:'600',marginBottom:'12px',color:'#333'}}>🚀 Do more with this listing:</p>
             <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
