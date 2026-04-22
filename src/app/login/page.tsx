@@ -22,7 +22,13 @@ export default function LoginPage() {
       setMessage(error.message)
     } else {
       trackLoginCompleted(data.user?.id || 'unknown')
-      window.location.href = '/dashboard'
+      const redirect = localStorage.getItem('post_payment_redirect')
+      if (redirect) {
+        localStorage.removeItem('post_payment_redirect')
+        window.location.href = redirect
+      } else {
+        window.location.href = '/dashboard'
+      }
     }
     setLoading(false)
   }
