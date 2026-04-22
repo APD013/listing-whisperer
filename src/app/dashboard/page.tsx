@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
+import jsPDF from 'jspdf'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -186,30 +187,195 @@ export default function Dashboard() {
   const handleDownloadPdf = async (type: string) => {
     setGeneratingPdf(true)
     try {
-      const res = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          listing: {
-            type: form.type,
-            beds: form.beds,
-            sqft: form.sqft,
-            price: form.price,
-            neighborhood: form.neighborhood,
-            features: form.features,
-          },
-          outputs,
-          type
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pageWidth = doc.internal.pageSize.getWidth()
+      const margin = 20
+      const contentWidth = pageWidth - margin * 2
+      let y = 20
+
+      // Helper functions
+      const addText = (text: string, x: number, yPos: number, options: any = {}) => {
+        doc.text(text, x, yPos, options)
+      }
+
+      const addWrappedText = (text: string, x: number, yPos: number, maxWidth: number, lineHeight: number = 6) => {
+        const lines = doc.splitTextToSize(text, maxWidth)
+        doc.text(lines, x, yPos)
+        return yPos + (lines.length * lineHeight)
+      }
+
+      const addSectionTitle = (title: string, yPos: number) => {
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(29, 158, 117)
+        addText(title.toUpperCase(), margin, yPos)
+        doc.setDrawColor(29, 158, 117)
+        doc.line(margin, yPos + 2, pageWidth - margin, yPos + 2)
+        return yPos + 8
+      }
+
+      const checkPageBreak = (yPos: number, needed: number = 30) => {
+        if (yPos > 270 - needed) {
+          doc.addPage()
+          return 20
+        }
+        return yPos
+      }
+
+      if (type === 'mls') {
+        // HEADER
+        doc.setFontSize(20)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(29, 158, 117)
+        addText('ListingWhisperer', margin, y)
+
+        doc.setFontSize(18)
+        doc.setTextColor(17, 17, 17)
+        doc.setFont('helvetica', 'bold')
+        addText(form.price || '', pageWidth - margin, y, { align: 'right' })
+
+        y += 8
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(100, 100, 100)
+        addText(form.neighborhood || '', pageWidth - margin, y, { align: 'right' })
+
+        doc.setDrawColor(29, 158, 117)
+        doc.setLineWidth(0.8)
+        doc.line(margin, y + 4, pageWidth - margin, y + 4)
+        y += 14
+
+        // PROPERTY INFO
+        doc.setFontSize(14)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(17, 17, 17)
+        addText(`${form.type || 'Property'} — ${form.beds || ''}`, margin, y)
+        y += 7
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(80, 80, 80)
+        addText(`${form.sqft || ''} sq ft  |  ${form.neighborhood || ''}`, margin, y)
+        y += 12
+
+        // MLS STANDARD
+        y = addSectionTitle('MLS Description', y)
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(50, 50, 50)
+        y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
+        y += 10
+
+        y = checkPageBreak(y)
+
+        // MLS LUXURY
+        y = addSectionTitle('Luxury MLS Version', y)
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(50, 50, 50)
+        y = addWrappedText(outputs.mls_luxury || '', margin, y, contentWidth)
+        y += 10
+
+        y = checkPageBreak(y)
+
+        // INSTAGRAM
+        y = addSectionTitle('Instagram Caption', y)
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(50, 50, 50)
+        const instaText = (outputs.instagram || '').split('---')[0].trim()
+        y = addWrappedText(instaText, margin, y, contentWidth)
+        y += 10
+
+        y = checkPageBreak(y)
+
+        // EMAIL
+        y = addSectionTitle('Email Blast', y)
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(50, 50, 50)
+        y = addWrappedText(outputs.email || '', margin, y, contentWidth)
+        y += 10
+
+        y = checkPageBreak(y)
+
+        // OPEN HOUSE
+        y = addSectionTitle('Open House', y)
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(50, 50, 50)
+        y = addWrappedText(outputs.openhouse || '', margin, y, contentWidth)
+
+        // FOOTER
+        doc.setFontSize(9)
+        doc.setTextColor(150, 150, 150)
+        doc.setFont('helvetica', 'normal')
+        addText('Generated by ListingWhisperer.com  |  AI Marketing Copy for Real Estate Agents', pageWidth / 2, 285, { align: 'center' })
+
+        doc.save(`MLS-Sheet-${form.neighborhood || 'listing'}.pdf`)
+
+      } else if (type === 'flyer') {
+        // HEADER - green box
+        doc.setFillColor(29, 158, 117)
+        doc.roundedRect(margin, y, contentWidth, 45, 4, 4, 'F')
+
+        doc.setFontSize(22)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(255, 255, 255)
+        addText(form.price || '', pageWidth / 2, y + 16, { align: 'center' })
+
+        doc.setFontSize(12)
+        doc.setFont('helvetica', 'normal')
+        addText(form.neighborhood || '', pageWidth / 2, y + 26, { align: 'center' })
+
+        doc.setFontSize(10)
+        doc.setTextColor(168, 240, 212)
+        addText(`${form.type || ''} | ${form.beds || ''} | ${form.sqft || ''} sq ft`, pageWidth / 2, y + 36, { align: 'center' })
+
+        y += 55
+
+        // ABOUT
+        y = addSectionTitle('About This Home', y)
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(50, 50, 50)
+        y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
+        y += 10
+
+        // FEATURES
+        y = checkPageBreak(y)
+        y = addSectionTitle('Key Features', y)
+        const features = (form.features || '').split(',')
+        doc.setFontSize(10)
+        doc.setTextColor(50, 50, 50)
+        features.forEach((feature: string) => {
+          y = checkPageBreak(y, 10)
+          doc.setFont('helvetica', 'normal')
+          addText(`✓ ${feature.trim()}`, margin, y)
+          y += 6
         })
-      })
-      const html = await res.text()
-      const blob = new Blob([html], { type: 'text/html' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `listing-${type}-${form.neighborhood || 'copy'}.html`
-      a.click()
-      URL.revokeObjectURL(url)
+        y += 6
+
+        // OPEN HOUSE
+        y = checkPageBreak(y)
+        y = addSectionTitle('Open House', y)
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(50, 50, 50)
+        y = addWrappedText(outputs.openhouse || '', margin, y, contentWidth)
+
+        // FOOTER
+        doc.setDrawColor(29, 158, 117)
+        doc.setLineWidth(0.8)
+        doc.line(margin, 278, pageWidth - margin, 278)
+        doc.setFontSize(9)
+        doc.setTextColor(100, 100, 100)
+        doc.setFont('helvetica', 'normal')
+        addText('ListingWhisperer.com', margin, 284)
+        addText('Generated by ListingWhisperer.com', pageWidth - margin, 284, { align: 'right' })
+
+        doc.save(`Flyer-${form.neighborhood || 'listing'}.pdf`)
+      }
+
     } catch(e: any) {
       alert('PDF error: ' + e.message)
     }
