@@ -240,11 +240,14 @@ export default function SnapStartPage() {
 
             {/* LISTING URL IMPORT */}
             <div style={{background:'#fff',borderRadius:'16px',border:'1px solid #eee',padding:'1.25rem',marginBottom:'1rem'}}>
-              <p style={{fontSize:'14px',fontWeight:'600',color:'#333',marginBottom:'8px'}}>🔗 Import from Listing URL (optional)</p>
-              <p style={{fontSize:'12px',color:'#666',marginBottom:'10px'}}>Paste a Zillow, Redfin, or Realtor.com listing URL and we'll try to extract the details automatically.</p>
+              <p style={{fontSize:'14px',fontWeight:'600',color:'#333',marginBottom:'8px'}}>📋 Import from Listing Text (optional)</p>
+              <p style={{fontSize:'12px',color:'#666',marginBottom:'6px'}}>Copy the listing details text from Zillow, Redfin, or any site and paste below.</p>
+              <div style={{background:'#fffbe6',border:'1px solid #ffe58f',borderRadius:'8px',padding:'8px 12px',marginBottom:'10px',fontSize:'12px',color:'#666'}}>
+                💡 <strong>How to use:</strong> On Zillow, select and copy the property details (beds, baths, price, description) then paste here. URL import doesn't work because Zillow blocks it.
+              </div>
               <div style={{display:'flex',gap:'8px'}}>
                 <input
-                  placeholder="https://www.zillow.com/homedetails/..."
+                  placeholder="Paste listing text here: 3 bed, 2 bath, 1850 sqft, $899,000, Newport Beach..."
                   id="listing-url-input"
                   style={{flex:1,padding:'10px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'13px'}}
                 />
