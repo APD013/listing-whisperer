@@ -201,7 +201,7 @@ export default function Home() {
         <div style={{maxWidth:'700px',margin:'0 auto',textAlign:'center'}}>
           <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Why not just use generic AI?</h2>
           <p style={{color:'#666',marginBottom:'3rem'}}>Great question. Here's the difference.</p>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1.5rem',textAlign:'left'}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(240px, 1fr))',gap:'1.5rem',textAlign:'left'}}>
             <div style={{background:'#fff',borderRadius:'12px',padding:'1.5rem',border:'1px solid #eee'}}>
               <p style={{fontWeight:'600',marginBottom:'1rem',color:'#999'}}>❌ Generic AI Tools</p>
               <ul style={{fontSize:'14px',color:'#666',lineHeight:'2',paddingLeft:'1rem'}}>
