@@ -441,6 +441,7 @@ export default function Dashboard() {
           )}
           <a href="/snap-start" style={{fontSize:'13px',color:'#fff',fontWeight:'500',textDecoration:'none',background:'#1D9E75',padding:'4px 12px',borderRadius:'20px'}}>📸 Snap & Start</a>
           <a href="/rewrite" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>✨ Rewrite</a>
+          <a href="/seller-prep" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>📋 Seller Prep</a>
           <a href="/launch-kit" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>🚀 Launch Kit</a>
           <a href="/settings" style={{fontSize:'13px',color:'#666',textDecoration:'none',padding:'4px 12px',borderRadius:'20px',border:'1px solid #eee'}}>⚙️ Settings</a>
           {plan === 'starter' && (
