@@ -127,7 +127,7 @@ export default function Home() {
       <section style={{padding:'4rem 2rem',maxWidth:'900px',margin:'0 auto'}}>
         <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>From rough notes to full marketing kit</h2>
         <p style={{textAlign:'center',color:'#666',marginBottom:'3rem'}}>Fill in the details — we handle everything from MLS copy to launch plans.</p>
-        <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:'1rem',alignItems:'center',gridTemplateRows:'auto'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'1rem',alignItems:'center'}}>
           <div style={{background:'#fff8f0',border:'1px solid #fde8c8',borderRadius:'12px',padding:'1.5rem'}}>
             <p style={{fontSize:'11px',fontWeight:'700',color:'#999',marginBottom:'8px',letterSpacing:'1px'}}>YOUR ROUGH NOTES</p>
             <p style={{fontSize:'14px',color:'#555',lineHeight:'1.8',fontStyle:'italic'}}>
