@@ -692,6 +692,17 @@ export default function Dashboard() {
                       <p style={{margin:'4px 0 0',fontSize:'11px',color:'#1D9E75',fontWeight:'500'}}>View copy →</p>
                     </div>
                   </div>
+                  <div style={{marginTop:'10px',borderTop:'1px solid #e5e7eb',paddingTop:'10px'}}>
+                  <textarea
+                    placeholder="Agent notes: seller motivation, property quirks, things to remember..."
+                    defaultValue={listing.agent_notes || ''}
+                    onBlur={async (e) => {
+                      await supabase.from('listings').update({ agent_notes: e.target.value }).eq('id', listing.id)
+                    }}
+                    onClick={e => e.stopPropagation()}
+                    style={{width:'100%',padding:'8px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'12px',color:'#555',minHeight:'60px',resize:'vertical',boxSizing:'border-box',background:'#fff'}}
+                  />
+                </div>
                 </div>
               ))}
             </div>
