@@ -23,7 +23,7 @@ export default function Home() {
         <div style={{fontSize:'18px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{display:'flex',gap:'24px',alignItems:'center'}}>
           <a href="#how-it-works" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>How It Works</a>
-          <a href="#examples" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Examples</a>
+          <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
           <a href="#pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
           <a href="/login" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Sign In</a>
           <a href="/signup" style={{fontSize:'14px',background:'#1D9E75',color:'#fff',padding:'8px 18px',borderRadius:'8px',textDecoration:'none',fontWeight:'500'}}>Get Started Free</a>
@@ -36,11 +36,11 @@ export default function Home() {
           BUILT FOR REAL ESTATE AGENTS
         </div>
         <h1 style={{fontSize:'3rem',fontWeight:'700',lineHeight:'1.2',maxWidth:'700px',margin:'0 auto 1.5rem'}}>
-          Turn rough listing notes into MLS copy, social posts, and email blasts —{' '}
-          <span style={{color:'#1D9E75'}}>in under 60 seconds.</span>
+          The AI assistant that works with you{' '}
+          <span style={{color:'#1D9E75'}}>before, during, and after every listing.</span>
         </h1>
-        <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'520px',margin:'0 auto 2rem',lineHeight:'1.7'}}>
-          No prompts. No ChatGPT guesswork. Just fill in your property details and get 11 ready-to-use marketing formats instantly.
+        <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'560px',margin:'0 auto 2rem',lineHeight:'1.7'}}>
+          From seller meeting prep to on-site photo drafts to full marketing kits — Listing Whisperer is the AI field assistant built specifically for real estate agents.
         </p>
         <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'1rem'}}>
           <a href="/signup" onClick={() => trackCTAClick('hero_cta', 'homepage')} style={{background:'#1D9E75',color:'#fff',padding:'14px 32px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',fontSize:'16px'}}>
@@ -53,7 +53,7 @@ export default function Home() {
         <p style={{fontSize:'13px',color:'#999'}}>No credit card required · Cancel anytime · Built specifically for real estate agents</p>
       </section>
 
-       {/* STATS STRIP */}
+      {/* STATS STRIP */}
       <section style={{background:'#fff',padding:'1.5rem 2rem',borderBottom:'1px solid #eee'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'4rem',flexWrap:'wrap'}}>
           {[
@@ -73,16 +73,61 @@ export default function Home() {
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'3rem',flexWrap:'wrap'}}>
-          {['11 copy formats in one click','MLS-ready formatting','Tone & buyer targeting','Saves listing history'].map(item => (
+          {['11 copy formats','Seller meeting prep','On-site photo drafts','7-day launch kit'].map(item => (
             <span key={item} style={{color:'#fff',fontSize:'14px',fontWeight:'500'}}>✓ {item}</span>
           ))}
         </div>
       </section>
 
+      {/* HOW IT WORKS */}
+      <section id="how-it-works" style={{padding:'4rem 2rem',background:'#f9fafb'}}>
+        <div style={{maxWidth:'800px',margin:'0 auto',textAlign:'center'}}>
+          <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>How it works</h2>
+          <p style={{color:'#666',marginBottom:'3rem'}}>One tool. The entire listing workflow.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'2rem'}}>
+            {[
+              {step:'1',title:'Before the appointment',desc:'Use Seller Meeting Prep to get a meeting outline, talking points, and questions to ask before you walk in the door.'},
+              {step:'2',title:'On-site with Snap & Start',desc:'Upload photos on your phone, confirm the details, and generate your first draft while still at the property.'},
+              {step:'3',title:'Full marketing launch',desc:'Generate 11 copy formats, download PDF flyers, and get a 7-day launch plan — all in one click.'},
+            ].map(({step,title,desc}) => (
+              <div key={step} style={{textAlign:'center'}}>
+                <div style={{width:'48px',height:'48px',background:'#1D9E75',color:'#fff',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',fontWeight:'700',margin:'0 auto 1rem'}}>{step}</div>
+                <h3 style={{fontSize:'16px',fontWeight:'600',marginBottom:'8px'}}>{title}</h3>
+                <p style={{fontSize:'14px',color:'#666',lineHeight:'1.7'}}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES GRID */}
+      <section id="features" style={{padding:'4rem 2rem',background:'#fff'}}>
+        <div style={{maxWidth:'900px',margin:'0 auto'}}>
+          <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Everything an agent needs</h2>
+          <p style={{textAlign:'center',color:'#666',marginBottom:'3rem'}}>Built around the real listing workflow — not generic AI.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1.5rem'}}>
+            {[
+              {icon:'📋',title:'Seller Meeting Prep',desc:'Meeting outlines, talking points, seller questions, and follow-up emails before every appointment.'},
+              {icon:'📸',title:'Snap & Start',desc:'Upload photos on-site, confirm details, and generate your first draft before you leave the property.'},
+              {icon:'🏠',title:'11 Copy Formats',desc:'MLS, Luxury MLS, Instagram, Facebook, Email, Open House, Video Script, SMS, Flyer, Price Drop, and SEO.'},
+              {icon:'🚀',title:'7-Day Launch Kit',desc:'A complete day-by-day marketing plan with social posts, email sequences, and pro tips.'},
+              {icon:'✨',title:'Listing Rewriter',desc:'Paste any boring MLS description and get a polished, buyer-ready rewrite instantly.'},
+              {icon:'🎙️',title:'Brand Voice Memory',desc:'Save your tone, style, and CTA preferences so every listing sounds like you.'},
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{background:'#f8fafc',borderRadius:'12px',padding:'1.5rem',border:'1px solid #eee'}}>
+                <div style={{fontSize:'2rem',marginBottom:'12px'}}>{icon}</div>
+                <h3 style={{fontSize:'15px',fontWeight:'600',marginBottom:'8px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#666',lineHeight:'1.7',margin:'0'}}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* BEFORE/AFTER */}
       <section style={{padding:'4rem 2rem',maxWidth:'900px',margin:'0 auto'}}>
-        <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>From messy notes to polished copy</h2>
-        <p style={{textAlign:'center',color:'#666',marginBottom:'3rem'}}>Just fill in the details — we handle the writing.</p>
+        <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>From rough notes to full marketing kit</h2>
+        <p style={{textAlign:'center',color:'#666',marginBottom:'3rem'}}>Fill in the details — we handle everything from MLS copy to launch plans.</p>
         <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:'1rem',alignItems:'center'}}>
           <div style={{background:'#fff8f0',border:'1px solid #fde8c8',borderRadius:'12px',padding:'1.5rem'}}>
             <p style={{fontSize:'11px',fontWeight:'700',color:'#999',marginBottom:'8px',letterSpacing:'1px'}}>YOUR ROUGH NOTES</p>
@@ -92,29 +137,8 @@ export default function Home() {
           </div>
           <div style={{fontSize:'2rem',color:'#1D9E75',fontWeight:'bold',textAlign:'center'}}>→</div>
           <div style={{background:'#f0fdf8',border:'1px solid #bbf0d9',borderRadius:'12px',padding:'1.5rem'}}>
-            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',marginBottom:'8px',letterSpacing:'1px'}}>8 READY-TO-USE FORMATS</p>
-            <p style={{fontSize:'13px',color:'#333',lineHeight:'1.8'}}>✅ MLS Description<br/>✅ Luxury MLS<br/>✅ Instagram Caption<br/>✅ Facebook Post<br/>✅ Email Blast<br/>✅ Open House Flyer<br/>✅ Video Script<br/>✅ SEO Copy</p>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section id="how-it-works" style={{padding:'4rem 2rem',background:'#f9fafb'}}>
-        <div style={{maxWidth:'800px',margin:'0 auto',textAlign:'center'}}>
-          <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>How it works</h2>
-          <p style={{color:'#666',marginBottom:'3rem'}}>Three steps. Under 60 seconds.</p>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'2rem'}}>
-            {[
-              {step:'1',title:'Enter your property details',desc:'Fill in the basics — type, beds, price, neighborhood, features, tone, and target buyer.'},
-              {step:'2',title:'Click Generate',desc:'Our AI writes 8 formats of marketing copy tailored to your property in seconds.'},
-              {step:'3',title:'Copy, paste, done',desc:'Grab the MLS copy, Instagram caption, email blast, and more — all ready to use.'},
-            ].map(({step,title,desc}) => (
-              <div key={step} style={{textAlign:'center'}}>
-                <div style={{width:'48px',height:'48px',background:'#1D9E75',color:'#fff',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',fontWeight:'700',margin:'0 auto 1rem'}}>{step}</div>
-                <h3 style={{fontSize:'16px',fontWeight:'600',marginBottom:'8px'}}>{title}</h3>
-                <p style={{fontSize:'14px',color:'#666',lineHeight:'1.7'}}>{desc}</p>
-              </div>
-            ))}
+            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',marginBottom:'8px',letterSpacing:'1px'}}>11 READY-TO-USE FORMATS</p>
+            <p style={{fontSize:'13px',color:'#333',lineHeight:'1.8'}}>✅ MLS Description<br/>✅ Luxury MLS<br/>✅ Instagram Caption<br/>✅ Facebook Post<br/>✅ Email Blast<br/>✅ Open House Flyer<br/>✅ Video Script<br/>✅ SMS, Flyer & Price Drop<br/>✅ SEO Copy</p>
           </div>
         </div>
       </section>
@@ -194,8 +218,9 @@ export default function Home() {
               <ul style={{fontSize:'14px',color:'#333',lineHeight:'2',paddingLeft:'1rem'}}>
                 <li>Built-in real estate workflow</li>
                 <li>11 formats in one click</li>
+                <li>Seller meeting prep</li>
+                <li>On-site photo drafts</li>
                 <li>Tone & buyer targeting</li>
-                <li>MLS-ready formatting</li>
                 <li>Saved listing history</li>
               </ul>
             </div>
@@ -246,9 +271,10 @@ export default function Home() {
               <li>✅ Unlimited listings</li>
               <li>✅ Unlimited rewrites</li>
               <li>✅ All 11 copy formats</li>
+              <li>✅ Seller Meeting Prep</li>
+              <li>✅ Snap & Start on-site</li>
               <li>✅ 7-Day Launch Kit</li>
               <li>✅ Brand voice memory</li>
-              <li>✅ Saved listing history</li>
               <li>✅ Priority support</li>
             </ul>
             <a href="/signup" onClick={() => trackCTAClick('pricing_pro_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',background:'#fff',color:'#1D9E75',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>Start free trial</a>
@@ -261,11 +287,12 @@ export default function Home() {
         <div style={{maxWidth:'600px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'3rem'}}>Frequently asked questions</h2>
           {[
-            {q:'Is this really free to start?',a:'Yes. You get 3 full listings and 3 listing rewrites completely free, no credit card required. Each listing generates all 8 formats.'},
-            {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, and SEO copy — all from one set of notes.'},
-            {q:'How is this different from generic AI tools?',a:'Listing Whisperer is purpose-built for real estate agents. It has a structured workflow, tone targeting, buyer targeting, MLS-ready formatting, and saves your listing history — no prompt engineering required.'},
+            {q:'Is this really free to start?',a:'Yes. You get 2 full listings and 3 listing rewrites completely free, no credit card required. Each listing generates all 11 formats.'},
+            {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, SMS, Flyer, Price Drop, and SEO copy — all from one set of notes.'},
+            {q:'What is Seller Meeting Prep?',a:'Before your listing appointment, Listing Whisperer generates a complete meeting outline, talking points, questions to ask the seller, and a follow-up email — so you walk in fully prepared.'},
+            {q:'What is Snap & Start?',a:'On your phone or tablet, upload property photos on-site. Our AI detects visible features, you confirm the details, and generate your first draft before you leave the property.'},
+            {q:'How is this different from generic AI tools?',a:'Listing Whisperer is purpose-built for real estate agents. It covers the entire listing workflow — from seller prep to on-site drafts to full marketing launch — not just copy generation.'},
             {q:'Can I cancel anytime?',a:'Yes. No contracts, no commitments. Cancel your Pro subscription anytime from your account settings.'},
-            {q:'Who is this built for?',a:'Real estate agents who want to spend less time writing and more time selling. Whether you do 2 listings a month or 20, Listing Whisperer saves you hours.'},
             {q:'How good is the copy quality?',a:'The copy is generated by Claude, one of the most advanced AI models available, trained to produce MLS-ready professional marketing copy.'},
           ].map(({q,a}) => (
             <div key={q} style={{borderBottom:'1px solid #eee',paddingBottom:'1.5rem',marginBottom:'1.5rem'}}>
@@ -279,7 +306,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid #eee',background:'#fff'}}>
         <div style={{fontSize:'16px',fontWeight:'600',marginBottom:'8px'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
-        <p style={{fontSize:'13px',color:'#999',marginBottom:'8px'}}>AI marketing copy for real estate agents. Not a coaching program. Not a guru. Just software.</p>
+        <p style={{fontSize:'13px',color:'#999',marginBottom:'8px'}}>The AI assistant for real estate agents. Before the appointment, on-site, and at launch.</p>
         <p style={{fontSize:'13px',color:'#999'}}>© 2025 Listing Whisperer · <a href="/login" style={{color:'#999'}}>Sign In</a> · <a href="/signup" style={{color:'#999'}}>Get Started Free</a> · <a href="#pricing" style={{color:'#999'}}>Pricing</a></p>
       </footer>
 
