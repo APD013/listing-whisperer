@@ -104,7 +104,7 @@ export default function Home() {
         <div style={{maxWidth:'900px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Everything an agent needs</h2>
           <p style={{textAlign:'center',color:'#666',marginBottom:'3rem'}}>Built around the real listing workflow — not generic AI.</p>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1.5rem'}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(250px, 1fr))',gap:'1.5rem'}}>
             {[
               {icon:'📋',title:'Seller Meeting Prep',desc:'Meeting outlines, talking points, seller questions, and follow-up emails before every appointment.'},
               {icon:'📸',title:'Snap & Start',desc:'Upload photos on-site, confirm details, and generate your first draft before you leave the property.'},
