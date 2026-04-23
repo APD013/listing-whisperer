@@ -71,7 +71,7 @@ export default function Home() {
 
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
-        <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'3rem',flexWrap:'wrap'}}>
+        <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'1.5rem',flexWrap:'wrap'}}>
           {['11 copy formats','Seller meeting prep','On-site photo drafts','7-day launch kit'].map(item => (
             <span key={item} style={{color:'#fff',fontSize:'14px',fontWeight:'500'}}>✓ {item}</span>
           ))}
