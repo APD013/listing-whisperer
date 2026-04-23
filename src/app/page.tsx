@@ -25,6 +25,7 @@ export default function Home() {
           <a href="#how-it-works" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>How It Works</a>
           <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
           <a href="#pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
+          <a href="/seller-prep" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Seller Prep</a>
           <a href="/login" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Sign In</a>
           <a href="/signup" style={{fontSize:'14px',background:'#1D9E75',color:'#fff',padding:'8px 18px',borderRadius:'8px',textDecoration:'none',fontWeight:'500'}}>Get Started Free</a>
         </div>
