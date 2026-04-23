@@ -230,10 +230,12 @@ export default function Dashboard() {
           <div style={{ fontSize: '16px', fontWeight: '700', color: '#f0f0f0' }}>
             Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
             {planLoaded && plan === 'pro' && (
-              <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle' }}>PRO</span>
+              <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle', boxShadow: '0 0 10px rgba(29,158,117,0.4)' }}>PRO</span>
             )}
           </div>
-          <div style={{ fontSize: '11px', color: '#8b8fa8', marginTop: '4px' }}>AI Assistant for Agents</div>
+          <div style={{ fontSize: '11px', color: planLoaded && plan === 'pro' ? '#1D9E75' : '#8b8fa8', marginTop: '4px', fontWeight: plan === 'pro' ? '500' : '400' }}>
+            {planLoaded && plan === 'pro' ? '✦ Pro Workspace' : 'AI Assistant for Agents'}
+          </div>
         </div>
 
         {/* NAV */}
@@ -276,13 +278,14 @@ export default function Dashboard() {
         <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           {plan === 'starter' && (
             <a href="/pricing" onClick={() => trackUpgradeClick('sidebar', plan)}
-              style={{ display: 'block', background: '#1D9E75', color: '#fff', padding: '10px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontSize: '13px', fontWeight: '600', marginBottom: '10px' }}>
-              ⚡ Upgrade to Pro
+              style={{ display: 'block', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', padding: '12px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontSize: '12px', fontWeight: '600', marginBottom: '8px', boxShadow: '0 0 20px rgba(29,158,117,0.25)', lineHeight: '1.6' }}>
+              ⚡ Upgrade to Pro<br/>
+              <span style={{ fontSize: '10px', fontWeight: '400', opacity: 0.85 }}>Unlimited listings, rewrites & launch kits</span>
             </a>
           )}
           {plan === 'starter' && (
-            <div style={{ fontSize: '11px', color: '#8b8fa8', textAlign: 'center', marginBottom: '10px' }}>
-              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} left` : '⚠️ No listings left'}
+            <div style={{ fontSize: '11px', color: '#555', textAlign: 'center', marginBottom: '10px', lineHeight: '1.5' }}>
+              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} left` : '⚠️ No listings left — upgrade to continue'}
             </div>
           )}
           <a href="/" style={{ display: 'block', fontSize: '12px', color: '#666', textAlign: 'center', textDecoration: 'none' }}>Sign out</a>
@@ -339,8 +342,22 @@ export default function Dashboard() {
               <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #2a2d3a', borderTop: '1px solid #2a2d3a', paddingTop: '16px', marginTop: '4px' }}>
                 <p style={{ fontSize: '12px', fontWeight: '600', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 12px' }}>FEATURES & MARKETING</p>
                 <div style={{ marginBottom: '12px' }}>
-                  <label style={styles.label}>Key features <span style={{ color: '#555', fontWeight: '400' }}>— the more detail, the better the copy</span></label>
+                  <label style={styles.label}>Key features <span style={{ color: '#555', fontWeight: '400', textTransform: 'none' }}>— the more detail, the better the copy</span></label>
                   <input placeholder="Ocean views, chef's kitchen, spa bath, 3-car garage, solar..." value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} style={styles.input} />
+                  <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {['Ocean views','Chef\'s kitchen','Spa bath','3-car garage','Solar panels','Pool','Open floor plan','Natural light','Updated finishes','Smart home','Walk-in closet','Outdoor entertaining'].map(chip => (
+                      <button key={chip} onClick={() => {
+                        const current = form.features
+                        const already = current.toLowerCase().includes(chip.toLowerCase())
+                        if (!already) setForm({ ...form, features: current ? current + ', ' + chip : chip })
+                      }}
+                        style={{ padding: '4px 10px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.2)', color: '#6b7280', fontSize: '11px', cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseOver={e => { e.currentTarget.style.borderColor = '#1D9E75'; e.currentTarget.style.color = '#1D9E75' }}
+                        onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#6b7280' }}>
+                        + {chip}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
