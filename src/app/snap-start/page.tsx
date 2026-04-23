@@ -238,6 +238,51 @@ export default function SnapStartPage() {
               <p style={{fontSize:'11px',color:'#999',marginTop:'6px'}}>📍 Location is always optional. Used only to suggest address context.</p>
             </div>
 
+            {/* LISTING URL IMPORT */}
+            <div style={{background:'#fff',borderRadius:'16px',border:'1px solid #eee',padding:'1.25rem',marginBottom:'1rem'}}>
+              <p style={{fontSize:'14px',fontWeight:'600',color:'#333',marginBottom:'8px'}}>🔗 Import from Listing URL (optional)</p>
+              <p style={{fontSize:'12px',color:'#666',marginBottom:'10px'}}>Paste a Zillow, Redfin, or Realtor.com listing URL and we'll try to extract the details automatically.</p>
+              <div style={{display:'flex',gap:'8px'}}>
+                <input
+                  placeholder="https://www.zillow.com/homedetails/..."
+                  id="listing-url-input"
+                  style={{flex:1,padding:'10px',border:'1px solid #ddd',borderRadius:'8px',fontSize:'13px'}}
+                />
+                <button
+                  onClick={async () => {
+                    const urlInput = (document.getElementById('listing-url-input') as HTMLInputElement)?.value
+                    if (!urlInput) return
+                    try {
+                      const res = await fetch('/api/import-listing', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: urlInput })
+                      })
+                      const data = await res.json()
+                      if (data.listing) {
+                        setForm(prev => ({
+                          ...prev,
+                          type: data.listing.type || prev.type,
+                          beds: data.listing.beds || prev.beds,
+                          sqft: data.listing.sqft || prev.sqft,
+                          price: data.listing.price || prev.price,
+                          neighborhood: data.listing.neighborhood || prev.neighborhood,
+                          notes: data.listing.notes || prev.notes,
+                        }))
+                        setStep('confirm')
+                      } else {
+                        alert('Could not import. Try pasting the listing text instead.')
+                      }
+                    } catch(e: any) {
+                      alert('Error: ' + e.message)
+                    }
+                  }}
+                  style={{padding:'10px 16px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'13px',fontWeight:'500',cursor:'pointer',whiteSpace:'nowrap'}}>
+                  Import
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={() => setStep('confirm')}
               style={{width:'100%',padding:'12px',background:'#ddd',color:'#666',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:'500',cursor:'pointer'}}>
