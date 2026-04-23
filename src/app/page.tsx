@@ -30,11 +30,11 @@ export default function Home() {
       </nav>
 
       {/* HERO */}
-      <section style={{textAlign:'center',padding:'5rem 2rem 3rem',background:'linear-gradient(180deg,#f0fdf8 0%,#fff 100%)'}}>
+      <section style={{textAlign:'center',padding:'3rem 1.5rem 2rem',background:'linear-gradient(180deg,#f0fdf8 0%,#fff 100%)'}}>
         <div style={{display:'inline-block',background:'#E1F5EE',color:'#085041',fontSize:'12px',fontWeight:'600',padding:'4px 12px',borderRadius:'20px',marginBottom:'1.5rem',letterSpacing:'0.5px'}}>
           BUILT FOR REAL ESTATE AGENTS
         </div>
-        <h1 style={{fontSize:'3rem',fontWeight:'700',lineHeight:'1.2',maxWidth:'700px',margin:'0 auto 1.5rem'}}>
+        <h1 style={{fontSize:'clamp(1.75rem, 5vw, 3rem)',fontWeight:'700',lineHeight:'1.2',maxWidth:'700px',margin:'0 auto 1.5rem'}}>
           The AI assistant that works with you{' '}
           <span style={{color:'#1D9E75'}}>before, during, and after every listing.</span>
         </h1>
