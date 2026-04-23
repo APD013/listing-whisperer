@@ -15,6 +15,7 @@ export default function SignupPage() {
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const handleSignup = async () => {
     trackSignupStarted()
@@ -29,7 +30,7 @@ export default function SignupPage() {
         setMessage(error.message)
       } else {
         trackSignupCompleted('new_user')
-        setMessage('Success! Check your email to confirm.')
+        setSuccess(true)
       }
     } catch(e) {
       setMessage('Something went wrong, try again.')
@@ -38,51 +39,113 @@ export default function SignupPage() {
   }
 
   return (
-    <main style={{minHeight:'100vh',display:'flex',fontFamily:'sans-serif'}}>
-      {/* LEFT SIDE */}
-      <div style={{flex:1,background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',flexDirection:'column',justifyContent:'center',padding:'4rem',color:'#fff'}}>
-        <div style={{fontSize:'22px',fontWeight:'700',marginBottom:'2rem'}}>Listing<span style={{color:'#a8f0d4'}}>Whisperer</span></div>
-        <h2 style={{fontSize:'1.75rem',fontWeight:'600',lineHeight:'1.3',marginBottom:'1rem'}}>
-          Write listing copy in under 60 seconds.
-        </h2>
-        <p style={{fontSize:'15px',color:'#a8f0d4',lineHeight:'1.8',marginBottom:'2rem'}}>
-          Join agents already using Listing Whisperer to save hours every week.
-        </p>
-        {[
-          '3 free listings to start',
-          'No credit card required',
-          '8 copy formats per listing',
-          'MLS, Instagram, Email & more',
-          'Cancel anytime',
-        ].map(item => (
-          <div key={item} style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
-            <span style={{color:'#a8f0d4',fontSize:'16px'}}>✓</span>
-            <span style={{fontSize:'14px',color:'#e0f7ee'}}>{item}</span>
-          </div>
-        ))}
-      </div>
+    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif",display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
 
-      {/* RIGHT SIDE */}
-      <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',padding:'4rem',background:'#fff'}}>
-        <div style={{width:'100%',maxWidth:'360px'}}>
-          <h1 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Create your account</h1>
-          <p style={{color:'#666',fontSize:'0.875rem',marginBottom:'2rem'}}>Start with 3 free listings — no credit card needed</p>
-          <input type="text" placeholder="Full name" value={name} onChange={e=>setName(e.target.value)}
-            style={{width:'100%',padding:'12px',border:'1px solid #ddd',borderRadius:'8px',marginBottom:'12px',fontSize:'14px',boxSizing:'border-box'}}/>
-          <input type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)}
-            style={{width:'100%',padding:'12px',border:'1px solid #ddd',borderRadius:'8px',marginBottom:'12px',fontSize:'14px',boxSizing:'border-box'}}/>
-          <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)}
-            style={{width:'100%',padding:'12px',border:'1px solid #ddd',borderRadius:'8px',marginBottom:'20px',fontSize:'14px',boxSizing:'border-box'}}/>
-          {message && <p style={{fontSize:'13px',marginBottom:'12px',color:message.includes('Success')?'green':'red'}}>{message}</p>}
-          <button onClick={handleSignup} disabled={loading}
-            style={{width:'100%',padding:'13px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'600',cursor:'pointer',marginBottom:'16px'}}>
-            {loading ? 'Creating account...' : 'Create free account'}
-          </button>
-          <p style={{textAlign:'center',fontSize:'13px',color:'#666'}}>
-            Already have an account? <a href="/login" style={{color:'#1D9E75',fontWeight:'500'}}>Sign in →</a>
-          </p>
-          <p style={{textAlign:'center',fontSize:'12px',color:'#999',marginTop:'2rem'}}>
-            By signing up you agree to our terms of service.
+      {/* BACKGROUND GLOW */}
+      <div style={{position:'fixed',top:'20%',left:'50%',transform:'translateX(-50%)',width:'600px',height:'600px',background:'radial-gradient(circle, rgba(29,158,117,0.08) 0%, transparent 70%)',pointerEvents:'none'}}/>
+
+      <div style={{width:'100%',maxWidth:'420px',position:'relative',zIndex:1}}>
+
+        {/* LOGO */}
+        <div style={{textAlign:'center',marginBottom:'2rem'}}>
+          <a href="/" style={{textDecoration:'none'}}>
+            <div style={{fontSize:'24px',fontWeight:'700',color:'#f0f0f0'}}>
+              Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+            </div>
+            <div style={{fontSize:'12px',color:'#6b7280',marginTop:'4px'}}>AI Assistant for Real Estate Agents</div>
+          </a>
+        </div>
+
+        {success ? (
+          <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.2)',padding:'2.5rem',boxShadow:'0 24px 48px rgba(0,0,0,0.4)',textAlign:'center'}}>
+            <div style={{fontSize:'3rem',marginBottom:'1rem'}}>✅</div>
+            <h2 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Check your email!</h2>
+            <p style={{fontSize:'14px',color:'#6b7280',lineHeight:'1.7',marginBottom:'1.5rem'}}>
+              We sent a confirmation link to <strong style={{color:'#f0f0f0'}}>{email}</strong>. Click it to activate your account and start generating listings.
+            </p>
+            <div style={{background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.2)',borderRadius:'10px',padding:'1rem',marginBottom:'1.5rem'}}>
+              <p style={{fontSize:'12px',color:'#1D9E75',margin:'0',lineHeight:'1.8'}}>
+                ✓ 2 free listings included<br/>
+                ✓ 11 copy formats per listing<br/>
+                ✓ Seller Meeting Prep<br/>
+                ✓ Snap & Start on-site drafts
+              </p>
+            </div>
+            <a href="/login" style={{display:'block',padding:'12px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>
+              Go to Sign In →
+            </a>
+          </div>
+        ) : (
+          <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.07)',padding:'2rem',boxShadow:'0 24px 48px rgba(0,0,0,0.4)'}}>
+
+            <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>Create your account</h1>
+            <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'1.5rem'}}>Free to start · No credit card required</p>
+
+            {/* FEATURE PILLS */}
+            <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'1.5rem'}}>
+              {['2 free listings','11 formats','Seller prep','Snap & Start'].map(f => (
+                <span key={f} style={{fontSize:'11px',background:'rgba(29,158,117,0.1)',color:'#1D9E75',padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.2)'}}>✓ {f}</span>
+              ))}
+            </div>
+
+            <div style={{marginBottom:'12px'}}>
+              <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Full Name</label>
+              <input
+                type="text"
+                placeholder="Jane Smith"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}
+              />
+            </div>
+
+            <div style={{marginBottom:'12px'}}>
+              <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Email</label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}
+              />
+            </div>
+
+            <div style={{marginBottom:'1.5rem'}}>
+              <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Password</label>
+              <input
+                type="password"
+                placeholder="Min 6 characters"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSignup()}
+                style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}
+              />
+            </div>
+
+            {message && (
+              <div style={{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'8px',padding:'10px 14px',marginBottom:'16px'}}>
+                <p style={{fontSize:'13px',color:'#f87171',margin:'0'}}>{message}</p>
+              </div>
+            )}
+
+            <button onClick={handleSignup} disabled={loading}
+              style={{width:'100%',padding:'13px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 24px rgba(29,158,117,0.3)',transition:'all 0.2s',letterSpacing:'0.3px'}}>
+              {loading ? 'Creating account...' : 'Create Free Account →'}
+            </button>
+
+            <div style={{marginTop:'1.5rem',paddingTop:'1.5rem',borderTop:'1px solid rgba(255,255,255,0.06)',textAlign:'center'}}>
+              <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>
+                Already have an account?{' '}
+                <a href="/login" style={{color:'#1D9E75',textDecoration:'none',fontWeight:'600'}}>Sign in</a>
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* FOOTER */}
+        <div style={{textAlign:'center',marginTop:'1.5rem'}}>
+          <p style={{fontSize:'12px',color:'#444'}}>
+            Use code <strong style={{color:'#1D9E75'}}>WELCOME50</strong> at checkout for 50% off Pro
           </p>
         </div>
       </div>

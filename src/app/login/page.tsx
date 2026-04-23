@@ -34,43 +34,76 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{minHeight:'100vh',display:'flex',fontFamily:'sans-serif'}}>
-      {/* LEFT SIDE */}
-      <div style={{flex:1,background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',flexDirection:'column',justifyContent:'center',padding:'4rem',color:'#fff'}}>
-        <div style={{fontSize:'22px',fontWeight:'700',marginBottom:'2rem'}}>Listing<span style={{color:'#a8f0d4'}}>Whisperer</span></div>
-        <h2 style={{fontSize:'1.75rem',fontWeight:'600',lineHeight:'1.3',marginBottom:'1rem'}}>
-          Turn rough listing notes into polished marketing copy — in seconds.
-        </h2>
-        <p style={{fontSize:'15px',color:'#a8f0d4',lineHeight:'1.8',marginBottom:'2rem'}}>
-          MLS descriptions, Instagram captions, email blasts, and more. All from one set of notes.
-        </p>
-        {['8 copy formats in one click','MLS-ready formatting','Tone & buyer targeting','Saves listing history'].map(item => (
-          <div key={item} style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
-            <span style={{color:'#a8f0d4',fontSize:'16px'}}>✓</span>
-            <span style={{fontSize:'14px',color:'#e0f7ee'}}>{item}</span>
-          </div>
-        ))}
-      </div>
+    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif",display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+      
+      {/* BACKGROUND GLOW */}
+      <div style={{position:'fixed',top:'20%',left:'50%',transform:'translateX(-50%)',width:'600px',height:'600px',background:'radial-gradient(circle, rgba(29,158,117,0.08) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
-      {/* RIGHT SIDE */}
-      <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',padding:'4rem',background:'#fff'}}>
-        <div style={{width:'100%',maxWidth:'360px'}}>
-          <h1 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Welcome back</h1>
-          <p style={{color:'#666',fontSize:'0.875rem',marginBottom:'2rem'}}>Sign in to your Listing Whisperer account</p>
-          <input type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)}
-            style={{width:'100%',padding:'12px',border:'1px solid #ddd',borderRadius:'8px',marginBottom:'12px',fontSize:'14px',boxSizing:'border-box'}}/>
-          <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)}
-            style={{width:'100%',padding:'12px',border:'1px solid #ddd',borderRadius:'8px',marginBottom:'20px',fontSize:'14px',boxSizing:'border-box'}}/>
-          {message && <p style={{fontSize:'13px',marginBottom:'12px',color:'red'}}>{message}</p>}
+      <div style={{width:'100%',maxWidth:'420px',position:'relative',zIndex:1}}>
+        
+        {/* LOGO */}
+        <div style={{textAlign:'center',marginBottom:'2rem'}}>
+          <a href="/" style={{textDecoration:'none'}}>
+            <div style={{fontSize:'24px',fontWeight:'700',color:'#f0f0f0'}}>
+              Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+            </div>
+            <div style={{fontSize:'12px',color:'#6b7280',marginTop:'4px'}}>AI Assistant for Real Estate Agents</div>
+          </a>
+        </div>
+
+        {/* CARD */}
+        <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.07)',padding:'2rem',boxShadow:'0 24px 48px rgba(0,0,0,0.4)'}}>
+          
+          <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>Welcome back</h1>
+          <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'1.5rem'}}>Sign in to your workspace</p>
+
+          <div style={{marginBottom:'12px'}}>
+            <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Email</label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleLogin()}
+              style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}
+            />
+          </div>
+
+          <div style={{marginBottom:'1.5rem'}}>
+            <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleLogin()}
+              style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}
+            />
+          </div>
+
+          {message && (
+            <div style={{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'8px',padding:'10px 14px',marginBottom:'16px'}}>
+              <p style={{fontSize:'13px',color:'#f87171',margin:'0'}}>{message}</p>
+            </div>
+          )}
+
           <button onClick={handleLogin} disabled={loading}
-            style={{width:'100%',padding:'13px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',fontSize:'15px',fontWeight:'600',cursor:'pointer',marginBottom:'16px'}}>
-            {loading ? 'Signing in...' : 'Sign in'}
+            style={{width:'100%',padding:'13px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 24px rgba(29,158,117,0.3)',transition:'all 0.2s',letterSpacing:'0.3px'}}>
+            {loading ? 'Signing in...' : 'Sign In →'}
           </button>
-          <p style={{textAlign:'center',fontSize:'13px',color:'#666'}}>
-            No account? <a href="/signup" style={{color:'#1D9E75',fontWeight:'500'}}>Get started free →</a>
-          </p>
-          <p style={{textAlign:'center',fontSize:'12px',color:'#999',marginTop:'2rem'}}>
-            3 free listings · No credit card required
+
+          <div style={{marginTop:'1.5rem',paddingTop:'1.5rem',borderTop:'1px solid rgba(255,255,255,0.06)',textAlign:'center'}}>
+            <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>
+              Don't have an account?{' '}
+              <a href="/signup" style={{color:'#1D9E75',textDecoration:'none',fontWeight:'600'}}>Sign up free</a>
+            </p>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <div style={{textAlign:'center',marginTop:'1.5rem'}}>
+          <p style={{fontSize:'12px',color:'#444'}}>
+            No credit card required · 2 free listings to start
           </p>
         </div>
       </div>
