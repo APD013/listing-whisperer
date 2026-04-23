@@ -24,6 +24,7 @@ export default function SettingsPage() {
     ctaStyle: '',
     avoidWords: '',
   })
+  const [language, setLanguage] = useState('English')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -36,12 +37,13 @@ export default function SettingsPage() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('plan, brand_voice')
+        .select('plan, brand_voice, preferred_language')
         .eq('id', user.id)
         .single()
 
       if (profile) {
         setPlan(profile.plan || 'starter')
+        setLanguage(profile.preferred_language || 'English')
         if (profile.brand_voice) {
           try {
             setBrandVoice(JSON.parse(profile.brand_voice))
@@ -56,7 +58,10 @@ export default function SettingsPage() {
     setSaving(true)
     await supabase
       .from('profiles')
-      .update({ brand_voice: JSON.stringify(brandVoice) })
+      .update({ 
+        brand_voice: JSON.stringify(brandVoice),
+        preferred_language: language
+      })
       .eq('id', userId)
     setSaving(false)
     setSaved(true)
@@ -141,6 +146,22 @@ export default function SettingsPage() {
             <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Your preferred CTA style</label>
             <input placeholder="e.g. Call me today, DM for details, Schedule a private tour..." value={brandVoice.ctaStyle} onChange={e=>setBrandVoice({...brandVoice,ctaStyle:e.target.value})}
               style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',boxSizing:'border-box'}}/>
+          </div>
+
+          <div style={{marginBottom:'12px'}}>
+            <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Output Language</label>
+            <select value={language} onChange={e => setLanguage(e.target.value)}
+              style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px'}}>
+              <option>English</option>
+              <option>Spanish</option>
+              <option>Mandarin Chinese</option>
+              <option>Polish</option>
+              <option>French</option>
+              <option>Vietnamese</option>
+              <option>Korean</option>
+              <option>Arabic</option>
+            </select>
+            <p style={{fontSize:'11px',color:'#999',marginTop:'4px'}}>All generated copy will be in this language</p>
           </div>
 
           <div style={{marginBottom:'12px'}}>

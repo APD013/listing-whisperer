@@ -31,14 +31,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'LIMIT_REACHED' }, { status: 403 })
     }
 
-    // Get brand voice
+    // Get brand voice and language
     let brandVoiceText = ''
+    let preferredLanguage = 'English'
     if (userId) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('brand_voice')
+        .select('brand_voice, preferred_language')
         .eq('id', userId)
         .single()
+      if (profile?.preferred_language) {
+        preferredLanguage = profile.preferred_language
+      }
       if (profile?.brand_voice) {
         try {
           const bv = JSON.parse(profile.brand_voice)
@@ -55,7 +59,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const prompt = `You are a real estate copywriter. Generate marketing copy. Respond ONLY with valid JSON, no markdown, no backticks.
+    const prompt = `You are a real estate copywriter. Generate marketing copy in ${preferredLanguage}. All output must be written entirely in ${preferredLanguage}. Respond ONLY with valid JSON, no markdown, no backticks.
 
 Property: ${property.type}, ${property.beds}, ${property.sqft} sq ft, ${property.neighborhood}${property.price ? ', ' + property.price : ''}
 Tone: ${property.tone} | Target: ${property.buyer}
