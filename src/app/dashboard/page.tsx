@@ -212,13 +212,13 @@ export default function Dashboard() {
   ]
 
   const styles = {
-    page: { minHeight: '100vh', background: '#0f1117', fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column' as const },
-    sidebar: { width: '220px', background: '#1a1d26', borderRight: '1px solid #2a2d3a', padding: '1.5rem 0', display: 'flex', flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 100 },
-    main: { marginLeft: '220px', padding: '2rem', minHeight: '100vh' },
-    card: { background: '#1e2130', borderRadius: '16px', border: '1px solid #2a2d3a', padding: '1.5rem' },
-    input: { width: '100%', padding: '10px 14px', background: '#0f1117', border: '1px solid #2a2d3a', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const },
-    select: { width: '100%', padding: '10px 14px', background: '#0f1117', border: '1px solid #2a2d3a', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
-    label: { fontSize: '12px', color: '#8b8fa8', display: 'block' as const, marginBottom: '4px', fontWeight: '500' as const },
+    page: { minHeight: '100vh', background: 'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' as const },
+    sidebar: { width: '220px', background: 'linear-gradient(180deg, #13161f 0%, #0f1117 100%)', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '1.5rem 0', display: 'flex', flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 100 },
+    main: { marginLeft: '220px', padding: '2.5rem', minHeight: '100vh' },
+    card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' },
+    input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
+    select: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
+    label: { fontSize: '11px', color: '#6b7280', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
   }
 
   return (
@@ -226,7 +226,7 @@ export default function Dashboard() {
       {/* SIDEBAR */}
       <div style={styles.sidebar}>
         {/* LOGO */}
-        <div style={{ padding: '0 1.5rem 1.5rem', borderBottom: '1px solid #2a2d3a' }}>
+        <div style={{ padding: '0 1.5rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div style={{ fontSize: '16px', fontWeight: '700', color: '#f0f0f0' }}>
             Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
             {planLoaded && plan === 'pro' && (
@@ -273,7 +273,7 @@ export default function Dashboard() {
         </div>
 
         {/* BOTTOM */}
-        <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #2a2d3a' }}>
+        <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           {plan === 'starter' && (
             <a href="/pricing" onClick={() => trackUpgradeClick('sidebar', plan)}
               style={{ display: 'block', background: '#1D9E75', color: '#fff', padding: '10px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontSize: '13px', fontWeight: '600', marginBottom: '10px' }}>
@@ -367,7 +367,7 @@ export default function Dashboard() {
 
               <div style={{ borderTop: '1px solid #2a2d3a', paddingTop: '16px', marginTop: '4px' }}>
                 <button onClick={generate} disabled={loading}
-                  style={{ width: '100%', padding: '16px', background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s', letterSpacing: '0.3px' }}>
+                  style={{ width: '100%', padding: '16px', background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75 0%,#085041 100%)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s', letterSpacing: '0.3px', boxShadow: loading ? 'none' : '0 0 30px rgba(29,158,117,0.3)' }}>
                   {loading ? '⏳ Generating your listing...' : '✨ Generate 11 Formats — MLS, Social, Email & More'}
                 </button>
                 <p style={{ fontSize: '11px', color: '#555', textAlign: 'center', marginTop: '8px' }}>Takes about 15-20 seconds · Your brand voice is applied automatically</p>
@@ -427,8 +427,9 @@ export default function Dashboard() {
                   style={{
                     padding: '6px 12px', borderRadius: '8px', border: '1px solid', fontSize: '12px', cursor: 'pointer', fontWeight: activeTab === t.key ? '600' : '400',
                     borderColor: activeTab === t.key ? '#1D9E75' : '#2a2d3a',
-                    background: activeTab === t.key ? 'rgba(29,158,117,0.15)' : 'transparent',
-                    color: activeTab === t.key ? '#1D9E75' : '#8b8fa8'
+                    background: activeTab === t.key ? 'rgba(29,158,117,0.2)' : 'rgba(0,0,0,0.2)',
+                    color: activeTab === t.key ? '#1D9E75' : '#6b7280',
+                    boxShadow: activeTab === t.key ? '0 0 12px rgba(29,158,117,0.2)' : 'none'
                   }}>
                   {t.icon} {t.label}
                 </button>
