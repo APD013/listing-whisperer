@@ -13,187 +13,102 @@ const supabase = createClient(
 export default function Dashboard() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
-  const [userEmail, setUserEmail] = useState<string | null>(null)
   const [listingsUsed, setListingsUsed] = useState(0)
   const [plan, setPlan] = useState('starter')
+  const [planLoaded, setPlanLoaded] = useState(false)
   const [listingCredits, setListingCredits] = useState(0)
-  const [form, setForm] = useState({
-    type: 'Single family', beds: '', sqft: '', price: '',
-    neighborhood: '', features: '', tone: 'Warm & inviting', name: '',
-    buyer: 'Move-up families', notes: ''
-  })
   const [outputs, setOutputs] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('mls_standard')
-  const [pastListings, setPastListings] = useState<any[]>([])
-  const [emailCopy, setEmailCopy] = useState(false)
   const [copied, setCopied] = useState(false)
   const [generatingPdf, setGeneratingPdf] = useState(false)
-  const [importUrl, setImportUrl] = useState('')
-  const [importing, setImporting] = useState(false)
-  const [showImport, setShowImport] = useState(false)
-  const [showPhotoUpload, setShowPhotoUpload] = useState(false)
-  const [analyzingPhotos, setAnalyzingPhotos] = useState(false)
-  const [photoPreview, setPhotoPreview] = useState<string[]>([])
+  const [pastListings, setPastListings] = useState<any[]>([])
+  const [showHistory, setShowHistory] = useState(false)
+  const [activePage, setActivePage] = useState('generate')
+
+  const [form, setForm] = useState({
+    type: 'Single family', beds: '', sqft: '', price: '',
+    neighborhood: '', features: '', tone: 'Professional', buyer: 'Move-up families',
+    notes: '', name: ''
+  })
 
   useEffect(() => {
-    // Check if returning from successful payment
     const params = new URLSearchParams(window.location.search)
     const upgraded = params.get('upgraded')
     const credits = params.get('credits')
-
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { 
-        // If returning from payment, store intent and redirect to login
-        if (upgraded || credits) {
-          localStorage.setItem('post_payment_redirect', '/dashboard')
-        }
-        router.push('/login'); 
-        return 
-      }
+      if (!user) { router.push('/login'); return }
       setUserId(user.id)
-      setUserEmail(user.email || null)
-
       const { data: profile } = await supabase
         .from('profiles')
-        .select('listings_used, plan, listing_credits')
+        .select('listings_used, plan, listing_credits, brand_voice, agent_notes')
         .eq('id', user.id)
         .single()
-
       if (profile) {
         setListingsUsed(profile.listings_used || 0)
         setPlan(profile.plan || 'starter')
         setListingCredits(profile.listing_credits || 0)
         trackDashboardView(profile.plan || 'starter')
+        setPlanLoaded(true)
+        if (profile.brand_voice) {
+          try {
+            const bv = JSON.parse(profile.brand_voice)
+            if (bv.preferredTone) setForm(prev => ({ ...prev, tone: bv.preferredTone }))
+          } catch(e) {}
+        }
+      } else {
+        setPlanLoaded(true)
       }
-
       const { data: listings } = await supabase
         .from('listings')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-
+        .limit(10)
       if (listings) setPastListings(listings)
+      if (upgraded) {
+        setPlan('pro')
+      }
     }
     getUser()
   }, [])
 
   const generate = async () => {
-    if (plan === 'starter' && listingsUsed >= 3 && listingCredits <= 0) {
-      router.push('/pricing')
-      return
-    }
+    if (!form.features && !form.neighborhood) { alert('Please fill in at least the neighborhood and features!'); return }
+    if (plan === 'starter' && listingsUsed >= 2 && listingCredits <= 0) { router.push('/pricing'); return }
     setLoading(true)
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property: form, userId, userEmail, sendEmail: plan === 'pro' && emailCopy })
+        body: JSON.stringify({ property: form, userId })
       })
       const data = await res.json()
-      if (data.error === 'LIMIT_REACHED') {
-        router.push('/pricing')
-        return
-      }
+      if (data.error === 'LIMIT_REACHED') { router.push('/pricing'); return }
       if (data.outputs) {
         setOutputs(data.outputs)
         setActiveTab('mls_standard')
         setListingsUsed(prev => prev + 1)
         trackListingCreated(plan, form.neighborhood)
+        setActivePage('results')
         const { data: listings } = await supabase
           .from('listings')
           .select('*')
           .eq('user_id', userId)
           .order('created_at', { ascending: false })
+          .limit(10)
         if (listings) setPastListings(listings)
-        // Scroll to results
-        setTimeout(() => {
-          document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' })
-        }, 100)
-      } else {
-        alert('Error: ' + JSON.stringify(data))
       }
-    } catch(e: any) {
-      alert('Fetch error: ' + e.message)
-    }
+    } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
   }
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-    if (files.length === 0) return
-
-    setAnalyzingPhotos(true)
-    setShowPhotoUpload(false)
-
-    try {
-      // Convert images to base64
-      const base64Images = await Promise.all(
-        files.slice(0, 5).map(file => new Promise<string>((resolve) => {
-          const reader = new FileReader()
-          reader.onload = () => resolve(reader.result as string)
-          reader.readAsDataURL(file)
-        }))
-      )
-
-      setPhotoPreview(base64Images)
-
-      const res = await fetch('/api/analyze-photos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ images: base64Images })
-      })
-
-      const data = await res.json()
-      if (data.analysis) {
-        setForm(prev => ({
-          ...prev,
-          features: data.analysis.features || prev.features,
-          type: data.analysis.property_type || prev.type,
-          notes: data.analysis.highlights || '',
-        }))
-        alert(`✅ Photos analyzed! Features and highlights auto-filled. Review and edit the fields before generating.`)
-      } else {
-        alert('Could not analyze photos. Please try again.')
-      }
-    } catch(e: any) {
-      alert('Photo analysis error: ' + e.message)
-    }
-    setAnalyzingPhotos(false)
-  }
-
-  const handleImport = async () => {
-    if (!importUrl.trim()) return
-    setImporting(true)
-    try {
-      const res = await fetch('/api/import-listing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: importUrl })
-      })
-      const data = await res.json()
-      if (data.listing) {
-        setForm({
-          ...form,
-          type: data.listing.type || form.type,
-          beds: data.listing.beds || form.beds,
-          sqft: data.listing.sqft || form.sqft,
-          price: data.listing.price || form.price,
-          neighborhood: data.listing.neighborhood || form.neighborhood,
-          features: data.listing.features || form.features,
-          notes: data.listing.notes || form.notes,
-        })
-        setShowImport(false)
-        setImportUrl('')
-        alert('✅ Listing details imported! Review and edit before generating.')
-      } else {
-        alert('Could not import that URL. Try a Zillow or Redfin listing page.')
-      }
-    } catch(e: any) {
-      alert('Import error: ' + e.message)
-    }
-    setImporting(false)
+  const handleCopy = () => {
+    navigator.clipboard.writeText(outputs[activeTab] || '')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+    trackOutputCopied(activeTab, plan)
   }
 
   const handleDownloadPdf = async (type: string) => {
@@ -204,512 +119,391 @@ export default function Dashboard() {
       const margin = 20
       const contentWidth = pageWidth - margin * 2
       let y = 20
-
-      // Helper functions
-      const addText = (text: string, x: number, yPos: number, options: any = {}) => {
-        doc.text(text, x, yPos, options)
-      }
-
+      const addText = (text: string, x: number, yPos: number, options: any = {}) => { doc.text(text, x, yPos, options) }
       const addWrappedText = (text: string, x: number, yPos: number, maxWidth: number, lineHeight: number = 6) => {
         const lines = doc.splitTextToSize(text, maxWidth)
         doc.text(lines, x, yPos)
         return yPos + (lines.length * lineHeight)
       }
-
       const addSectionTitle = (title: string, yPos: number) => {
-        doc.setFontSize(9)
-        doc.setFont('helvetica', 'bold')
-        doc.setTextColor(29, 158, 117)
+        doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(29, 158, 117)
         addText(title.toUpperCase(), margin, yPos)
-        doc.setDrawColor(29, 158, 117)
-        doc.line(margin, yPos + 2, pageWidth - margin, yPos + 2)
+        doc.setDrawColor(29, 158, 117); doc.line(margin, yPos + 2, pageWidth - margin, yPos + 2)
         return yPos + 8
       }
-
       const checkPageBreak = (yPos: number, needed: number = 30) => {
-        if (yPos > 270 - needed) {
-          doc.addPage()
-          return 20
-        }
+        if (yPos > 270 - needed) { doc.addPage(); return 20 }
         return yPos
       }
-
       if (type === 'mls') {
-        // HEADER
-        doc.setFontSize(20)
-        doc.setFont('helvetica', 'bold')
-        doc.setTextColor(29, 158, 117)
+        doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor(29, 158, 117)
         addText('ListingWhisperer', margin, y)
-
-        doc.setFontSize(18)
-        doc.setTextColor(17, 17, 17)
-        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(18); doc.setTextColor(17, 17, 17); doc.setFont('helvetica', 'bold')
         addText(form.price || '', pageWidth - margin, y, { align: 'right' })
-
-        y += 8
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(100, 100, 100)
+        y += 8; doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 100, 100)
         addText(form.neighborhood || '', pageWidth - margin, y, { align: 'right' })
-
-        doc.setDrawColor(29, 158, 117)
-        doc.setLineWidth(0.8)
-        doc.line(margin, y + 4, pageWidth - margin, y + 4)
-        y += 14
-
-        // PROPERTY INFO
-        doc.setFontSize(14)
-        doc.setFont('helvetica', 'bold')
-        doc.setTextColor(17, 17, 17)
+        doc.setDrawColor(29, 158, 117); doc.setLineWidth(0.8); doc.line(margin, y + 4, pageWidth - margin, y + 4)
+        y += 14; doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(17, 17, 17)
         addText(`${form.type || 'Property'} — ${form.beds || ''}`, margin, y)
-        y += 7
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(80, 80, 80)
+        y += 7; doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(80, 80, 80)
         addText(`${form.sqft || ''} sq ft  |  ${form.neighborhood || ''}`, margin, y)
-        y += 12
-
-        // MLS STANDARD
-        y = addSectionTitle('MLS Description', y)
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(50, 50, 50)
+        y += 12; y = addSectionTitle('MLS Description', y)
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50)
         y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
-        y += 10
-
-        y = checkPageBreak(y)
-
-        // MLS LUXURY
-        y = addSectionTitle('Luxury MLS Version', y)
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(50, 50, 50)
+        y += 10; y = checkPageBreak(y); y = addSectionTitle('Luxury MLS Version', y)
         y = addWrappedText(outputs.mls_luxury || '', margin, y, contentWidth)
-        y += 10
-
-        y = checkPageBreak(y)
-
-        // INSTAGRAM
-        y = addSectionTitle('Instagram Caption', y)
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(50, 50, 50)
-        const instaText = (outputs.instagram || '').split('---')[0].trim()
-        y = addWrappedText(instaText, margin, y, contentWidth)
-        y += 10
-
-        y = checkPageBreak(y)
-
-        // EMAIL
-        y = addSectionTitle('Email Blast', y)
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(50, 50, 50)
+        y += 10; y = checkPageBreak(y); y = addSectionTitle('Instagram Caption', y)
+        y = addWrappedText((outputs.instagram || '').split('---')[0].trim(), margin, y, contentWidth)
+        y += 10; y = checkPageBreak(y); y = addSectionTitle('Email Blast', y)
         y = addWrappedText(outputs.email || '', margin, y, contentWidth)
-        y += 10
-
-        y = checkPageBreak(y)
-
-        // OPEN HOUSE
-        y = addSectionTitle('Open House', y)
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(50, 50, 50)
+        y += 10; y = checkPageBreak(y); y = addSectionTitle('Open House', y)
         y = addWrappedText(outputs.openhouse || '', margin, y, contentWidth)
-
-        // FOOTER
-        doc.setFontSize(9)
-        doc.setTextColor(150, 150, 150)
-        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(9); doc.setTextColor(150, 150, 150); doc.setFont('helvetica', 'normal')
         addText('Generated by ListingWhisperer.com  |  AI Marketing Copy for Real Estate Agents', pageWidth / 2, 285, { align: 'center' })
-
         doc.save(`MLS-Sheet-${form.neighborhood || 'listing'}.pdf`)
-
       } else if (type === 'flyer') {
-        // HEADER - clean no background
-        doc.setFontSize(22)
-        doc.setFont('helvetica', 'bold')
-        doc.setTextColor(29, 158, 117)
+        doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(29, 158, 117)
         addText(form.price || '', pageWidth / 2, y + 10, { align: 'center' })
-
-        doc.setFontSize(14)
-        doc.setFont('helvetica', 'bold')
-        doc.setTextColor(17, 17, 17)
+        doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(17, 17, 17)
         addText(form.neighborhood || '', pageWidth / 2, y + 20, { align: 'center' })
-
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(100, 100, 100)
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 100, 100)
         addText(`${form.type || ''} | ${form.beds || ''} | ${form.sqft || ''} sq ft`, pageWidth / 2, y + 28, { align: 'center' })
-
-        doc.setDrawColor(29, 158, 117)
-        doc.setLineWidth(0.8)
-        doc.line(margin, y + 32, pageWidth - margin, y + 32)
-
-        y += 42
-
-        // ABOUT
-        y = addSectionTitle('About This Home', y)
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(50, 50, 50)
+        doc.setDrawColor(29, 158, 117); doc.setLineWidth(0.8); doc.line(margin, y + 32, pageWidth - margin, y + 32)
+        y += 42; y = addSectionTitle('About This Home', y)
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50)
         y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
-        y += 10
-
-        // FEATURES
-        y = checkPageBreak(y)
-        y = addSectionTitle('Key Features', y)
+        y += 10; y = checkPageBreak(y); y = addSectionTitle('Key Features', y)
         const features = (form.features || '').split(',')
-        doc.setFontSize(10)
-        doc.setTextColor(50, 50, 50)
         features.forEach((feature: string) => {
-          y = checkPageBreak(y, 10)
-          doc.setFont('helvetica', 'normal')
-          addText(`✓ ${feature.trim()}`, margin, y)
-          y += 6
+          y = checkPageBreak(y, 10); doc.setFont('helvetica', 'normal')
+          addText(`✓ ${feature.trim()}`, margin, y); y += 6
         })
-        y += 6
-
-        // OPEN HOUSE
-        y = checkPageBreak(y)
-        y = addSectionTitle('Open House', y)
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(50, 50, 50)
+        y += 6; y = checkPageBreak(y); y = addSectionTitle('Open House', y)
         y = addWrappedText(outputs.openhouse || '', margin, y, contentWidth)
-
-        // FOOTER
-        doc.setDrawColor(29, 158, 117)
-        doc.setLineWidth(0.8)
-        doc.line(margin, 278, pageWidth - margin, 278)
-        doc.setFontSize(9)
-        doc.setTextColor(100, 100, 100)
-        doc.setFont('helvetica', 'normal')
+        doc.setDrawColor(29, 158, 117); doc.setLineWidth(0.8); doc.line(margin, 278, pageWidth - margin, 278)
+        doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.setFont('helvetica', 'normal')
         addText('ListingWhisperer.com', margin, 284)
         addText('Generated by ListingWhisperer.com', pageWidth - margin, 284, { align: 'right' })
-
         doc.save(`Flyer-${form.neighborhood || 'listing'}.pdf`)
       }
-
-    } catch(e: any) {
-      alert('PDF error: ' + e.message)
-    }
+    } catch(e: any) { alert('PDF error: ' + e.message) }
     setGeneratingPdf(false)
   }
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(outputs[activeTab] || '')
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-    trackOutputCopied(activeTab, plan)
-  }
-
-  const remaining = 3 - listingsUsed
-
+  const remaining = 2 - listingsUsed
   const tabs = [
     { key: 'mls_standard', label: 'MLS', icon: '🏠' },
-    { key: 'mls_luxury', label: 'Luxury MLS', icon: '✨' },
+    { key: 'mls_luxury', label: 'Luxury', icon: '✨' },
     { key: 'instagram', label: 'Instagram', icon: '📸' },
     { key: 'facebook', label: 'Facebook', icon: '👥' },
     { key: 'email', label: 'Email', icon: '📧' },
     { key: 'openhouse', label: 'Open House', icon: '🚪' },
-    { key: 'video', label: 'Video Script', icon: '🎬' },
+    { key: 'video', label: 'Video', icon: '🎬' },
     { key: 'seo', label: 'SEO', icon: '🔍' },
-    { key: 'text_message', label: 'Text/SMS', icon: '📱' },
+    { key: 'text_message', label: 'SMS', icon: '📱' },
     { key: 'flyer', label: 'Flyer', icon: '📄' },
     { key: 'price_drop', label: 'Price Drop', icon: '💰' },
   ]
 
-  return (
-    <main style={{minHeight:'100vh',fontFamily:'sans-serif',background:'#f8fafc'}}>
+  const navItems = [
+    { key: 'generate', icon: '✨', label: 'New Listing' },
+    { key: 'results', icon: '📋', label: 'Results', disabled: !outputs },
+    { key: 'history', icon: '🕐', label: 'History' },
+  ]
 
-      {/* TOP NAV */}
-      <div style={{background:'#fff',borderBottom:'1px solid #eee',padding:'1rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,flexWrap:'wrap',gap:'8px'}}>
-        <div style={{fontSize:'16px',fontWeight:'600'}}>
-          Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
-          {plan === 'pro' && (
-            <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>
-              PRO
-            </span>
-          )}
+  const styles = {
+    page: { minHeight: '100vh', background: '#0f1117', fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column' as const },
+    sidebar: { width: '220px', background: '#1a1d26', borderRight: '1px solid #2a2d3a', padding: '1.5rem 0', display: 'flex', flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 100 },
+    main: { marginLeft: '220px', padding: '2rem', minHeight: '100vh' },
+    card: { background: '#1e2130', borderRadius: '16px', border: '1px solid #2a2d3a', padding: '1.5rem' },
+    input: { width: '100%', padding: '10px 14px', background: '#0f1117', border: '1px solid #2a2d3a', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const },
+    select: { width: '100%', padding: '10px 14px', background: '#0f1117', border: '1px solid #2a2d3a', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
+    label: { fontSize: '12px', color: '#8b8fa8', display: 'block' as const, marginBottom: '4px', fontWeight: '500' as const },
+  }
+
+  return (
+    <div style={styles.page}>
+      {/* SIDEBAR */}
+      <div style={styles.sidebar}>
+        {/* LOGO */}
+        <div style={{ padding: '0 1.5rem 1.5rem', borderBottom: '1px solid #2a2d3a' }}>
+          <div style={{ fontSize: '16px', fontWeight: '700', color: '#f0f0f0' }}>
+            Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
+            {planLoaded && plan === 'pro' && (
+              <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle' }}>PRO</span>
+            )}
+          </div>
+          <div style={{ fontSize: '11px', color: '#8b8fa8', marginTop: '4px' }}>AI Assistant for Agents</div>
         </div>
-        <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+
+        {/* NAV */}
+        <div style={{ padding: '1rem 0', flex: 1 }}>
+          {navItems.map(item => (
+            <button key={item.key}
+              onClick={() => !item.disabled && setActivePage(item.key)}
+              style={{
+                width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px',
+                background: activePage === item.key ? 'rgba(29,158,117,0.15)' : 'transparent',
+                border: 'none', borderLeft: activePage === item.key ? '3px solid #1D9E75' : '3px solid transparent',
+                color: activePage === item.key ? '#1D9E75' : item.disabled ? '#444' : '#8b8fa8',
+                fontSize: '13px', fontWeight: activePage === item.key ? '600' : '400',
+                cursor: item.disabled ? 'not-allowed' : 'pointer', textAlign: 'left' as const
+              }}>
+              <span>{item.icon}</span> {item.label}
+            </button>
+          ))}
+
+          <div style={{ borderTop: '1px solid #2a2d3a', margin: '1rem 0' }} />
+
+          <a href="/snap-start" style={{ width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', background: 'transparent', border: 'none', borderLeft: '3px solid transparent' }}>
+            <span>📸</span> Snap & Start
+          </a>
+          <a href="/seller-prep" style={{ width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', background: 'transparent', border: 'none', borderLeft: '3px solid transparent' }}>
+            <span>📋</span> Seller Prep
+          </a>
+          <a href="/rewrite" style={{ width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', background: 'transparent', border: 'none', borderLeft: '3px solid transparent' }}>
+            <span>✨</span> Rewrite
+          </a>
+          <a href="/launch-kit" style={{ width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', background: 'transparent', border: 'none', borderLeft: '3px solid transparent' }}>
+            <span>🚀</span> Launch Kit
+          </a>
+          <a href="/settings" style={{ width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', background: 'transparent', border: 'none', borderLeft: '3px solid transparent' }}>
+            <span>⚙️</span> Settings
+          </a>
+        </div>
+
+        {/* BOTTOM */}
+        <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid #2a2d3a' }}>
           {plan === 'starter' && (
-            <span style={{fontSize:'12px',fontWeight:'bold',color: remaining <= 1 && listingCredits === 0 ? 'red' : '#666'}}>
-              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} remaining` : '⚠️ No listings left'}
-            </span>
+            <a href="/pricing" onClick={() => trackUpgradeClick('sidebar', plan)}
+              style={{ display: 'block', background: '#1D9E75', color: '#fff', padding: '10px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontSize: '13px', fontWeight: '600', marginBottom: '10px' }}>
+              ⚡ Upgrade to Pro
+            </a>
           )}
-          <a href="/snap-start" style={{fontSize:'13px',color:'#fff',fontWeight:'500',textDecoration:'none',background:'#1D9E75',padding:'4px 12px',borderRadius:'20px'}}>📸 Snap & Start</a>
-          <a href="/rewrite" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>✨ Rewrite</a>
-          <a href="/seller-prep" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>📋 Seller Prep</a>
-          <a href="/launch-kit" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>🚀 Launch Kit</a>
-          <a href="/settings" style={{fontSize:'13px',color:'#666',textDecoration:'none',padding:'4px 12px',borderRadius:'20px',border:'1px solid #eee'}}>⚙️ Settings</a>
           {plan === 'starter' && (
-            <a href="/pricing" onClick={() => trackUpgradeClick('dashboard_nav', plan)} style={{fontSize:'13px',background:'#1D9E75',color:'#fff',textDecoration:'none',padding:'6px 14px',borderRadius:'20px',fontWeight:'500'}}>Upgrade</a>
+            <div style={{ fontSize: '11px', color: '#8b8fa8', textAlign: 'center', marginBottom: '10px' }}>
+              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} left` : '⚠️ No listings left'}
+            </div>
           )}
-          <a href="/" style={{fontSize:'13px',color:'#666',textDecoration:'none'}}>Sign out</a>
+          <a href="/" style={{ display: 'block', fontSize: '12px', color: '#666', textAlign: 'center', textDecoration: 'none' }}>Sign out</a>
         </div>
       </div>
 
-      <div style={{maxWidth:'720px',margin:'0 auto',padding:'2rem'}}>
+      {/* MAIN CONTENT */}
+      <div style={styles.main}>
 
-        {plan === 'starter' && listingsUsed >= 3 && listingCredits <= 0 && (
-          <div style={{background:'#FFF3CD',border:'1px solid #FFCC00',borderRadius:'12px',padding:'1.25rem',marginBottom:'1.5rem',textAlign:'center'}}>
-            <p style={{margin:'0 0 8px',fontSize:'14px',fontWeight:'600'}}>You've used all 3 free listings!</p>
-            <p style={{fontSize:'13px',color:'#666',margin:'0 0 12px'}}>Upgrade to Pro for unlimited listings, rewrites, and full marketing kits.</p>
-            <button onClick={() => router.push('/pricing')}
-              style={{background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',padding:'10px 24px',cursor:'pointer',fontSize:'14px',fontWeight:'600'}}>
-              Upgrade to Pro — $29/mo
-            </button>
-          </div>
-        )}
-
-        {/* FORM */}
-        <div style={{background:'#fff',borderRadius:'16px',border:'1px solid #eee',padding:'1.5rem',marginBottom:'1.5rem',boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.25rem'}}>
-            <h1 style={{fontSize:'1.25rem',fontWeight:'600',margin:'0'}}>New listing</h1>
-            <div style={{display:'flex',gap:'8px'}}>
-              <button onClick={() => setShowImport(!showImport)}
-                style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
-                📋 Paste Details
-              </button>
-              <label title="Upload 1-5 photos of the property interior/exterior. AI will detect features automatically." style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',cursor:'pointer',fontWeight:'500'}}>
-                {analyzingPhotos ? '🔍 Analyzing photos...' : '📸 Upload Property Photos'}
-                <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} style={{display:'none'}} disabled={analyzingPhotos}/>
-              </label>
+        {/* GENERATE PAGE */}
+        {activePage === 'generate' && (
+          <div style={{ maxWidth: '760px' }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f0f0f0', marginBottom: '6px' }}>New Listing</h1>
+              <p style={{ fontSize: '14px', color: '#8b8fa8' }}>Fill in the details and generate 11 marketing formats instantly.</p>
             </div>
-          </div>
 
-          {showImport && (
-            <div style={{background:'#f0fdf8',borderRadius:'10px',padding:'1rem',marginBottom:'1rem',border:'1px solid #bbf0d9'}}>
-              <p style={{fontSize:'13px',color:'#085041',fontWeight:'500',marginBottom:'4px'}}>📋 How to use this:</p>
-              <ol style={{fontSize:'12px',color:'#444',lineHeight:'2',marginBottom:'10px',paddingLeft:'16px'}}>
-                <li>Open a listing on Zillow, Redfin, or Realtor.com</li>
-                <li>Copy <strong>only the listing details</strong> — beds, baths, price, sq ft, address, and features</li>
-                <li>Do NOT copy the whole page — just the property facts section</li>
-                <li>Paste below and we'll fill the form automatically</li>
-              </ol>
-              <div style={{background:'#fffbe6',border:'1px solid #ffe58f',borderRadius:'8px',padding:'8px 12px',marginBottom:'10px',fontSize:'12px',color:'#666'}}>
-                💡 <strong>Tip:</strong> The more specific your paste, the better the results. Include price, beds/baths, sq ft, address, and key features only.
+            <div style={{ ...styles.card, marginBottom: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                <div>
+                  <label style={styles.label}>Listing name (optional)</label>
+                  <input placeholder="123 Oak Street" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={styles.input} />
+                </div>
+                <div>
+                  <label style={styles.label}>Property type</label>
+                  <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={styles.select}>
+                    <option>Single family</option><option>Condo</option><option>Townhome</option><option>Luxury estate</option><option>Multi-family</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={styles.label}>Beds / Baths</label>
+                  <input placeholder="3 bed / 2 bath" value={form.beds} onChange={e => setForm({ ...form, beds: e.target.value })} style={styles.input} />
+                </div>
+                <div>
+                  <label style={styles.label}>Sq Ft</label>
+                  <input placeholder="1,850" value={form.sqft} onChange={e => setForm({ ...form, sqft: e.target.value })} style={styles.input} />
+                </div>
+                <div>
+                  <label style={styles.label}>Price</label>
+                  <input placeholder="$899,000" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} style={styles.input} />
+                </div>
+                <div>
+                  <label style={styles.label}>Neighborhood</label>
+                  <input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} style={styles.input} />
+                </div>
               </div>
-              <textarea
-                placeholder="Paste copied listing text here... e.g. '3 bed / 2 bath, 1,850 sq ft, $899,000, Newport Beach CA. Features: ocean views, chef kitchen, spa bath. Built 2018...'"
-                value={importUrl}
-                onChange={e => setImportUrl(e.target.value)}
-                style={{width:'100%',padding:'8px',border:'1px solid #bbf0d9',borderRadius:'8px',fontSize:'13px',minHeight:'100px',resize:'vertical',boxSizing:'border-box',marginBottom:'8px'}}
-              />
-              <button onClick={handleImport} disabled={importing}
-                style={{width:'100%',padding:'10px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',fontSize:'13px',fontWeight:'500'}}>
-                {importing ? 'Extracting details...' : '✨ Extract & Fill Form'}
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={styles.label}>Key features</label>
+                <input placeholder="Ocean views, chef's kitchen, spa bath, 3-car garage, solar..." value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} style={styles.input} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                <div>
+                  <label style={styles.label}>Tone</label>
+                  <select value={form.tone} onChange={e => setForm({ ...form, tone: e.target.value })} style={styles.select}>
+                    <option>Professional</option><option>Luxury & aspirational</option><option>Warm & inviting</option><option>Modern & minimal</option><option>Family-friendly</option><option>Investment-focused</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={styles.label}>Target buyer</label>
+                  <select value={form.buyer} onChange={e => setForm({ ...form, buyer: e.target.value })} style={styles.select}>
+                    <option>Move-up families</option><option>Luxury buyers</option><option>First-time buyers</option><option>Investors</option><option>Downsizers</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={styles.label}>Additional notes</label>
+                <textarea placeholder="Anything extra — seller story, open house date, urgency..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
+                  style={{ ...styles.input, minHeight: '70px', resize: 'vertical' as const }} />
+              </div>
+
+              <button onClick={generate} disabled={loading}
+                style={{ width: '100%', padding: '14px', background: loading ? '#085041' : '#1D9E75', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
+                {loading ? '⏳ Generating your listing...' : '✨ Generate 11 Formats'}
               </button>
-              <p style={{fontSize:'11px',color:'#888',marginTop:'6px'}}>⚠️ Note: Real estate sites like Zillow block direct URL imports, so paste the text instead — it works better!</p>
             </div>
-          )}
 
-          <p style={{fontSize:'13px',color:'#666',marginBottom:'1.25rem'}}>Fill in the details and generate all your marketing copy.</p>
+            {loading && (
+              <div style={{ ...styles.card, textAlign: 'center', padding: '2rem' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⏳</div>
+                <p style={{ color: '#f0f0f0', fontWeight: '600', marginBottom: '6px' }}>Generating 11 marketing formats...</p>
+                <p style={{ color: '#8b8fa8', fontSize: '13px' }}>This takes about 15-20 seconds. Please don't close this page!</p>
+              </div>
+            )}
 
-          <div style={{marginBottom:'1rem'}}>
-            <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Listing nickname (optional)</label>
-            <input placeholder="e.g. Johnson listing, 123 Main St" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}
-              style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',boxSizing:'border-box'}}/>
-          </div>
-
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))',gap:'12px',marginBottom:'12px'}}>
-            <div>
-              <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Property type</label>
-              <select value={form.type} onChange={e=>setForm({...form,type:e.target.value})}
-                style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px'}}>
-                <option>Single family</option><option>Condo</option><option>Townhome</option>
-                <option>Luxury estate</option><option>Multi-family</option>
-              </select>
-            </div>
-            <div>
-              <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Beds / Baths</label>
-              <input placeholder="3 bed / 2 bath" value={form.beds} onChange={e=>setForm({...form,beds:e.target.value})}
-                style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',boxSizing:'border-box'}}/>
-            </div>
-            <div>
-              <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Sq ft</label>
-              <input placeholder="1,850" value={form.sqft} onChange={e=>setForm({...form,sqft:e.target.value})}
-                style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',boxSizing:'border-box'}}/>
-            </div>
-            <div>
-              <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Price</label>
-              <input placeholder="$899,000" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}
-                style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',boxSizing:'border-box'}}/>
-            </div>
-          </div>
-
-          <div style={{marginBottom:'12px'}}>
-            <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Neighborhood / City</label>
-            <input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e=>setForm({...form,neighborhood:e.target.value})}
-              style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',boxSizing:'border-box'}}/>
-          </div>
-
-          <div style={{marginBottom:'12px'}}>
-            <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Best features</label>
-            <input placeholder="Ocean views, chef's kitchen, spa bath" value={form.features} onChange={e=>setForm({...form,features:e.target.value})}
-              style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',boxSizing:'border-box'}}/>
-          </div>
-
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))',gap:'12px',marginBottom:'12px'}}>
-            <div>
-              <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Tone</label>
-              <select value={form.tone} onChange={e=>setForm({...form,tone:e.target.value})}
-                style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px'}}>
-                <option>Warm & inviting</option><option>Luxury & aspirational</option>
-                <option>Modern & minimal</option><option>Family-friendly</option><option>Investment-focused</option>
-              </select>
-            </div>
-            <div>
-              <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Target buyer</label>
-              <select value={form.buyer} onChange={e=>setForm({...form,buyer:e.target.value})}
-                style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px'}}>
-                <option>Move-up families</option><option>Luxury buyers</option>
-                <option>First-time buyers</option><option>Investors</option><option>Downsizers</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={{marginBottom:'12px'}}>
-            <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Agent notes</label>
-            <textarea placeholder="Any special details, upgrades, or story..." value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}
-              style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',minHeight:'80px',resize:'vertical',boxSizing:'border-box'}}/>
-          </div>
-
-          {plan === 'pro' && (
-            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px',padding:'10px',background:'#f0fdf8',borderRadius:'8px',border:'1px solid #bbf0d9'}}>
-              <input type="checkbox" id="emailCopy" checked={emailCopy} onChange={e => setEmailCopy(e.target.checked)}
-                style={{width:'16px',height:'16px',cursor:'pointer'}}/>
-              <label htmlFor="emailCopy" style={{fontSize:'13px',color:'#333',cursor:'pointer'}}>
-                Email me all generated copy at <strong>{userEmail}</strong>
-              </label>
-            </div>
-          )}
-
-          <button onClick={generate} disabled={loading || (plan === 'starter' && listingsUsed >= 3)}
-            style={{width:'100%',padding:'13px',background: plan === 'starter' && listingsUsed >= 3 && listingCredits <= 0 ? '#ccc' : '#1D9E75',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'600',cursor: plan === 'starter' && listingsUsed >= 3 && listingCredits <= 0 ? 'not-allowed' : 'pointer',transition:'all 0.2s'}}>
-            {loading ? '✨ Generating your marketing copy...' : '🚀 Generate All Marketing Copy'}
-          </button>
-        </div>
-
-        {/* LOADING BANNER */}
-        {loading && (
-          <div style={{background:'#fff',borderRadius:'16px',border:'1px solid #e5e7eb',padding:'2rem',marginBottom:'1.5rem',textAlign:'center',boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
-            <div style={{fontSize:'2rem',marginBottom:'1rem'}}>✨</div>
-            <p style={{fontSize:'15px',fontWeight:'600',color:'#333',marginBottom:'8px'}}>Generating your marketing copy...</p>
-            <p style={{fontSize:'13px',color:'#666',marginBottom:'16px'}}>This takes about 15-20 seconds. Please don't close this page!</p>
-            <div style={{background:'#f0fdf8',borderRadius:'8px',padding:'12px',border:'1px solid #bbf0d9'}}>
-              <p style={{fontSize:'12px',color:'#085041',margin:'0'}}>🏠 Creating MLS copy, Instagram captions, email blast, and 5 more formats...</p>
+            {/* QUICK ACTIONS */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginTop: '1rem' }}>
+              {[
+                { href: '/snap-start', icon: '📸', title: 'Snap & Start', desc: 'Start from photos' },
+                { href: '/seller-prep', icon: '📋', title: 'Seller Prep', desc: 'Meeting preparation' },
+                { href: '/launch-kit', icon: '🚀', title: 'Launch Kit', desc: '7-day plan' },
+                { href: '/rewrite', icon: '✨', title: 'Rewriter', desc: 'Polish existing copy' },
+              ].map(item => (
+                <a key={item.href} href={item.href}
+                  style={{ ...styles.card, textDecoration: 'none', display: 'block', padding: '1rem', transition: 'border-color 0.2s', borderColor: '#2a2d3a' }}
+                  onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
+                  onMouseOut={e => (e.currentTarget.style.borderColor = '#2a2d3a')}>
+                  <div style={{ fontSize: '1.5rem', marginBottom: '6px' }}>{item.icon}</div>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: '#f0f0f0', marginBottom: '2px' }}>{item.title}</div>
+                  <div style={{ fontSize: '12px', color: '#8b8fa8' }}>{item.desc}</div>
+                </a>
+              ))}
             </div>
           </div>
         )}
 
-        {/* RESULTS */}
-        {outputs && (
-          <div id="results" style={{background:'#fff',borderRadius:'16px',border:'1px solid #eee',padding:'1.5rem',marginBottom:'1.5rem',boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
-              <h2 style={{fontSize:'1rem',fontWeight:'600',margin:'0'}}>🎉 Your marketing copy is ready!</h2>
-              <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'500'}}>8 formats generated</span>
+        {/* RESULTS PAGE */}
+        {activePage === 'results' && outputs && (
+          <div style={{ maxWidth: '760px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <div>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f0f0f0', marginBottom: '4px' }}>🎉 Your listing is ready!</h1>
+                <p style={{ fontSize: '14px', color: '#8b8fa8' }}>11 formats generated — click any tab to view and copy</p>
+              </div>
+              <button onClick={() => setActivePage('generate')}
+                style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #2a2d3a', borderRadius: '8px', color: '#8b8fa8', fontSize: '13px', cursor: 'pointer' }}>
+                ← New Listing
+              </button>
             </div>
 
             {/* TABS */}
-            <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'1.25rem'}}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '1rem' }}>
               {tabs.map(t => (
                 <button key={t.key} onClick={() => setActiveTab(t.key)}
-                  style={{fontSize:'12px',padding:'6px 14px',borderRadius:'20px',border:'1px solid',cursor:'pointer',transition:'all 0.15s',
-                    borderColor: activeTab === t.key ? '#1D9E75' : '#e5e7eb',
-                    background: activeTab === t.key ? '#1D9E75' : '#fff',
-                    color: activeTab === t.key ? '#fff' : '#666',
-                    fontWeight: activeTab === t.key ? '600' : '400'}}>
+                  style={{
+                    padding: '6px 12px', borderRadius: '8px', border: '1px solid', fontSize: '12px', cursor: 'pointer', fontWeight: activeTab === t.key ? '600' : '400',
+                    borderColor: activeTab === t.key ? '#1D9E75' : '#2a2d3a',
+                    background: activeTab === t.key ? 'rgba(29,158,117,0.15)' : 'transparent',
+                    color: activeTab === t.key ? '#1D9E75' : '#8b8fa8'
+                  }}>
                   {t.icon} {t.label}
                 </button>
               ))}
             </div>
 
-            {/* OUTPUT BOX */}
-            <div style={{background:'#f8fafc',borderRadius:'12px',padding:'1.5rem',border:'1px solid #e5e7eb',position:'relative',minHeight:'120px'}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
-                <span style={{fontSize:'12px',fontWeight:'600',color:'#1D9E75',textTransform:'uppercase',letterSpacing:'0.5px'}}>
-                  {tabs.find(t => t.key === activeTab)?.icon} {tabs.find(t => t.key === activeTab)?.label}
-                </span>
-                <button onClick={handleCopy}
-                  style={{fontSize:'12px',padding:'6px 16px',borderRadius:'20px',background: copied ? '#1D9E75' : '#fff',color: copied ? '#fff' : '#333',border:'1px solid',borderColor: copied ? '#1D9E75' : '#ddd',cursor:'pointer',fontWeight:'500',transition:'all 0.2s'}}>
-                  {copied ? '✓ Copied!' : '📋 Copy'}
-                </button>
-              </div>
-              <p style={{fontSize:'14px',lineHeight:'1.9',whiteSpace:'pre-wrap',color:'#333',margin:'0'}}>
+            {/* OUTPUT */}
+            <div style={{ ...styles.card, position: 'relative', marginBottom: '1rem' }}>
+              <button onClick={handleCopy}
+                style={{ position: 'absolute', top: '16px', right: '16px', padding: '6px 16px', borderRadius: '20px', border: '1px solid', fontSize: '12px', cursor: 'pointer', fontWeight: '500', background: copied ? '#1D9E75' : 'transparent', color: copied ? '#fff' : '#8b8fa8', borderColor: copied ? '#1D9E75' : '#2a2d3a' }}>
+                {copied ? '✓ Copied!' : '📋 Copy'}
+              </button>
+              <p style={{ fontSize: '14px', lineHeight: '1.9', whiteSpace: 'pre-wrap', color: '#e0e0e0', margin: '0', paddingRight: '90px' }}>
                 {outputs[activeTab] || ''}
               </p>
             </div>
 
-            {/* ACTION BUTTONS */}
-            <div style={{marginTop:'1rem',display:'flex',gap:'8px',flexWrap:'wrap'}}>
-              <a href="/rewrite" style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f0fdf8',color:'#085041',border:'1px solid #bbf0d9',textDecoration:'none',fontWeight:'500'}}>
-                ✨ Rewrite & Improve
-              </a>
+            {/* ACTIONS */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <button onClick={() => handleDownloadPdf('mls')} disabled={generatingPdf}
-                style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f8fafc',color:'#333',border:'1px solid #e5e7eb',cursor:'pointer',fontWeight:'500'}}>
-                📄 Download MLS Sheet
+                style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #2a2d3a', borderRadius: '8px', color: '#8b8fa8', fontSize: '13px', cursor: 'pointer' }}>
+                📄 MLS Sheet PDF
               </button>
               <button onClick={() => handleDownloadPdf('flyer')} disabled={generatingPdf}
-                style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f8fafc',color:'#333',border:'1px solid #e5e7eb',cursor:'pointer',fontWeight:'500'}}>
-                🏠 Download Flyer
+                style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #2a2d3a', borderRadius: '8px', color: '#8b8fa8', fontSize: '13px', cursor: 'pointer' }}>
+                🏠 Flyer PDF
               </button>
-              <button onClick={() => setOutputs(null)}
-                style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#f8fafc',color:'#666',border:'1px solid #e5e7eb',cursor:'pointer'}}>
-                🔄 New Listing
-              </button>
-              {plan === 'starter' && (
-                <a href="/pricing" style={{fontSize:'12px',padding:'7px 14px',borderRadius:'8px',background:'#1D9E75',color:'#fff',textDecoration:'none',fontWeight:'500'}}>
-                  ⚡ Upgrade for Unlimited
-                </a>
-              )}
+              <a href="/launch-kit"
+                style={{ padding: '8px 16px', background: 'rgba(29,158,117,0.15)', border: '1px solid #1D9E75', borderRadius: '8px', color: '#1D9E75', fontSize: '13px', textDecoration: 'none', fontWeight: '500' }}>
+                🚀 7-Day Launch Kit
+              </a>
+              <a href="/rewrite"
+                style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #2a2d3a', borderRadius: '8px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none' }}>
+                ✨ Rewrite & Improve
+              </a>
             </div>
           </div>
         )}
 
-        {/* PAST LISTINGS */}
-        {pastListings.length > 0 && (
-          <div style={{background:'#fff',borderRadius:'16px',border:'1px solid #eee',padding:'1.5rem',boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
-            <h2 style={{fontSize:'1rem',fontWeight:'600',marginBottom:'1rem'}}>📁 Past listings</h2>
-            <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-              {pastListings.map((listing) => (
-                <div key={listing.id} onClick={() => { setOutputs(listing.outputs); setActiveTab('mls_standard'); setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100) }}
-                  style={{background:'#f8fafc',border:'1px solid #e5e7eb',borderRadius:'10px',padding:'12px 16px',cursor:'pointer',transition:'all 0.15s'}}
-                  onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
-                  onMouseOut={e => (e.currentTarget.style.borderColor = '#e5e7eb')}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                    <div>
-                      <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'#111'}}>
-                        {listing.name || `${listing.property_type} — ${listing.neighborhood}`}
-                      </p>
-                      <p style={{margin:'4px 0 0',fontSize:'12px',color:'#888'}}>
-                        {listing.beds_baths} · {listing.sqft} sq ft · {listing.price}
-                      </p>
-                    </div>
-                    <div style={{textAlign:'right'}}>
-                      <p style={{margin:'0',fontSize:'11px',color:'#999'}}>{new Date(listing.created_at).toLocaleDateString()}</p>
-                      <p style={{margin:'4px 0 0',fontSize:'11px',color:'#1D9E75',fontWeight:'500'}}>View copy →</p>
-                    </div>
-                  </div>
-                  <div style={{marginTop:'10px',borderTop:'1px solid #e5e7eb',paddingTop:'10px'}}>
-                  <textarea
-                    placeholder="Agent notes: seller motivation, property quirks, things to remember..."
-                    defaultValue={listing.agent_notes || ''}
-                    onBlur={async (e) => {
-                      await supabase.from('listings').update({ agent_notes: e.target.value }).eq('id', listing.id)
-                    }}
-                    onClick={e => e.stopPropagation()}
-                    style={{width:'100%',padding:'8px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'12px',color:'#555',minHeight:'60px',resize:'vertical',boxSizing:'border-box',background:'#fff'}}
-                  />
-                </div>
-                </div>
-              ))}
+        {/* HISTORY PAGE */}
+        {activePage === 'history' && (
+          <div style={{ maxWidth: '760px' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f0f0f0', marginBottom: '6px' }}>Listing History</h1>
+              <p style={{ fontSize: '14px', color: '#8b8fa8' }}>Your {pastListings.length} most recent listings</p>
             </div>
+
+            {pastListings.length === 0 ? (
+              <div style={{ ...styles.card, textAlign: 'center', padding: '3rem' }}>
+                <p style={{ color: '#8b8fa8' }}>No listings yet — generate your first one!</p>
+                <button onClick={() => setActivePage('generate')}
+                  style={{ marginTop: '1rem', padding: '10px 24px', background: '#1D9E75', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>
+                  Generate a Listing
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {pastListings.map(listing => (
+                  <div key={listing.id} style={{ ...styles.card, cursor: 'pointer' }}
+                    onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
+                    onMouseOut={e => (e.currentTarget.style.borderColor = '#2a2d3a')}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}
+                      onClick={() => { setOutputs(listing.outputs); setActiveTab('mls_standard'); setActivePage('results') }}>
+                      <div>
+                        <p style={{ margin: '0', fontSize: '14px', fontWeight: '600', color: '#f0f0f0' }}>
+                          {listing.name || `${listing.property_type} — ${listing.neighborhood}`}
+                        </p>
+                        <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#8b8fa8' }}>
+                          {listing.beds_baths} · {listing.sqft} sq ft · {listing.price}
+                        </p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ margin: '0', fontSize: '11px', color: '#666' }}>{new Date(listing.created_at).toLocaleDateString()}</p>
+                        <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#1D9E75', fontWeight: '500' }}>View copy →</p>
+                      </div>
+                    </div>
+                    <textarea
+                      placeholder="Agent notes: seller motivation, property quirks, things to remember..."
+                      defaultValue={listing.agent_notes || ''}
+                      onBlur={async (e) => { await supabase.from('listings').update({ agent_notes: e.target.value }).eq('id', listing.id) }}
+                      onClick={e => e.stopPropagation()}
+                      style={{ width: '100%', padding: '8px', background: '#0f1117', border: '1px solid #2a2d3a', borderRadius: '8px', fontSize: '12px', color: '#8b8fa8', minHeight: '60px', resize: 'vertical', boxSizing: 'border-box' as const }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }
