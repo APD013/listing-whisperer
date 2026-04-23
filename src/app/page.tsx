@@ -83,7 +83,7 @@ export default function Home() {
         <div style={{maxWidth:'800px',margin:'0 auto',textAlign:'center'}}>
           <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>How it works</h2>
           <p style={{color:'#666',marginBottom:'3rem'}}>One tool. The entire listing workflow.</p>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'2rem'}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'2rem'}}>
             {[
               {step:'1',title:'Before the appointment',desc:'Use Seller Meeting Prep to get a meeting outline, talking points, and questions to ask before you walk in the door.'},
               {step:'2',title:'On-site with Snap & Start',desc:'Upload photos on your phone, confirm the details, and generate your first draft while still at the property.'},
