@@ -37,9 +37,21 @@ export default function Dashboard() {
   const [photoPreview, setPhotoPreview] = useState<string[]>([])
 
   useEffect(() => {
+    // Check if returning from successful payment
+    const params = new URLSearchParams(window.location.search)
+    const upgraded = params.get('upgraded')
+    const credits = params.get('credits')
+
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
+      if (!user) { 
+        // If returning from payment, store intent and redirect to login
+        if (upgraded || credits) {
+          localStorage.setItem('post_payment_redirect', '/dashboard')
+        }
+        router.push('/login'); 
+        return 
+      }
       setUserId(user.id)
       setUserEmail(user.email || null)
 
@@ -427,6 +439,7 @@ export default function Dashboard() {
               {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} remaining` : '⚠️ No listings left'}
             </span>
           )}
+          <a href="/snap-start" style={{fontSize:'13px',color:'#fff',fontWeight:'500',textDecoration:'none',background:'#1D9E75',padding:'4px 12px',borderRadius:'20px'}}>📸 Snap & Start</a>
           <a href="/rewrite" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>✨ Rewrite</a>
           <a href="/launch-kit" style={{fontSize:'13px',color:'#1D9E75',fontWeight:'500',textDecoration:'none',border:'1px solid #1D9E75',padding:'4px 12px',borderRadius:'20px'}}>🚀 Launch Kit</a>
           <a href="/settings" style={{fontSize:'13px',color:'#666',textDecoration:'none',padding:'4px 12px',borderRadius:'20px',border:'1px solid #eee'}}>⚙️ Settings</a>
