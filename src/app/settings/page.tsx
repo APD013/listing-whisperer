@@ -25,6 +25,7 @@ export default function SettingsPage() {
     avoidWords: '',
   })
   const [language, setLanguage] = useState('English')
+  const [marketingEmails, setMarketingEmails] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -37,13 +38,14 @@ export default function SettingsPage() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('plan, brand_voice, preferred_language')
+        .select('plan, brand_voice, preferred_language, marketing_emails')
         .eq('id', user.id)
         .single()
 
       if (profile) {
         setPlan(profile.plan || 'starter')
         setLanguage(profile.preferred_language || 'English')
+        setMarketingEmails(profile.marketing_emails || false)
         if (profile.brand_voice) {
           try {
             setBrandVoice(JSON.parse(profile.brand_voice))
@@ -60,7 +62,8 @@ export default function SettingsPage() {
       .from('profiles')
       .update({ 
         brand_voice: JSON.stringify(brandVoice),
-        preferred_language: language
+        preferred_language: language,
+        marketing_emails: marketingEmails
       })
       .eq('id', userId)
     setSaving(false)
@@ -146,6 +149,22 @@ export default function SettingsPage() {
             <label style={{fontSize:'12px',color:'#666',display:'block',marginBottom:'4px',fontWeight:'500'}}>Your preferred CTA style</label>
             <input placeholder="e.g. Call me today, DM for details, Schedule a private tour..." value={brandVoice.ctaStyle} onChange={e=>setBrandVoice({...brandVoice,ctaStyle:e.target.value})}
               style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'13px',boxSizing:'border-box'}}/>
+          </div>
+
+          {/* EMAIL PREFERENCES */}
+          <div style={{marginBottom:'20px',paddingBottom:'20px',borderBottom:'1px solid #eee'}}>
+            <p style={{fontSize:'14px',fontWeight:'600',color:'#333',marginBottom:'12px'}}>📧 Email Preferences</p>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:'#f8fafc',borderRadius:'10px',padding:'12px 16px',border:'1px solid #eee'}}>
+              <div>
+                <p style={{fontSize:'13px',fontWeight:'500',color:'#333',margin:'0 0 2px'}}>Product updates & new features</p>
+                <p style={{fontSize:'12px',color:'#999',margin:'0'}}>Get notified when we launch new tools and improvements</p>
+              </div>
+              <div onClick={() => setMarketingEmails(!marketingEmails)}
+                style={{width:'44px',height:'24px',borderRadius:'12px',background: marketingEmails ? '#1D9E75' : '#ddd',cursor:'pointer',position:'relative',transition:'all 0.2s',flexShrink:0,marginLeft:'12px'}}>
+                <div style={{width:'20px',height:'20px',borderRadius:'50%',background:'#fff',position:'absolute',top:'2px',left: marketingEmails ? '22px' : '2px',transition:'all 0.2s',boxShadow:'0 1px 3px rgba(0,0,0,0.2)'}}></div>
+              </div>
+            </div>
+            <p style={{fontSize:'11px',color:'#999',marginTop:'8px'}}>We never share your email. Unsubscribe anytime from any email we send.</p>
           </div>
 
           <div style={{marginBottom:'12px'}}>
