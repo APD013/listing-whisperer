@@ -296,11 +296,17 @@ export default function Dashboard() {
         {activePage === 'generate' && (
           <div style={{ maxWidth: '760px' }}>
             <div style={{ marginBottom: '2rem' }}>
-              <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f0f0f0', marginBottom: '6px' }}>New Listing</h1>
-              <p style={{ fontSize: '14px', color: '#8b8fa8' }}>Fill in the details and generate 11 marketing formats instantly.</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f0f0f0', margin: '0' }}>New Listing</h1>
+                <span style={{ background: 'rgba(29,158,117,0.15)', color: '#1D9E75', fontSize: '11px', fontWeight: '600', padding: '3px 10px', borderRadius: '20px', border: '1px solid rgba(29,158,117,0.3)' }}>11 formats in one click</span>
+              </div>
+              <p style={{ fontSize: '14px', color: '#8b8fa8' }}>Fill in the property details below — your AI assistant will generate MLS copy, social posts, email blasts, and more instantly.</p>
             </div>
 
             <div style={{ ...styles.card, marginBottom: '1rem' }}>
+              <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #2a2d3a' }}>
+                <p style={{ fontSize: '12px', fontWeight: '600', color: '#1D9E75', letterSpacing: '1px', margin: '0' }}>PROPERTY DETAILS</p>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '12px' }}>
                 <div>
                   <label style={styles.label}>Listing name (optional)</label>
@@ -330,9 +336,12 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div style={{ marginBottom: '12px' }}>
-                <label style={styles.label}>Key features</label>
-                <input placeholder="Ocean views, chef's kitchen, spa bath, 3-car garage, solar..." value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} style={styles.input} />
+              <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #2a2d3a', borderTop: '1px solid #2a2d3a', paddingTop: '16px', marginTop: '4px' }}>
+                <p style={{ fontSize: '12px', fontWeight: '600', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 12px' }}>FEATURES & MARKETING</p>
+                <div style={{ marginBottom: '12px' }}>
+                  <label style={styles.label}>Key features <span style={{ color: '#555', fontWeight: '400' }}>— the more detail, the better the copy</span></label>
+                  <input placeholder="Ocean views, chef's kitchen, spa bath, 3-car garage, solar..." value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} style={styles.input} />
+                </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
@@ -356,10 +365,13 @@ export default function Dashboard() {
                   style={{ ...styles.input, minHeight: '70px', resize: 'vertical' as const }} />
               </div>
 
-              <button onClick={generate} disabled={loading}
-                style={{ width: '100%', padding: '14px', background: loading ? '#085041' : '#1D9E75', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-                {loading ? '⏳ Generating your listing...' : '✨ Generate 11 Formats'}
-              </button>
+              <div style={{ borderTop: '1px solid #2a2d3a', paddingTop: '16px', marginTop: '4px' }}>
+                <button onClick={generate} disabled={loading}
+                  style={{ width: '100%', padding: '16px', background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s', letterSpacing: '0.3px' }}>
+                  {loading ? '⏳ Generating your listing...' : '✨ Generate 11 Formats — MLS, Social, Email & More'}
+                </button>
+                <p style={{ fontSize: '11px', color: '#555', textAlign: 'center', marginTop: '8px' }}>Takes about 15-20 seconds · Your brand voice is applied automatically</p>
+              </div>
             </div>
 
             {loading && (
@@ -371,7 +383,10 @@ export default function Dashboard() {
             )}
 
             {/* QUICK ACTIONS */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginTop: '1rem' }}>
+            <div style={{ marginTop: '1.5rem', marginBottom: '12px' }}>
+              <p style={{ fontSize: '12px', fontWeight: '600', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 12px' }}>YOUR AI TOOLKIT</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
               {[
                 { href: '/snap-start', icon: '📸', title: 'Snap & Start', desc: 'Start from photos' },
                 { href: '/seller-prep', icon: '📋', title: 'Seller Prep', desc: 'Meeting preparation' },
