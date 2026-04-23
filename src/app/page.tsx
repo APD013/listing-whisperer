@@ -54,7 +54,7 @@ export default function Home() {
 
       {/* STATS STRIP */}
       <section style={{background:'#fff',padding:'1.5rem 2rem',borderBottom:'1px solid #eee'}}>
-        <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'4rem',flexWrap:'wrap'}}>
+        <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
           {[
             {stat:'11',label:'Copy formats per listing'},
             {stat:'60s',label:'Average generation time'},
