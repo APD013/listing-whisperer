@@ -424,7 +424,7 @@ export default function Dashboard() {
     <main style={{minHeight:'100vh',fontFamily:'sans-serif',background:'#f8fafc'}}>
 
       {/* TOP NAV */}
-      <div style={{background:'#fff',borderBottom:'1px solid #eee',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
+      <div style={{background:'#fff',borderBottom:'1px solid #eee',padding:'1rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,flexWrap:'wrap',gap:'8px'}}>
         <div style={{fontSize:'16px',fontWeight:'600'}}>
           Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
           {plan === 'pro' && (
