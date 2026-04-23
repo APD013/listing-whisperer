@@ -19,15 +19,13 @@ export default function Home() {
     <main style={{fontFamily:'sans-serif',color:'#111'}}>
 
       {/* NAV */}
-      <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 2rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:0,zIndex:100}}>
+      <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:0,zIndex:100}}>
         <div style={{fontSize:'18px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
-        <div style={{display:'flex',gap:'24px',alignItems:'center'}}>
-          <a href="#how-it-works" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>How It Works</a>
-          <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
+        <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
+          <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none',display:'none'}} className="desktop-only">Features</a>
           <a href="#pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
-          <a href="/seller-prep" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Seller Prep</a>
           <a href="/login" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Sign In</a>
-          <a href="/signup" style={{fontSize:'14px',background:'#1D9E75',color:'#fff',padding:'8px 18px',borderRadius:'8px',textDecoration:'none',fontWeight:'500'}}>Get Started Free</a>
+          <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 14px',borderRadius:'8px',textDecoration:'none',fontWeight:'500',whiteSpace:'nowrap'}}>Get Started Free</a>
         </div>
       </nav>
 
@@ -234,7 +232,7 @@ export default function Home() {
         <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Simple, flexible pricing</h2>
         <p style={{color:'#666',marginBottom:'0.5rem'}}>Only have one listing this month? Pay $9. Use it often? Go Pro.</p>
         <p style={{color:'#999',fontSize:'13px',marginBottom:'3rem'}}>No credit card required to start free.</p>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1.5rem'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'1.5rem'}}>
           <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'1px solid #eee',textAlign:'left'}}>
             <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Free</h3>
             <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>Try it out</p>
