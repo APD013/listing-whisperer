@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [showHistory, setShowHistory] = useState(false)
   const [activePage, setActivePage] = useState('generate')
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
@@ -214,8 +215,8 @@ export default function Dashboard() {
 
   const styles = {
     page: { minHeight: '100vh', background: 'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' as const },
-    sidebar: { width: '220px', background: 'linear-gradient(180deg, #13161f 0%, #0f1117 100%)', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '1.5rem 0', display: 'flex', flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 100 },
-    main: { marginLeft: '220px', padding: '2.5rem', minHeight: '100vh' },
+    sidebar: { width: '220px', background: 'linear-gradient(180deg, #13161f 0%, #0f1117 100%)', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '1.5rem 0', display: 'flex', flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 100, transition: 'transform 0.3s ease', transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)' },
+    main: { marginLeft: '0', padding: '1.5rem', minHeight: '100vh' },
     card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' },
     input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
     select: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
@@ -227,7 +228,7 @@ export default function Dashboard() {
       {/* SIDEBAR */}
       <div style={styles.sidebar}>
         {/* LOGO */}
-        <div style={{ padding: '0 1.5rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ padding: '0 1.5rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <div style={{ fontSize: '16px', fontWeight: '700', color: '#f0f0f0' }}>
             Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
             {planLoaded && plan === 'pro' && (
@@ -237,6 +238,11 @@ export default function Dashboard() {
           <div style={{ fontSize: '11px', color: planLoaded && plan === 'pro' ? '#1D9E75' : '#8b8fa8', marginTop: '4px', fontWeight: plan === 'pro' ? '500' : '400' }}>
             {planLoaded && plan === 'pro' ? '✦ Pro Workspace' : 'AI Assistant for Agents'}
           </div>
+          </div>
+          <button onClick={() => setSidebarOpen(false)}
+            style={{background:'none',border:'none',color:'#6b7280',fontSize:'20px',cursor:'pointer',padding:'0',marginTop:'4px'}}>
+            ✕
+          </button>
         </div>
 
         {/* NAV */}
@@ -295,6 +301,29 @@ export default function Dashboard() {
           <a href="/" style={{ display: 'block', fontSize: '12px', color: '#666', textAlign: 'center', textDecoration: 'none' }}>Sign out</a>
         </div>
       </div>
+
+      {/* MOBILE HEADER */}
+      <div style={{background:'rgba(26,29,46,0.95)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:99}}>
+        <button onClick={() => setSidebarOpen(true)}
+          style={{background:'none',border:'none',color:'#f0f0f0',fontSize:'22px',cursor:'pointer',padding:'0'}}>
+          ☰
+        </button>
+        <div style={{fontSize:'15px',fontWeight:'700',color:'#f0f0f0'}}>
+          Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+          {planLoaded && plan === 'pro' && (
+            <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>PRO</span>
+          )}
+        </div>
+        <a href="/pricing" style={{fontSize:'12px',color: plan === 'pro' ? '#1D9E75' : '#6b7280',textDecoration:'none',fontWeight:'500'}}>
+          {plan === 'pro' ? '✦ Pro' : '⚡ Upgrade'}
+        </a>
+      </div>
+
+      {/* SIDEBAR OVERLAY */}
+      {sidebarOpen && (
+        <div onClick={() => setSidebarOpen(false)}
+          style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.7)',zIndex:99}}/>
+      )}
 
       {/* MAIN CONTENT */}
       <div style={styles.main}>
