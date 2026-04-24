@@ -269,6 +269,7 @@ export default function Dashboard() {
           <p style={{fontSize:'10px',fontWeight:'700',color:'#444',letterSpacing:'1px',margin:'0 0 6px',padding:'0 1.5rem'}}>TOOLS</p>
 
           {[
+            { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
             { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
             { href: '/photos', icon: '🖼️', label: 'Photo Library' },
             { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
@@ -432,6 +433,7 @@ export default function Dashboard() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
                 {[
+                  { href: '/quick-listing', icon: '⚡', title: 'Quick Listing', desc: 'Photo → Full listing' },
                   { href: '/snap-start', icon: '📸', title: 'Snap & Start', desc: 'Start from photos' },
                   { href: '/seller-prep', icon: '📋', title: 'Seller Prep', desc: 'Meeting preparation' },
                   { href: '/launch-kit', icon: '🚀', title: 'Launch Kit', desc: '7-day plan' },
