@@ -232,7 +232,7 @@ export default function Home() {
         <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Simple, flexible pricing</h2>
         <p style={{color:'#666',marginBottom:'0.5rem'}}>Only have one listing this month? Pay $9. Use it often? Go Pro.</p>
         <p style={{color:'#999',fontSize:'13px',marginBottom:'3rem'}}>No credit card required to start free.</p>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'1.5rem'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3, 1fr)',gap:'1.5rem'}}>
           <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'1px solid #eee',textAlign:'left'}}>
             <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Free</h3>
             <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>Try it out</p>
