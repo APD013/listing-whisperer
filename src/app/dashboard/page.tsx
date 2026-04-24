@@ -275,6 +275,7 @@ export default function Dashboard() {
             { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
             { href: '/rewrite', icon: '✨', label: 'Rewrite' },
             { href: '/launch-kit', icon: '🚀', label: 'Launch Kit' },
+            { href: '/leads', icon: '👥', label: 'Leads & Clients' },
             { href: '/settings', icon: '⚙️', label: 'Settings' },
           ].map(item => (
             <a key={item.href} href={item.href}
