@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [pastListings, setPastListings] = useState<any[]>([])
   const [showHistory, setShowHistory] = useState(false)
   const [activePage, setActivePage] = useState('generate')
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
@@ -76,7 +77,7 @@ export default function Dashboard() {
 
   const generate = async () => {
     if (!form.features && !form.neighborhood) { alert('Please fill in at least the neighborhood and features!'); return }
-    if (plan === 'starter' && listingsUsed >= 2 && listingCredits <= 0) { router.push('/pricing'); return }
+    if (plan === 'starter' && listingsUsed >= 2 && listingCredits <= 0) { setShowUpgradeModal(true); return }
     setLoading(true)
     try {
       const res = await fetch('/api/generate', {
@@ -540,6 +541,55 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+    {/* UPGRADE MODAL */}
+      {showUpgradeModal && (
+        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+          <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)',padding:'2.5rem',maxWidth:'480px',width:'100%',boxShadow:'0 0 60px rgba(29,158,117,0.15)',textAlign:'center',position:'relative'}}>
+            <button onClick={() => setShowUpgradeModal(false)}
+              style={{position:'absolute',top:'1rem',right:'1rem',background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',width:'32px',height:'32px',borderRadius:'50%',fontSize:'16px',cursor:'pointer'}}>
+              ✕
+            </button>
+            <div style={{fontSize:'3rem',marginBottom:'1rem'}}>🚀</div>
+            <h2 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>You've used your 2 free listings!</h2>
+            <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'1.5rem',lineHeight:'1.7'}}>
+              Upgrade to Pro or buy a single listing credit to keep generating.
+            </p>
+
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'1.5rem',textAlign:'left'}}>
+              <div style={{background:'rgba(0,0,0,0.2)',borderRadius:'12px',padding:'1.25rem',border:'1px solid rgba(255,255,255,0.07)'}}>
+                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Pay Per Listing</p>
+                <p style={{fontSize:'2rem',fontWeight:'700',color:'#1D9E75',marginBottom:'8px'}}>$9</p>
+                <ul style={{fontSize:'12px',color:'#8b8fa8',lineHeight:'2',paddingLeft:'0',listStyle:'none',marginBottom:'12px'}}>
+                  <li>✅ 1 listing credit</li>
+                  <li>✅ All 11 formats</li>
+                  <li>✅ Never expires</li>
+                </ul>
+                <a href="/pricing"
+                  style={{display:'block',textAlign:'center',padding:'8px',borderRadius:'8px',background:'rgba(29,158,117,0.15)',color:'#1D9E75',textDecoration:'none',fontSize:'13px',fontWeight:'600',border:'1px solid rgba(29,158,117,0.3)'}}>
+                  Buy 1 Listing
+                </a>
+              </div>
+              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.15),rgba(8,80,65,0.15))',borderRadius:'12px',padding:'1.25rem',border:'1px solid rgba(29,158,117,0.3)'}}>
+                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Pro — Best Value</p>
+                <p style={{fontSize:'2rem',fontWeight:'700',color:'#1D9E75',marginBottom:'8px'}}>$29<span style={{fontSize:'14px',color:'#6b7280'}}>/mo</span></p>
+                <ul style={{fontSize:'12px',color:'#8b8fa8',lineHeight:'2',paddingLeft:'0',listStyle:'none',marginBottom:'12px'}}>
+                  <li>✅ Unlimited listings</li>
+                  <li>✅ Unlimited rewrites</li>
+                  <li>✅ All features</li>
+                </ul>
+                <a href="/pricing"
+                  style={{display:'block',textAlign:'center',padding:'8px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',textDecoration:'none',fontSize:'13px',fontWeight:'600',boxShadow:'0 0 16px rgba(29,158,117,0.3)'}}>
+                  Go Pro
+                </a>
+              </div>
+            </div>
+
+            <p style={{fontSize:'12px',color:'#444'}}>
+              Use code <strong style={{color:'#1D9E75'}}>WELCOME50</strong> for 50% off your first Pro month
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
