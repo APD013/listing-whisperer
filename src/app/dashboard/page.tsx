@@ -435,6 +435,7 @@ export default function Dashboard() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
                 {[
                   { href: '/quick-listing', icon: '⚡', title: 'Quick Listing', desc: 'Photo → Full listing' },
+                  { href: '/leads', icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline' },
                   { href: '/snap-start', icon: '📸', title: 'Snap & Start', desc: 'Start from photos' },
                   { href: '/seller-prep', icon: '📋', title: 'Seller Prep', desc: 'Meeting preparation' },
                   { href: '/launch-kit', icon: '🚀', title: 'Launch Kit', desc: '7-day plan' },
