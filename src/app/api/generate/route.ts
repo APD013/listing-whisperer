@@ -61,6 +61,8 @@ export async function POST(request: Request) {
 
     const prompt = `You are a real estate copywriter. Generate marketing copy in ${preferredLanguage}. All output must be written entirely in ${preferredLanguage}. Respond ONLY with valid JSON, no markdown, no backticks.
 
+IMPORTANT: Use EXACTLY the bed and bath count provided. Do not change or approximate it.
+
 Property: ${property.type}, ${property.beds}, ${property.sqft} sq ft, ${property.neighborhood}${property.price ? ', ' + property.price : ''}
 Tone: ${property.tone} | Target: ${property.buyer}
 Features: ${property.features}
