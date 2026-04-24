@@ -20,8 +20,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Listing Whisperer — AI Marketing Copy for Real Estate Agents",
-  description: "Turn property notes into polished MLS descriptions, Instagram captions, email blasts, and more in seconds. Built for real estate agents.",
+  title: "Listing Whisperer — AI Assistant for Real Estate Agents",
+  description: "The AI assistant that works with you before, during, and after every listing. Seller meeting prep, on-site photo drafts, and full marketing kits.",
+  manifest: "/manifest.json",
+  themeColor: "#1D9E75",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "ListingWhisperer",
+  },
 };
 
 export default function RootLayout({
