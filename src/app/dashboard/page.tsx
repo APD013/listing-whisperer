@@ -299,8 +299,12 @@ export default function Dashboard() {
             </div>
           )}
           <a href="https://docs.google.com/forms/d/e/1FAIpQLScCLYVYMcFti8uxW4_3T7nhHK__AdYfsUEeB1WfGIAE2SHgJg/viewform?usp=publish-editor" target="_blank"
-            style={{ display: 'block', fontSize: '12px', color: '#1D9E75', textAlign: 'center', textDecoration: 'none', marginBottom: '8px', fontWeight: '500' }}>
+            style={{ display: 'block', fontSize: '12px', color: '#1D9E75', textAlign: 'center', textDecoration: 'none', marginBottom: '6px', fontWeight: '500' }}>
             💬 Give Feedback
+          </a>
+          <a href="/contact"
+            style={{ display: 'block', fontSize: '12px', color: '#6b7280', textAlign: 'center', textDecoration: 'none', marginBottom: '8px' }}>
+            📧 Contact Us
           </a>
           <a href="/" style={{ display: 'block', fontSize: '12px', color: '#666', textAlign: 'center', textDecoration: 'none' }}>Sign out</a>
         </div>
