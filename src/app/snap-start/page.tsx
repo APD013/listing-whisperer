@@ -57,6 +57,19 @@ export default function SnapStartPage() {
         }))
       )
       setPhotos(base64Images)
+
+      // Save photos to Supabase Storage
+      if (userId) {
+        await Promise.all(
+          files.slice(0, 10).map(async (file) => {
+            const fileName = `${userId}/${Date.now()}-${file.name}`
+            await supabase.storage
+              .from('listing-photos')
+              .upload(fileName, file, { cacheControl: '3600', upsert: false })
+          })
+        )
+      }
+
       const res = await fetch('/api/analyze-photos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
