@@ -260,6 +260,9 @@ export default function Dashboard() {
           <a href="/snap-start" style={{ width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', background: 'transparent', border: 'none', borderLeft: '3px solid transparent' }}>
             <span>📸</span> Snap & Start
           </a>
+          <a href="/photos" style={{ width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', background: 'transparent', border: 'none', borderLeft: '3px solid transparent' }}>
+            <span>🖼️</span> Photo Library
+          </a>
           <a href="/seller-prep" style={{ width: '100%', padding: '10px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', background: 'transparent', border: 'none', borderLeft: '3px solid transparent' }}>
             <span>📋</span> Seller Prep
           </a>
