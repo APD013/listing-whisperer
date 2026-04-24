@@ -302,6 +302,9 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* MAIN WRAPPER */}
+      <div style={{display:'flex',flexDirection:'column' as const,flex:1}}>
+
       {/* MOBILE HEADER */}
       <div style={{background:'rgba(26,29,46,0.95)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:99}}>
         <button onClick={() => setSidebarOpen(true)}
@@ -619,6 +622,7 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }
