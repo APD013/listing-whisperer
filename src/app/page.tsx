@@ -256,6 +256,9 @@ export default function Home() {
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ 1 full listing generation</li>
               <li>✅ All 11 copy formats</li>
+              <li>✅ Seller Meeting Prep</li>
+              <li>✅ Snap & Start on-site</li>
+              <li>✅ PDF flyer & MLS sheet</li>
               <li>✅ Saved to your history</li>
               <li>✅ Never expires</li>
             </ul>
@@ -306,7 +309,7 @@ export default function Home() {
       <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid #eee',background:'#fff'}}>
         <div style={{fontSize:'16px',fontWeight:'600',marginBottom:'8px'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <p style={{fontSize:'13px',color:'#999',marginBottom:'8px'}}>The AI assistant for real estate agents. Before the appointment, on-site, and at launch.</p>
-        <p style={{fontSize:'13px',color:'#999'}}>© 2025 Listing Whisperer · <a href="/login" style={{color:'#999'}}>Sign In</a> · <a href="/signup" style={{color:'#999'}}>Get Started Free</a> · <a href="#pricing" style={{color:'#999'}}>Pricing</a></p>
+        <p style={{fontSize:'13px',color:'#999'}}>© 2025 Listing Whisperer · <a href="/login" style={{color:'#999'}}>Sign In</a> · <a href="/signup" style={{color:'#999'}}>Get Started Free</a> · <a href="#pricing" style={{color:'#999'}}>Pricing</a> · <a href="/contact" style={{color:'#999'}}>Contact Us</a></p>
       </footer>
 
     </main>
