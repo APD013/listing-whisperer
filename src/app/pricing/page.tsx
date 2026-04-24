@@ -101,6 +101,8 @@ export default function PricingPage() {
             <ul style={{fontSize:'13px',color:'#8b8fa8',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ 1 full listing generation</li>
               <li>✅ All 11 copy formats</li>
+              <li>✅ Seller Meeting Prep</li>
+              <li>✅ Snap & Start on-site</li>
               <li>✅ Saved to your history</li>
               <li>✅ Never expires</li>
             </ul>
