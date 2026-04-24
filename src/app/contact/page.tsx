@@ -24,7 +24,8 @@ export default function ContactPage() {
       if (data.success) {
         setSent(true)
       } else {
-        alert('Error sending message. Please try again.')
+        setLoading(false)
+        return
       }
     } catch(e) {
       alert('Error sending message. Please try again.')
