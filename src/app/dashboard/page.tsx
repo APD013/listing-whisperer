@@ -437,6 +437,22 @@ export default function Dashboard() {
                 </div>
               )}
 
+              {/* MOBILE APP BANNER */}
+              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.1),rgba(8,80,65,0.1))',borderRadius:'12px',border:'1px solid rgba(29,158,117,0.2)',padding:'1rem',marginBottom:'1.5rem'}}>
+                <p style={{fontSize:'12px',fontWeight:'700',color:'#1D9E75',marginBottom:'6px',letterSpacing:'0.5px'}}>📱 USE ON YOUR PHONE</p>
+                <p style={{fontSize:'12px',color:'#6b7280',marginBottom:'10px',lineHeight:'1.6'}}>Add Listing Whisperer to your home screen for instant access on-site!</p>
+                <div style={{fontSize:'12px',color:'#8b8fa8',lineHeight:'2'}}>
+                  <p style={{margin:'0',fontWeight:'600',color:'#f0f0f0',marginBottom:'4px'}}>iPhone (Safari):</p>
+                  <p style={{margin:'0'}}>1. Tap the Share button ⬆️</p>
+                  <p style={{margin:'0'}}>2. Tap "Add to Home Screen"</p>
+                  <p style={{margin:'0'}}>3. Tap "Add" ✅</p>
+                  <p style={{margin:'8px 0 4px',fontWeight:'600',color:'#f0f0f0'}}>Android (Chrome):</p>
+                  <p style={{margin:'0'}}>1. Tap the menu ⋮</p>
+                  <p style={{margin:'0'}}>2. Tap "Add to Home Screen"</p>
+                  <p style={{margin:'0'}}>3. Tap "Add" ✅</p>
+                </div>
+              </div>
+
               <div style={{ marginTop: '1.5rem', marginBottom: '12px' }}>
                 <p style={{ fontSize: '12px', fontWeight: '600', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 12px' }}>YOUR AI TOOLKIT</p>
               </div>
