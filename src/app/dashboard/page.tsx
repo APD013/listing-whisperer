@@ -335,7 +335,7 @@ export default function Dashboard() {
 
           {/* GENERATE PAGE */}
           {activePage === 'generate' && (
-            <div style={{ maxWidth: '760px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: outputs ? '1fr 1fr' : '1fr', gap: '1.5rem', maxWidth: outputs ? '100%' : '760px', transition: 'all 0.3s' }}>
               <div style={{ marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
                   <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f0f0f0', margin: '0' }}>New Listing</h1>
@@ -438,7 +438,7 @@ export default function Dashboard() {
               )}
 
               {/* MOBILE APP BANNER */}
-              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.1),rgba(8,80,65,0.1))',borderRadius:'12px',border:'1px solid rgba(29,158,117,0.2)',padding:'1rem',marginBottom:'1.5rem'}}>
+              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.1),rgba(8,80,65,0.1))',borderRadius:'12px',border:'1px solid rgba(29,158,117,0.2)',padding:'1rem',marginBottom:'1rem'}}>
                 <p style={{fontSize:'12px',fontWeight:'700',color:'#1D9E75',marginBottom:'6px',letterSpacing:'0.5px'}}>📱 USE ON YOUR PHONE</p>
                 <p style={{fontSize:'12px',color:'#6b7280',marginBottom:'10px',lineHeight:'1.6'}}>Add Listing Whisperer to your home screen for instant access on-site!</p>
                 <div style={{fontSize:'12px',color:'#8b8fa8',lineHeight:'2'}}>
@@ -475,6 +475,61 @@ export default function Dashboard() {
                   </a>
                 ))}
               </div>
+            {/* INLINE RESULTS - shows to the right when outputs exist */}
+            {outputs && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <div>
+                    <h2 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#f0f0f0', marginBottom: '4px' }}>🎉 Ready!</h2>
+                    <p style={{ fontSize: '13px', color: '#8b8fa8' }}>11 formats generated</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '6px', marginBottom: '1rem' }}>
+                  {tabs.map(t => (
+                    <button key={t.key} onClick={() => setActiveTab(t.key)}
+                      style={{
+                        padding: '5px 10px', borderRadius: '8px', border: '1px solid', fontSize: '11px', cursor: 'pointer',
+                        borderColor: activeTab === t.key ? '#1D9E75' : '#2a2d3a',
+                        background: activeTab === t.key ? 'rgba(29,158,117,0.2)' : 'rgba(0,0,0,0.2)',
+                        color: activeTab === t.key ? '#1D9E75' : '#6b7280',
+                        fontWeight: activeTab === t.key ? '600' : '400',
+                      }}>
+                      {t.icon} {t.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{ background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.25rem', position: 'relative', marginBottom: '1rem', minHeight: '200px' }}>
+                  <button onClick={handleCopy}
+                    style={{ position: 'absolute', top: '12px', right: '12px', padding: '5px 12px', borderRadius: '20px', border: '1px solid', fontSize: '11px', cursor: 'pointer', background: copied ? '#1D9E75' : 'transparent', color: copied ? '#fff' : '#8b8fa8', borderColor: copied ? '#1D9E75' : '#2a2d3a' }}>
+                    {copied ? '✓ Copied!' : '📋 Copy'}
+                  </button>
+                  <p style={{ fontSize: '13px', lineHeight: '1.9', whiteSpace: 'pre-wrap' as const, color: '#e0e0e0', margin: '0', paddingRight: '80px' }}>
+                    {outputs[activeTab] || ''}
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' as const }}>
+                  <button onClick={() => handleDownloadPdf('mls')} disabled={generatingPdf}
+                    style={{ padding: '7px 12px', background: 'transparent', border: '1px solid #2a2d3a', borderRadius: '8px', color: '#8b8fa8', fontSize: '12px', cursor: 'pointer' }}>
+                    📄 MLS PDF
+                  </button>
+                  <button onClick={() => handleDownloadPdf('flyer')} disabled={generatingPdf}
+                    style={{ padding: '7px 12px', background: 'transparent', border: '1px solid #2a2d3a', borderRadius: '8px', color: '#8b8fa8', fontSize: '12px', cursor: 'pointer' }}>
+                    🏠 Flyer PDF
+                  </button>
+                  <a href="/launch-kit"
+                    style={{ padding: '7px 12px', background: 'rgba(29,158,117,0.15)', border: '1px solid #1D9E75', borderRadius: '8px', color: '#1D9E75', fontSize: '12px', textDecoration: 'none' }}>
+                    🚀 Launch Kit
+                  </a>
+                  <button onClick={() => setOutputs(null)}
+                    style={{ padding: '7px 12px', background: 'transparent', border: '1px solid #2a2d3a', borderRadius: '8px', color: '#6b7280', fontSize: '12px', cursor: 'pointer' }}>
+                    🔄 Clear
+                  </button>
+                </div>
+              </div>
+            )}
             </div>
           )}
 
