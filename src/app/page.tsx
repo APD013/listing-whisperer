@@ -16,54 +16,60 @@ export default function Home() {
   }
 
   return (
-    <main style={{fontFamily:'sans-serif',color:'#111'}}>
+    <main style={{fontFamily:"'Inter', sans-serif",color:'#111'}}>
 
       {/* NAV */}
       <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'18px',fontWeight:'600'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
+        <div style={{fontSize:'18px',fontWeight:'700'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
-          <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none',display:'none'}} className="desktop-only">Features</a>
+          <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
           <a href="#pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
           <a href="/login" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Sign In</a>
-          <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 14px',borderRadius:'8px',textDecoration:'none',fontWeight:'500',whiteSpace:'nowrap'}}>Get Started Free</a>
+          <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 16px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',whiteSpace:'nowrap',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>Try Free →</a>
         </div>
       </nav>
 
       {/* HERO */}
-      <section style={{textAlign:'center',padding:'3rem 1.5rem 2rem',background:'linear-gradient(180deg,#f0fdf8 0%,#fff 100%)'}}>
-        <div style={{display:'inline-block',background:'#E1F5EE',color:'#085041',fontSize:'12px',fontWeight:'600',padding:'4px 12px',borderRadius:'20px',marginBottom:'1.5rem',letterSpacing:'0.5px'}}>
+      <section style={{textAlign:'center',padding:'4rem 1.5rem 3rem',background:'linear-gradient(180deg,#f0fdf8 0%,#fff 100%)'}}>
+        <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'#E1F5EE',color:'#085041',fontSize:'12px',fontWeight:'700',padding:'5px 14px',borderRadius:'20px',marginBottom:'1.5rem',letterSpacing:'0.5px',border:'1px solid #bbf0d9'}}>
+          <span style={{width:'6px',height:'6px',borderRadius:'50%',background:'#1D9E75',display:'inline-block'}}/>
           BUILT FOR REAL ESTATE AGENTS
         </div>
-        <h1 style={{fontSize:'clamp(1.75rem, 5vw, 3rem)',fontWeight:'700',lineHeight:'1.2',maxWidth:'700px',margin:'0 auto 1.5rem'}}>
-          The AI assistant that works with you{' '}
-          <span style={{color:'#1D9E75'}}>before, during, and after every listing.</span>
+        <h1 style={{fontSize:'clamp(2rem, 5vw, 3.25rem)',fontWeight:'800',lineHeight:'1.15',maxWidth:'740px',margin:'0 auto 1.25rem',letterSpacing:'-0.5px'}}>
+          Stop writing listings<br/>
+          <span style={{color:'#1D9E75'}}>one format at a time.</span>
         </h1>
-        <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'560px',margin:'0 auto 2rem',lineHeight:'1.7'}}>
-          From seller meeting prep to on-site photo drafts to full marketing kits — Listing Whisperer is the AI field assistant built specifically for real estate agents.
+        <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'540px',margin:'0 auto 1rem',lineHeight:'1.75'}}>
+          Listing Whisperer turns your property notes into 11 ready-to-use marketing formats in under 60 seconds — MLS, Instagram, email, flyer, video script, and more.
+        </p>
+        <p style={{fontSize:'14px',color:'#1D9E75',fontWeight:'600',maxWidth:'480px',margin:'0 auto 2rem'}}>
+          Used by agents across California to save 30+ minutes per listing.
         </p>
         <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'1rem'}}>
-          <a href="/signup" onClick={() => trackCTAClick('hero_cta', 'homepage')} style={{background:'#1D9E75',color:'#fff',padding:'14px 32px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',fontSize:'16px'}}>
-            Try 3 Free Listings
+          <a href="/signup" onClick={() => trackCTAClick('hero_cta', 'homepage')}
+            style={{background:'#1D9E75',color:'#fff',padding:'15px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 20px rgba(29,158,117,0.35)',transition:'all 0.2s'}}>
+            Get 2 Free Listings →
           </a>
-          <a href="#examples" style={{background:'#fff',color:'#111',padding:'14px 32px',borderRadius:'8px',textDecoration:'none',fontWeight:'500',fontSize:'16px',border:'1px solid #ddd'}}>
-            See Real Outputs
+          <a href="#examples"
+            style={{background:'#fff',color:'#111',padding:'15px 32px',borderRadius:'10px',textDecoration:'none',fontWeight:'500',fontSize:'16px',border:'1px solid #ddd'}}>
+            See Real Output
           </a>
         </div>
-        <p style={{fontSize:'13px',color:'#999'}}>No credit card required · Cancel anytime · Built specifically for real estate agents</p>
+        <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · 2 free listings · Cancel anytime</p>
       </section>
 
       {/* STATS STRIP */}
-      <section style={{background:'#fff',padding:'1.5rem 2rem',borderBottom:'1px solid #eee'}}>
-        <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
+      <section style={{background:'#fff',padding:'2rem',borderTop:'1px solid #f0f0f0',borderBottom:'1px solid #f0f0f0'}}>
+        <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'3rem',flexWrap:'wrap'}}>
           {[
-            {stat:'11',label:'Copy formats per listing'},
-            {stat:'60s',label:'Average generation time'},
-            {stat:'3',label:'Free listings to start'},
-            {stat:'$0',label:'No credit card needed'},
+            {stat:'11',label:'Formats per listing'},
+            {stat:'60s',label:'Generation time'},
+            {stat:'30+',label:'Minutes saved per listing'},
+            {stat:'$0',label:'To get started'},
           ].map(({stat,label}) => (
             <div key={label} style={{textAlign:'center'}}>
-              <p style={{fontSize:'2rem',fontWeight:'700',color:'#1D9E75',margin:'0'}}>{stat}</p>
-              <p style={{fontSize:'13px',color:'#666',margin:'0'}}>{label}</p>
+              <p style={{fontSize:'2.25rem',fontWeight:'800',color:'#1D9E75',margin:'0',letterSpacing:'-1px'}}>{stat}</p>
+              <p style={{fontSize:'13px',color:'#888',margin:'4px 0 0',fontWeight:'500'}}>{label}</p>
             </div>
           ))}
         </div>
@@ -71,28 +77,28 @@ export default function Home() {
 
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
-        <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'1.5rem',flexWrap:'wrap'}}>
-          {['11 copy formats','Seller meeting prep','On-site photo drafts','7-day launch kit'].map(item => (
-            <span key={item} style={{color:'#fff',fontSize:'14px',fontWeight:'500'}}>✓ {item}</span>
+        <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
+          {['MLS + 10 more formats','Seller meeting prep','On-site photo drafts','7-day launch kit','Brand voice memory'].map(item => (
+            <span key={item} style={{color:'#fff',fontSize:'13px',fontWeight:'600'}}>✓ {item}</span>
           ))}
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how-it-works" style={{padding:'4rem 2rem',background:'#f9fafb'}}>
-        <div style={{maxWidth:'800px',margin:'0 auto',textAlign:'center'}}>
-          <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>How it works</h2>
-          <p style={{color:'#666',marginBottom:'3rem'}}>One tool. The entire listing workflow.</p>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'2rem'}}>
+      <section id="how-it-works" style={{padding:'5rem 2rem',background:'#f9fafb'}}>
+        <div style={{maxWidth:'820px',margin:'0 auto',textAlign:'center'}}>
+          <h2 style={{fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>The full listing workflow. One tool.</h2>
+          <p style={{color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>From seller appointment to launch day — Listing Whisperer handles it all.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'2rem'}}>
             {[
-              {step:'1',title:'Before the appointment',desc:'Use Seller Meeting Prep to get a meeting outline, talking points, and questions to ask before you walk in the door.'},
-              {step:'2',title:'On-site with Snap & Start',desc:'Upload photos on your phone, confirm the details, and generate your first draft while still at the property.'},
-              {step:'3',title:'Full marketing launch',desc:'Generate 11 copy formats, download PDF flyers, and get a 7-day launch plan — all in one click.'},
-            ].map(({step,title,desc}) => (
-              <div key={step} style={{textAlign:'center'}}>
-                <div style={{width:'48px',height:'48px',background:'#1D9E75',color:'#fff',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',fontWeight:'700',margin:'0 auto 1rem'}}>{step}</div>
-                <h3 style={{fontSize:'16px',fontWeight:'600',marginBottom:'8px'}}>{title}</h3>
-                <p style={{fontSize:'14px',color:'#666',lineHeight:'1.7'}}>{desc}</p>
+              {step:'1',title:'Before the appointment',desc:'Generate a complete seller meeting prep kit — talking points, questions to ask, and a follow-up email — before you walk in the door.',color:'#1D9E75'},
+              {step:'2',title:'On-site with Snap & Start',desc:'Upload property photos from your phone. Our AI detects features and generates your first draft while you\'re still at the property.',color:'#085041'},
+              {step:'3',title:'Full marketing launch',desc:'Generate all 11 copy formats, download PDF flyers, and get a 7-day launch plan — everything ready before you leave your desk.',color:'#1D9E75'},
+            ].map(({step,title,desc,color}) => (
+              <div key={step} style={{textAlign:'center',padding:'1.5rem',background:'#fff',borderRadius:'16px',border:'1px solid #eee',boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
+                <div style={{width:'52px',height:'52px',background:color,color:'#fff',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',fontWeight:'800',margin:'0 auto 1.25rem',boxShadow:`0 4px 12px ${color}40`}}>{step}</div>
+                <h3 style={{fontSize:'15px',fontWeight:'700',marginBottom:'10px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
               </div>
             ))}
           </div>
@@ -100,23 +106,25 @@ export default function Home() {
       </section>
 
       {/* FEATURES GRID */}
-      <section id="features" style={{padding:'4rem 2rem',background:'#fff'}}>
-        <div style={{maxWidth:'900px',margin:'0 auto'}}>
-          <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Everything an agent needs</h2>
-          <p style={{textAlign:'center',color:'#666',marginBottom:'3rem'}}>Built around the real listing workflow — not generic AI.</p>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(250px, 1fr))',gap:'1.5rem'}}>
+      <section id="features" style={{padding:'5rem 2rem',background:'#fff'}}>
+        <div style={{maxWidth:'920px',margin:'0 auto'}}>
+          <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>Everything an agent needs</h2>
+          <p style={{textAlign:'center',color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>Built around the real listing workflow — not generic AI.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))',gap:'1.5rem'}}>
             {[
-              {icon:'📋',title:'Seller Meeting Prep',desc:'Meeting outlines, talking points, seller questions, and follow-up emails before every appointment.'},
+              {icon:'📋',title:'Seller Meeting Prep',desc:'Meeting outlines, talking points, seller questions, and follow-up emails — before every appointment.'},
               {icon:'📸',title:'Snap & Start',desc:'Upload photos on-site, confirm details, and generate your first draft before you leave the property.'},
               {icon:'🏠',title:'11 Copy Formats',desc:'MLS, Luxury MLS, Instagram, Facebook, Email, Open House, Video Script, SMS, Flyer, Price Drop, and SEO.'},
               {icon:'🚀',title:'7-Day Launch Kit',desc:'A complete day-by-day marketing plan with social posts, email sequences, and pro tips.'},
               {icon:'✨',title:'Listing Rewriter',desc:'Paste any boring MLS description and get a polished, buyer-ready rewrite instantly.'},
               {icon:'🎙️',title:'Brand Voice Memory',desc:'Save your tone, style, and CTA preferences so every listing sounds like you.'},
             ].map(({icon,title,desc}) => (
-              <div key={title} style={{background:'#f8fafc',borderRadius:'12px',padding:'1.5rem',border:'1px solid #eee'}}>
+              <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
+                onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}
+                onMouseOut={e => {e.currentTarget.style.borderColor='#eee';e.currentTarget.style.boxShadow='none'}}>
                 <div style={{fontSize:'2rem',marginBottom:'12px'}}>{icon}</div>
-                <h3 style={{fontSize:'15px',fontWeight:'600',marginBottom:'8px'}}>{title}</h3>
-                <p style={{fontSize:'13px',color:'#666',lineHeight:'1.7',margin:'0'}}>{desc}</p>
+                <h3 style={{fontSize:'15px',fontWeight:'700',marginBottom:'8px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
               </div>
             ))}
           </div>
@@ -124,71 +132,84 @@ export default function Home() {
       </section>
 
       {/* BEFORE/AFTER */}
-      <section style={{padding:'4rem 2rem',maxWidth:'900px',margin:'0 auto'}}>
-        <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>From rough notes to full marketing kit</h2>
-        <p style={{textAlign:'center',color:'#666',marginBottom:'3rem'}}>Fill in the details — we handle everything from MLS copy to launch plans.</p>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'1rem',alignItems:'center'}}>
-          <div style={{background:'#fff8f0',border:'1px solid #fde8c8',borderRadius:'12px',padding:'1.5rem'}}>
-            <p style={{fontSize:'11px',fontWeight:'700',color:'#999',marginBottom:'8px',letterSpacing:'1px'}}>YOUR ROUGH NOTES</p>
-            <p style={{fontSize:'14px',color:'#555',lineHeight:'1.8',fontStyle:'italic'}}>
+      <section style={{padding:'5rem 2rem',maxWidth:'900px',margin:'0 auto'}}>
+        <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>From rough notes to full marketing kit</h2>
+        <p style={{textAlign:'center',color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>Fill in the details — we handle everything from MLS copy to launch plans.</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'1.5rem',alignItems:'center'}}>
+          <div style={{background:'#fff8f0',border:'1px solid #fde8c8',borderRadius:'14px',padding:'1.75rem'}}>
+            <p style={{fontSize:'11px',fontWeight:'700',color:'#aaa',marginBottom:'10px',letterSpacing:'1px'}}>YOUR ROUGH NOTES</p>
+            <p style={{fontSize:'14px',color:'#666',lineHeight:'1.85',fontStyle:'italic',margin:'0'}}>
               "4bd 3ba NB, 2200sf, ocean views, chefs kitchen quartz, spa bath, 3 car garage, solar, smart home, top schools, $1.295m"
             </p>
           </div>
-          <div style={{fontSize:'2rem',color:'#1D9E75',fontWeight:'bold',textAlign:'center'}}>→</div>
-          <div style={{background:'#f0fdf8',border:'1px solid #bbf0d9',borderRadius:'12px',padding:'1.5rem'}}>
-            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',marginBottom:'8px',letterSpacing:'1px'}}>11 READY-TO-USE FORMATS</p>
-            <p style={{fontSize:'13px',color:'#333',lineHeight:'1.8'}}>✅ MLS Description<br/>✅ Luxury MLS<br/>✅ Instagram Caption<br/>✅ Facebook Post<br/>✅ Email Blast<br/>✅ Open House Flyer<br/>✅ Video Script<br/>✅ SMS, Flyer & Price Drop<br/>✅ SEO Copy</p>
+          <div style={{fontSize:'2.5rem',color:'#1D9E75',fontWeight:'800',textAlign:'center'}}>→</div>
+          <div style={{background:'#f0fdf8',border:'1px solid #bbf0d9',borderRadius:'14px',padding:'1.75rem'}}>
+            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',marginBottom:'10px',letterSpacing:'1px'}}>11 READY-TO-USE FORMATS</p>
+            <p style={{fontSize:'13px',color:'#333',lineHeight:'2',margin:'0'}}>
+              ✅ MLS Description<br/>✅ Luxury MLS<br/>✅ Instagram Caption<br/>✅ Facebook Post<br/>✅ Email Blast<br/>✅ Open House Flyer<br/>✅ Video Script<br/>✅ SMS, Flyer & Price Drop<br/>✅ SEO Copy
+            </p>
           </div>
         </div>
       </section>
 
       {/* SAMPLE OUTPUTS */}
-      <section id="examples" style={{padding:'4rem 2rem',maxWidth:'800px',margin:'0 auto'}}>
-        <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>See real outputs</h2>
-        <p style={{textAlign:'center',color:'#666',marginBottom:'0.5rem'}}>One set of property notes. Three formats. Ready to copy and paste.</p>
-        <p style={{textAlign:'center',fontSize:'13px',color:'#1D9E75',fontWeight:'600',marginBottom:'2rem'}}>👇 Click each tab to see the actual output</p>
-        <div style={{display:'flex',gap:'8px',justifyContent:'center',marginBottom:'1.5rem',flexWrap:'wrap'}}>
-          {[{key:'mls',label:'MLS Description'},{key:'instagram',label:'Instagram'},{key:'email',label:'Email Blast'}].map(t => (
-            <button key={t.key} onClick={() => setActiveOutput(t.key)}
-              style={{padding:'8px 18px',borderRadius:'20px',border:'1px solid',fontSize:'13px',cursor:'pointer',
-                borderColor: activeOutput === t.key ? '#1D9E75' : '#ddd',
-                background: activeOutput === t.key ? '#E1F5EE' : '#fff',
-                color: activeOutput === t.key ? '#085041' : '#666'}}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <div style={{background:'#f9fafb',borderRadius:'12px',padding:'1.5rem',border:'1px solid #eee'}}>
-          <p style={{fontSize:'14px',lineHeight:'1.9',color:'#333',whiteSpace:'pre-wrap'}}>{sampleOutputs[activeOutput]}</p>
+      <section id="examples" style={{padding:'5rem 2rem',background:'#f9fafb',maxWidth:'100%'}}>
+        <div style={{maxWidth:'800px',margin:'0 auto'}}>
+          <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>See real output</h2>
+          <p style={{textAlign:'center',color:'#777',marginBottom:'0.5rem',fontSize:'15px'}}>One set of property notes. Three formats. Ready to copy and paste.</p>
+          <p style={{textAlign:'center',fontSize:'13px',color:'#1D9E75',fontWeight:'600',marginBottom:'2.5rem'}}>👇 Click each tab to preview</p>
+          <div style={{display:'flex',gap:'8px',justifyContent:'center',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+            {[{key:'mls',label:'🏠 MLS Description'},{key:'instagram',label:'📸 Instagram'},{key:'email',label:'📧 Email Blast'}].map(t => (
+              <button key={t.key} onClick={() => setActiveOutput(t.key)}
+                style={{padding:'9px 20px',borderRadius:'20px',border:'1px solid',fontSize:'13px',cursor:'pointer',fontWeight:'500',transition:'all 0.15s',
+                  borderColor: activeOutput === t.key ? '#1D9E75' : '#ddd',
+                  background: activeOutput === t.key ? '#E1F5EE' : '#fff',
+                  color: activeOutput === t.key ? '#085041' : '#777'}}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <div style={{background:'#fff',borderRadius:'14px',padding:'2rem',border:'1px solid #e5e7eb',boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
+            <p style={{fontSize:'14px',lineHeight:'1.95',color:'#333',whiteSpace:'pre-wrap',margin:'0'}}>{sampleOutputs[activeOutput]}</p>
+          </div>
+          <div style={{textAlign:'center',marginTop:'1.5rem'}}>
+            <a href="/signup" onClick={() => trackCTAClick('examples_cta', 'homepage')}
+              style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'12px 28px',borderRadius:'10px',textDecoration:'none',fontWeight:'600',fontSize:'14px',boxShadow:'0 4px 16px rgba(29,158,117,0.3)'}}>
+              Generate yours free →
+            </a>
+          </div>
         </div>
       </section>
 
       {/* SOCIAL PROOF */}
-      <section style={{padding:'4rem 2rem',background:'#fff'}}>
-        <div style={{maxWidth:'700px',margin:'0 auto'}}>
-          <div style={{background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',borderRadius:'16px',padding:'2rem',marginBottom:'2rem',border:'1px solid #bbf0d9'}}>
-            <p style={{fontSize:'14px',color:'#085041',fontWeight:'600',marginBottom:'8px'}}>👋 A note from the founder</p>
-            <p style={{fontSize:'15px',color:'#333',lineHeight:'1.8',marginBottom:'12px'}}>
+      <section style={{padding:'5rem 2rem',background:'#fff'}}>
+        <div style={{maxWidth:'720px',margin:'0 auto'}}>
+          <div style={{background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',borderRadius:'16px',padding:'2.25rem',marginBottom:'2.5rem',border:'1px solid #bbf0d9'}}>
+            <p style={{fontSize:'13px',color:'#085041',fontWeight:'700',marginBottom:'10px',letterSpacing:'0.3px'}}>👋 A NOTE FROM THE FOUNDER</p>
+            <p style={{fontSize:'15px',color:'#333',lineHeight:'1.85',marginBottom:'12px'}}>
               I built Listing Whisperer because I watched agents spend 30+ minutes writing copy for every single listing — MLS, Instagram, email, open house — separately, manually, every time.
             </p>
-            <p style={{fontSize:'15px',color:'#333',lineHeight:'1.8',marginBottom:'12px'}}>
-              This tool does all of it in under 60 seconds. It's new, it's built specifically for real estate agents, and early users get priority support directly from me.
+            <p style={{fontSize:'15px',color:'#333',lineHeight:'1.85',marginBottom:'16px'}}>
+              This tool does all of it in under 60 seconds. It's built specifically for real estate agents, and early users get priority support directly from me.
             </p>
-            <p style={{fontSize:'14px',color:'#1D9E75',fontWeight:'600'}}>— Adrian, Founder of Listing Whisperer</p>
+            <p style={{fontSize:'14px',color:'#1D9E75',fontWeight:'700',margin:'0'}}>— Adrian, Founder of Listing Whisperer</p>
           </div>
-          <h3 style={{fontSize:'1.25rem',fontWeight:'600',marginBottom:'0.5rem',textAlign:'center'}}>Early user feedback</h3>
-          <p style={{fontSize:'13px',color:'#999',textAlign:'center',marginBottom:'2rem'}}>From our first beta users</p>
+          <h3 style={{fontSize:'1.4rem',fontWeight:'700',marginBottom:'0.4rem',textAlign:'center'}}>What early users are saying</h3>
+          <p style={{fontSize:'13px',color:'#aaa',textAlign:'center',marginBottom:'2rem'}}>From our first beta users</p>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'1.5rem'}}>
             {[
               {quote:'"Saved me at least 20 minutes on my last listing. The Instagram captions were ready to post."',initials:'S.M.',role:'Realtor, Orange County'},
               {quote:'"Finally something built for agents. Not just another generic AI tool. The MLS copy was spot on."',initials:'J.T.',role:'Agent, Los Angeles'},
               {quote:'"I used to dread writing listing descriptions. Now I generate everything in one click."',initials:'L.R.',role:'Broker, San Diego'},
             ].map(({quote,initials,role}) => (
-              <div key={initials} style={{background:'#f9fafb',borderRadius:'12px',padding:'1.5rem',border:'1px solid #eee'}}>
+              <div key={initials} style={{background:'#f9fafb',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee'}}>
+                <div style={{display:'flex',gap:'2px',marginBottom:'10px'}}>
+                  {[1,2,3,4,5].map(s => <span key={s} style={{color:'#f59e0b',fontSize:'14px'}}>★</span>)}
+                </div>
                 <p style={{fontSize:'14px',color:'#333',lineHeight:'1.8',marginBottom:'1rem',fontStyle:'italic'}}>{quote}</p>
                 <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                  <div style={{width:'36px',height:'36px',background:'#1D9E75',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:'13px',fontWeight:'600'}}>{initials}</div>
-                  <p style={{fontSize:'12px',color:'#999',margin:'0'}}>{role}</p>
+                  <div style={{width:'36px',height:'36px',background:'#1D9E75',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:'12px',fontWeight:'700'}}>{initials}</div>
+                  <p style={{fontSize:'12px',color:'#aaa',margin:'0'}}>{role}</p>
                 </div>
               </div>
             ))}
@@ -197,27 +218,28 @@ export default function Home() {
       </section>
 
       {/* WHY NOT GENERIC AI */}
-      <section style={{padding:'4rem 2rem',background:'#f9fafb'}}>
+      <section style={{padding:'5rem 2rem',background:'#f9fafb'}}>
         <div style={{maxWidth:'700px',margin:'0 auto',textAlign:'center'}}>
-          <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Why not just use generic AI?</h2>
-          <p style={{color:'#666',marginBottom:'3rem'}}>Great question. Here's the difference.</p>
+          <h2 style={{fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>Why not just use ChatGPT?</h2>
+          <p style={{color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>Great question. Here's the real difference.</p>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(240px, 1fr))',gap:'1.5rem',textAlign:'left'}}>
-            <div style={{background:'#fff',borderRadius:'12px',padding:'1.5rem',border:'1px solid #eee'}}>
-              <p style={{fontWeight:'600',marginBottom:'1rem',color:'#999'}}>❌ Generic AI Tools</p>
-              <ul style={{fontSize:'14px',color:'#666',lineHeight:'2',paddingLeft:'1rem'}}>
+            <div style={{background:'#fff',borderRadius:'14px',padding:'1.75rem',border:'1px solid #eee'}}>
+              <p style={{fontWeight:'700',marginBottom:'1rem',color:'#bbb',fontSize:'14px'}}>❌ ChatGPT / Generic AI</p>
+              <ul style={{fontSize:'14px',color:'#888',lineHeight:'2.2',paddingLeft:'1rem',margin:'0'}}>
                 <li>Write your own prompts every time</li>
                 <li>One format at a time</li>
                 <li>No real estate workflow</li>
                 <li>No tone or buyer targeting</li>
                 <li>No saved listing history</li>
+                <li>No seller prep or on-site tools</li>
               </ul>
             </div>
-            <div style={{background:'#f0fdf8',borderRadius:'12px',padding:'1.5rem',border:'1px solid #bbf0d9'}}>
-              <p style={{fontWeight:'600',marginBottom:'1rem',color:'#1D9E75'}}>✅ Listing Whisperer</p>
-              <ul style={{fontSize:'14px',color:'#333',lineHeight:'2',paddingLeft:'1rem'}}>
+            <div style={{background:'#f0fdf8',borderRadius:'14px',padding:'1.75rem',border:'2px solid #bbf0d9'}}>
+              <p style={{fontWeight:'700',marginBottom:'1rem',color:'#1D9E75',fontSize:'14px'}}>✅ Listing Whisperer</p>
+              <ul style={{fontSize:'14px',color:'#333',lineHeight:'2.2',paddingLeft:'1rem',margin:'0'}}>
                 <li>Built-in real estate workflow</li>
                 <li>11 formats in one click</li>
-                <li>Seller meeting prep</li>
+                <li>Seller meeting prep included</li>
                 <li>On-site photo drafts</li>
                 <li>Tone & buyer targeting</li>
                 <li>Saved listing history</li>
@@ -228,31 +250,34 @@ export default function Home() {
       </section>
 
       {/* PRICING */}
-      <section id="pricing" style={{padding:'4rem 2rem',maxWidth:'700px',margin:'0 auto',textAlign:'center'}}>
-        <h2 style={{fontSize:'1.75rem',fontWeight:'600',marginBottom:'0.5rem'}}>Simple, flexible pricing</h2>
-        <p style={{color:'#666',marginBottom:'0.5rem'}}>Only have one listing this month? Pay $9. Use it often? Go Pro.</p>
-        <p style={{color:'#999',fontSize:'13px',marginBottom:'3rem'}}>No credit card required to start free.</p>
+      <section id="pricing" style={{padding:'5rem 2rem',maxWidth:'760px',margin:'0 auto',textAlign:'center'}}>
+        <h2 style={{fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>Simple, honest pricing</h2>
+        <p style={{color:'#777',marginBottom:'0.5rem',fontSize:'15px'}}>One listing this month? Pay $9. Use it often? Go Pro for $29.</p>
+        <p style={{color:'#aaa',fontSize:'13px',marginBottom:'3.5rem'}}>No credit card required to start free.</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(3, 1fr)',gap:'1.5rem'}}>
           <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'1px solid #eee',textAlign:'left'}}>
-            <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Free</h3>
-            <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>Try it out</p>
-            <p style={{fontSize:'2.5rem',fontWeight:'700',marginBottom:'1.5rem'}}>$0</p>
+            <h3 style={{fontSize:'18px',fontWeight:'700',marginBottom:'4px'}}>Free</h3>
+            <p style={{color:'#aaa',fontSize:'13px',marginBottom:'1rem'}}>Try it out, no risk</p>
+            <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'1.5rem',letterSpacing:'-1px'}}>$0</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ 2 free listings</li>
               <li>✅ 3 free rewrites</li>
               <li>✅ All 11 copy formats</li>
               <li>✅ No credit card required</li>
             </ul>
-            <a href="/signup" onClick={() => trackCTAClick('pricing_free_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',border:'1px solid #ddd',color:'#333',textDecoration:'none',fontSize:'14px'}}>Get started free</a>
+            <a href="/signup" onClick={() => trackCTAClick('pricing_free_cta', 'homepage')}
+              style={{display:'block',textAlign:'center',padding:'11px',borderRadius:'8px',border:'1px solid #ddd',color:'#333',textDecoration:'none',fontSize:'14px',fontWeight:'500'}}>
+              Start for free
+            </a>
           </div>
-          <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'2px solid #1D9E75',textAlign:'left',position:'relative'}}>
-            <div style={{position:'absolute',top:'-12px',left:'50%',transform:'translateX(-50%)',background:'#1D9E75',color:'#fff',fontSize:'11px',fontWeight:'700',padding:'3px 12px',borderRadius:'20px',whiteSpace:'nowrap'}}>
+          <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'2px solid #1D9E75',textAlign:'left',position:'relative',boxShadow:'0 8px 32px rgba(29,158,117,0.12)'}}>
+            <div style={{position:'absolute',top:'-13px',left:'50%',transform:'translateX(-50%)',background:'#1D9E75',color:'#fff',fontSize:'11px',fontWeight:'700',padding:'4px 14px',borderRadius:'20px',whiteSpace:'nowrap'}}>
               MOST POPULAR
             </div>
-            <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Pay Per Listing</h3>
-            <p style={{color:'#666',fontSize:'13px',marginBottom:'1rem'}}>No subscription. No commitment.</p>
-            <p style={{fontSize:'2.5rem',fontWeight:'700',marginBottom:'4px'}}>$9<span style={{fontSize:'16px',fontWeight:'400'}}>/listing</span></p>
-            <p style={{fontSize:'12px',color:'#999',marginBottom:'1.5rem'}}>No subscription needed</p>
+            <h3 style={{fontSize:'18px',fontWeight:'700',marginBottom:'4px'}}>Pay Per Listing</h3>
+            <p style={{color:'#aaa',fontSize:'13px',marginBottom:'1rem'}}>No subscription needed.</p>
+            <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'4px',letterSpacing:'-1px'}}>$9<span style={{fontSize:'16px',fontWeight:'400',color:'#aaa'}}>/listing</span></p>
+            <p style={{fontSize:'12px',color:'#bbb',marginBottom:'1.5rem'}}>Buy as many as you need</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ 1 full listing generation</li>
               <li>✅ All 11 copy formats</li>
@@ -262,12 +287,15 @@ export default function Home() {
               <li>✅ Saved to your history</li>
               <li>✅ Never expires</li>
             </ul>
-            <a href="/pricing" onClick={() => trackCTAClick('pricing_ppl_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',background:'#1D9E75',color:'#fff',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>Buy 1 Listing — $9</a>
+            <a href="/pricing" onClick={() => trackCTAClick('pricing_ppl_cta', 'homepage')}
+              style={{display:'block',textAlign:'center',padding:'11px',borderRadius:'8px',background:'#1D9E75',color:'#fff',textDecoration:'none',fontSize:'14px',fontWeight:'700'}}>
+              Buy 1 Listing — $9
+            </a>
           </div>
           <div style={{background:'#1D9E75',borderRadius:'16px',padding:'2rem',textAlign:'left',color:'#fff'}}>
-            <h3 style={{fontSize:'20px',fontWeight:'600',marginBottom:'4px'}}>Pro</h3>
+            <h3 style={{fontSize:'18px',fontWeight:'700',marginBottom:'4px'}}>Pro</h3>
             <p style={{color:'#a8f0d4',fontSize:'13px',marginBottom:'1rem'}}>For active agents</p>
-            <p style={{fontSize:'2.5rem',fontWeight:'700',marginBottom:'4px'}}>$29<span style={{fontSize:'16px',fontWeight:'400'}}>/mo</span></p>
+            <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'4px',letterSpacing:'-1px'}}>$29<span style={{fontSize:'16px',fontWeight:'400',opacity:0.7}}>/mo</span></p>
             <p style={{fontSize:'12px',color:'#a8f0d4',marginBottom:'1.5rem'}}>Best value for 4+ listings/month</p>
             <ul style={{fontSize:'14px',color:'#e0f7ee',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ Unlimited listings</li>
@@ -279,37 +307,52 @@ export default function Home() {
               <li>✅ Brand voice memory</li>
               <li>✅ Priority support</li>
             </ul>
-            <a href="/signup" onClick={() => trackCTAClick('pricing_pro_cta', 'homepage')} style={{display:'block',textAlign:'center',padding:'10px',borderRadius:'8px',background:'#fff',color:'#1D9E75',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>Start free trial</a>
+            <a href="/signup" onClick={() => trackCTAClick('pricing_pro_cta', 'homepage')}
+              style={{display:'block',textAlign:'center',padding:'11px',borderRadius:'8px',background:'#fff',color:'#1D9E75',textDecoration:'none',fontSize:'14px',fontWeight:'700'}}>
+              Start free → Go Pro
+            </a>
           </div>
         </div>
+        <p style={{fontSize:'13px',color:'#bbb',marginTop:'1.5rem'}}>Use code <strong style={{color:'#1D9E75'}}>WELCOME50</strong> for 50% off your first month of Pro</p>
       </section>
 
       {/* FAQ */}
-      <section style={{padding:'4rem 2rem',background:'#f9fafb'}}>
-        <div style={{maxWidth:'600px',margin:'0 auto'}}>
-          <h2 style={{textAlign:'center',fontSize:'1.75rem',fontWeight:'600',marginBottom:'3rem'}}>Frequently asked questions</h2>
+      <section style={{padding:'5rem 2rem',background:'#f9fafb'}}>
+        <div style={{maxWidth:'620px',margin:'0 auto'}}>
+          <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'3.5rem',letterSpacing:'-0.3px'}}>Frequently asked questions</h2>
           {[
-            {q:'Is this really free to start?',a:'Yes. You get 2 full listings and 3 listing rewrites completely free, no credit card required. Each listing generates all 11 formats.'},
+            {q:'Is this really free to start?',a:'Yes. You get 2 full listings and 3 listing rewrites completely free — no credit card required. Each listing generates all 11 formats.'},
             {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, SMS, Flyer, Price Drop, and SEO copy — all from one set of notes.'},
             {q:'What is Seller Meeting Prep?',a:'Before your listing appointment, Listing Whisperer generates a complete meeting outline, talking points, questions to ask the seller, and a follow-up email — so you walk in fully prepared.'},
             {q:'What is Snap & Start?',a:'On your phone or tablet, upload property photos on-site. Our AI detects visible features, you confirm the details, and generate your first draft before you leave the property.'},
-            {q:'How is this different from generic AI tools?',a:'Listing Whisperer is purpose-built for real estate agents. It covers the entire listing workflow — from seller prep to on-site drafts to full marketing launch — not just copy generation.'},
+            {q:'How is this different from ChatGPT?',a:'Listing Whisperer is purpose-built for real estate agents. It covers the entire listing workflow — seller prep, on-site drafts, and full marketing launch — not just copy generation. No prompt writing required.'},
             {q:'Can I cancel anytime?',a:'Yes. No contracts, no commitments. Cancel your Pro subscription anytime from your account settings.'},
             {q:'How good is the copy quality?',a:'The copy is generated by Claude, one of the most advanced AI models available, trained to produce MLS-ready professional marketing copy.'},
           ].map(({q,a}) => (
-            <div key={q} style={{borderBottom:'1px solid #eee',paddingBottom:'1.5rem',marginBottom:'1.5rem'}}>
-              <p style={{fontWeight:'600',fontSize:'15px',marginBottom:'8px'}}>{q}</p>
-              <p style={{fontSize:'14px',color:'#666',lineHeight:'1.8'}}>{a}</p>
+            <div key={q} style={{borderBottom:'1px solid #e5e7eb',paddingBottom:'1.5rem',marginBottom:'1.5rem'}}>
+              <p style={{fontWeight:'700',fontSize:'15px',marginBottom:'8px',color:'#111'}}>{q}</p>
+              <p style={{fontSize:'14px',color:'#777',lineHeight:'1.85',margin:'0'}}>{a}</p>
             </div>
           ))}
         </div>
       </section>
 
+      {/* BOTTOM CTA */}
+      <section style={{padding:'5rem 2rem',background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',textAlign:'center',borderTop:'1px solid #bbf0d9'}}>
+        <h2 style={{fontSize:'2rem',fontWeight:'800',marginBottom:'0.75rem',letterSpacing:'-0.3px'}}>Ready to save 30 minutes per listing?</h2>
+        <p style={{fontSize:'15px',color:'#555',marginBottom:'2rem',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — no credit card needed. Your first 2 listings are on us.</p>
+        <a href="/signup" onClick={() => trackCTAClick('bottom_cta', 'homepage')}
+          style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'16px 40px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 24px rgba(29,158,117,0.35)'}}>
+          Get Started Free →
+        </a>
+        <p style={{fontSize:'13px',color:'#aaa',marginTop:'1rem'}}>No credit card · 2 free listings · Cancel anytime</p>
+      </section>
+
       {/* FOOTER */}
       <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid #eee',background:'#fff'}}>
-        <div style={{fontSize:'16px',fontWeight:'600',marginBottom:'8px'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
-        <p style={{fontSize:'13px',color:'#999',marginBottom:'8px'}}>The AI assistant for real estate agents. Before the appointment, on-site, and at launch.</p>
-        <p style={{fontSize:'13px',color:'#999'}}>© 2025 Listing Whisperer · <a href="/login" style={{color:'#999'}}>Sign In</a> · <a href="/signup" style={{color:'#999'}}>Get Started Free</a> · <a href="#pricing" style={{color:'#999'}}>Pricing</a> · <a href="/contact" style={{color:'#999'}}>Contact Us</a></p>
+        <div style={{fontSize:'16px',fontWeight:'700',marginBottom:'8px'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
+        <p style={{fontSize:'13px',color:'#aaa',marginBottom:'8px'}}>The AI assistant for real estate agents. Before the appointment, on-site, and at launch.</p>
+        <p style={{fontSize:'13px',color:'#aaa'}}>© 2026 Listing Whisperer · <a href="/login" style={{color:'#aaa'}}>Sign In</a> · <a href="/signup" style={{color:'#aaa'}}>Get Started Free</a> · <a href="#pricing" style={{color:'#aaa'}}>Pricing</a> · <a href="/contact" style={{color:'#aaa'}}>Contact Us</a></p>
       </footer>
 
     </main>
