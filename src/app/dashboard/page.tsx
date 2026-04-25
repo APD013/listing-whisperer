@@ -335,13 +335,12 @@ export default function Dashboard() {
 
           {/* GENERATE PAGE */}
           {activePage === 'generate' && (
-            <div style={{ display: 'grid', gridTemplateColumns: outputs ? 'minmax(320px, 1fr) minmax(320px, 1fr)' : '1fr', gap: '1.5rem', maxWidth: outputs ? '100%' : '760px', transition: 'all 0.3s', alignItems: 'start' }}>
-              <div style={{ marginBottom: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: outputs ? '420px 1fr' : '1fr', gap: '1.5rem', maxWidth: outputs ? '100%' : '760px', alignItems: 'start' }}>
+              <div style={{ marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-                  <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f0f0f0', margin: '0' }}>New Listing</h1>
-                  <span style={{ background: 'rgba(29,158,117,0.15)', color: '#1D9E75', fontSize: '11px', fontWeight: '600', padding: '3px 10px', borderRadius: '20px', border: '1px solid rgba(29,158,117,0.3)' }}>11 formats in one click</span>
+                  <h1 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#f0f0f0', margin: '0' }}>New Listing</h1>
+                  <span style={{ background: 'rgba(29,158,117,0.15)', color: '#1D9E75', fontSize: '11px', fontWeight: '600', padding: '3px 10px', borderRadius: '20px', border: '1px solid rgba(29,158,117,0.3)' }}>11 formats</span>
                 </div>
-                <p style={{ fontSize: '14px', color: '#8b8fa8' }}>Fill in the property details below — your AI assistant will generate MLS copy, social posts, email blasts, and more instantly.</p>
               </div>
 
               <div style={{ ...styles.card, marginBottom: '1rem' }}>
@@ -437,6 +436,8 @@ export default function Dashboard() {
                 </div>
               )}
 
+              {!outputs && (
+              <>
               {/* MOBILE APP BANNER */}
               <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.1),rgba(8,80,65,0.1))',borderRadius:'12px',border:'1px solid rgba(29,158,117,0.2)',padding:'1rem',marginBottom:'1rem'}}>
                 <p style={{fontSize:'12px',fontWeight:'700',color:'#1D9E75',marginBottom:'6px',letterSpacing:'0.5px'}}>📱 USE ON YOUR PHONE</p>
@@ -475,6 +476,8 @@ export default function Dashboard() {
                   </a>
                 ))}
               </div>
+              </>
+              )}
             {/* INLINE RESULTS - shows to the right when outputs exist */}
             {outputs && (
               <div>
