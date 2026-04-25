@@ -257,7 +257,7 @@ const [showReferralBanner, setShowReferralBanner] = useState(false)
 
         <div style={{ padding: '1rem 0', flex: 1, overflowY: 'auto' as const }}>
           <div style={{padding:'0 0.75rem', marginBottom:'8px'}}>
-            <p style={{fontSize:'10px',fontWeight:'700',color:'#444',letterSpacing:'1px',margin:'0 0 6px',padding:'0 0.75rem'}}>WORKSPACE</p>
+            <p style={{fontSize:'10px',fontWeight:'700',color:'#444',letterSpacing:'1px',margin:'0 0 6px',padding:'0 0.75rem'}}>MAIN</p>
             {navItems.map(item => (
               <button key={item.key}
                 onClick={() => { !item.disabled && setActivePage(item.key); setSidebarOpen(false) }}
@@ -276,19 +276,6 @@ const [showReferralBanner, setShowReferralBanner] = useState(false)
               </button>
             ))}
           </div>
-
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.5rem 0.75rem' }} />
-          <p style={{fontSize:'10px',fontWeight:'700',color:'#444',letterSpacing:'1px',margin:'0 0 6px',padding:'0 1.5rem'}}>START</p>
-          {[
-            { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
-            { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
-            { href: '/rewrite', icon: '✨', label: 'Rewrite' },
-          ].map(item => (
-            <a key={item.href} href={item.href}
-              style={{ width: '100%', padding: '9px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', borderLeft: '3px solid transparent' }}>
-              <span>{item.icon}</span> {item.label}
-            </a>
-          ))}
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.5rem 0.75rem' }} />
           <p style={{fontSize:'10px',fontWeight:'700',color:'#444',letterSpacing:'1px',margin:'0 0 6px',padding:'0 1.5rem'}}>TOOLS</p>
@@ -377,9 +364,9 @@ const [showReferralBanner, setShowReferralBanner] = useState(false)
                 {[
                   {icon:'✨',title:'New Listing',desc:'Generate 11 marketing formats from property details',color:'#1D9E75',action:() => setActivePage('generate')},
                   {icon:'⚡',title:'Quick Listing',desc:'Upload a photo and get a full listing instantly',color:'#d4af37',href:'/quick-listing'},
-                  {icon:'📸',title:'Snap & Start',desc:'On-site photo drafts while you\'re at the property',color:'#e1306c',href:'/snap-start'},
+                  {icon:'📸',title:'Snap & Start',desc:'At the property? Draft your listing on-site',color:'#e1306c',href:'/snap-start'},
                   {icon:'📋',title:'Seller Meeting Prep',desc:'Walk into every seller meeting fully prepared',color:'#8b5cf6',href:'/seller-prep'},
-                  {icon:'🚀',title:'7-Day Launch Kit',desc:'Full marketing launch plan for your listing',color:'#f59e0b',href:'/launch-kit'},
+                  {icon:'🚀',title:'Launch Plan',desc:'7-day marketing plan for your listing',color:'#f59e0b',href:'/launch-kit'},
                   {icon:'✍️',title:'Rewrite Listing',desc:'Improve and refresh existing listing copy',color:'#6366f1',href:'/rewrite'},
                   {icon:'👥',title:'Leads & Clients',desc:'Manage your pipeline and client relationships',color:'#10b981',href:'/leads'},
                   {icon:'🖼️',title:'Photo Library',desc:'Organize and manage your property photos',color:'#f97316',href:'/photos'},
