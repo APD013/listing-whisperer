@@ -465,111 +465,264 @@ export default function Dashboard() {
           {/* RESULTS WORKSPACE */}
           {activePage === 'results' && outputs && (
             <div>
-              {/* RESULTS HEADER */}
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.5rem',flexWrap:'wrap',gap:'12px'}}>
-                <div>
-                  <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'4px'}}>
-                    <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>🎉 Marketing Suite Ready</h1>
-                    <span style={{background:'rgba(29,158,117,0.15)',color:'#1D9E75',fontSize:'11px',fontWeight:'600',padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)'}}>11 formats</span>
+              {/* COMPLETION HEADER */}
+              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.12),rgba(8,80,65,0.08))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.2)',padding:'1.5rem 2rem',marginBottom:'2rem',boxShadow:'0 0 40px rgba(29,158,117,0.08)'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
+                  <div>
+                    <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'6px'}}>
+                      <span style={{fontSize:'1.75rem'}}>🎉</span>
+                      <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Marketing Suite Ready</h1>
+                      <span style={{background:'rgba(29,158,117,0.2)',color:'#1D9E75',fontSize:'11px',fontWeight:'700',padding:'4px 12px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.4)',boxShadow:'0 0 12px rgba(29,158,117,0.2)'}}>
+                        ✓ 11 FORMATS
+                      </span>
+                    </div>
+                    <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>
+                      {form.neighborhood || form.name || 'Your listing'}{form.price ? ` · ${form.price}` : ''} · {form.beds || ''} · {form.sqft ? `${form.sqft} sq ft` : ''}
+                    </p>
                   </div>
-                  <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>{form.neighborhood || form.name} · {form.price}</p>
-                </div>
-                <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
-                  <button onClick={() => handleDownloadPdf('mls')} disabled={generatingPdf}
-                    style={{padding:'8px 14px',background:'transparent',border:'1px solid #2a2d3a',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer'}}>
-                    📄 MLS PDF
-                  </button>
-                  <button onClick={() => handleDownloadPdf('flyer')} disabled={generatingPdf}
-                    style={{padding:'8px 14px',background:'transparent',border:'1px solid #2a2d3a',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer'}}>
-                    🏠 Flyer PDF
-                  </button>
-                  <button onClick={() => { setActivePage('generate'); setOutputs(null) }}
-                    style={{padding:'8px 14px',background:'transparent',border:'1px solid #2a2d3a',borderRadius:'8px',color:'#6b7280',fontSize:'12px',cursor:'pointer'}}>
-                    + New Listing
-                  </button>
+                  <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+                    <button onClick={() => handleDownloadPdf('mls')} disabled={generatingPdf}
+                      style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>
+                      📄 MLS PDF
+                    </button>
+                    <button onClick={() => handleDownloadPdf('flyer')} disabled={generatingPdf}
+                      style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>
+                      🏠 Flyer PDF
+                    </button>
+                    <button onClick={() => { setActivePage('generate'); setOutputs(null) }}
+                      style={{padding:'8px 16px',background:'rgba(29,158,117,0.15)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'8px',color:'#1D9E75',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>
+                      + New Listing
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* OUTPUT CARDS GRID */}
-              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))',gap:'1rem'}}>
-                {outputCards.map(card => (
-                  <div key={card.key}
-                    style={{...styles.card, border: expandedCard === card.key ? `1px solid ${card.color}40` : '1px solid rgba(255,255,255,0.07)', transition:'all 0.2s', cursor:'pointer'}}
-                    onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}40`)}
-                    onMouseOut={e => (e.currentTarget.style.borderColor = expandedCard === card.key ? `${card.color}40` : 'rgba(255,255,255,0.07)')}>
-
-                    {/* CARD HEADER */}
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}
-                      onClick={() => setExpandedCard(expandedCard === card.key ? null : card.key)}>
+              {/* FEATURED HERO CARD - MLS */}
+              <div style={{background:'linear-gradient(135deg,#1e2235,#232840)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.25)',padding:'2rem',marginBottom:'1.5rem',boxShadow:'0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(212,175,55,0.1)'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'1rem',flexWrap:'wrap',gap:'12px'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                    <div style={{width:'42px',height:'42px',background:'linear-gradient(135deg,rgba(212,175,55,0.2),rgba(212,175,55,0.05))',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',border:'1px solid rgba(212,175,55,0.2)'}}>🏠</div>
+                    <div>
                       <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                        <span style={{fontSize:'18px'}}>{card.icon}</span>
-                        <span style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</span>
+                        <span style={{fontSize:'15px',fontWeight:'700',color:'#f0f0f0'}}>MLS Description</span>
+                        <span style={{fontSize:'10px',fontWeight:'700',color:'#d4af37',background:'rgba(212,175,55,0.1)',padding:'2px 8px',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.2)'}}>FEATURED</span>
                       </div>
-                      <span style={{fontSize:'12px',color:'#444'}}>{expandedCard === card.key ? '▲' : '▼'}</span>
+                      <span style={{fontSize:'11px',color:'#6b7280'}}>Primary listing copy — MLS ready</span>
                     </div>
+                  </div>
+                  <button onClick={() => handleCopy('mls_standard', outputs.mls_standard || '')}
+                    style={{padding:'8px 20px',borderRadius:'8px',border:'1px solid',fontSize:'13px',cursor:'pointer',fontWeight:'600',
+                      background: copied === 'mls_standard' ? '#d4af37' : 'rgba(212,175,55,0.1)',
+                      color: copied === 'mls_standard' ? '#000' : '#d4af37',
+                      borderColor: copied === 'mls_standard' ? '#d4af37' : 'rgba(212,175,55,0.3)'}}>
+                    {copied === 'mls_standard' ? '✓ Copied!' : '📋 Copy'}
+                  </button>
+                </div>
+                <p style={{fontSize:'15px',lineHeight:'1.9',color:'#e8e8e8',margin:'0',borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'1rem'}}>
+                  {outputs.mls_standard || ''}
+                </p>
+              </div>
 
-                    {/* PREVIEW */}
-                    <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display: expandedCard === card.key ? 'none' : '-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
-                      {outputs[card.key] || ''}
-                    </p>
-
-                    {/* EXPANDED */}
-                    {expandedCard === card.key && (
-                      <p style={{fontSize:'13px',color:'#e0e0e0',lineHeight:'1.8',margin:'0 0 12px',whiteSpace:'pre-wrap'}}>
+              {/* SECTION: CORE LISTING */}
+              <div style={{marginBottom:'1.5rem'}}>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'#d4af37',letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
+                  <span style={{width:'24px',height:'1px',background:'rgba(212,175,55,0.3)',display:'inline-block'}}/>
+                  CORE LISTING
+                  <span style={{flex:1,height:'1px',background:'rgba(212,175,55,0.1)',display:'inline-block'}}/>
+                </p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
+                  {[
+                    {key:'mls_luxury', label:'Luxury MLS', icon:'✨', color:'#d4af37', desc:'Premium luxury version'},
+                    {key:'openhouse', label:'Open House', icon:'🚪', color:'#f59e0b', desc:'Open house announcement'},
+                    {key:'price_drop', label:'Price Drop', icon:'💰', color:'#ef4444', desc:'Price reduction alert'},
+                  ].map(card => (
+                    <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:`1px solid rgba(255,255,255,0.07)`,padding:'1.25rem',transition:'all 0.2s'}}
+                      onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
+                      onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                          <span style={{fontSize:'16px'}}>{card.icon}</span>
+                          <div>
+                            <div style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</div>
+                            <div style={{fontSize:'10px',color:'#555'}}>{card.desc}</div>
+                          </div>
+                        </div>
+                        <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
+                      </div>
+                      <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
                         {outputs[card.key] || ''}
                       </p>
-                    )}
-
-                    {/* ACTIONS */}
-                    <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
                       <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
-                        style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',
+                        style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',
+                          background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',
+                          color: copied === card.key ? '#000' : '#6b7280',
+                          borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                        {copied === card.key ? '✓ Copied!' : '📋 Copy'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* SECTION: SOCIAL MEDIA */}
+              <div style={{marginBottom:'1.5rem'}}>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'#818cf8',letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
+                  <span style={{width:'24px',height:'1px',background:'rgba(129,140,248,0.3)',display:'inline-block'}}/>
+                  SOCIAL MEDIA
+                  <span style={{flex:1,height:'1px',background:'rgba(129,140,248,0.1)',display:'inline-block'}}/>
+                </p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
+                  {[
+                    {key:'instagram', label:'Instagram', icon:'📸', color:'#e1306c', platform:'instagram'},
+                    {key:'facebook', label:'Facebook Post', icon:'👥', color:'#1877f2', platform:'facebook'},
+                    {key:'video', label:'Video Script', icon:'🎬', color:'#ef4444', platform:null},
+                  ].map(card => (
+                    <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
+                      onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
+                      onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                          <span style={{fontSize:'16px'}}>{card.icon}</span>
+                          <div>
+                            <div style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</div>
+                          </div>
+                        </div>
+                        <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
+                      </div>
+                      <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
+                        {outputs[card.key] || ''}
+                      </p>
+                      <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
+                        <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
+                          style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',
+                            background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',
+                            color: copied === card.key ? '#fff' : '#6b7280',
+                            borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                          {copied === card.key ? '✓ Copied!' : '📋 Copy'}
+                        </button>
+                        {card.platform === 'facebook' && (
+                          <>
+                            <button onClick={() => handleShare('facebook', outputs[card.key] || '')}
+                              style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2'}}>
+                              Facebook
+                            </button>
+                            <button onClick={() => handleShare('linkedin', outputs[card.key] || '')}
+                              style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(10,102,194,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(10,102,194,0.1)',color:'#0a66c2'}}>
+                              LinkedIn
+                            </button>
+                          </>
+                        )}
+                        {card.platform === 'instagram' && (
+                          <div>
+                            <button onClick={() => handleCopy(card.key+'_ig', outputs[card.key] || '')}
+                              style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(225,48,108,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(225,48,108,0.1)',color:'#e1306c'}}>
+                              Copy for Instagram
+                            </button>
+                            <p style={{fontSize:'10px',color:'#444',margin:'3px 0 0'}}>Instagram requires manual posting</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* SECTION: EMAIL & OUTREACH */}
+              <div style={{marginBottom:'1.5rem'}}>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
+                  <span style={{width:'24px',height:'1px',background:'rgba(29,158,117,0.3)',display:'inline-block'}}/>
+                  EMAIL & OUTREACH
+                  <span style={{flex:1,height:'1px',background:'rgba(29,158,117,0.1)',display:'inline-block'}}/>
+                </p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
+                  {[
+                    {key:'email', label:'Email Blast', icon:'📧', color:'#1D9E75'},
+                    {key:'text_message', label:'SMS / Text', icon:'📱', color:'#10b981'},
+                    {key:'seo', label:'SEO Copy', icon:'🔍', color:'#8b5cf6'},
+                  ].map(card => (
+                    <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
+                      onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
+                      onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                          <span style={{fontSize:'16px'}}>{card.icon}</span>
+                          <span style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</span>
+                        </div>
+                        <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
+                      </div>
+                      <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
+                        {outputs[card.key] || ''}
+                      </p>
+                      <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
+                        style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',
                           background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',
                           color: copied === card.key ? '#fff' : '#6b7280',
                           borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
                         {copied === card.key ? '✓ Copied!' : '📋 Copy'}
                       </button>
-
-                      {/* SOCIAL SHARE BUTTONS */}
-                      {card.social && card.platform === 'facebook' && (
-                        <>
-                          <button onClick={() => handleShare('facebook', outputs[card.key] || '')}
-                            style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2',fontWeight:'500'}}>
-                            Share on Facebook
-                          </button>
-                          <button onClick={() => handleShare('linkedin', outputs[card.key] || '')}
-                            style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(10,102,194,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(10,102,194,0.1)',color:'#0a66c2',fontWeight:'500'}}>
-                            Share on LinkedIn
-                          </button>
-                        </>
-                      )}
-                      {card.social && card.platform === 'instagram' && (
-                        <button onClick={() => handleCopy(card.key + '_ig', outputs[card.key] || '')}
-                          style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(225,48,108,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(225,48,108,0.1)',color:'#e1306c',fontWeight:'500'}}>
-                          Copy for Instagram
-                        </button>
-                      )}
-                      {card.social && card.platform === 'twitter' && (
-                        <button onClick={() => handleShare('twitter', outputs[card.key] || '')}
-                          style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(29,161,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(29,161,242,0.1)',color:'#1da1f2',fontWeight:'500'}}>
-                          Share on X
-                        </button>
-                      )}
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+
+              {/* SECTION: PRINT & FLYER */}
+              <div style={{marginBottom:'2rem'}}>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'#f97316',letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
+                  <span style={{width:'24px',height:'1px',background:'rgba(249,115,22,0.3)',display:'inline-block'}}/>
+                  PRINT & FLYER
+                  <span style={{flex:1,height:'1px',background:'rgba(249,115,22,0.1)',display:'inline-block'}}/>
+                </p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
+                  {[
+                    {key:'flyer', label:'Flyer Copy', icon:'📄', color:'#f97316'},
+                  ].map(card => (
+                    <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
+                      onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
+                      onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                          <span style={{fontSize:'16px'}}>{card.icon}</span>
+                          <span style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</span>
+                        </div>
+                        <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
+                      </div>
+                      <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
+                        {outputs[card.key] || ''}
+                      </p>
+                      <div style={{display:'flex',gap:'6px'}}>
+                        <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
+                          style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',
+                            background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',
+                            color: copied === card.key ? '#fff' : '#6b7280',
+                            borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                          {copied === card.key ? '✓ Copied!' : '📋 Copy'}
+                        </button>
+                        <button onClick={() => handleDownloadPdf('flyer')}
+                          style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(249,115,22,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(249,115,22,0.1)',color:'#f97316',fontWeight:'500'}}>
+                          📥 Download PDF
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* BOTTOM ACTIONS */}
-              <div style={{marginTop:'1.5rem',display:'flex',gap:'10px',flexWrap:'wrap'}}>
-                <a href="/launch-kit"
-                  style={{padding:'10px 20px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'13px',fontWeight:'600',boxShadow:'0 0 20px rgba(29,158,117,0.3)'}}>
-                  🚀 Generate 7-Day Launch Kit
-                </a>
-                <a href="/rewrite"
-                  style={{padding:'10px 20px',background:'rgba(0,0,0,0.2)',color:'#8b8fa8',borderRadius:'10px',textDecoration:'none',fontSize:'13px',border:'1px solid rgba(255,255,255,0.08)'}}>
-                  ✨ Rewrite & Improve
-                </a>
+              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.08),rgba(8,80,65,0.05))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.15)',padding:'1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
+                <div>
+                  <p style={{fontSize:'14px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>Ready to launch this listing?</p>
+                  <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>Generate a 7-day marketing plan or improve existing copy.</p>
+                </div>
+                <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
+                  <a href="/launch-kit"
+                    style={{padding:'10px 20px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'13px',fontWeight:'600',boxShadow:'0 0 20px rgba(29,158,117,0.3)'}}>
+                    🚀 7-Day Launch Kit
+                  </a>
+                  <a href="/rewrite"
+                    style={{padding:'10px 20px',background:'rgba(0,0,0,0.2)',color:'#8b8fa8',borderRadius:'10px',textDecoration:'none',fontSize:'13px',border:'1px solid rgba(255,255,255,0.08)'}}>
+                    ✨ Rewrite & Improve
+                  </a>
+                </div>
               </div>
             </div>
           )}
