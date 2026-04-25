@@ -492,19 +492,79 @@ export default function Dashboard() {
 
               {/* LOADING */}
               {loading && (
-                <div style={{...styles.card,padding:'2rem'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'1.5rem'}}>
-                    <div style={{width:'10px',height:'10px',borderRadius:'50%',background:'#1D9E75',boxShadow:'0 0 10px #1D9E75',animation:'pulse 1s infinite'}}/>
-                    <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'14px',margin:'0'}}>Generating your marketing suite...</p>
+                <div>
+                  <style>{`
+                    @keyframes shimmer {
+                      0% { background-position: -800px 0 }
+                      100% { background-position: 800px 0 }
+                    }
+                    @keyframes pulse-dot {
+                      0%, 100% { opacity: 1; transform: scale(1); }
+                      50% { opacity: 0.5; transform: scale(0.8); }
+                    }
+                    .skeleton {
+                      background: linear-gradient(90deg, #1a1d2e 25%, #22263a 50%, #1a1d2e 75%);
+                      background-size: 800px 100%;
+                      animation: shimmer 1.5s infinite linear;
+                      border-radius: 6px;
+                    }
+                  `}</style>
+
+                  {/* STATUS BAR */}
+                  <div style={{...styles.card, padding:'1.25rem 1.5rem', marginBottom:'1rem', display:'flex', alignItems:'center', gap:'12px'}}>
+                    <div style={{display:'flex',gap:'4px'}}>
+                      {[0,1,2].map(i => (
+                        <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>
+                      ))}
+                    </div>
+                    <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>
+                      {loadingSteps[loadingStep]}
+                    </p>
+                    <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>
+                      {Math.round(((loadingStep + 1) / loadingSteps.length) * 100)}%
+                    </span>
                   </div>
-                  <div style={{background:'rgba(0,0,0,0.2)',borderRadius:'8px',height:'4px',marginBottom:'1.5rem',overflow:'hidden'}}>
+
+                  {/* PROGRESS BAR */}
+                  <div style={{background:'rgba(0,0,0,0.2)',borderRadius:'8px',height:'3px',marginBottom:'1.5rem',overflow:'hidden'}}>
                     <div style={{height:'100%',background:'linear-gradient(90deg,#1D9E75,#085041)',borderRadius:'8px',width:`${((loadingStep + 1) / loadingSteps.length) * 100}%`,transition:'width 0.5s ease'}}/>
                   </div>
-                  <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                    {loadingSteps.map((step, i) => (
-                      <div key={i} style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                        <span style={{fontSize:'12px',color: i <= loadingStep ? '#1D9E75' : '#333'}}>{i <= loadingStep ? '✓' : '○'}</span>
-                        <span style={{fontSize:'12px',color: i <= loadingStep ? '#8b8fa8' : '#333'}}>{step}</span>
+
+                  {/* SKELETON HERO CARD */}
+                  <div style={{background:'linear-gradient(135deg,#1e2235,#232840)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.15)',padding:'2rem',marginBottom:'1rem'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'1.5rem'}}>
+                      <div className="skeleton" style={{width:'42px',height:'42px',borderRadius:'10px',flexShrink:0}}/>
+                      <div style={{flex:1}}>
+                        <div className="skeleton" style={{height:'14px',width:'140px',marginBottom:'8px'}}/>
+                        <div className="skeleton" style={{height:'11px',width:'200px'}}/>
+                      </div>
+                      <div className="skeleton" style={{width:'80px',height:'32px',borderRadius:'8px'}}/>
+                    </div>
+                    <div className="skeleton" style={{height:'13px',marginBottom:'8px'}}/>
+                    <div className="skeleton" style={{height:'13px',marginBottom:'8px'}}/>
+                    <div className="skeleton" style={{height:'13px',marginBottom:'8px',width:'85%'}}/>
+                    <div className="skeleton" style={{height:'13px',marginBottom:'8px',width:'70%'}}/>
+                    <div className="skeleton" style={{height:'13px',width:'90%'}}/>
+                  </div>
+
+                  {/* SKELETON GRID CARDS */}
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
+                    {[1,2,3,4,5,6].map(i => (
+                      <div key={i} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.06)',padding:'1.25rem'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
+                          <div className="skeleton" style={{width:'32px',height:'32px',borderRadius:'8px',flexShrink:0}}/>
+                          <div style={{flex:1}}>
+                            <div className="skeleton" style={{height:'12px',width:'100px',marginBottom:'6px'}}/>
+                            <div className="skeleton" style={{height:'10px',width:'60px'}}/>
+                          </div>
+                        </div>
+                        <div className="skeleton" style={{height:'11px',marginBottom:'6px'}}/>
+                        <div className="skeleton" style={{height:'11px',marginBottom:'6px',width:'90%'}}/>
+                        <div className="skeleton" style={{height:'11px',width:'75%',marginBottom:'14px'}}/>
+                        <div style={{display:'flex',gap:'6px'}}>
+                          <div className="skeleton" style={{height:'28px',width:'80px',borderRadius:'6px'}}/>
+                          <div className="skeleton" style={{height:'28px',width:'120px',borderRadius:'6px'}}/>
+                        </div>
                       </div>
                     ))}
                   </div>
