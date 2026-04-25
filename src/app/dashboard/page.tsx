@@ -335,7 +335,7 @@ export default function Dashboard() {
 
           {/* GENERATE PAGE */}
           {activePage === 'generate' && (
-            <div style={{ display: 'grid', gridTemplateColumns: outputs ? '420px 1fr' : '1fr', gap: '1.5rem', maxWidth: outputs ? '100%' : '760px', alignItems: 'start' }}>
+            <div style={{ display: outputs ? 'grid' : 'block', gridTemplateColumns: '420px 1fr', gap: '1.5rem', alignItems: 'start' }}>
               <div style={{ marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
                   <h1 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#f0f0f0', margin: '0' }}>New Listing</h1>
