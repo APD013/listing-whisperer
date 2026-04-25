@@ -62,7 +62,7 @@ export default function Home() {
       <section style={{background:'#fff',padding:'2rem',borderTop:'1px solid #f0f0f0',borderBottom:'1px solid #f0f0f0'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'3rem',flexWrap:'wrap'}}>
           {[
-            {stat:'11',label:'Formats per listing'},
+            {stat:'11',label:'Formats per listing — and growing'},
             {stat:'60s',label:'Generation time'},
             {stat:'30+',label:'Minutes saved per listing'},
             {stat:'$0',label:'To get started'},
@@ -78,7 +78,7 @@ export default function Home() {
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
-          {['MLS + 10 more formats','Seller meeting prep','On-site photo drafts','7-day launch kit','Brand voice memory'].map(item => (
+          {['11 copy formats','Seller meeting prep','On-site photo drafts','7-day launch kit','Brand voice memory'].map(item => (
             <span key={item} style={{color:'#fff',fontSize:'13px',fontWeight:'600'}}>✓ {item}</span>
           ))}
         </div>
@@ -114,7 +114,7 @@ export default function Home() {
             {[
               {icon:'📋',title:'Seller Meeting Prep',desc:'Meeting outlines, talking points, seller questions, and follow-up emails — before every appointment.'},
               {icon:'📸',title:'Snap & Start',desc:'Upload photos on-site, confirm details, and generate your first draft before you leave the property.'},
-              {icon:'🏠',title:'11 Copy Formats',desc:'MLS, Luxury MLS, Instagram, Facebook, Email, Open House, Video Script, SMS, Flyer, Price Drop, and SEO.'},
+              {icon:'🏠',title:'11 Copy Formats',desc:'MLS, Luxury MLS, Instagram, Facebook, Email, Open House, Video Script, SMS, Flyer, Price Drop, SEO — and more formats coming.'},
               {icon:'🚀',title:'7-Day Launch Kit',desc:'A complete day-by-day marketing plan with social posts, email sequences, and pro tips.'},
               {icon:'✨',title:'Listing Rewriter',desc:'Paste any boring MLS description and get a polished, buyer-ready rewrite instantly.'},
               {icon:'🎙️',title:'Brand Voice Memory',desc:'Save your tone, style, and CTA preferences so every listing sounds like you.'},
@@ -144,7 +144,7 @@ export default function Home() {
           </div>
           <div style={{fontSize:'2.5rem',color:'#1D9E75',fontWeight:'800',textAlign:'center'}}>→</div>
           <div style={{background:'#f0fdf8',border:'1px solid #bbf0d9',borderRadius:'14px',padding:'1.75rem'}}>
-            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',marginBottom:'10px',letterSpacing:'1px'}}>11 READY-TO-USE FORMATS</p>
+            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',marginBottom:'10px',letterSpacing:'1px'}}>11 READY-TO-USE FORMATS (AND GROWING)</p>
             <p style={{fontSize:'13px',color:'#333',lineHeight:'2',margin:'0'}}>
               ✅ MLS Description<br/>✅ Luxury MLS<br/>✅ Instagram Caption<br/>✅ Facebook Post<br/>✅ Email Blast<br/>✅ Open House Flyer<br/>✅ Video Script<br/>✅ SMS, Flyer & Price Drop<br/>✅ SEO Copy
             </p>

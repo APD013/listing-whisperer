@@ -28,6 +28,7 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [expandedCard, setExpandedCard] = useState<string | null>(null)
   const [featuredKey, setFeaturedKey] = useState('mls_standard')
+const [userName, setUserName] = useState('')
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
@@ -54,13 +55,14 @@ export default function Dashboard() {
       setUserId(user.id)
       const { data: profile } = await supabase
         .from('profiles')
-        .select('listings_used, plan, listing_credits, brand_voice')
+        .select('listings_used, plan, listing_credits, brand_voice, full_name')
         .eq('id', user.id)
         .single()
       if (profile) {
         setListingsUsed(profile.listings_used || 0)
         setPlan(profile.plan || 'starter')
         setListingCredits(profile.listing_credits || 0)
+        setUserName(profile.full_name || '')
         trackDashboardView(profile.plan || 'starter')
         setPlanLoaded(true)
         if (profile.brand_voice) {
@@ -338,11 +340,22 @@ export default function Dashboard() {
           {activePage === 'home' && (
             <div style={{maxWidth:'760px'}}>
               {/* WELCOME HEADER */}
-              <div style={{marginBottom:'2rem'}}>
-                <h1 style={{fontSize:'1.75rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 6px'}}>
-                  Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'} 👋
-                </h1>
-                <p style={{fontSize:'15px',color:'#6b7280',margin:'0'}}>What would you like to do today?</p>
+              <div style={{marginBottom:'2rem',display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'12px'}}>
+                <div>
+                  <h1 style={{fontSize:'1.75rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 6px'}}>
+                    Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}{userName ? `, ${userName.split(' ')[0]}` : ''} 👋
+                  </h1>
+                  <p style={{fontSize:'15px',color:'#6b7280',margin:'0'}}>What would you like to do today?</p>
+                </div>
+                {planLoaded && plan === 'pro' && (
+                  <div style={{display:'flex',alignItems:'center',gap:'10px',background:'linear-gradient(135deg,rgba(29,158,117,0.12),rgba(8,80,65,0.08))',border:'1px solid rgba(29,158,117,0.25)',borderRadius:'12px',padding:'10px 16px'}}>
+                    <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'14px',boxShadow:'0 0 12px rgba(29,158,117,0.4)'}}>✦</div>
+                    <div>
+                      <div style={{fontSize:'12px',fontWeight:'700',color:'#1D9E75',letterSpacing:'0.3px'}}>PRO WORKSPACE</div>
+                      <div style={{fontSize:'11px',color:'#6b7280'}}>Unlimited listings & features</div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* MAIN ACTION CARDS */}
