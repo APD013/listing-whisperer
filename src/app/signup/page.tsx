@@ -16,12 +16,19 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [success, setSuccess] = useState(false)
+  const [refCode, setRefCode] = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const ref = params.get('ref')
+    if (ref) setRefCode(ref)
+  }, [])
 
   const handleSignup = async () => {
     trackSignupStarted()
     setLoading(true)
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { full_name: name } }
@@ -29,6 +36,12 @@ export default function SignupPage() {
       if (error) {
         setMessage(error.message)
       } else {
+        if (refCode && data.user) {
+          await supabase.rpc('handle_referral', {
+            referral_code_used: refCode,
+            new_user_id: data.user.id
+          })
+        }
         trackSignupCompleted('new_user')
         setSuccess(true)
       }
@@ -69,6 +82,7 @@ export default function SignupPage() {
                 ✓ 11 copy formats per listing<br/>
                 ✓ Seller Meeting Prep<br/>
                 ✓ Snap & Start on-site drafts
+                {refCode && <><br/>✓ <strong>+1 bonus listing credit from referral!</strong></>}
               </p>
             </div>
             <a href="/login" style={{display:'block',padding:'12px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>

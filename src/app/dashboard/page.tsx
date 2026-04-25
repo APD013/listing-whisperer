@@ -29,6 +29,9 @@ export default function Dashboard() {
   const [expandedCard, setExpandedCard] = useState<string | null>(null)
   const [featuredKey, setFeaturedKey] = useState('mls_standard')
 const [userName, setUserName] = useState('')
+const [referralCode, setReferralCode] = useState('')
+const [referralCopied, setReferralCopied] = useState(false)
+const [showReferralBanner, setShowReferralBanner] = useState(false)
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
@@ -55,7 +58,7 @@ const [userName, setUserName] = useState('')
       setUserId(user.id)
       const { data: profile } = await supabase
         .from('profiles')
-        .select('listings_used, plan, listing_credits, brand_voice, full_name')
+        .select('listings_used, plan, listing_credits, brand_voice, full_name, referral_code')
         .eq('id', user.id)
         .single()
       if (profile) {
@@ -63,6 +66,7 @@ const [userName, setUserName] = useState('')
         setPlan(profile.plan || 'starter')
         setListingCredits(profile.listing_credits || 0)
         setUserName(profile.full_name || '')
+        setReferralCode(profile.referral_code || '')
         trackDashboardView(profile.plan || 'starter')
         setPlanLoaded(true)
         if (profile.brand_voice) {
@@ -107,6 +111,7 @@ const [userName, setUserName] = useState('')
         setListingsUsed(prev => prev + 1)
         trackListingCreated(plan, form.neighborhood)
         setActivePage('results')
+        setShowReferralBanner(true)
         const { data: listings } = await supabase
           .from('listings').select('*').eq('user_id', userId)
           .order('created_at', { ascending: false }).limit(10)
@@ -613,6 +618,40 @@ const [userName, setUserName] = useState('')
           {/* RESULTS WORKSPACE */}
           {activePage === 'results' && outputs && (
             <div>
+              {/* REFERRAL BANNER */}
+              {showReferralBanner && referralCode && (
+                <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.12),rgba(8,80,65,0.08))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.25)',padding:'1.25rem 1.5rem',marginBottom:'1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                    <span style={{fontSize:'1.5rem'}}>🎁</span>
+                    <div>
+                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share with a fellow agent — you both get a free listing!</p>
+                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 2 free listings + 1 bonus · You get 1 free listing credit</p>
+                    </div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
+                    <div style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',color:'#1D9E75',fontWeight:'600',letterSpacing:'0.5px'}}>
+                      listingwhisperer.com/signup?ref={referralCode}
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(`https://listingwhisperer.com/signup?ref=${referralCode}`)
+                        setReferralCopied(true)
+                        setTimeout(() => setReferralCopied(false), 2000)
+                      }}
+                      style={{padding:'7px 16px',borderRadius:'8px',border:'1px solid',fontSize:'12px',cursor:'pointer',fontWeight:'600',
+                        background: referralCopied ? '#1D9E75' : 'rgba(29,158,117,0.15)',
+                        color: referralCopied ? '#fff' : '#1D9E75',
+                        borderColor: referralCopied ? '#1D9E75' : 'rgba(29,158,117,0.3)'}}>
+                      {referralCopied ? '✓ Copied!' : '📋 Copy Link'}
+                    </button>
+                    <button onClick={() => setShowReferralBanner(false)}
+                      style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer',padding:'0 4px'}}>
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* COMPLETION HEADER */}
               <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.12),rgba(8,80,65,0.08))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.2)',padding:'1.5rem 2rem',marginBottom:'2rem',boxShadow:'0 0 40px rgba(29,158,117,0.08)'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
