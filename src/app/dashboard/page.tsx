@@ -23,7 +23,7 @@ export default function Dashboard() {
   const [copied, setCopied] = useState<string | null>(null)
   const [generatingPdf, setGeneratingPdf] = useState(false)
   const [pastListings, setPastListings] = useState<any[]>([])
-  const [activePage, setActivePage] = useState('generate')
+  const [activePage, setActivePage] = useState('home')
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [expandedCard, setExpandedCard] = useState<string | null>(null)
@@ -206,6 +206,7 @@ export default function Dashboard() {
   ]
 
   const navItems = [
+    { key: 'home', icon: '🏠', label: 'Home' },
     { key: 'generate', icon: '✨', label: 'New Listing' },
     { key: 'results', icon: '📊', label: 'Results', disabled: !outputs },
     { key: 'history', icon: '🕐', label: 'History' },
@@ -332,6 +333,79 @@ export default function Dashboard() {
         </div>
 
         <div style={{padding:'2rem',flex:1}}>
+
+          {/* HOME PAGE */}
+          {activePage === 'home' && (
+            <div style={{maxWidth:'760px'}}>
+              {/* WELCOME HEADER */}
+              <div style={{marginBottom:'2rem'}}>
+                <h1 style={{fontSize:'1.75rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 6px'}}>
+                  Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'} 👋
+                </h1>
+                <p style={{fontSize:'15px',color:'#6b7280',margin:'0'}}>What would you like to do today?</p>
+              </div>
+
+              {/* MAIN ACTION CARDS */}
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))',gap:'14px',marginBottom:'2rem'}}>
+                {[
+                  {icon:'✨',title:'New Listing',desc:'Generate 11 marketing formats from property details',color:'#1D9E75',action:() => setActivePage('generate')},
+                  {icon:'⚡',title:'Quick Listing',desc:'Upload a photo and get a full listing instantly',color:'#d4af37',href:'/quick-listing'},
+                  {icon:'📸',title:'Snap & Start',desc:'On-site photo drafts while you\'re at the property',color:'#e1306c',href:'/snap-start'},
+                  {icon:'📋',title:'Seller Meeting Prep',desc:'Walk into every seller meeting fully prepared',color:'#8b5cf6',href:'/seller-prep'},
+                  {icon:'🚀',title:'7-Day Launch Kit',desc:'Full marketing launch plan for your listing',color:'#f59e0b',href:'/launch-kit'},
+                  {icon:'✍️',title:'Rewrite Listing',desc:'Improve and refresh existing listing copy',color:'#6366f1',href:'/rewrite'},
+                  {icon:'👥',title:'Leads & Clients',desc:'Manage your pipeline and client relationships',color:'#10b981',href:'/leads'},
+                  {icon:'🖼️',title:'Photo Library',desc:'Organize and manage your property photos',color:'#f97316',href:'/photos'},
+                ].map((item,i) => (
+                  item.href ? (
+                    <a key={i} href={item.href}
+                      style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.5rem',textDecoration:'none',display:'block',transition:'all 0.2s',cursor:'pointer'}}
+                      onMouseOver={e => {e.currentTarget.style.borderColor=`${item.color}40`;e.currentTarget.style.transform='translateY(-2px)'}}
+                      onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.07)';e.currentTarget.style.transform='translateY(0)'}}>
+                      <div style={{width:'44px',height:'44px',borderRadius:'12px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',marginBottom:'12px'}}>{item.icon}</div>
+                      <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0',marginBottom:'4px'}}>{item.title}</div>
+                      <div style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.5'}}>{item.desc}</div>
+                    </a>
+                  ) : (
+                    <div key={i} onClick={item.action}
+                      style={{background:`linear-gradient(135deg,${item.color}12,${item.color}06)`,borderRadius:'16px',border:`1px solid ${item.color}30`,padding:'1.5rem',cursor:'pointer',transition:'all 0.2s'}}
+                      onMouseOver={e => {e.currentTarget.style.borderColor=`${item.color}60`;e.currentTarget.style.transform='translateY(-2px)'}}
+                      onMouseOut={e => {e.currentTarget.style.borderColor=`${item.color}30`;e.currentTarget.style.transform='translateY(0)'}}>
+                      <div style={{width:'44px',height:'44px',borderRadius:'12px',background:`${item.color}20`,border:`1px solid ${item.color}40`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',marginBottom:'12px'}}>{item.icon}</div>
+                      <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0',marginBottom:'4px'}}>{item.title}</div>
+                      <div style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.5'}}>{item.desc}</div>
+                      <div style={{marginTop:'10px',fontSize:'12px',fontWeight:'600',color:item.color}}>Start now →</div>
+                    </div>
+                  )
+                ))}
+              </div>
+
+              {/* RECENT LISTINGS */}
+              {pastListings.length > 0 && (
+                <div>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
+                    <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0'}}>RECENT LISTINGS</p>
+                    <button onClick={() => setActivePage('history')} style={{background:'none',border:'none',color:'#6b7280',fontSize:'12px',cursor:'pointer'}}>View all →</button>
+                  </div>
+                  <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                    {pastListings.slice(0,3).map(listing => (
+                      <div key={listing.id}
+                        onClick={() => { setOutputs(listing.outputs); setActivePage('results') }}
+                        style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'12px',border:'1px solid rgba(255,255,255,0.07)',padding:'1rem 1.25rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'border-color 0.2s'}}
+                        onMouseOver={e => e.currentTarget.style.borderColor='#1D9E75'}
+                        onMouseOut={e => e.currentTarget.style.borderColor='rgba(255,255,255,0.07)'}>
+                        <div>
+                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
+                          <p style={{margin:'4px 0 0',fontSize:'11px',color:'#6b7280'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'500'}}>View →</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* GENERATE PAGE */}
           {activePage === 'generate' && (
