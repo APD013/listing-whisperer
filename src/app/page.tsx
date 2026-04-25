@@ -43,7 +43,7 @@ export default function Home() {
           Listing Whisperer turns your property notes into 11 ready-to-use marketing formats in under 60 seconds — MLS, Instagram, email, flyer, video script, and more.
         </p>
         <p style={{fontSize:'14px',color:'#1D9E75',fontWeight:'600',maxWidth:'480px',margin:'0 auto 2rem'}}>
-          Used by agents across California to save 30+ minutes per listing.
+          Used by agents across the country to save 30+ minutes per listing.
         </p>
         <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'1rem'}}>
           <a href="/signup" onClick={() => trackCTAClick('hero_cta', 'homepage')}
