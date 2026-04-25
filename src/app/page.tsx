@@ -154,29 +154,67 @@ export default function Home() {
 
       {/* SAMPLE OUTPUTS */}
       <section id="examples" style={{padding:'5rem 2rem',background:'#f9fafb',maxWidth:'100%'}}>
-        <div style={{maxWidth:'800px',margin:'0 auto'}}>
+        <div style={{maxWidth:'860px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>See real output</h2>
           <p style={{textAlign:'center',color:'#777',marginBottom:'0.5rem',fontSize:'15px'}}>One set of property notes. Three formats. Ready to copy and paste.</p>
           <p style={{textAlign:'center',fontSize:'13px',color:'#1D9E75',fontWeight:'600',marginBottom:'2.5rem'}}>👇 Click each tab to preview</p>
-          <div style={{display:'flex',gap:'8px',justifyContent:'center',marginBottom:'1.5rem',flexWrap:'wrap'}}>
-            {[{key:'mls',label:'🏠 MLS Description'},{key:'instagram',label:'📸 Instagram'},{key:'email',label:'📧 Email Blast'}].map(t => (
+
+          {/* TABS */}
+          <div style={{display:'flex',gap:'10px',justifyContent:'center',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+            {[
+              {key:'mls',label:'🏠 MLS Description',color:'#1D9E75',bg:'#E1F5EE',desc:'MLS ready'},
+              {key:'instagram',label:'📸 Instagram',color:'#e1306c',bg:'#fde8f0',desc:'Social ready'},
+              {key:'email',label:'📧 Email Blast',color:'#6366f1',bg:'#eef2ff',desc:'Send ready'}
+            ].map(t => (
               <button key={t.key} onClick={() => setActiveOutput(t.key)}
-                style={{padding:'9px 20px',borderRadius:'20px',border:'1px solid',fontSize:'13px',cursor:'pointer',fontWeight:'500',transition:'all 0.15s',
-                  borderColor: activeOutput === t.key ? '#1D9E75' : '#ddd',
-                  background: activeOutput === t.key ? '#E1F5EE' : '#fff',
-                  color: activeOutput === t.key ? '#085041' : '#777'}}>
+                style={{padding:'10px 22px',borderRadius:'20px',border:'2px solid',fontSize:'13px',cursor:'pointer',fontWeight:'600',transition:'all 0.15s',
+                  borderColor: activeOutput === t.key ? t.color : '#e5e7eb',
+                  background: activeOutput === t.key ? t.bg : '#fff',
+                  color: activeOutput === t.key ? t.color : '#888',
+                  boxShadow: activeOutput === t.key ? `0 4px 12px ${t.color}20` : 'none'}}>
                 {t.label}
+                {activeOutput === t.key && <span style={{marginLeft:'6px',fontSize:'10px',fontWeight:'700',opacity:0.7}}>{t.desc}</span>}
               </button>
             ))}
           </div>
-          <div style={{background:'#fff',borderRadius:'14px',padding:'2rem',border:'1px solid #e5e7eb',boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
-            <p style={{fontSize:'14px',lineHeight:'1.95',color:'#333',whiteSpace:'pre-wrap',margin:'0'}}>{sampleOutputs[activeOutput]}</p>
+
+          {/* OUTPUT CARD */}
+          <div style={{background:'#fff',borderRadius:'16px',border:'2px solid',overflow:'hidden',boxShadow:'0 4px 24px rgba(0,0,0,0.06)',
+            borderColor: activeOutput === 'mls' ? '#1D9E75' : activeOutput === 'instagram' ? '#e1306c' : '#6366f1'}}>
+
+            {/* CARD HEADER */}
+            <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid #f0f0f0',display:'flex',justifyContent:'space-between',alignItems:'center',
+              background: activeOutput === 'mls' ? '#f0fdf8' : activeOutput === 'instagram' ? '#fdf2f5' : '#f5f3ff'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                <span style={{fontSize:'1.25rem'}}>{activeOutput === 'mls' ? '🏠' : activeOutput === 'instagram' ? '📸' : '📧'}</span>
+                <div>
+                  <p style={{margin:'0',fontSize:'13px',fontWeight:'700',color:'#111'}}>
+                    {activeOutput === 'mls' ? 'MLS Description' : activeOutput === 'instagram' ? 'Instagram Caption' : 'Email Blast'}
+                  </p>
+                  <p style={{margin:'0',fontSize:'11px',color:'#888'}}>
+                    {activeOutput === 'mls' ? 'Ready to paste into your MLS portal' : activeOutput === 'instagram' ? 'Ready to post — hashtags included' : 'Ready to send to your list'}
+                  </p>
+                </div>
+              </div>
+              <span style={{fontSize:'11px',fontWeight:'700',padding:'3px 10px',borderRadius:'20px',
+                background: activeOutput === 'mls' ? '#E1F5EE' : activeOutput === 'instagram' ? '#fde8f0' : '#eef2ff',
+                color: activeOutput === 'mls' ? '#085041' : activeOutput === 'instagram' ? '#e1306c' : '#6366f1'}}>
+                SAMPLE OUTPUT
+              </span>
+            </div>
+
+            {/* CARD BODY */}
+            <div style={{padding:'1.75rem'}}>
+              <p style={{fontSize:'14px',lineHeight:'1.95',color:'#333',whiteSpace:'pre-wrap',margin:'0'}}>{sampleOutputs[activeOutput]}</p>
+            </div>
           </div>
-          <div style={{textAlign:'center',marginTop:'1.5rem'}}>
+
+          <div style={{textAlign:'center',marginTop:'2rem'}}>
             <a href="/signup" onClick={() => trackCTAClick('examples_cta', 'homepage')}
-              style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'12px 28px',borderRadius:'10px',textDecoration:'none',fontWeight:'600',fontSize:'14px',boxShadow:'0 4px 16px rgba(29,158,117,0.3)'}}>
+              style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'13px 32px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'14px',boxShadow:'0 4px 16px rgba(29,158,117,0.3)'}}>
               Generate yours free →
             </a>
+            <p style={{fontSize:'12px',color:'#aaa',marginTop:'8px'}}>No credit card · Takes 60 seconds</p>
           </div>
         </div>
       </section>
