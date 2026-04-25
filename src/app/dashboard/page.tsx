@@ -122,10 +122,11 @@ export default function Dashboard() {
 
   const handleShare = (platform: string, text: string) => {
     const encodedText = encodeURIComponent(text.substring(0, 500))
+    const encodedUrl = encodeURIComponent('https://listingwhisperer.com')
     const urls: Record<string, string> = {
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=https://listingwhisperer.com&quote=${encodedText}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodedText}`,
-      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=https://listingwhisperer.com`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}&summary=${encodedText}`,
     }
     window.open(urls[platform], '_blank', 'width=600,height=400')
   }
@@ -531,10 +532,16 @@ export default function Dashboard() {
 
                       {/* SOCIAL SHARE BUTTONS */}
                       {card.social && card.platform === 'facebook' && (
-                        <button onClick={() => handleShare('facebook', outputs[card.key] || '')}
-                          style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2',fontWeight:'500'}}>
-                          Share on Facebook
-                        </button>
+                        <>
+                          <button onClick={() => handleShare('facebook', outputs[card.key] || '')}
+                            style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2',fontWeight:'500'}}>
+                            Share on Facebook
+                          </button>
+                          <button onClick={() => handleShare('linkedin', outputs[card.key] || '')}
+                            style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(10,102,194,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(10,102,194,0.1)',color:'#0a66c2',fontWeight:'500'}}>
+                            Share on LinkedIn
+                          </button>
+                        </>
                       )}
                       {card.social && card.platform === 'instagram' && (
                         <button onClick={() => handleCopy(card.key + '_ig', outputs[card.key] || '')}
