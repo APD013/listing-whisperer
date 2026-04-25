@@ -278,16 +278,25 @@ const [showReferralBanner, setShowReferralBanner] = useState(false)
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.5rem 0.75rem' }} />
-          <p style={{fontSize:'10px',fontWeight:'700',color:'#444',letterSpacing:'1px',margin:'0 0 6px',padding:'0 1.5rem'}}>TOOLS</p>
-
+          <p style={{fontSize:'10px',fontWeight:'700',color:'#444',letterSpacing:'1px',margin:'0 0 6px',padding:'0 1.5rem'}}>START</p>
           {[
             { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
-            { href: '/leads', icon: '👥', label: 'Leads & Clients' },
             { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
-            { href: '/photos', icon: '🖼️', label: 'Photo Library' },
-            { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
             { href: '/rewrite', icon: '✨', label: 'Rewrite' },
+          ].map(item => (
+            <a key={item.href} href={item.href}
+              style={{ width: '100%', padding: '9px 1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#8b8fa8', fontSize: '13px', textDecoration: 'none', borderLeft: '3px solid transparent' }}>
+              <span>{item.icon}</span> {item.label}
+            </a>
+          ))}
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.5rem 0.75rem' }} />
+          <p style={{fontSize:'10px',fontWeight:'700',color:'#444',letterSpacing:'1px',margin:'0 0 6px',padding:'0 1.5rem'}}>TOOLS</p>
+          {[
+            { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
             { href: '/launch-kit', icon: '🚀', label: 'Launch Kit' },
+            { href: '/leads', icon: '👥', label: 'Leads & Clients' },
+            { href: '/photos', icon: '🖼️', label: 'Photo Library' },
             { href: '/settings', icon: '⚙️', label: 'Settings' },
           ].map(item => (
             <a key={item.href} href={item.href}
@@ -302,12 +311,12 @@ const [showReferralBanner, setShowReferralBanner] = useState(false)
             <a href="/pricing" onClick={() => trackUpgradeClick('sidebar', plan)}
               style={{ display: 'block', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', padding: '12px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontSize: '12px', fontWeight: '600', marginBottom: '8px', boxShadow: '0 0 20px rgba(29,158,117,0.25)', lineHeight: '1.6' }}>
               ⚡ Upgrade to Pro<br/>
-              <span style={{ fontSize: '10px', fontWeight: '400', opacity: 0.85 }}>Unlimited listings & features</span>
+              <span style={{ fontSize: '10px', fontWeight: '400', opacity: 0.85 }}>Unlimited listings, rewrites, launch kits & all features</span>
             </a>
           )}
           {plan === 'starter' && (
             <div style={{ fontSize: '11px', color: '#555', textAlign: 'center', marginBottom: '8px' }}>
-              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} left` : '⚠️ No listings left'}
+              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} left — Pro unlocks everything` : '⚠️ No listings left — upgrade to continue'}
             </div>
           )}
           <a href="https://docs.google.com/forms/d/e/1FAIpQLScCLYVYMcFti8uxW4_3T7nhHK__AdYfsUEeB1WfGIAE2SHgJg/viewform?usp=publish-editor" target="_blank"
@@ -589,29 +598,7 @@ const [showReferralBanner, setShowReferralBanner] = useState(false)
                 </div>
               )}
 
-              {/* QUICK TOOLKIT */}
-              {!loading && !outputs && (
-                <div>
-                  <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'1.5rem 0 12px'}}>YOUR AI TOOLKIT</p>
-                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))',gap:'10px'}}>
-                    {[
-                      {href:'/quick-listing',icon:'⚡',title:'Quick Listing',desc:'Photo → Full listing'},
-                      {href:'/leads',icon:'👥',title:'Leads',desc:'Track pipeline'},
-                      {href:'/seller-prep',icon:'📋',title:'Seller Prep',desc:'Meeting kit'},
-                      {href:'/launch-kit',icon:'🚀',title:'Launch Kit',desc:'7-day plan'},
-                    ].map(item => (
-                      <a key={item.href} href={item.href}
-                        style={{...styles.card,textDecoration:'none',display:'block',padding:'1rem',transition:'border-color 0.2s'}}
-                        onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
-                        onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                        <div style={{fontSize:'1.5rem',marginBottom:'4px'}}>{item.icon}</div>
-                        <div style={{fontSize:'12px',fontWeight:'600',color:'#f0f0f0',marginBottom:'2px'}}>{item.title}</div>
-                        <div style={{fontSize:'11px',color:'#8b8fa8'}}>{item.desc}</div>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
+              
             </div>
           )}
 
