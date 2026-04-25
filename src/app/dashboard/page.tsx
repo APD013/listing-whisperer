@@ -89,7 +89,7 @@ export default function Dashboard() {
         setActiveTab('mls_standard')
         setListingsUsed(prev => prev + 1)
         trackListingCreated(plan, form.neighborhood)
-        setActivePage('results')
+        setActivePage('generate')
         const { data: listings } = await supabase
           .from('listings')
           .select('*')
@@ -335,7 +335,7 @@ export default function Dashboard() {
 
           {/* GENERATE PAGE */}
           {activePage === 'generate' && (
-            <div style={{ display: 'grid', gridTemplateColumns: outputs ? '1fr 1fr' : '1fr', gap: '1.5rem', maxWidth: outputs ? '100%' : '760px', transition: 'all 0.3s' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: outputs ? 'minmax(320px, 1fr) minmax(320px, 1fr)' : '1fr', gap: '1.5rem', maxWidth: outputs ? '100%' : '760px', transition: 'all 0.3s', alignItems: 'start' }}>
               <div style={{ marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
                   <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#f0f0f0', margin: '0' }}>New Listing</h1>
@@ -616,7 +616,7 @@ export default function Dashboard() {
                       onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
                       onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', cursor: 'pointer' }}
-                        onClick={() => { setOutputs(listing.outputs); setActiveTab('mls_standard'); setActivePage('results') }}>
+                        onClick={() => { setOutputs(listing.outputs); setActiveTab('mls_standard'); setActivePage('generate') }}>
                         <div>
                           <p style={{ margin: '0', fontSize: '14px', fontWeight: '600', color: '#f0f0f0' }}>
                             {listing.name || `${listing.property_type} — ${listing.neighborhood}`}
