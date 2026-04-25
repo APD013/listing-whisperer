@@ -505,7 +505,7 @@ export default function Dashboard() {
                     <div style={{width:'42px',height:'42px',background:'linear-gradient(135deg,rgba(212,175,55,0.2),rgba(212,175,55,0.05))',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',border:'1px solid rgba(212,175,55,0.2)'}}>🏠</div>
                     <div>
                       <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                        <span style={{fontSize:'15px',fontWeight:'700',color:'#f0f0f0'}}>MLS Description</span>
+                        <span style={{fontSize:'15px',fontWeight:'700',color:'#f0f0f0'}}>{outputCards.find(c => c.key === featuredKey)?.label || 'MLS Description'}</span>
                         <span style={{fontSize:'10px',fontWeight:'700',color:'#d4af37',background:'rgba(212,175,55,0.1)',padding:'2px 8px',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.2)'}}>
                           {outputCards.find(c => c.key === featuredKey)?.label || 'MLS Description'}
                         </span>
@@ -565,7 +565,7 @@ export default function Dashboard() {
                         </button>
                         <button onClick={() => { setFeaturedKey(card.key); window.scrollTo({top:0,behavior:'smooth'}) }}
                           style={{padding:'5px 14px',borderRadius:'6px',border:`1px solid ${card.color}30`,fontSize:'11px',cursor:'pointer',background:`${card.color}10`,color:card.color,fontWeight:'500'}}>
-                          ↑ View in Hero
+                          ↑ Set as Main Preview
                         </button>
                       </div>
                     </div>
@@ -608,6 +608,10 @@ export default function Dashboard() {
                             color: copied === card.key ? '#fff' : '#6b7280',
                             borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
                           {copied === card.key ? '✓ Copied!' : '📋 Copy'}
+                        </button>
+                        <button onClick={() => { setFeaturedKey(card.key); window.scrollTo({top:0,behavior:'smooth'}) }}
+                          style={{padding:'5px 12px',borderRadius:'6px',border:`1px solid ${card.color}30`,fontSize:'11px',cursor:'pointer',background: featuredKey === card.key ? card.color : `${card.color}10`,color: featuredKey === card.key ? '#fff' : card.color,fontWeight:'500'}}>
+                          {featuredKey === card.key ? '✓ Previewing' : '↑ Set as Main Preview'}
                         </button>
                         {card.platform === 'facebook' && (
                           <>
@@ -662,13 +666,19 @@ export default function Dashboard() {
                       <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
                         {outputs[card.key] || ''}
                       </p>
-                      <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
-                        style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',
-                          background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',
-                          color: copied === card.key ? '#fff' : '#6b7280',
-                          borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
-                        {copied === card.key ? '✓ Copied!' : '📋 Copy'}
-                      </button>
+                      <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
+                        <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
+                          style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',
+                            background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',
+                            color: copied === card.key ? '#fff' : '#6b7280',
+                            borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                          {copied === card.key ? '✓ Copied!' : '📋 Copy'}
+                        </button>
+                        <button onClick={() => { setFeaturedKey(card.key); window.scrollTo({top:0,behavior:'smooth'}) }}
+                          style={{padding:'5px 12px',borderRadius:'6px',border:`1px solid ${card.color}30`,fontSize:'11px',cursor:'pointer',background: featuredKey === card.key ? card.color : `${card.color}10`,color: featuredKey === card.key ? '#fff' : card.color,fontWeight:'500'}}>
+                          {featuredKey === card.key ? '✓ Previewing' : '↑ Set as Main Preview'}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
