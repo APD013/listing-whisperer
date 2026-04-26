@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const { form } = await request.json()
 
-    const prompt = `You are a real estate marketing expert. Generate a complete open house kit for an agent. Respond ONLY with valid JSON, no markdown, no backticks.
+    const prompt = `You are a real estate marketing expert. Generate a complete open house kit for an agent. Use ALL the specific details provided below. Respond ONLY with valid JSON, no markdown, no backticks.
 
 Open House Details:
 - Address: ${form.address}
@@ -15,10 +15,13 @@ Open House Details:
 - Beds: ${form.beds} | Baths: ${form.baths} | Sqft: ${form.sqft}
 - Price: ${form.price}
 - Highlights: ${form.highlights}
-- Agent: ${form.agentName || 'Agent'} | Phone: ${form.phone || ''}
+- Agent Name: ${form.agentName || 'Your Agent'}
+- Agent Phone: ${form.phone || ''}
 
-Return exactly this JSON:
-{"flyerCopy":"Full print-ready flyer copy with headline, subheadline, property details, and agent contact","socialPost":"Instagram and Facebook post announcing the open house with emojis and hashtags","reminderText":"Short SMS reminder to send the day before the open house","emailInvite":"Full email invite with subject line to send to the agent's list","followUpEmail":"Thank you follow-up email to send to open house attendees"}`
+IMPORTANT: Use the exact address, date, time, price, beds, baths, sqft, highlights, and agent name in every output. Do not use placeholder text like "Contact Agent" or "TBA".
+
+Return exactly this JSON with no line breaks inside string values:
+{"flyerCopy":"Full print-ready flyer copy with the exact address, date, time, price, beds, baths, sqft, highlights and agent contact info","socialPost":"Instagram and Facebook post with the exact date, time, address, price and highlights — include emojis and hashtags","reminderText":"Short SMS reminder with the exact date, time and address to send the day before","emailInvite":"Subject: [write subject here]\n\n[Full email body with exact date, time, address, price and highlights]","followUpEmail":"Subject: [write subject here]\n\n[Thank you follow-up email to send to open house attendees]"}`
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
