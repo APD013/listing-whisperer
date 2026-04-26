@@ -12,6 +12,9 @@ export default function FollowUpAssistant() {
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [showReminderModal, setShowReminderModal] = useState<string | null>(null)
+  const [reminderDate, setReminderDate] = useState('')
+  const [reminderSaved, setReminderSaved] = useState<string | null>(null)
   const [form, setForm] = useState({
     contactName: '',
     contactType: 'Seller lead',
@@ -37,6 +40,30 @@ export default function FollowUpAssistant() {
     input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
     select: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
     label: { fontSize: '11px', color: '#6b7280', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
+  }
+
+  const handleAddReminder = async (key: string, content: string, subject: string) => {
+    if (!reminderDate) { alert('Please select a date and time for the reminder.'); return }
+    try {
+      const res = await fetch('/api/reminders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          contactName: form.contactName,
+          reminderType: key,
+          content,
+          subject,
+          remindAt: new Date(reminderDate).toISOString()
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setReminderSaved(key)
+        setShowReminderModal(null)
+        setTimeout(() => setReminderSaved(null), 3000)
+      }
+    } catch(e: any) { alert('Error saving reminder: ' + e.message) }
   }
 
   const handleCopy = (key: string, text: string) => {
@@ -152,6 +179,42 @@ export default function FollowUpAssistant() {
           </div>
         )}
 
+        {/* REMINDER MODAL */}
+        {showReminderModal && (
+          <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+            <div style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.3)',padding:'2rem',maxWidth:'420px',width:'100%',boxShadow:'0 0 60px rgba(212,175,55,0.1)'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.5rem'}}>
+                <h3 style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>⏰ Set a Reminder</h3>
+                <button onClick={() => setShowReminderModal(null)} style={{background:'none',border:'none',color:'#555',fontSize:'20px',cursor:'pointer'}}>✕</button>
+              </div>
+              <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'1.5rem'}}>
+                We'll email you a reminder to follow up with <strong style={{color:'#f0f0f0'}}>{form.contactName}</strong>.
+              </p>
+              <label style={{fontSize:'11px',color:'#6b7280',display:'block',marginBottom:'6px',fontWeight:'600',letterSpacing:'0.3px',textTransform:'uppercase' as const}}>Remind me on</label>
+              <input
+                type="datetime-local"
+                value={reminderDate}
+                onChange={e => setReminderDate(e.target.value)}
+                style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'13px',color:'#f0f0f0',boxSizing:'border-box' as const,outline:'none',marginBottom:'1.5rem'}}
+              />
+              <button
+                onClick={() => {
+                  const card = [
+                    {key:'emailFollowUp', label:'Follow-Up Email'},
+                    {key:'textFollowUp', label:'Follow-Up Text'},
+                    {key:'linkedinMessage', label:'LinkedIn Message'},
+                    {key:'reminderNote', label:'CRM Note'},
+                    {key:'nextStepEmail', label:'Next Step Email'},
+                  ].find(c => c.key === showReminderModal)
+                  handleAddReminder(showReminderModal, result[showReminderModal], `Follow up with ${form.contactName} — ${card?.label}`)
+                }}
+                style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,#d4af37,#a08040)',color:'#000',border:'none',borderRadius:'8px',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>
+                Set Reminder
+              </button>
+            </div>
+          </div>
+        )}
+
         {result && !loading && (
           <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
             {[
@@ -170,10 +233,16 @@ export default function FollowUpAssistant() {
                       <p style={{fontSize:'11px',color:'#5a5f72',margin:'0'}}>{card.desc}</p>
                     </div>
                   </div>
-                  <button onClick={() => handleCopy(card.key, result[card.key])}
-                    style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
-                    {copied === card.key ? '✓ Copied!' : '📋 Copy'}
-                  </button>
+                  <div style={{display:'flex',gap:'6px'}}>
+                    <button onClick={() => handleCopy(card.key, result[card.key])}
+                      style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                      {copied === card.key ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                    <button onClick={() => setShowReminderModal(card.key)}
+                      style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(212,175,55,0.3)',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: reminderSaved === card.key ? '#d4af37' : 'rgba(212,175,55,0.1)',color: reminderSaved === card.key ? '#000' : '#d4af37'}}>
+                      {reminderSaved === card.key ? '✓ Reminder Set!' : '⏰ Remind Me'}
+                    </button>
+                  </div>
                 </div>
                 <p style={{fontSize:'13px',lineHeight:'1.85',color:'#c0c0c0',margin:'0',whiteSpace:'pre-wrap'}}>{result[card.key]}</p>
               </div>
