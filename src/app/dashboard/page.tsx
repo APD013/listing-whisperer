@@ -26,7 +26,6 @@ export default function Dashboard() {
   const [activePage, setActivePage] = useState('home')
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [expandedCard, setExpandedCard] = useState<string | null>(null)
   const [featuredKey, setFeaturedKey] = useState('mls_standard')
   const [userName, setUserName] = useState('')
   const [referralCode, setReferralCode] = useState('')
@@ -196,8 +195,6 @@ export default function Dashboard() {
     setGeneratingPdf(false)
   }
 
-  const remaining = 2 - listingsUsed
-
   const outputCards = [
     { key: 'mls_standard', label: 'MLS Description', icon: '🏠', color: '#1D9E75', social: false },
     { key: 'mls_luxury', label: 'Luxury MLS', icon: '✨', color: '#d4af37', social: false },
@@ -220,8 +217,8 @@ export default function Dashboard() {
   ]
 
   const styles = {
-    page: { minHeight: '100vh', background: 'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)', fontFamily: "'Inter', sans-serif", display: 'flex' as const },
-    sidebar: { width: '200px', background: '#0d1117', borderRight: '1px solid rgba(255,255,255,0.05)', padding: '0', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-200px)' },
+    page: { minHeight: '100vh', background: '#0d1117', fontFamily: "'Inter', sans-serif", display: 'flex' as const },
+    sidebar: { width: '210px', background: '#0a0d14', borderRight: '1px solid rgba(255,255,255,0.04)', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-210px)' },
     main: { flex: 1, minHeight: '100vh', display: 'flex' as const, flexDirection: 'column' as const },
     card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' },
     input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
@@ -233,15 +230,45 @@ export default function Dashboard() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = userName ? userName.split(' ')[0] : ''
 
-  const actionCards = [
-    { icon: '✨', title: 'New Listing', desc: 'Generate 11 formats from property details', color: '#1D9E75', action: () => setActivePage('generate') },
-    { icon: '⚡', title: 'Quick Listing', desc: 'Faster start with minimal input', color: '#d4af37', href: '/quick-listing' },
-    { icon: '📸', title: 'Snap & Start', desc: 'Start from photos — on-site or at your desk', color: '#e1306c', href: '/snap-start' },
-    { icon: '📋', title: 'Seller Prep', desc: 'Prep for your listing appointment', color: '#8b5cf6', href: '/seller-prep' },
-    { icon: '✍️', title: 'Rewrite Listing', desc: 'Improve and polish existing copy', color: '#6366f1', href: '/rewrite' },
-    { icon: '🚀', title: 'Launch Plan', desc: '7-day marketing rollout for your listing', color: '#f59e0b', href: '/launch-kit' },
-    { icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline and contacts', color: '#10b981', href: '/leads' },
-    { icon: '🖼️', title: 'Photo Library', desc: 'Manage your saved property photos', color: '#f97316', href: '/photos' },
+  // HOME SCREEN BUCKETS
+  const buckets = [
+    {
+      label: 'WIN THE LISTING',
+      color: '#8b5cf6',
+      cards: [
+        { icon: '📋', title: 'Seller Prep', desc: 'Prepare for your listing appointment', color: '#8b5cf6', href: '/seller-prep' },
+        { icon: '💲', title: 'Pricing Assistant', desc: 'Get a data-backed price range and strategy', color: '#d4af37', href: '/pricing-assistant' },
+        { icon: '🎯', title: 'Listing Presentation', desc: 'Build your full seller appointment deck', color: '#a78bfa', href: '/listing-presentation' },
+      ]
+    },
+    {
+      label: 'BUILD THE LISTING',
+      color: '#1D9E75',
+      cards: [
+        { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => setActivePage('generate') },
+        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing' },
+        { icon: '📸', title: 'Snap & Start', desc: 'On-site? Start from photos instantly', color: '#e1306c', href: '/snap-start' },
+        { icon: '✍️', title: 'Rewrite Listing', desc: 'Polish and improve existing copy', color: '#6366f1', href: '/rewrite' },
+        { icon: '🖼️', title: 'Photo Library', desc: 'Manage your saved property photos', color: '#f97316', href: '/photos' },
+      ]
+    },
+    {
+      label: 'LAUNCH THE LISTING',
+      color: '#f59e0b',
+      cards: [
+        { icon: '🚀', title: 'Launch Plan', desc: '7-day marketing rollout strategy', color: '#f59e0b', href: '/launch-kit' },
+        { icon: '🏡', title: 'Open House Kit', desc: 'Flyer, posts, and follow-up emails', color: '#10b981', href: '/open-house' },
+        { icon: '💰', title: 'Price Drop Kit', desc: 'Price improvement announcement suite', color: '#ef4444', href: '/price-drop' },
+      ]
+    },
+    {
+      label: 'MANAGE THE RELATIONSHIP',
+      color: '#10b981',
+      cards: [
+        { icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline and contacts', color: '#10b981', href: '/leads' },
+        { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up' },
+      ]
+    },
   ]
 
   return (
@@ -250,27 +277,30 @@ export default function Dashboard() {
       {/* SIDEBAR OVERLAY */}
       {sidebarOpen && (
         <div onClick={() => setSidebarOpen(false)}
-          style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.7)',zIndex:199}}/>
+          style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.75)',zIndex:199}}/>
       )}
 
       {/* SIDEBAR */}
       <div style={styles.sidebar}>
-
         {/* LOGO */}
-        <div style={{padding:'1.5rem 1.25rem 1rem',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
+        <div style={{padding:'1.5rem 1.25rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <div>
               <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0',letterSpacing:'-0.2px'}}>
                 Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
               </div>
               {planLoaded && plan === 'pro' ? (
-                <div style={{fontSize:'10px',color:'#1D9E75',marginTop:'3px',fontWeight:'600',letterSpacing:'0.5px'}}>✦ Pro</div>
+                <div style={{fontSize:'10px',marginTop:'3px',fontWeight:'600'}}>
+                  <span style={{color:'#1D9E75'}}>Listing</span>
+                  <span style={{color:'#6b7280'}}>Whisperer</span>
+                  <span style={{color:'#d4af37'}}>Pro</span>
+                </div>
               ) : (
-                <div style={{fontSize:'10px',color:'#444',marginTop:'3px'}}>AI for Agents</div>
+                <div style={{fontSize:'10px',color:'#333',marginTop:'3px'}}>AI Assistant for Agents</div>
               )}
             </div>
             <button onClick={() => setSidebarOpen(false)}
-              style={{background:'none',border:'none',color:'#444',fontSize:'16px',cursor:'pointer',padding:'0'}}>✕</button>
+              style={{background:'none',border:'none',color:'#333',fontSize:'16px',cursor:'pointer',padding:'0'}}>✕</button>
           </div>
         </div>
 
@@ -281,63 +311,65 @@ export default function Dashboard() {
               onClick={() => { !item.disabled && setActivePage(item.key); setSidebarOpen(false) }}
               style={{
                 width:'100%', padding:'9px 1.25rem', display:'flex', alignItems:'center', gap:'9px',
-                background: activePage === item.key ? 'rgba(29,158,117,0.12)' : 'transparent',
+                background: activePage === item.key ? 'rgba(29,158,117,0.1)' : 'transparent',
                 border:'none',
                 borderLeft: activePage === item.key ? '2px solid #1D9E75' : '2px solid transparent',
-                color: activePage === item.key ? '#1D9E75' : item.disabled ? '#2a2a2a' : '#5a5f72',
-                fontSize:'13px', fontWeight: activePage === item.key ? '600' : '400',
+                color: activePage === item.key ? '#1D9E75' : item.disabled ? '#222' : '#4a4f62',
+                fontSize:'12px', fontWeight: activePage === item.key ? '600' : '400',
                 cursor: item.disabled ? 'not-allowed' : 'pointer', textAlign:'left' as const,
                 transition:'all 0.15s', marginBottom:'1px',
               }}>
-              <span style={{fontSize:'14px'}}>{item.icon}</span>
+              <span style={{fontSize:'13px'}}>{item.icon}</span>
               {item.label}
             </button>
           ))}
 
           <div style={{margin:'0.75rem 1.25rem',borderTop:'1px solid rgba(255,255,255,0.04)'}}/>
-          <p style={{fontSize:'9px',fontWeight:'700',color:'#333',letterSpacing:'1.2px',margin:'0 0 4px',padding:'0 1.25rem'}}>TOOLS</p>
+          <p style={{fontSize:'9px',fontWeight:'700',color:'#2a2a2a',letterSpacing:'1.2px',margin:'0 0 4px',padding:'0 1.25rem'}}>TOOLS</p>
           {[
+            { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
+            { href: '/pricing-assistant', icon: '💲', label: 'Pricing Assistant' },
             { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
             { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
             { href: '/rewrite', icon: '✍️', label: 'Rewrite' },
-            { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
             { href: '/launch-kit', icon: '🚀', label: 'Launch Plan' },
             { href: '/leads', icon: '👥', label: 'Leads & Clients' },
             { href: '/photos', icon: '🖼️', label: 'Photo Library' },
             { href: '/settings', icon: '⚙️', label: 'Settings' },
           ].map(item => (
             <a key={item.href} href={item.href}
-              style={{width:'100%',padding:'8px 1.25rem',display:'flex',alignItems:'center',gap:'9px',color:'#5a5f72',fontSize:'12px',textDecoration:'none',borderLeft:'2px solid transparent',transition:'color 0.15s'}}
-              onMouseOver={e => e.currentTarget.style.color='#8b8fa8'}
-              onMouseOut={e => e.currentTarget.style.color='#5a5f72'}>
-              <span style={{fontSize:'13px'}}>{item.icon}</span> {item.label}
+              style={{width:'100%',padding:'7px 1.25rem',display:'flex',alignItems:'center',gap:'9px',color:'#3a3f52',fontSize:'12px',textDecoration:'none',borderLeft:'2px solid transparent',transition:'color 0.15s'}}
+              onMouseOver={e => e.currentTarget.style.color='#6b7280'}
+              onMouseOut={e => e.currentTarget.style.color='#3a3f52'}>
+              <span style={{fontSize:'12px'}}>{item.icon}</span> {item.label}
             </a>
           ))}
         </div>
 
-        {/* BOTTOM */}
+        {/* SIDEBAR BOTTOM */}
         <div style={{padding:'1rem 1.25rem',borderTop:'1px solid rgba(255,255,255,0.04)'}}>
           {plan === 'starter' && (
             <a href="/pricing" onClick={() => trackUpgradeClick('sidebar', plan)}
-              style={{display:'block',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',padding:'10px',borderRadius:'8px',textAlign:'center',textDecoration:'none',fontSize:'11px',fontWeight:'600',marginBottom:'8px',lineHeight:'1.6'}}>
+              style={{display:'block',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',padding:'11px',borderRadius:'9px',textAlign:'center',textDecoration:'none',fontSize:'11px',fontWeight:'700',marginBottom:'6px',lineHeight:'1.7',boxShadow:'0 0 16px rgba(29,158,117,0.2)'}}>
               ⚡ Upgrade to Pro
               <span style={{display:'block',fontSize:'10px',fontWeight:'400',opacity:0.85}}>Unlimited listings & all features</span>
+              <span style={{display:'block',fontSize:'10px',fontWeight:'600',color:'#d4af37',marginTop:'2px'}}>Use code WELCOME50 for 50% off</span>
             </a>
           )}
           {plan === 'starter' && (
-            <div style={{fontSize:'10px',color:'#444',textAlign:'center',marginBottom:'8px'}}>
+            <div style={{fontSize:'10px',color:'#2a2a2a',textAlign:'center',marginBottom:'8px'}}>
               {listingCredits > 0
                 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining`
-                : remaining > 0
-                  ? `${remaining} free listing${remaining > 1 ? 's' : ''} left`
-                  : '⚠️ No listings left'}
+                : listingsUsed < 2
+                  ? `Try free — 24 hours of Pro on us`
+                  : '⚠️ Trial ended — upgrade to continue'}
             </div>
           )}
-          <div style={{display:'flex',justifyContent:'center',gap:'12px'}}>
+          <div style={{display:'flex',justifyContent:'center',gap:'10px'}}>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLScCLYVYMcFti8uxW4_3T7nhHK__AdYfsUEeB1WfGIAE2SHgJg/viewform?usp=publish-editor" target="_blank"
-              style={{fontSize:'11px',color:'#444',textDecoration:'none'}}>Feedback</a>
-            <a href="/contact" style={{fontSize:'11px',color:'#444',textDecoration:'none'}}>Contact</a>
-            <a href="/" style={{fontSize:'11px',color:'#444',textDecoration:'none'}}>Sign out</a>
+              style={{fontSize:'10px',color:'#2a2a2a',textDecoration:'none'}}>Feedback</a>
+            <a href="/contact" style={{fontSize:'10px',color:'#2a2a2a',textDecoration:'none'}}>Contact</a>
+            <a href="/" style={{fontSize:'10px',color:'#2a2a2a',textDecoration:'none'}}>Sign out</a>
           </div>
         </div>
       </div>
@@ -346,163 +378,133 @@ export default function Dashboard() {
       <div style={styles.main}>
 
         {/* MOBILE HEADER */}
-        <div style={{background:'rgba(13,17,23,0.97)',borderBottom:'1px solid rgba(255,255,255,0.05)',padding:'0.75rem 1.25rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(12px)'}}>
+        <div style={{background:'rgba(10,13,20,0.98)',borderBottom:'1px solid rgba(255,255,255,0.04)',padding:'0.75rem 1.25rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
           <button onClick={() => setSidebarOpen(true)}
-            style={{background:'none',border:'1px solid rgba(255,255,255,0.08)',color:'#6b7280',fontSize:'16px',cursor:'pointer',padding:'5px 10px',borderRadius:'7px'}}>
+            style={{background:'none',border:'1px solid rgba(255,255,255,0.07)',color:'#5a5f72',fontSize:'15px',cursor:'pointer',padding:'5px 10px',borderRadius:'7px'}}>
             ☰
           </button>
           <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0'}}>
             Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
             {planLoaded && plan === 'pro' && (
-              <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'8px',fontWeight:'700',padding:'2px 6px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle'}}>PRO</span>
+              <span style={{marginLeft:'5px',fontSize:'10px',fontWeight:'700',color:'#d4af37',verticalAlign:'middle'}}>Pro</span>
             )}
           </div>
-          <a href="/pricing" style={{fontSize:'11px',color: plan === 'pro' ? '#1D9E75' : '#555',textDecoration:'none',fontWeight:'500'}}>
-            {plan === 'pro' ? '✦ Pro' : '⚡ Upgrade'}
+          <a href="/pricing" style={{fontSize:'11px',color: plan === 'pro' ? '#d4af37' : '#444',textDecoration:'none',fontWeight:'600'}}>
+            {plan === 'pro' ? '✦ Pro' : 'Upgrade'}
           </a>
         </div>
 
-        <div style={{padding:'2rem 1.5rem',flex:1,maxWidth:'820px',width:'100%',margin:'0 auto'}}>
+        <div style={{padding:'2.5rem 1.5rem 3rem',flex:1,maxWidth:'860px',width:'100%',margin:'0 auto'}}>
 
           {/* ============ HOME PAGE ============ */}
           {activePage === 'home' && (
             <div>
 
-              {/* GREETING */}
-              <div style={{marginBottom:'2.5rem'}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'16px'}}>
+              {/* GREETING SECTION */}
+              <div style={{marginBottom:'3rem'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'16px',marginBottom:'8px'}}>
                   <div>
-                    <h1 style={{fontSize:'1.85rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 6px',letterSpacing:'-0.3px'}}>
+                    <h1 style={{fontSize:'2rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 8px',letterSpacing:'-0.5px'}}>
                       {greeting}{firstName ? `, ${firstName}` : ''} 👋
                     </h1>
-                    <p style={{fontSize:'15px',color:'#5a5f72',margin:'0',lineHeight:'1.5'}}>
+                    <p style={{fontSize:'15px',color:'#3a3f52',margin:'0',fontWeight:'400'}}>
                       What would you like to do today?
                     </p>
                   </div>
 
                   {/* PRO BADGE */}
                   {planLoaded && plan === 'pro' && (
-                    <div style={{display:'flex',alignItems:'center',gap:'10px',background:'linear-gradient(135deg,rgba(29,158,117,0.1),rgba(8,80,65,0.06))',border:'1px solid rgba(29,158,117,0.2)',borderRadius:'12px',padding:'10px 14px'}}>
-                      <div style={{width:'28px',height:'28px',borderRadius:'7px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',boxShadow:'0 0 10px rgba(29,158,117,0.35)'}}>✦</div>
+                    <div style={{display:'flex',alignItems:'center',gap:'10px',background:'linear-gradient(135deg,rgba(212,175,55,0.06),rgba(212,175,55,0.02))',border:'1px solid rgba(212,175,55,0.15)',borderRadius:'12px',padding:'10px 16px'}}>
+                      <div style={{width:'30px',height:'30px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px',boxShadow:'0 0 12px rgba(29,158,117,0.3)'}}>✦</div>
                       <div>
-                        <div style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'0.5px'}}>
-                          ListingWhisperer<span style={{color:'#d4af37'}}>Pro</span>
+                        <div style={{fontSize:'12px',fontWeight:'700',letterSpacing:'0.2px'}}>
+                          <span style={{color:'#e8e8e8'}}>Listing</span>
+                          <span style={{color:'#1D9E75'}}>Whisperer</span>
+                          <span style={{color:'#d4af37'}}>Pro</span>
                         </div>
-                        <div style={{fontSize:'10px',color:'#444',marginTop:'1px'}}>Unlimited access</div>
+                        <div style={{fontSize:'10px',color:'#333',marginTop:'2px'}}>Unlimited access · All features</div>
                       </div>
                     </div>
                   )}
 
-                  {/* FREE USAGE */}
+                  {/* FREE TRIAL BADGE */}
                   {planLoaded && plan === 'starter' && (
-                    <a href="/pricing" style={{textDecoration:'none',display:'flex',alignItems:'center',gap:'10px',background:'rgba(0,0,0,0.2)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'12px',padding:'10px 14px'}}>
+                    <a href="/pricing" style={{textDecoration:'none',display:'flex',alignItems:'center',gap:'10px',background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'12px',padding:'10px 14px',transition:'border-color 0.2s'}}
+                      onMouseOver={e => e.currentTarget.style.borderColor='rgba(29,158,117,0.3)'}
+                      onMouseOut={e => e.currentTarget.style.borderColor='rgba(255,255,255,0.06)'}>
                       <div>
-                        <div style={{fontSize:'11px',fontWeight:'600',color:'#f0f0f0'}}>
-                          {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} left` : remaining > 0 ? `${remaining} free listing${remaining > 1 ? 's' : ''} left` : '⚠️ No listings left'}
+                        <div style={{fontSize:'11px',fontWeight:'600',color:'#d0d0d0'}}>
+                          {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} left` : listingsUsed < 2 ? '24 hours of Pro — on us' : '⚠️ Trial ended'}
                         </div>
-                        <div style={{fontSize:'10px',color:'#1D9E75',marginTop:'1px',fontWeight:'500'}}>Upgrade to Pro →</div>
+                        <div style={{fontSize:'10px',color:'#1D9E75',marginTop:'2px',fontWeight:'500'}}>Upgrade to Pro →</div>
                       </div>
                     </a>
                   )}
                 </div>
               </div>
 
-              {/* PRIMARY ACTION CARDS */}
-              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(210px, 1fr))',gap:'12px',marginBottom:'3rem'}}>
-                {actionCards.map((item, i) => (
-                  item.href ? (
-                    <a key={i} href={item.href}
-                      style={{
-                        background:'linear-gradient(135deg,#13161f,#161926)',
-                        borderRadius:'14px',
-                        border:'1px solid rgba(255,255,255,0.06)',
-                        padding:'1.25rem',
-                        textDecoration:'none',
-                        display:'block',
-                        transition:'all 0.2s',
-                        cursor:'pointer',
-                      }}
-                      onMouseOver={e => {
-                        e.currentTarget.style.borderColor = `${item.color}35`
-                        e.currentTarget.style.transform = 'translateY(-2px)'
-                        e.currentTarget.style.boxShadow = `0 8px 24px rgba(0,0,0,0.3)`
-                      }}
-                      onMouseOut={e => {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
-                        e.currentTarget.style.transform = 'translateY(0)'
-                        e.currentTarget.style.boxShadow = 'none'
-                      }}>
-                      <div style={{width:'40px',height:'40px',borderRadius:'10px',background:`${item.color}15`,border:`1px solid ${item.color}25`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',marginBottom:'12px'}}>{item.icon}</div>
-                      <div style={{fontSize:'13px',fontWeight:'700',color:'#e8e8e8',marginBottom:'4px'}}>{item.title}</div>
-                      <div style={{fontSize:'11px',color:'#4a4f62',lineHeight:'1.5'}}>{item.desc}</div>
-                    </a>
-                  ) : (
-                    <div key={i} onClick={item.action}
-                      style={{
-                        background:`linear-gradient(135deg,${item.color}10,${item.color}05)`,
-                        borderRadius:'14px',
-                        border:`1px solid ${item.color}25`,
-                        padding:'1.25rem',
-                        cursor:'pointer',
-                        transition:'all 0.2s',
-                      }}
-                      onMouseOver={e => {
-                        e.currentTarget.style.borderColor = `${item.color}50`
-                        e.currentTarget.style.transform = 'translateY(-2px)'
-                        e.currentTarget.style.boxShadow = `0 8px 24px rgba(0,0,0,0.3)`
-                      }}
-                      onMouseOut={e => {
-                        e.currentTarget.style.borderColor = `${item.color}25`
-                        e.currentTarget.style.transform = 'translateY(0)'
-                        e.currentTarget.style.boxShadow = 'none'
-                      }}>
-                      <div style={{width:'40px',height:'40px',borderRadius:'10px',background:`${item.color}18`,border:`1px solid ${item.color}35`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',marginBottom:'12px'}}>{item.icon}</div>
-                      <div style={{fontSize:'13px',fontWeight:'700',color:'#e8e8e8',marginBottom:'4px'}}>{item.title}</div>
-                      <div style={{fontSize:'11px',color:'#4a4f62',lineHeight:'1.5'}}>{item.desc}</div>
-                      <div style={{marginTop:'10px',fontSize:'11px',fontWeight:'600',color:item.color}}>Start now →</div>
+              {/* BUCKETED ACTION CARDS */}
+              <div style={{display:'flex',flexDirection:'column',gap:'2.5rem',marginBottom:'3rem'}}>
+                {buckets.map((bucket, bi) => (
+                  <div key={bi}>
+                    {/* BUCKET LABEL */}
+                    <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'14px'}}>
+                      <span style={{width:'3px',height:'14px',background:bucket.color,borderRadius:'2px',display:'inline-block',boxShadow:`0 0 8px ${bucket.color}60`}}/>
+                      <p style={{fontSize:'10px',fontWeight:'700',color:bucket.color,letterSpacing:'1.5px',margin:'0',opacity:0.8}}>{bucket.label}</p>
+                      <span style={{flex:1,height:'1px',background:`${bucket.color}12`,display:'inline-block'}}/>
                     </div>
-                  )
+
+                    {/* CARDS */}
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(190px, 1fr))',gap:'10px'}}>
+                      {bucket.cards.map((card: any, ci: number) => (
+                        card.href ? (
+                          <a key={ci} href={card.href}
+                            style={{background:'linear-gradient(135deg,#111420,#13161f)',borderRadius:'13px',border:'1px solid rgba(255,255,255,0.05)',padding:'1.125rem',textDecoration:'none',display:'block',transition:'all 0.2s'}}
+                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}30`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
+                            onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.05)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
+                            <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color:'#e0e0e0',marginBottom:'3px'}}>{card.title}</div>
+                            <div style={{fontSize:'11px',color:'#3a3f52',lineHeight:'1.5'}}>{card.desc}</div>
+                          </a>
+                        ) : (
+                          <div key={ci} onClick={card.action}
+                            style={{background:`linear-gradient(135deg,${card.color}0e,${card.color}05)`,borderRadius:'13px',border:`1px solid ${card.color}20`,padding:'1.125rem',cursor:'pointer',transition:'all 0.2s'}}
+                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}45`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
+                            onMouseOut={e => {e.currentTarget.style.borderColor=`${card.color}20`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
+                            <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}15`,border:`1px solid ${card.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color:'#e0e0e0',marginBottom:'3px'}}>{card.title}</div>
+                            <div style={{fontSize:'11px',color:'#3a3f52',lineHeight:'1.5'}}>{card.desc}</div>
+                            <div style={{marginTop:'8px',fontSize:'11px',fontWeight:'600',color:card.color}}>Start now →</div>
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
 
-              {/* RECENT LISTINGS */}
+              {/* RECENT WORK */}
               {pastListings.length > 0 && (
                 <div>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
-                    <p style={{fontSize:'10px',fontWeight:'700',color:'#333',letterSpacing:'1px',margin:'0'}}>RECENT WORK</p>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
+                    <p style={{fontSize:'10px',fontWeight:'700',color:'#2a2a2a',letterSpacing:'1px',margin:'0'}}>RECENT WORK</p>
                     <button onClick={() => setActivePage('history')}
-                      style={{background:'none',border:'none',color:'#444',fontSize:'12px',cursor:'pointer',padding:'0'}}>
+                      style={{background:'none',border:'none',color:'#333',fontSize:'11px',cursor:'pointer',padding:'0'}}>
                       View all →
                     </button>
                   </div>
-                  <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                  <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
                     {pastListings.slice(0, 3).map(listing => (
                       <div key={listing.id}
                         onClick={() => { setOutputs(listing.outputs); setActivePage('results') }}
-                        style={{
-                          background:'rgba(255,255,255,0.02)',
-                          borderRadius:'10px',
-                          border:'1px solid rgba(255,255,255,0.05)',
-                          padding:'0.875rem 1.125rem',
-                          cursor:'pointer',
-                          display:'flex',
-                          justifyContent:'space-between',
-                          alignItems:'center',
-                          transition:'all 0.15s',
-                        }}
-                        onMouseOver={e => {
-                          e.currentTarget.style.borderColor = 'rgba(29,158,117,0.25)'
-                          e.currentTarget.style.background = 'rgba(29,158,117,0.04)'
-                        }}
-                        onMouseOut={e => {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
-                        }}>
+                        style={{background:'rgba(255,255,255,0.015)',borderRadius:'9px',border:'1px solid rgba(255,255,255,0.04)',padding:'0.8rem 1rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all 0.15s'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.2)';e.currentTarget.style.background='rgba(29,158,117,0.03)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.04)';e.currentTarget.style.background='rgba(255,255,255,0.015)'}}>
                         <div>
-                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'#d0d0d0'}}>
+                          <p style={{margin:'0',fontSize:'12px',fontWeight:'600',color:'#c0c0c0'}}>
                             {listing.name || `${listing.property_type} — ${listing.neighborhood}`}
                           </p>
-                          <p style={{margin:'3px 0 0',fontSize:'11px',color:'#3a3f52'}}>
+                          <p style={{margin:'2px 0 0',fontSize:'10px',color:'#2a2a2a'}}>
                             {listing.price} · {new Date(listing.created_at).toLocaleDateString()}
                           </p>
                         </div>
@@ -520,7 +522,7 @@ export default function Dashboard() {
             <div style={{maxWidth:'680px'}}>
               <div style={{marginBottom:'1.5rem',display:'flex',alignItems:'center',gap:'12px'}}>
                 <button onClick={() => setActivePage('home')}
-                  style={{background:'none',border:'none',color:'#555',fontSize:'13px',cursor:'pointer',padding:'0',display:'flex',alignItems:'center',gap:'4px'}}>
+                  style={{background:'none',border:'none',color:'#444',fontSize:'13px',cursor:'pointer',padding:'0'}}>
                   ← Home
                 </button>
                 <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>New Listing</h1>
@@ -602,30 +604,16 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* LOADING */}
               {loading && (
                 <div>
                   <style>{`
-                    @keyframes shimmer {
-                      0% { background-position: -800px 0 }
-                      100% { background-position: 800px 0 }
-                    }
-                    @keyframes pulse-dot {
-                      0%, 100% { opacity: 1; transform: scale(1); }
-                      50% { opacity: 0.5; transform: scale(0.8); }
-                    }
-                    .skeleton {
-                      background: linear-gradient(90deg, #1a1d2e 25%, #22263a 50%, #1a1d2e 75%);
-                      background-size: 800px 100%;
-                      animation: shimmer 1.5s infinite linear;
-                      border-radius: 6px;
-                    }
+                    @keyframes shimmer { 0% { background-position: -800px 0 } 100% { background-position: 800px 0 } }
+                    @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+                    .skeleton { background: linear-gradient(90deg, #1a1d2e 25%, #22263a 50%, #1a1d2e 75%); background-size: 800px 100%; animation: shimmer 1.5s infinite linear; border-radius: 6px; }
                   `}</style>
                   <div style={{...styles.card, padding:'1.25rem 1.5rem', marginBottom:'1rem', display:'flex', alignItems:'center', gap:'12px'}}>
                     <div style={{display:'flex',gap:'4px'}}>
-                      {[0,1,2].map(i => (
-                        <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>
-                      ))}
+                      {[0,1,2].map(i => <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>)}
                     </div>
                     <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>{loadingSteps[loadingStep]}</p>
                     <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>{Math.round(((loadingStep + 1) / loadingSteps.length) * 100)}%</span>
@@ -645,8 +633,7 @@ export default function Dashboard() {
                     <div className="skeleton" style={{height:'13px',marginBottom:'8px'}}/>
                     <div className="skeleton" style={{height:'13px',marginBottom:'8px'}}/>
                     <div className="skeleton" style={{height:'13px',marginBottom:'8px',width:'85%'}}/>
-                    <div className="skeleton" style={{height:'13px',marginBottom:'8px',width:'70%'}}/>
-                    <div className="skeleton" style={{height:'13px',width:'90%'}}/>
+                    <div className="skeleton" style={{height:'13px',width:'70%'}}/>
                   </div>
                   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
                     {[1,2,3,4,5,6].map(i => (
@@ -676,56 +663,49 @@ export default function Dashboard() {
           {/* ============ RESULTS PAGE ============ */}
           {activePage === 'results' && outputs && (
             <div>
-              {/* REFERRAL BANNER */}
               {showReferralBanner && referralCode && (
                 <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.12),rgba(8,80,65,0.08))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.25)',padding:'1.25rem 1.5rem',marginBottom:'1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
                   <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                     <span style={{fontSize:'1.5rem'}}>🎁</span>
                     <div>
                       <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share with a fellow agent — you both get a free listing!</p>
-                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 2 free listings + 1 bonus · You get 1 free listing credit</p>
+                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get a free trial · You get 1 listing credit</p>
                     </div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
-                    <div style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',color:'#1D9E75',fontWeight:'600',letterSpacing:'0.5px'}}>
+                    <div style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>
                       listingwhisperer.com/signup?ref={referralCode}
                     </div>
                     <button onClick={() => { navigator.clipboard.writeText(`https://listingwhisperer.com/signup?ref=${referralCode}`); setReferralCopied(true); setTimeout(() => setReferralCopied(false), 2000) }}
                       style={{padding:'7px 16px',borderRadius:'8px',border:'1px solid',fontSize:'12px',cursor:'pointer',fontWeight:'600',background: referralCopied ? '#1D9E75' : 'rgba(29,158,117,0.15)',color: referralCopied ? '#fff' : '#1D9E75',borderColor: referralCopied ? '#1D9E75' : 'rgba(29,158,117,0.3)'}}>
                       {referralCopied ? '✓ Copied!' : '📋 Copy Link'}
                     </button>
-                    <button onClick={() => setShowReferralBanner(false)}
-                      style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer',padding:'0 4px'}}>✕</button>
+                    <button onClick={() => setShowReferralBanner(false)} style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer',padding:'0 4px'}}>✕</button>
                   </div>
                 </div>
               )}
 
-              {/* COMPLETION HEADER */}
-              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.12),rgba(8,80,65,0.08))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.2)',padding:'1.5rem 2rem',marginBottom:'2rem',boxShadow:'0 0 40px rgba(29,158,117,0.08)'}}>
+              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.12),rgba(8,80,65,0.08))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.2)',padding:'1.5rem 2rem',marginBottom:'2rem'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
                   <div>
                     <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'6px'}}>
                       <span style={{fontSize:'1.75rem'}}>🎉</span>
                       <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Marketing Suite Ready</h1>
-                      <span style={{background:'rgba(29,158,117,0.2)',color:'#1D9E75',fontSize:'11px',fontWeight:'700',padding:'4px 12px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.4)',boxShadow:'0 0 12px rgba(29,158,117,0.2)'}}>✓ 11 FORMATS</span>
+                      <span style={{background:'rgba(29,158,117,0.2)',color:'#1D9E75',fontSize:'11px',fontWeight:'700',padding:'4px 12px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.4)'}}>✓ 11 FORMATS</span>
                     </div>
                     <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>
                       {form.neighborhood || form.name || 'Your listing'}{form.price ? ` · ${form.price}` : ''} · {form.beds || ''} · {form.sqft ? `${form.sqft} sq ft` : ''}
                     </p>
                   </div>
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
-                    <button onClick={() => handleDownloadPdf('mls')} disabled={generatingPdf}
-                      style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
-                    <button onClick={() => handleDownloadPdf('flyer')} disabled={generatingPdf}
-                      style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>🏠 Flyer PDF</button>
-                    <button onClick={() => { setActivePage('generate'); setOutputs(null) }}
-                      style={{padding:'8px 16px',background:'rgba(29,158,117,0.15)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'8px',color:'#1D9E75',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>+ New Listing</button>
+                    <button onClick={() => handleDownloadPdf('mls')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
+                    <button onClick={() => handleDownloadPdf('flyer')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>🏠 Flyer PDF</button>
+                    <button onClick={() => { setActivePage('generate'); setOutputs(null) }} style={{padding:'8px 16px',background:'rgba(29,158,117,0.15)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'8px',color:'#1D9E75',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>+ New Listing</button>
                   </div>
                 </div>
               </div>
 
-              {/* FEATURED HERO CARD */}
-              <div style={{background:'linear-gradient(135deg,#1e2235,#232840)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.25)',padding:'2rem',marginBottom:'1.5rem',boxShadow:'0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(212,175,55,0.1)'}}>
+              <div style={{background:'linear-gradient(135deg,#1e2235,#232840)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.25)',padding:'2rem',marginBottom:'1.5rem',boxShadow:'0 8px 32px rgba(0,0,0,0.4)'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'1rem',flexWrap:'wrap',gap:'12px'}}>
                   <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                     <div style={{width:'42px',height:'42px',background:'linear-gradient(135deg,rgba(212,175,55,0.2),rgba(212,175,55,0.05))',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',border:'1px solid rgba(212,175,55,0.2)'}}>🏠</div>
@@ -745,166 +725,77 @@ export default function Dashboard() {
                 <p style={{fontSize:'15px',lineHeight:'1.9',color:'#e8e8e8',margin:'0',borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'1rem',whiteSpace:'pre-wrap'}}>{outputs[featuredKey] || ''}</p>
               </div>
 
-              {/* CORE LISTING */}
-              <div style={{marginBottom:'1.5rem'}}>
-                <p style={{fontSize:'11px',fontWeight:'700',color:'#d4af37',letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
-                  <span style={{width:'24px',height:'1px',background:'rgba(212,175,55,0.3)',display:'inline-block'}}/>CORE LISTING<span style={{flex:1,height:'1px',background:'rgba(212,175,55,0.1)',display:'inline-block'}}/>
-                </p>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
-                  {[
-                    {key:'mls_luxury', label:'Luxury MLS', icon:'✨', color:'#d4af37', desc:'Premium luxury version'},
-                    {key:'openhouse', label:'Open House', icon:'🚪', color:'#f59e0b', desc:'Open house announcement'},
-                    {key:'price_drop', label:'Price Drop', icon:'💰', color:'#ef4444', desc:'Price reduction alert'},
-                  ].map(card => (
-                    <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
-                      onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
-                      onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                          <span style={{fontSize:'16px'}}>{card.icon}</span>
-                          <div>
-                            <div style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</div>
-                            <div style={{fontSize:'10px',color:'#555'}}>{card.desc}</div>
+              {[
+                { label: 'CORE LISTING', labelColor: '#d4af37', cards: [
+                  {key:'mls_luxury', label:'Luxury MLS', icon:'✨', color:'#d4af37', desc:'Premium luxury version'},
+                  {key:'openhouse', label:'Open House', icon:'🚪', color:'#f59e0b', desc:'Open house announcement'},
+                  {key:'price_drop', label:'Price Drop', icon:'💰', color:'#ef4444', desc:'Price reduction alert'},
+                ]},
+                { label: 'SOCIAL MEDIA', labelColor: '#818cf8', cards: [
+                  {key:'instagram', label:'Instagram', icon:'📸', color:'#e1306c', platform:'instagram'},
+                  {key:'facebook', label:'Facebook Post', icon:'👥', color:'#1877f2', platform:'facebook'},
+                  {key:'video', label:'Video Script', icon:'🎬', color:'#ef4444', platform:null},
+                ]},
+                { label: 'EMAIL & OUTREACH', labelColor: '#1D9E75', cards: [
+                  {key:'email', label:'Email Blast', icon:'📧', color:'#1D9E75'},
+                  {key:'text_message', label:'SMS / Text', icon:'📱', color:'#10b981'},
+                  {key:'seo', label:'SEO Copy', icon:'🔍', color:'#8b5cf6'},
+                ]},
+                { label: 'PRINT & FLYER', labelColor: '#f97316', cards: [
+                  {key:'flyer', label:'Flyer Copy', icon:'📄', color:'#f97316'},
+                ]},
+              ].map(section => (
+                <div key={section.label} style={{marginBottom:'1.5rem'}}>
+                  <p style={{fontSize:'11px',fontWeight:'700',color:section.labelColor,letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
+                    <span style={{width:'24px',height:'1px',background:`${section.labelColor}30`,display:'inline-block'}}/>{section.label}<span style={{flex:1,height:'1px',background:`${section.labelColor}10`,display:'inline-block'}}/>
+                  </p>
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
+                    {section.cards.map((card: any) => (
+                      <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
+                        onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
+                        onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
+                          <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                            <span style={{fontSize:'16px'}}>{card.icon}</span>
+                            <div>
+                              <div style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</div>
+                              {card.desc && <div style={{fontSize:'10px',color:'#555'}}>{card.desc}</div>}
+                            </div>
                           </div>
+                          <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
                         </div>
-                        <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
-                      </div>
-                      <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{outputs[card.key] || ''}</p>
-                      <div style={{display:'flex',gap:'6px'}}>
-                        <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
-                          style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#000' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
-                          {copied === card.key ? '✓ Copied!' : '📋 Copy'}
-                        </button>
-                        <button onClick={() => { setFeaturedKey(card.key); window.scrollTo({top:0,behavior:'smooth'}) }}
-                          style={{padding:'5px 14px',borderRadius:'6px',border:`1px solid ${card.color}30`,fontSize:'11px',cursor:'pointer',background:`${card.color}10`,color:card.color,fontWeight:'500'}}>
-                          ↑ Set as Main Preview
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* SOCIAL MEDIA */}
-              <div style={{marginBottom:'1.5rem'}}>
-                <p style={{fontSize:'11px',fontWeight:'700',color:'#818cf8',letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
-                  <span style={{width:'24px',height:'1px',background:'rgba(129,140,248,0.3)',display:'inline-block'}}/>SOCIAL MEDIA<span style={{flex:1,height:'1px',background:'rgba(129,140,248,0.1)',display:'inline-block'}}/>
-                </p>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
-                  {[
-                    {key:'instagram', label:'Instagram', icon:'📸', color:'#e1306c', platform:'instagram'},
-                    {key:'facebook', label:'Facebook Post', icon:'👥', color:'#1877f2', platform:'facebook'},
-                    {key:'video', label:'Video Script', icon:'🎬', color:'#ef4444', platform:null},
-                  ].map(card => (
-                    <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
-                      onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
-                      onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                          <span style={{fontSize:'16px'}}>{card.icon}</span>
-                          <div style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</div>
+                        <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{outputs[card.key] || ''}</p>
+                        <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
+                          <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
+                            style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                            {copied === card.key ? '✓ Copied!' : '📋 Copy'}
+                          </button>
+                          <button onClick={() => { setFeaturedKey(card.key); window.scrollTo({top:0,behavior:'smooth'}) }}
+                            style={{padding:'5px 12px',borderRadius:'6px',border:`1px solid ${card.color}30`,fontSize:'11px',cursor:'pointer',background: featuredKey === card.key ? card.color : `${card.color}10`,color: featuredKey === card.key ? '#fff' : card.color,fontWeight:'500'}}>
+                            {featuredKey === card.key ? '✓ Previewing' : '↑ Set as Main Preview'}
+                          </button>
+                          {card.platform === 'facebook' && (
+                            <>
+                              <button onClick={() => handleShare('facebook', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2'}}>Facebook</button>
+                              <button onClick={() => handleShare('linkedin', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(10,102,194,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(10,102,194,0.1)',color:'#0a66c2'}}>LinkedIn</button>
+                            </>
+                          )}
+                          {card.platform === 'instagram' && (
+                            <div>
+                              <button onClick={() => handleCopy(card.key+'_ig', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(225,48,108,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(225,48,108,0.1)',color:'#e1306c'}}>Copy for Instagram</button>
+                              <p style={{fontSize:'10px',color:'#444',margin:'3px 0 0'}}>Instagram requires manual posting</p>
+                            </div>
+                          )}
+                          {card.key === 'flyer' && (
+                            <button onClick={() => handleDownloadPdf('flyer')} style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(249,115,22,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(249,115,22,0.1)',color:'#f97316',fontWeight:'500'}}>📥 Download PDF</button>
+                          )}
                         </div>
-                        <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
                       </div>
-                      <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{outputs[card.key] || ''}</p>
-                      <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
-                        <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
-                          style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
-                          {copied === card.key ? '✓ Copied!' : '📋 Copy'}
-                        </button>
-                        <button onClick={() => { setFeaturedKey(card.key); window.scrollTo({top:0,behavior:'smooth'}) }}
-                          style={{padding:'5px 12px',borderRadius:'6px',border:`1px solid ${card.color}30`,fontSize:'11px',cursor:'pointer',background: featuredKey === card.key ? card.color : `${card.color}10`,color: featuredKey === card.key ? '#fff' : card.color,fontWeight:'500'}}>
-                          {featuredKey === card.key ? '✓ Previewing' : '↑ Set as Main Preview'}
-                        </button>
-                        {card.platform === 'facebook' && (
-                          <>
-                            <button onClick={() => handleShare('facebook', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2'}}>Facebook</button>
-                            <button onClick={() => handleShare('linkedin', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(10,102,194,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(10,102,194,0.1)',color:'#0a66c2'}}>LinkedIn</button>
-                          </>
-                        )}
-                        {card.platform === 'instagram' && (
-                          <div>
-                            <button onClick={() => handleCopy(card.key+'_ig', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(225,48,108,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(225,48,108,0.1)',color:'#e1306c'}}>Copy for Instagram</button>
-                            <p style={{fontSize:'10px',color:'#444',margin:'3px 0 0'}}>Instagram requires manual posting</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ))}
 
-              {/* EMAIL & OUTREACH */}
-              <div style={{marginBottom:'1.5rem'}}>
-                <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
-                  <span style={{width:'24px',height:'1px',background:'rgba(29,158,117,0.3)',display:'inline-block'}}/>EMAIL & OUTREACH<span style={{flex:1,height:'1px',background:'rgba(29,158,117,0.1)',display:'inline-block'}}/>
-                </p>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
-                  {[
-                    {key:'email', label:'Email Blast', icon:'📧', color:'#1D9E75'},
-                    {key:'text_message', label:'SMS / Text', icon:'📱', color:'#10b981'},
-                    {key:'seo', label:'SEO Copy', icon:'🔍', color:'#8b5cf6'},
-                  ].map(card => (
-                    <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
-                      onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
-                      onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                          <span style={{fontSize:'16px'}}>{card.icon}</span>
-                          <span style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</span>
-                        </div>
-                        <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
-                      </div>
-                      <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{outputs[card.key] || ''}</p>
-                      <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
-                        <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
-                          style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
-                          {copied === card.key ? '✓ Copied!' : '📋 Copy'}
-                        </button>
-                        <button onClick={() => { setFeaturedKey(card.key); window.scrollTo({top:0,behavior:'smooth'}) }}
-                          style={{padding:'5px 12px',borderRadius:'6px',border:`1px solid ${card.color}30`,fontSize:'11px',cursor:'pointer',background: featuredKey === card.key ? card.color : `${card.color}10`,color: featuredKey === card.key ? '#fff' : card.color,fontWeight:'500'}}>
-                          {featuredKey === card.key ? '✓ Previewing' : '↑ Set as Main Preview'}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* PRINT & FLYER */}
-              <div style={{marginBottom:'2rem'}}>
-                <p style={{fontSize:'11px',fontWeight:'700',color:'#f97316',letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
-                  <span style={{width:'24px',height:'1px',background:'rgba(249,115,22,0.3)',display:'inline-block'}}/>PRINT & FLYER<span style={{flex:1,height:'1px',background:'rgba(249,115,22,0.1)',display:'inline-block'}}/>
-                </p>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
-                  {[{key:'flyer', label:'Flyer Copy', icon:'📄', color:'#f97316'}].map(card => (
-                    <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
-                      onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
-                      onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                          <span style={{fontSize:'16px'}}>{card.icon}</span>
-                          <span style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</span>
-                        </div>
-                        <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
-                      </div>
-                      <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{outputs[card.key] || ''}</p>
-                      <div style={{display:'flex',gap:'6px'}}>
-                        <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
-                          style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
-                          {copied === card.key ? '✓ Copied!' : '📋 Copy'}
-                        </button>
-                        <button onClick={() => handleDownloadPdf('flyer')}
-                          style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(249,115,22,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(249,115,22,0.1)',color:'#f97316',fontWeight:'500'}}>
-                          📥 Download PDF
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* BOTTOM ACTIONS */}
               <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.08),rgba(8,80,65,0.05))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.15)',padding:'1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
                 <div>
                   <p style={{fontSize:'14px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>Ready to launch this listing?</p>
@@ -928,10 +819,7 @@ export default function Dashboard() {
               {pastListings.length === 0 ? (
                 <div style={{...styles.card,textAlign:'center',padding:'3rem'}}>
                   <p style={{color:'#8b8fa8'}}>No listings yet!</p>
-                  <button onClick={() => setActivePage('generate')}
-                    style={{marginTop:'1rem',padding:'10px 24px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',fontSize:'14px'}}>
-                    Generate First Listing
-                  </button>
+                  <button onClick={() => setActivePage('generate')} style={{marginTop:'1rem',padding:'10px 24px',background:'#1D9E75',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer',fontSize:'14px'}}>Generate First Listing</button>
                 </div>
               ) : (
                 <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
@@ -950,20 +838,16 @@ export default function Dashboard() {
                           <p style={{margin:'4px 0 0',fontSize:'12px',color:'#1D9E75',fontWeight:'500'}}>View →</p>
                         </div>
                       </div>
-                      <textarea
-                        placeholder="Agent notes..."
-                        defaultValue={listing.agent_notes || ''}
+                      <textarea placeholder="Agent notes..." defaultValue={listing.agent_notes || ''}
                         onBlur={async (e) => { await supabase.from('listings').update({agent_notes: e.target.value}).eq('id', listing.id) }}
                         onClick={e => e.stopPropagation()}
-                        style={{width:'100%',padding:'8px',background:'rgba(0,0,0,0.2)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'8px',fontSize:'12px',color:'#8b8fa8',minHeight:'60px',resize:'vertical',boxSizing:'border-box'}}
-                      />
+                        style={{width:'100%',padding:'8px',background:'rgba(0,0,0,0.2)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'8px',fontSize:'12px',color:'#8b8fa8',minHeight:'60px',resize:'vertical',boxSizing:'border-box'}}/>
                     </div>
                   ))}
                 </div>
               )}
             </div>
           )}
-
         </div>
       </div>
 
@@ -971,11 +855,10 @@ export default function Dashboard() {
       {showUpgradeModal && (
         <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
           <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)',padding:'2.5rem',maxWidth:'480px',width:'100%',boxShadow:'0 0 60px rgba(29,158,117,0.15)',textAlign:'center',position:'relative'}}>
-            <button onClick={() => setShowUpgradeModal(false)}
-              style={{position:'absolute',top:'1rem',right:'1rem',background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',width:'32px',height:'32px',borderRadius:'50%',fontSize:'16px',cursor:'pointer'}}>✕</button>
+            <button onClick={() => setShowUpgradeModal(false)} style={{position:'absolute',top:'1rem',right:'1rem',background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',width:'32px',height:'32px',borderRadius:'50%',fontSize:'16px',cursor:'pointer'}}>✕</button>
             <div style={{fontSize:'3rem',marginBottom:'1rem'}}>🚀</div>
-            <h2 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>You've used your 2 free listings!</h2>
-            <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'1.5rem',lineHeight:'1.7'}}>Upgrade to continue generating.</p>
+            <h2 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Your free trial has ended</h2>
+            <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'1.5rem',lineHeight:'1.7'}}>Upgrade to Pro to keep generating unlimited listings, rewrites, launch kits, and more.</p>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'1.5rem',textAlign:'left'}}>
               <div style={{background:'rgba(0,0,0,0.2)',borderRadius:'12px',padding:'1.25rem',border:'1px solid rgba(255,255,255,0.07)'}}>
                 <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Pay Per Listing</p>
@@ -988,7 +871,7 @@ export default function Dashboard() {
                 <a href="/pricing" style={{display:'block',textAlign:'center',padding:'8px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',textDecoration:'none',fontSize:'13px',fontWeight:'600'}}>Go Pro</a>
               </div>
             </div>
-            <p style={{fontSize:'12px',color:'#444'}}>Use code <strong style={{color:'#1D9E75'}}>WELCOME50</strong> for 50% off Pro</p>
+            <p style={{fontSize:'12px',color:'#444'}}>Use code <strong style={{color:'#d4af37'}}>WELCOME50</strong> for 50% off your first month</p>
           </div>
         </div>
       )}
