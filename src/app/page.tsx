@@ -55,7 +55,7 @@ export default function Home() {
             See Real Output
           </a>
         </div>
-        <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · 2 free listings · Cancel anytime</p>
+        <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · 2 listings included · Cancel anytime</p>
       </section>
 
       {/* STATS STRIP */}
@@ -64,7 +64,6 @@ export default function Home() {
           {[
             {stat:'11',label:'Formats per listing — and growing'},
             {stat:'60s',label:'Generation time'},
-            {stat:'24h',label:'Free Pro trial to start'},
             {stat:'24h',label:'Free Pro trial to start'},
           ].map(({stat,label}) => (
             <div key={label} style={{textAlign:'center'}}>
@@ -78,7 +77,7 @@ export default function Home() {
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
-          {['11 copy formats','Seller meeting prep','On-site photo drafts','7-day launch kit','Brand voice memory'].map(item => (
+          {['11 copy formats','Seller meeting prep','Pricing assistant','On-site photo drafts','7-day launch kit'].map(item => (
             <span key={item} style={{color:'#fff',fontSize:'13px',fontWeight:'600'}}>✓ {item}</span>
           ))}
         </div>
@@ -269,7 +268,7 @@ export default function Home() {
                 <li>No real estate workflow</li>
                 <li>No tone or buyer targeting</li>
                 <li>No saved listing history</li>
-                <li>No seller prep or on-site tools</li>
+                <li>No seller prep or pricing tools</li>
               </ul>
             </div>
             <div style={{background:'#f0fdf8',borderRadius:'14px',padding:'1.75rem',border:'2px solid #bbf0d9'}}>
@@ -281,6 +280,8 @@ export default function Home() {
                 <li>On-site photo drafts</li>
                 <li>Tone & buyer targeting</li>
                 <li>Saved listing history</li>
+                <li>Pricing assistant</li>
+                <li>Follow-up tools</li>
               </ul>
             </div>
           </div>
@@ -348,7 +349,7 @@ export default function Home() {
             {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, SMS, Flyer, Price Drop, and SEO copy — all from one set of notes.'},
             {q:'What is Seller Meeting Prep?',a:'Before your listing appointment, Listing Whisperer generates a complete meeting outline, talking points, questions to ask the seller, and a follow-up email — so you walk in fully prepared.'},
             {q:'What is Snap & Start?',a:'On your phone or tablet, upload property photos on-site. Our AI detects visible features, you confirm the details, and generate your first draft before you leave the property.'},
-            {q:'How is this different from ChatGPT?',a:'Listing Whisperer is purpose-YOUR AI FIELD ASSISTANT FOR REAL ESTATE. It covers the entire listing workflow — seller prep, on-site drafts, and full marketing launch — not just copy generation. No prompt writing required.'},
+            {q:'How is this different from ChatGPT?',a:'Listing Whisperer is built specifically for real estate agents. It covers the entire listing workflow — seller prep, on-site photo drafts, full marketing launch, and pricing strategy — not just copy generation. No prompt writing required.'},
             {q:'Can I cancel anytime?',a:'Yes. No contracts, no commitments. Cancel your Pro subscription anytime from your account settings.'},
             {q:'How good is the copy quality?',a:'Our AI is trained specifically for real estate marketing and produces MLS-ready, professional copy that sounds like it was written by an experienced agent.'},
           ].map(({q,a}) => (
@@ -368,7 +369,7 @@ export default function Home() {
           style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'16px 40px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 24px rgba(29,158,117,0.35)'}}>
           Get Started Free →
         </a>
-        <p style={{fontSize:'13px',color:'#aaa',marginTop:'1rem'}}>No credit card · 2 free listings · Cancel anytime</p>
+        <p style={{fontSize:'13px',color:'#aaa',marginTop:'1rem'}}>No credit card · 2 listings included · Cancel anytime</p>
       </section>
 
       {/* FOOTER */}
