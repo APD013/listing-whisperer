@@ -31,6 +31,8 @@ export default function Dashboard() {
   const [referralCode, setReferralCode] = useState('')
   const [referralCopied, setReferralCopied] = useState(false)
   const [showReferralBanner, setShowReferralBanner] = useState(false)
+  const [dueReminders, setDueReminders] = useState<any[]>([])
+  const [showReminderPopup, setShowReminderPopup] = useState(false)
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
@@ -80,6 +82,21 @@ export default function Dashboard() {
         .order('created_at', { ascending: false }).limit(10)
       if (listings) setPastListings(listings)
       if (upgraded) setPlan('pro')
+
+      // Check for due reminders
+      const checkReminders = async () => {
+        const { data: reminders } = await supabase
+          .from('reminders')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('sent', false)
+          .lte('remind_at', new Date().toISOString())
+        if (reminders && reminders.length > 0) {
+          setDueReminders(reminders)
+          setShowReminderPopup(true)
+        }
+      }
+      checkReminders()
     }
     getUser()
   }, [])
@@ -850,6 +867,60 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* REMINDER POPUP */}
+      {showReminderPopup && dueReminders.length > 0 && (
+        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.9)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+          <div style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.4)',padding:'2.5rem',maxWidth:'500px',width:'100%',boxShadow:'0 0 80px rgba(212,175,55,0.15)',position:'relative'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'1.5rem'}}>
+              <div style={{width:'44px',height:'44px',borderRadius:'12px',background:'rgba(212,175,55,0.15)',border:'1px solid rgba(212,175,55,0.3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',flexShrink:0}}>⏰</div>
+              <div>
+                <h2 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 4px'}}>
+                  You have {dueReminders.length} reminder{dueReminders.length > 1 ? 's' : ''} due
+                </h2>
+                <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>Take care of these before you get started</p>
+              </div>
+            </div>
+
+            <div style={{display:'flex',flexDirection:'column',gap:'10px',marginBottom:'1.5rem'}}>
+              {dueReminders.map(reminder => (
+                <div key={reminder.id} style={{background:'rgba(0,0,0,0.25)',borderRadius:'12px',border:'1px solid rgba(212,175,55,0.15)',padding:'1rem 1.25rem'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'8px'}}>
+                    <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>
+                      {reminder.contact_name || 'Follow up'}
+                    </p>
+                    <span style={{fontSize:'11px',color:'#d4af37',background:'rgba(212,175,55,0.1)',padding:'2px 8px',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.2)',whiteSpace:'nowrap',marginLeft:'8px'}}>
+                      {new Date(reminder.remind_at).toLocaleString()}
+                    </span>
+                  </div>
+                  <p style={{fontSize:'12px',color:'#8b8fa8',margin:'0 0 10px',lineHeight:'1.6',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical' as const,overflow:'hidden'}}>
+                    {reminder.content}
+                  </p>
+                  <button
+                    onClick={async () => {
+                      await supabase.from('reminders').update({sent: true}).eq('id', reminder.id)
+                      const remaining = dueReminders.filter(r => r.id !== reminder.id)
+                      setDueReminders(remaining)
+                      if (remaining.length === 0) setShowReminderPopup(false)
+                    }}
+                    style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(29,158,117,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(29,158,117,0.1)',color:'#1D9E75',fontWeight:'600'}}>
+                    ✓ Mark as Done
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowReminderPopup(false)}
+              style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,#d4af37,#a08040)',color:'#000',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>
+              Dismiss All & Continue
+            </button>
+            <p style={{fontSize:'11px',color:'#444',textAlign:'center',marginTop:'10px',margin:'10px 0 0'}}>
+              Dismissed reminders are marked as done and won't show again
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* UPGRADE MODAL */}
       {showUpgradeModal && (
