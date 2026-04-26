@@ -1,10 +1,18 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export default function PricingAssistant() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [pastReports, setPastReports] = useState<any[]>([])
   const [form, setForm] = useState({
     propertyType: 'Single family',
     beds: '',
@@ -16,6 +24,23 @@ export default function PricingAssistant() {
     comps: '',
     notes: '',
   })
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUserId(user.id)
+        const { data: reports } = await supabase
+          .from('pricing_reports')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5)
+        if (reports) setPastReports(reports)
+      }
+    }
+    getUser()
+  }, [])
 
   const styles = {
     page: { minHeight: '100vh', background: '#0d1117', fontFamily: "'Inter', sans-serif", color: '#f0f0f0' },
@@ -39,7 +64,7 @@ export default function PricingAssistant() {
       const res = await fetch('/api/pricing-assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ form })
+        body: JSON.stringify({ form, userId })
       })
       const data = await res.json()
       if (data.result) setResult(data.result)
@@ -148,6 +173,32 @@ export default function PricingAssistant() {
             </div>
             <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>Analyzing market factors and building your pricing strategy...</p>
             <span style={{fontSize:'12px',color:'#d4af37',fontWeight:'600'}}>⏳</span>
+          </div>
+        )}
+
+        {/* PAST REPORTS */}
+        {pastReports.length > 0 && !result && !loading && (
+          <div style={{...styles.card, marginBottom:'1.5rem'}}>
+            <p style={{fontSize:'11px',fontWeight:'700',color:'#d4af37',letterSpacing:'1px',margin:'0 0 12px'}}>RECENT PRICING REPORTS</p>
+            <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+              {pastReports.map(report => (
+                <div key={report.id}
+                  onClick={() => setResult(report.full_report)}
+                  style={{background:'rgba(0,0,0,0.2)',borderRadius:'10px',border:'1px solid rgba(255,255,255,0.06)',padding:'0.875rem 1rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all 0.15s'}}
+                  onMouseOver={e => {e.currentTarget.style.borderColor='rgba(212,175,55,0.25)';e.currentTarget.style.background='rgba(212,175,55,0.04)'}}
+                  onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.06)';e.currentTarget.style.background='rgba(0,0,0,0.2)'}}>
+                  <div>
+                    <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'#d0d0d0'}}>
+                      {report.neighborhood || report.property_type} · {report.price_range}
+                    </p>
+                    <p style={{margin:'3px 0 0',fontSize:'11px',color:'#3a3f52'}}>
+                      {report.beds}bd / {report.baths}ba · {report.sqft} sqft · {new Date(report.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span style={{fontSize:'11px',color:'#d4af37',fontWeight:'500'}}>View →</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

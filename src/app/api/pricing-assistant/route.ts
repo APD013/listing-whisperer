@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export const maxDuration = 30
 
 export async function POST(request: Request) {
   try {
-    const { form } = await request.json()
+    const { form, userId } = await request.json()
 
     const prompt = `You are an expert real estate pricing strategist helping a licensed real estate agent prepare for a seller listing appointment.
 
@@ -45,6 +51,25 @@ Return exactly this JSON:
     const data = await res.json()
     const text = data.content?.[0]?.text || ''
     const result = JSON.parse(text.replace(/```json|```/g, '').trim())
+
+    // Save to Supabase
+    if (userId) {
+      await supabase.from('pricing_reports').insert({
+        user_id: userId,
+        property_type: form.propertyType,
+        beds: form.beds,
+        baths: form.baths,
+        sqft: form.sqft,
+        condition: form.condition,
+        neighborhood: form.neighborhood,
+        upgrades: form.upgrades || '',
+        comps: form.comps || '',
+        notes: form.notes || '',
+        price_range: result.priceRange,
+        confidence: result.confidence,
+        full_report: result
+      })
+    }
 
     return NextResponse.json({ result })
 
