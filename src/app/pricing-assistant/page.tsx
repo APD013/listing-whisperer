@@ -136,15 +136,18 @@ export default function PricingAssistant() {
 
         {/* LOADING */}
         {loading && (
-          <div style={{...styles.card, padding:'2rem', textAlign:'center'}}>
-            <style>{`@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }`}</style>
-            <div style={{display:'flex',justifyContent:'center',gap:'6px',marginBottom:'1rem'}}>
+          <div style={{...styles.card, padding:'1.25rem 1.5rem', display:'flex', alignItems:'center', gap:'12px'}}>
+            <style>{`
+              @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+              @keyframes shimmer { 0% { background-position: -800px 0 } 100% { background-position: 800px 0 } }
+            `}</style>
+            <div style={{display:'flex',gap:'4px'}}>
               {[0,1,2].map(i => (
-                <div key={i} style={{width:'10px',height:'10px',borderRadius:'50%',background:'#d4af37',animation:`pulse 1.2s ${i*0.2}s infinite`}}/>
+                <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#d4af37',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>
               ))}
             </div>
-            <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'14px',margin:'0 0 6px'}}>Analyzing market factors...</p>
-            <p style={{color:'#5a5f72',fontSize:'12px',margin:'0'}}>Building your pricing strategy and seller talking points</p>
+            <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>Analyzing market factors and building your pricing strategy...</p>
+            <span style={{fontSize:'12px',color:'#d4af37',fontWeight:'600'}}>⏳</span>
           </div>
         )}
 
