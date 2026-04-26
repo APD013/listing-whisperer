@@ -858,17 +858,19 @@ export default function Dashboard() {
             <button onClick={() => setShowUpgradeModal(false)} style={{position:'absolute',top:'1rem',right:'1rem',background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',width:'32px',height:'32px',borderRadius:'50%',fontSize:'16px',cursor:'pointer'}}>✕</button>
             <div style={{fontSize:'3rem',marginBottom:'1rem'}}>🚀</div>
             <h2 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Your free trial has ended</h2>
-            <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'1.5rem',lineHeight:'1.7'}}>Upgrade to Pro to keep generating unlimited listings, rewrites, launch kits, and more.</p>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'1.5rem',textAlign:'left'}}>
-              <div style={{background:'rgba(0,0,0,0.2)',borderRadius:'12px',padding:'1.25rem',border:'1px solid rgba(255,255,255,0.07)'}}>
-                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Pay Per Listing</p>
-                <p style={{fontSize:'2rem',fontWeight:'700',color:'#1D9E75',marginBottom:'8px'}}>$9</p>
-                <a href="/pricing" style={{display:'block',textAlign:'center',padding:'8px',borderRadius:'8px',background:'rgba(29,158,117,0.15)',color:'#1D9E75',textDecoration:'none',fontSize:'13px',fontWeight:'600',border:'1px solid rgba(29,158,117,0.3)'}}>Buy 1 Listing</a>
-              </div>
-              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.15),rgba(8,80,65,0.15))',borderRadius:'12px',padding:'1.25rem',border:'1px solid rgba(29,158,117,0.3)'}}>
-                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Pro</p>
-                <p style={{fontSize:'2rem',fontWeight:'700',color:'#1D9E75',marginBottom:'8px'}}>$29<span style={{fontSize:'14px',color:'#6b7280'}}>/mo</span></p>
-                <a href="/pricing" style={{display:'block',textAlign:'center',padding:'8px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',textDecoration:'none',fontSize:'13px',fontWeight:'600'}}>Go Pro</a>
+            <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'1.5rem',lineHeight:'1.7'}}>Upgrade to Pro to keep generating unlimited listings, rewrites, and more.</p>
+            <div style={{marginBottom:'1.5rem'}}>
+              <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.15),rgba(8,80,65,0.15))',borderRadius:'12px',padding:'1.5rem',border:'1px solid rgba(29,158,117,0.3)',textAlign:'left'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
+                  <p style={{fontSize:'15px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Pro Plan</p>
+                  <p style={{fontSize:'2rem',fontWeight:'800',color:'#1D9E75',margin:'0'}}>$20<span style={{fontSize:'14px',color:'#6b7280'}}>/mo</span></p>
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4px',marginBottom:'16px'}}>
+                  {['Unlimited listings','All AI tools','Seller Prep','Launch Kit','Pricing Assistant','Priority support'].map(f => (
+                    <p key={f} style={{fontSize:'12px',color:'#a8f0d4',margin:'0'}}>✅ {f}</p>
+                  ))}
+                </div>
+                <a href="/pricing" style={{display:'block',textAlign:'center',padding:'12px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',textDecoration:'none',fontSize:'14px',fontWeight:'700',boxShadow:'0 0 20px rgba(29,158,117,0.3)'}}>Upgrade to Pro — $20/mo</a>
               </div>
             </div>
             <p style={{fontSize:'12px',color:'#444'}}>Use code <strong style={{color:'#d4af37'}}>WELCOME50</strong> for 50% off your first month</p>
