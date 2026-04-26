@@ -323,10 +323,10 @@ export default function Home() {
               <li>✅ Unlimited rewrites</li>
               <li>✅ All 11 copy formats</li>
               <li>✅ All AI assistant tools</li>
-              <li>✅ Seller Meeting Prep</li>
-              <li>✅ Snap & Start on-site</li>
-              <li>✅ 7-Day Launch Kit</li>
-              <li>✅ Pricing Assistant</li>
+              <li>✅ Seller meeting prep</li>
+              <li>✅ Snap & start on-site</li>
+              <li>✅ 7-day launch kit</li>
+              <li>✅ Pricing assistant</li>
               <li>✅ Brand voice memory</li>
               <li>✅ Priority support</li>
             </ul>
