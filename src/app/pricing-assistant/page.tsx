@@ -43,7 +43,7 @@ export default function PricingAssistant() {
       })
       const data = await res.json()
       if (data.result) setResult(data.result)
-      else alert('Something went wrong. Please try again.')
+      else alert('Error: ' + (data.error || 'Something went wrong'))
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
   }
