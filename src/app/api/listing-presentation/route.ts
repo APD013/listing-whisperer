@@ -36,7 +36,7 @@ Return exactly this JSON with no line breaks inside string values:
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-opus-4-5',
         max_tokens: 3000,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -49,9 +49,14 @@ Return exactly this JSON with no line breaks inside string values:
 
     const data = await res.json()
     const text = data.content?.[0]?.text || ''
+    if (!text) return NextResponse.json({ error: 'Empty response from AI' }, { status: 500 })
     const clean = text.replace(/```json|```/g, '').trim()
-    const result = JSON.parse(clean)
-    return NextResponse.json({ result })
+    try {
+      const result = JSON.parse(clean)
+      return NextResponse.json({ result })
+    } catch(parseError) {
+      return NextResponse.json({ error: 'Parse failed: ' + clean.substring(0, 200) }, { status: 500 })
+    }
 
   } catch(e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
