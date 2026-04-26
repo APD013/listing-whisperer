@@ -43,12 +43,12 @@ export default function Home() {
           From seller meeting prep to on-site photo drafts to full marketing launch — Listing Whisperer is your AI field assistant before, during, and after every listing.
         </p>
         <p style={{fontSize:'14px',color:'#1D9E75',fontWeight:'600',maxWidth:'480px',margin:'0 auto 2rem'}}>
-          Used by agents across the country to save 30+ minutes per listing.
+          Used by agents across the country to save hours per listing.
         </p>
         <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'1rem'}}>
           <a href="/signup" onClick={() => trackCTAClick('hero_cta', 'homepage')}
             style={{background:'#1D9E75',color:'#fff',padding:'15px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 20px rgba(29,158,117,0.35)',transition:'all 0.2s'}}>
-            Try Free — No Credit Card →
+            Start Free — 24 Hours of Pro →
           </a>
           <a href="#examples"
             style={{background:'#fff',color:'#111',padding:'15px 32px',borderRadius:'10px',textDecoration:'none',fontWeight:'500',fontSize:'16px',border:'1px solid #ddd'}}>
@@ -64,8 +64,8 @@ export default function Home() {
           {[
             {stat:'11',label:'Formats per listing — and growing'},
             {stat:'60s',label:'Generation time'},
-            {stat:'30+',label:'Minutes saved per listing'},
-            {stat:'$0',label:'To get started'},
+            {stat:'24h',label:'Free Pro trial to start'},
+            {stat:'24h',label:'Free Pro trial to start'},
           ].map(({stat,label}) => (
             <div key={label} style={{textAlign:'center'}}>
               <p style={{fontSize:'2.25rem',fontWeight:'800',color:'#1D9E75',margin:'0',letterSpacing:'-1px'}}>{stat}</p>
@@ -225,7 +225,7 @@ export default function Home() {
           <div style={{background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',borderRadius:'16px',padding:'2.25rem',marginBottom:'2.5rem',border:'1px solid #bbf0d9'}}>
             <p style={{fontSize:'13px',color:'#085041',fontWeight:'700',marginBottom:'10px',letterSpacing:'0.3px'}}>👋 A NOTE FROM THE FOUNDER</p>
             <p style={{fontSize:'15px',color:'#333',lineHeight:'1.85',marginBottom:'12px'}}>
-              I built Listing Whisperer because I watched agents spend 30+ minutes writing copy for every single listing — MLS, Instagram, email, open house — separately, manually, every time.
+              I built Listing Whisperer because I watched agents spend hours writing copy for every single listing — MLS, Instagram, email, open house — separately, manually, every time.
             </p>
             <p style={{fontSize:'15px',color:'#333',lineHeight:'1.85',marginBottom:'16px'}}>
               This tool does all of it in under 60 seconds. It's built specifically for real estate agents, and early users get priority support directly from me.
@@ -236,7 +236,7 @@ export default function Home() {
           <p style={{fontSize:'13px',color:'#aaa',textAlign:'center',marginBottom:'2rem'}}>From our first beta users</p>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'1.5rem'}}>
             {[
-              {quote:'"Saved me at least 20 minutes on my last listing. The Instagram captions were ready to post."',initials:'S.M.',role:'Realtor, Orange County'},
+              {quote:'"Saved me hours on my last listing. The Instagram captions were ready to post."',initials:'S.M.',role:'Realtor, Orange County'},
               {quote:'"Finally something built for agents. Not just another generic AI tool. The MLS copy was spot on."',initials:'J.T.',role:'Agent, Los Angeles'},
               {quote:'"I used to dread writing listing descriptions. Now I generate everything in one click."',initials:'L.R.',role:'Broker, San Diego'},
             ].map(({quote,initials,role}) => (
@@ -290,58 +290,43 @@ export default function Home() {
       {/* PRICING */}
       <section id="pricing" style={{padding:'5rem 2rem',maxWidth:'760px',margin:'0 auto',textAlign:'center'}}>
         <h2 style={{fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>Simple, honest pricing</h2>
-        <p style={{color:'#777',marginBottom:'0.5rem',fontSize:'15px'}}>One listing this month? Pay $9. Use it often? Go Pro for $29.</p>
+        <p style={{color:'#777',marginBottom:'0.5rem',fontSize:'15px'}}>Try free for 24 hours — then go Pro for $20/month.</p>
         <p style={{color:'#aaa',fontSize:'13px',marginBottom:'3.5rem'}}>No credit card required to start free.</p>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3, 1fr)',gap:'1.5rem'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(2, 1fr)',gap:'1.5rem',maxWidth:'600px',margin:'0 auto'}}>
           <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'1px solid #eee',textAlign:'left'}}>
-            <h3 style={{fontSize:'18px',fontWeight:'700',marginBottom:'4px'}}>Free</h3>
-            <p style={{color:'#aaa',fontSize:'13px',marginBottom:'1rem'}}>Try it out, no risk</p>
-            <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'1.5rem',letterSpacing:'-1px'}}>$0</p>
+            <h3 style={{fontSize:'18px',fontWeight:'700',marginBottom:'4px'}}>Free Trial</h3>
+            <p style={{color:'#aaa',fontSize:'13px',marginBottom:'1rem'}}>No credit card required</p>
+            <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'4px',letterSpacing:'-1px'}}>$0</p>
+            <p style={{fontSize:'12px',color:'#bbb',marginBottom:'1.5rem'}}>24 hours of full Pro access</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
-              <li>✅ 2 free listings</li>
-              <li>✅ 3 free rewrites</li>
+              <li>✅ 24 hours of Pro access</li>
+              <li>✅ 2 listings included</li>
               <li>✅ All 11 copy formats</li>
-              <li>✅ No credit card required</li>
+              <li>✅ All AI assistant tools</li>
+              <li>✅ No credit card needed</li>
             </ul>
             <a href="/signup" onClick={() => trackCTAClick('pricing_free_cta', 'homepage')}
               style={{display:'block',textAlign:'center',padding:'11px',borderRadius:'8px',border:'1px solid #ddd',color:'#333',textDecoration:'none',fontSize:'14px',fontWeight:'500'}}>
-              Start for free
+              Start free trial
             </a>
           </div>
-          <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'2px solid #1D9E75',textAlign:'left',position:'relative',boxShadow:'0 8px 32px rgba(29,158,117,0.12)'}}>
-            <div style={{position:'absolute',top:'-13px',left:'50%',transform:'translateX(-50%)',background:'#1D9E75',color:'#fff',fontSize:'11px',fontWeight:'700',padding:'4px 14px',borderRadius:'20px',whiteSpace:'nowrap'}}>
+          <div style={{background:'#1D9E75',borderRadius:'16px',padding:'2rem',textAlign:'left',color:'#fff',position:'relative',boxShadow:'0 8px 32px rgba(29,158,117,0.25)'}}>
+            <div style={{position:'absolute',top:'-13px',left:'50%',transform:'translateX(-50%)',background:'#d4af37',color:'#000',fontSize:'11px',fontWeight:'700',padding:'4px 14px',borderRadius:'20px',whiteSpace:'nowrap'}}>
               MOST POPULAR
             </div>
-            <h3 style={{fontSize:'18px',fontWeight:'700',marginBottom:'4px'}}>Pay Per Listing</h3>
-            <p style={{color:'#aaa',fontSize:'13px',marginBottom:'1rem'}}>No subscription needed.</p>
-            <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'4px',letterSpacing:'-1px'}}>$9<span style={{fontSize:'16px',fontWeight:'400',color:'#aaa'}}>/listing</span></p>
-            <p style={{fontSize:'12px',color:'#bbb',marginBottom:'1.5rem'}}>Buy as many as you need</p>
-            <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
-              <li>✅ 1 full listing generation</li>
-              <li>✅ All 11 copy formats</li>
-              <li>✅ Seller Meeting Prep</li>
-              <li>✅ Snap & Start on-site</li>
-              <li>✅ PDF flyer & MLS sheet</li>
-              <li>✅ Saved to your history</li>
-              <li>✅ Never expires</li>
-            </ul>
-            <a href="/pricing" onClick={() => trackCTAClick('pricing_ppl_cta', 'homepage')}
-              style={{display:'block',textAlign:'center',padding:'11px',borderRadius:'8px',background:'#1D9E75',color:'#fff',textDecoration:'none',fontSize:'14px',fontWeight:'700'}}>
-              Buy 1 Listing — $9
-            </a>
-          </div>
-          <div style={{background:'#1D9E75',borderRadius:'16px',padding:'2rem',textAlign:'left',color:'#fff'}}>
             <h3 style={{fontSize:'18px',fontWeight:'700',marginBottom:'4px'}}>Pro</h3>
             <p style={{color:'#a8f0d4',fontSize:'13px',marginBottom:'1rem'}}>For active agents</p>
-            <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'4px',letterSpacing:'-1px'}}>$29<span style={{fontSize:'16px',fontWeight:'400',opacity:0.7}}>/mo</span></p>
-            <p style={{fontSize:'12px',color:'#a8f0d4',marginBottom:'1.5rem'}}>Best value for 4+ listings/month</p>
+            <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'4px',letterSpacing:'-1px'}}>$20<span style={{fontSize:'16px',fontWeight:'400',opacity:0.7}}>/mo</span></p>
+            <p style={{fontSize:'12px',color:'#a8f0d4',marginBottom:'1.5rem'}}>Unlimited everything — cancel anytime</p>
             <ul style={{fontSize:'14px',color:'#e0f7ee',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ Unlimited listings</li>
               <li>✅ Unlimited rewrites</li>
               <li>✅ All 11 copy formats</li>
+              <li>✅ All AI assistant tools</li>
               <li>✅ Seller Meeting Prep</li>
               <li>✅ Snap & Start on-site</li>
               <li>✅ 7-Day Launch Kit</li>
+              <li>✅ Pricing Assistant</li>
               <li>✅ Brand voice memory</li>
               <li>✅ Priority support</li>
             </ul>
@@ -351,7 +336,7 @@ export default function Home() {
             </a>
           </div>
         </div>
-        <p style={{fontSize:'13px',color:'#bbb',marginTop:'1.5rem'}}>Use code <strong style={{color:'#1D9E75'}}>WELCOME50</strong> for 50% off your first month of Pro</p>
+        <p style={{fontSize:'13px',color:'#bbb',marginTop:'1.5rem',textAlign:'center'}}>Use code <strong style={{color:'#1D9E75'}}>WELCOME50</strong> for 50% off your first month</p>
       </section>
 
       {/* FAQ */}
@@ -359,7 +344,7 @@ export default function Home() {
         <div style={{maxWidth:'620px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'3.5rem',letterSpacing:'-0.3px'}}>Frequently asked questions</h2>
           {[
-            {q:'Is this really free to start?',a:'Yes. You get 2 full listings and 3 listing rewrites completely free — no credit card required. Each listing generates all 11 formats.'},
+            {q:'Is this really free to start?',a:'Yes. You get 24 hours of full Pro access and 2 listings completely free — no credit card required. After your trial, Pro is $20/month with unlimited listings and all features.'},
             {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, SMS, Flyer, Price Drop, and SEO copy — all from one set of notes.'},
             {q:'What is Seller Meeting Prep?',a:'Before your listing appointment, Listing Whisperer generates a complete meeting outline, talking points, questions to ask the seller, and a follow-up email — so you walk in fully prepared.'},
             {q:'What is Snap & Start?',a:'On your phone or tablet, upload property photos on-site. Our AI detects visible features, you confirm the details, and generate your first draft before you leave the property.'},
@@ -378,7 +363,7 @@ export default function Home() {
       {/* BOTTOM CTA */}
       <section style={{padding:'5rem 2rem',background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',textAlign:'center',borderTop:'1px solid #bbf0d9'}}>
         <h2 style={{fontSize:'2rem',fontWeight:'800',marginBottom:'0.75rem',letterSpacing:'-0.3px'}}>Your AI listing assistant is ready.</h2>
-        <p style={{fontSize:'15px',color:'#555',marginBottom:'2rem',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — seller prep, photo drafts, and full marketing launch. No credit card needed.</p>
+        <p style={{fontSize:'15px',color:'#555',marginBottom:'2rem',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 24 hours of full Pro access, 2 listings included. No credit card needed.</p>
         <a href="/signup" onClick={() => trackCTAClick('bottom_cta', 'homepage')}
           style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'16px 40px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 24px rgba(29,158,117,0.35)'}}>
           Get Started Free →
