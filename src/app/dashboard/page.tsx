@@ -33,6 +33,10 @@ export default function Dashboard() {
   const [showReferralBanner, setShowReferralBanner] = useState(false)
   const [dueReminders, setDueReminders] = useState<any[]>([])
   const [showReminderPopup, setShowReminderPopup] = useState(false)
+  const [showChat, setShowChat] = useState(false)
+  const [chatMessages, setChatMessages] = useState<{role:string,content:string}[]>([])
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', sqft: '', price: '',
@@ -83,7 +87,6 @@ export default function Dashboard() {
       if (listings) setPastListings(listings)
       if (upgraded) setPlan('pro')
 
-      // Check for due reminders
       const checkReminders = async () => {
         const { data: reminders } = await supabase
           .from('reminders')
@@ -135,6 +138,29 @@ export default function Dashboard() {
       }
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
+  }
+
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || chatLoading) return
+    const userMessage = { role: 'user', content: chatInput }
+    const updatedMessages = [...chatMessages, userMessage]
+    setChatMessages(updatedMessages)
+    setChatInput('')
+    setChatLoading(true)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: updatedMessages })
+      })
+      const data = await res.json()
+      if (data.message) {
+        setChatMessages([...updatedMessages, { role: 'assistant', content: data.message }])
+      }
+    } catch(e: any) {
+      setChatMessages([...updatedMessages, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
+    }
+    setChatLoading(false)
   }
 
   const handleCopy = (key: string, text: string) => {
@@ -247,7 +273,6 @@ export default function Dashboard() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = userName ? userName.split(' ')[0] : ''
 
-  // HOME SCREEN BUCKETS
   const buckets = [
     {
       label: 'WIN THE LISTING',
@@ -291,7 +316,6 @@ export default function Dashboard() {
   return (
     <div style={styles.page}>
 
-      {/* SIDEBAR OVERLAY */}
       {sidebarOpen && (
         <div onClick={() => setSidebarOpen(false)}
           style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.75)',zIndex:199}}/>
@@ -299,7 +323,6 @@ export default function Dashboard() {
 
       {/* SIDEBAR */}
       <div style={styles.sidebar}>
-        {/* LOGO */}
         <div style={{padding:'1.5rem 1.25rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <div>
@@ -321,7 +344,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* NAV */}
         <div style={{flex:1,overflowY:'auto' as const,padding:'0.75rem 0'}}>
           {navItems.map(item => (
             <button key={item.key}
@@ -363,7 +385,6 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* SIDEBAR BOTTOM */}
         <div style={{padding:'1rem 1.25rem',borderTop:'1px solid rgba(255,255,255,0.04)'}}>
           {plan === 'starter' && (
             <a href="/pricing" onClick={() => trackUpgradeClick('sidebar', plan)}
@@ -375,11 +396,7 @@ export default function Dashboard() {
           )}
           {plan === 'starter' && (
             <div style={{fontSize:'10px',color:'#2a2a2a',textAlign:'center',marginBottom:'8px'}}>
-              {listingCredits > 0
-                ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining`
-                : listingsUsed < 2
-                  ? `Try free — 24 hours of Pro on us`
-                  : '⚠️ Trial ended — upgrade to continue'}
+              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : listingsUsed < 2 ? 'Try free — 24 hours of Pro on us' : '⚠️ Trial ended — upgrade to continue'}
             </div>
           )}
           <div style={{display:'flex',justifyContent:'center',gap:'10px'}}>
@@ -393,8 +410,6 @@ export default function Dashboard() {
 
       {/* MAIN */}
       <div style={styles.main}>
-
-        {/* MOBILE HEADER */}
         <div style={{background:'rgba(10,13,20,0.98)',borderBottom:'1px solid rgba(255,255,255,0.04)',padding:'0.75rem 1.25rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
           <button onClick={() => setSidebarOpen(true)}
             style={{background:'none',border:'1px solid rgba(255,255,255,0.07)',color:'#5a5f72',fontSize:'15px',cursor:'pointer',padding:'5px 10px',borderRadius:'7px'}}>
@@ -413,11 +428,9 @@ export default function Dashboard() {
 
         <div style={{padding:'2.5rem 1.5rem 3rem',flex:1,maxWidth:'860px',width:'100%',margin:'0 auto'}}>
 
-          {/* ============ HOME PAGE ============ */}
+          {/* HOME PAGE */}
           {activePage === 'home' && (
             <div>
-
-              {/* GREETING SECTION */}
               <div style={{marginBottom:'3rem'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'16px',marginBottom:'8px'}}>
                   <div>
@@ -429,7 +442,6 @@ export default function Dashboard() {
                     </p>
                   </div>
 
-                  {/* PRO BADGE */}
                   {planLoaded && plan === 'pro' && (
                     <div style={{display:'flex',alignItems:'center',gap:'10px',background:'linear-gradient(135deg,rgba(212,175,55,0.06),rgba(212,175,55,0.02))',border:'1px solid rgba(212,175,55,0.15)',borderRadius:'12px',padding:'10px 16px'}}>
                       <div style={{width:'30px',height:'30px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px',boxShadow:'0 0 12px rgba(29,158,117,0.3)'}}>✦</div>
@@ -444,7 +456,6 @@ export default function Dashboard() {
                     </div>
                   )}
 
-                  {/* FREE TRIAL BADGE */}
                   {planLoaded && plan === 'starter' && (
                     <a href="/pricing" style={{textDecoration:'none',display:'flex',alignItems:'center',gap:'10px',background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'12px',padding:'10px 14px',transition:'border-color 0.2s'}}
                       onMouseOver={e => e.currentTarget.style.borderColor='rgba(29,158,117,0.3)'}
@@ -460,18 +471,14 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* BUCKETED ACTION CARDS */}
               <div style={{display:'flex',flexDirection:'column',gap:'2.5rem',marginBottom:'3rem'}}>
                 {buckets.map((bucket, bi) => (
                   <div key={bi}>
-                    {/* BUCKET LABEL */}
                     <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'14px'}}>
                       <span style={{width:'3px',height:'14px',background:bucket.color,borderRadius:'2px',display:'inline-block',boxShadow:`0 0 8px ${bucket.color}60`}}/>
                       <p style={{fontSize:'10px',fontWeight:'700',color:bucket.color,letterSpacing:'1.5px',margin:'0',opacity:0.8}}>{bucket.label}</p>
                       <span style={{flex:1,height:'1px',background:`${bucket.color}12`,display:'inline-block'}}/>
                     </div>
-
-                    {/* CARDS */}
                     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(190px, 1fr))',gap:'10px'}}>
                       {bucket.cards.map((card: any, ci: number) => (
                         card.href ? (
@@ -500,15 +507,11 @@ export default function Dashboard() {
                 ))}
               </div>
 
-              {/* RECENT WORK */}
               {pastListings.length > 0 && (
                 <div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
                     <p style={{fontSize:'10px',fontWeight:'700',color:'#2a2a2a',letterSpacing:'1px',margin:'0'}}>RECENT WORK</p>
-                    <button onClick={() => setActivePage('history')}
-                      style={{background:'none',border:'none',color:'#333',fontSize:'11px',cursor:'pointer',padding:'0'}}>
-                      View all →
-                    </button>
+                    <button onClick={() => setActivePage('history')} style={{background:'none',border:'none',color:'#333',fontSize:'11px',cursor:'pointer',padding:'0'}}>View all →</button>
                   </div>
                   <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
                     {pastListings.slice(0, 3).map(listing => (
@@ -518,12 +521,8 @@ export default function Dashboard() {
                         onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.2)';e.currentTarget.style.background='rgba(29,158,117,0.03)'}}
                         onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.04)';e.currentTarget.style.background='rgba(255,255,255,0.015)'}}>
                         <div>
-                          <p style={{margin:'0',fontSize:'12px',fontWeight:'600',color:'#c0c0c0'}}>
-                            {listing.name || `${listing.property_type} — ${listing.neighborhood}`}
-                          </p>
-                          <p style={{margin:'2px 0 0',fontSize:'10px',color:'#2a2a2a'}}>
-                            {listing.price} · {new Date(listing.created_at).toLocaleDateString()}
-                          </p>
+                          <p style={{margin:'0',fontSize:'12px',fontWeight:'600',color:'#c0c0c0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
+                          <p style={{margin:'2px 0 0',fontSize:'10px',color:'#2a2a2a'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
                         </div>
                         <span style={{fontSize:'11px',color:'#1D9E75',fontWeight:'500'}}>View →</span>
                       </div>
@@ -534,14 +533,11 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* ============ GENERATE PAGE ============ */}
+          {/* GENERATE PAGE */}
           {activePage === 'generate' && (
             <div style={{maxWidth:'680px'}}>
               <div style={{marginBottom:'1.5rem',display:'flex',alignItems:'center',gap:'12px'}}>
-                <button onClick={() => setActivePage('home')}
-                  style={{background:'none',border:'none',color:'#444',fontSize:'13px',cursor:'pointer',padding:'0'}}>
-                  ← Home
-                </button>
+                <button onClick={() => setActivePage('home')} style={{background:'none',border:'none',color:'#444',fontSize:'13px',cursor:'pointer',padding:'0'}}>← Home</button>
                 <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>New Listing</h1>
                 <span style={{background:'rgba(29,158,117,0.15)',color:'#1D9E75',fontSize:'11px',fontWeight:'600',padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)'}}>11 formats</span>
               </div>
@@ -549,73 +545,34 @@ export default function Dashboard() {
               <div style={{...styles.card, marginBottom:'1rem'}}>
                 <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 16px',paddingBottom:'12px',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>PROPERTY DETAILS</p>
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))',gap:'12px',marginBottom:'12px'}}>
-                  <div>
-                    <label style={styles.label}>Listing name</label>
-                    <input placeholder="123 Oak Street" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={styles.input}/>
-                  </div>
-                  <div>
-                    <label style={styles.label}>Type</label>
-                    <select value={form.type} onChange={e => setForm({...form, type: e.target.value})} style={styles.select}>
-                      <option>Single family</option><option>Condo</option><option>Townhome</option><option>Luxury estate</option><option>Multi-family</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style={styles.label}>Beds / Baths</label>
-                    <input placeholder="3 bed / 2 bath" value={form.beds} onChange={e => setForm({...form, beds: e.target.value})} style={styles.input}/>
-                  </div>
-                  <div>
-                    <label style={styles.label}>Sq Ft</label>
-                    <input placeholder="1,850" value={form.sqft} onChange={e => setForm({...form, sqft: e.target.value})} style={styles.input}/>
-                  </div>
-                  <div>
-                    <label style={styles.label}>Price</label>
-                    <input placeholder="$899,000" value={form.price} onChange={e => setForm({...form, price: e.target.value})} style={styles.input}/>
-                  </div>
-                  <div>
-                    <label style={styles.label}>Neighborhood</label>
-                    <input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({...form, neighborhood: e.target.value})} style={styles.input}/>
-                  </div>
+                  <div><label style={styles.label}>Listing name</label><input placeholder="123 Oak Street" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={styles.input}/></div>
+                  <div><label style={styles.label}>Type</label><select value={form.type} onChange={e => setForm({...form, type: e.target.value})} style={styles.select}><option>Single family</option><option>Condo</option><option>Townhome</option><option>Luxury estate</option><option>Multi-family</option></select></div>
+                  <div><label style={styles.label}>Beds / Baths</label><input placeholder="3 bed / 2 bath" value={form.beds} onChange={e => setForm({...form, beds: e.target.value})} style={styles.input}/></div>
+                  <div><label style={styles.label}>Sq Ft</label><input placeholder="1,850" value={form.sqft} onChange={e => setForm({...form, sqft: e.target.value})} style={styles.input}/></div>
+                  <div><label style={styles.label}>Price</label><input placeholder="$899,000" value={form.price} onChange={e => setForm({...form, price: e.target.value})} style={styles.input}/></div>
+                  <div><label style={styles.label}>Neighborhood</label><input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({...form, neighborhood: e.target.value})} style={styles.input}/></div>
                 </div>
-
                 <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'16px',marginBottom:'12px'}}>
                   <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 12px'}}>FEATURES & MARKETING</p>
                   <label style={styles.label}>Key features</label>
                   <input placeholder="Ocean views, chef's kitchen, spa bath..." value={form.features} onChange={e => setForm({...form, features: e.target.value})} style={{...styles.input, marginBottom:'8px'}}/>
                   <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'12px'}}>
                     {["Ocean views","Chef's kitchen","Spa bath","3-car garage","Solar panels","Pool","Open floor plan","Natural light","Updated finishes","Smart home","Walk-in closet","Outdoor entertaining"].map(chip => (
-                      <button key={chip} onClick={() => {
-                        const current = form.features
-                        if (!current.toLowerCase().includes(chip.toLowerCase())) setForm({...form, features: current ? current + ', ' + chip : chip})
-                      }}
+                      <button key={chip} onClick={() => { const current = form.features; if (!current.toLowerCase().includes(chip.toLowerCase())) setForm({...form, features: current ? current + ', ' + chip : chip}) }}
                         style={{padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.08)',background:'rgba(0,0,0,0.2)',color:'#6b7280',fontSize:'11px',cursor:'pointer'}}
                         onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.color='#1D9E75'}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.08)';e.currentTarget.style.color='#6b7280'}}>
-                        + {chip}
-                      </button>
+                        onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.08)';e.currentTarget.style.color='#6b7280'}}>+ {chip}</button>
                     ))}
                   </div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
-                    <div>
-                      <label style={styles.label}>Tone</label>
-                      <select value={form.tone} onChange={e => setForm({...form, tone: e.target.value})} style={styles.select}>
-                        <option>Professional</option><option>Luxury & aspirational</option><option>Warm & inviting</option><option>Modern & minimal</option><option>Family-friendly</option><option>Investment-focused</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label style={styles.label}>Target buyer</label>
-                      <select value={form.buyer} onChange={e => setForm({...form, buyer: e.target.value})} style={styles.select}>
-                        <option>Move-up families</option><option>Luxury buyers</option><option>First-time buyers</option><option>Investors</option><option>Downsizers</option>
-                      </select>
-                    </div>
+                    <div><label style={styles.label}>Tone</label><select value={form.tone} onChange={e => setForm({...form, tone: e.target.value})} style={styles.select}><option>Professional</option><option>Luxury & aspirational</option><option>Warm & inviting</option><option>Modern & minimal</option><option>Family-friendly</option><option>Investment-focused</option></select></div>
+                    <div><label style={styles.label}>Target buyer</label><select value={form.buyer} onChange={e => setForm({...form, buyer: e.target.value})} style={styles.select}><option>Move-up families</option><option>Luxury buyers</option><option>First-time buyers</option><option>Investors</option><option>Downsizers</option></select></div>
                   </div>
                 </div>
-
                 <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'16px'}}>
                   <label style={styles.label}>Additional notes</label>
-                  <textarea placeholder="Seller story, open house date, urgency..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})}
-                    style={{...styles.input, minHeight:'60px', resize:'vertical' as const, marginBottom:'16px'}}/>
-                  <button onClick={generate} disabled={loading}
-                    style={{width:'100%',padding:'15px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 30px rgba(29,158,117,0.3)',transition:'all 0.2s'}}>
+                  <textarea placeholder="Seller story, open house date, urgency..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} style={{...styles.input, minHeight:'60px', resize:'vertical' as const, marginBottom:'16px'}}/>
+                  <button onClick={generate} disabled={loading} style={{width:'100%',padding:'15px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 30px rgba(29,158,117,0.3)',transition:'all 0.2s'}}>
                     {loading ? '⏳ Generating...' : '✨ Generate 11 Formats'}
                   </button>
                 </div>
@@ -629,9 +586,7 @@ export default function Dashboard() {
                     .skeleton { background: linear-gradient(90deg, #1a1d2e 25%, #22263a 50%, #1a1d2e 75%); background-size: 800px 100%; animation: shimmer 1.5s infinite linear; border-radius: 6px; }
                   `}</style>
                   <div style={{...styles.card, padding:'1.25rem 1.5rem', marginBottom:'1rem', display:'flex', alignItems:'center', gap:'12px'}}>
-                    <div style={{display:'flex',gap:'4px'}}>
-                      {[0,1,2].map(i => <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>)}
-                    </div>
+                    <div style={{display:'flex',gap:'4px'}}>{[0,1,2].map(i => <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>)}</div>
                     <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>{loadingSteps[loadingStep]}</p>
                     <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>{Math.round(((loadingStep + 1) / loadingSteps.length) * 100)}%</span>
                   </div>
@@ -641,34 +596,20 @@ export default function Dashboard() {
                   <div style={{background:'linear-gradient(135deg,#1e2235,#232840)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.15)',padding:'2rem',marginBottom:'1rem'}}>
                     <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'1.5rem'}}>
                       <div className="skeleton" style={{width:'42px',height:'42px',borderRadius:'10px',flexShrink:0}}/>
-                      <div style={{flex:1}}>
-                        <div className="skeleton" style={{height:'14px',width:'140px',marginBottom:'8px'}}/>
-                        <div className="skeleton" style={{height:'11px',width:'200px'}}/>
-                      </div>
+                      <div style={{flex:1}}><div className="skeleton" style={{height:'14px',width:'140px',marginBottom:'8px'}}/><div className="skeleton" style={{height:'11px',width:'200px'}}/></div>
                       <div className="skeleton" style={{width:'80px',height:'32px',borderRadius:'8px'}}/>
                     </div>
-                    <div className="skeleton" style={{height:'13px',marginBottom:'8px'}}/>
-                    <div className="skeleton" style={{height:'13px',marginBottom:'8px'}}/>
-                    <div className="skeleton" style={{height:'13px',marginBottom:'8px',width:'85%'}}/>
-                    <div className="skeleton" style={{height:'13px',width:'70%'}}/>
+                    <div className="skeleton" style={{height:'13px',marginBottom:'8px'}}/><div className="skeleton" style={{height:'13px',marginBottom:'8px'}}/><div className="skeleton" style={{height:'13px',marginBottom:'8px',width:'85%'}}/><div className="skeleton" style={{height:'13px',width:'70%'}}/>
                   </div>
                   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
                     {[1,2,3,4,5,6].map(i => (
                       <div key={i} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.06)',padding:'1.25rem'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
                           <div className="skeleton" style={{width:'32px',height:'32px',borderRadius:'8px',flexShrink:0}}/>
-                          <div style={{flex:1}}>
-                            <div className="skeleton" style={{height:'12px',width:'100px',marginBottom:'6px'}}/>
-                            <div className="skeleton" style={{height:'10px',width:'60px'}}/>
-                          </div>
+                          <div style={{flex:1}}><div className="skeleton" style={{height:'12px',width:'100px',marginBottom:'6px'}}/><div className="skeleton" style={{height:'10px',width:'60px'}}/></div>
                         </div>
-                        <div className="skeleton" style={{height:'11px',marginBottom:'6px'}}/>
-                        <div className="skeleton" style={{height:'11px',marginBottom:'6px',width:'90%'}}/>
-                        <div className="skeleton" style={{height:'11px',width:'75%',marginBottom:'14px'}}/>
-                        <div style={{display:'flex',gap:'6px'}}>
-                          <div className="skeleton" style={{height:'28px',width:'80px',borderRadius:'6px'}}/>
-                          <div className="skeleton" style={{height:'28px',width:'120px',borderRadius:'6px'}}/>
-                        </div>
+                        <div className="skeleton" style={{height:'11px',marginBottom:'6px'}}/><div className="skeleton" style={{height:'11px',marginBottom:'6px',width:'90%'}}/><div className="skeleton" style={{height:'11px',width:'75%',marginBottom:'14px'}}/>
+                        <div style={{display:'flex',gap:'6px'}}><div className="skeleton" style={{height:'28px',width:'80px',borderRadius:'6px'}}/><div className="skeleton" style={{height:'28px',width:'120px',borderRadius:'6px'}}/></div>
                       </div>
                     ))}
                   </div>
@@ -677,7 +618,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* ============ RESULTS PAGE ============ */}
+          {/* RESULTS PAGE */}
           {activePage === 'results' && outputs && (
             <div>
               {showReferralBanner && referralCode && (
@@ -690,9 +631,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
-                    <div style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>
-                      listingwhisperer.com/signup?ref={referralCode}
-                    </div>
+                    <div style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>listingwhisperer.com/signup?ref={referralCode}</div>
                     <button onClick={() => { navigator.clipboard.writeText(`https://listingwhisperer.com/signup?ref=${referralCode}`); setReferralCopied(true); setTimeout(() => setReferralCopied(false), 2000) }}
                       style={{padding:'7px 16px',borderRadius:'8px',border:'1px solid',fontSize:'12px',cursor:'pointer',fontWeight:'600',background: referralCopied ? '#1D9E75' : 'rgba(29,158,117,0.15)',color: referralCopied ? '#fff' : '#1D9E75',borderColor: referralCopied ? '#1D9E75' : 'rgba(29,158,117,0.3)'}}>
                       {referralCopied ? '✓ Copied!' : '📋 Copy Link'}
@@ -710,9 +649,7 @@ export default function Dashboard() {
                       <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Marketing Suite Ready</h1>
                       <span style={{background:'rgba(29,158,117,0.2)',color:'#1D9E75',fontSize:'11px',fontWeight:'700',padding:'4px 12px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.4)'}}>✓ 11 FORMATS</span>
                     </div>
-                    <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>
-                      {form.neighborhood || form.name || 'Your listing'}{form.price ? ` · ${form.price}` : ''} · {form.beds || ''} · {form.sqft ? `${form.sqft} sq ft` : ''}
-                    </p>
+                    <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>{form.neighborhood || form.name || 'Your listing'}{form.price ? ` · ${form.price}` : ''} · {form.beds || ''} · {form.sqft ? `${form.sqft} sq ft` : ''}</p>
                   </div>
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
                     <button onClick={() => handleDownloadPdf('mls')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
@@ -743,24 +680,10 @@ export default function Dashboard() {
               </div>
 
               {[
-                { label: 'CORE LISTING', labelColor: '#d4af37', cards: [
-                  {key:'mls_luxury', label:'Luxury MLS', icon:'✨', color:'#d4af37', desc:'Premium luxury version'},
-                  {key:'openhouse', label:'Open House', icon:'🚪', color:'#f59e0b', desc:'Open house announcement'},
-                  {key:'price_drop', label:'Price Drop', icon:'💰', color:'#ef4444', desc:'Price reduction alert'},
-                ]},
-                { label: 'SOCIAL MEDIA', labelColor: '#818cf8', cards: [
-                  {key:'instagram', label:'Instagram', icon:'📸', color:'#e1306c', platform:'instagram'},
-                  {key:'facebook', label:'Facebook Post', icon:'👥', color:'#1877f2', platform:'facebook'},
-                  {key:'video', label:'Video Script', icon:'🎬', color:'#ef4444', platform:null},
-                ]},
-                { label: 'EMAIL & OUTREACH', labelColor: '#1D9E75', cards: [
-                  {key:'email', label:'Email Blast', icon:'📧', color:'#1D9E75'},
-                  {key:'text_message', label:'SMS / Text', icon:'📱', color:'#10b981'},
-                  {key:'seo', label:'SEO Copy', icon:'🔍', color:'#8b5cf6'},
-                ]},
-                { label: 'PRINT & FLYER', labelColor: '#f97316', cards: [
-                  {key:'flyer', label:'Flyer Copy', icon:'📄', color:'#f97316'},
-                ]},
+                { label: 'CORE LISTING', labelColor: '#d4af37', cards: [{key:'mls_luxury',label:'Luxury MLS',icon:'✨',color:'#d4af37',desc:'Premium luxury version'},{key:'openhouse',label:'Open House',icon:'🚪',color:'#f59e0b',desc:'Open house announcement'},{key:'price_drop',label:'Price Drop',icon:'💰',color:'#ef4444',desc:'Price reduction alert'}]},
+                { label: 'SOCIAL MEDIA', labelColor: '#818cf8', cards: [{key:'instagram',label:'Instagram',icon:'📸',color:'#e1306c',platform:'instagram'},{key:'facebook',label:'Facebook Post',icon:'👥',color:'#1877f2',platform:'facebook'},{key:'video',label:'Video Script',icon:'🎬',color:'#ef4444',platform:null}]},
+                { label: 'EMAIL & OUTREACH', labelColor: '#1D9E75', cards: [{key:'email',label:'Email Blast',icon:'📧',color:'#1D9E75'},{key:'text_message',label:'SMS / Text',icon:'📱',color:'#10b981'},{key:'seo',label:'SEO Copy',icon:'🔍',color:'#8b5cf6'}]},
+                { label: 'PRINT & FLYER', labelColor: '#f97316', cards: [{key:'flyer',label:'Flyer Copy',icon:'📄',color:'#f97316'}]},
               ].map(section => (
                 <div key={section.label} style={{marginBottom:'1.5rem'}}>
                   <p style={{fontSize:'11px',fontWeight:'700',color:section.labelColor,letterSpacing:'1.5px',margin:'0 0 12px',display:'flex',alignItems:'center',gap:'8px'}}>
@@ -791,21 +714,9 @@ export default function Dashboard() {
                             style={{padding:'5px 12px',borderRadius:'6px',border:`1px solid ${card.color}30`,fontSize:'11px',cursor:'pointer',background: featuredKey === card.key ? card.color : `${card.color}10`,color: featuredKey === card.key ? '#fff' : card.color,fontWeight:'500'}}>
                             {featuredKey === card.key ? '✓ Previewing' : '↑ Set as Main Preview'}
                           </button>
-                          {card.platform === 'facebook' && (
-                            <>
-                              <button onClick={() => handleShare('facebook', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2'}}>Facebook</button>
-                              <button onClick={() => handleShare('linkedin', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(10,102,194,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(10,102,194,0.1)',color:'#0a66c2'}}>LinkedIn</button>
-                            </>
-                          )}
-                          {card.platform === 'instagram' && (
-                            <div>
-                              <button onClick={() => handleCopy(card.key+'_ig', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(225,48,108,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(225,48,108,0.1)',color:'#e1306c'}}>Copy for Instagram</button>
-                              <p style={{fontSize:'10px',color:'#444',margin:'3px 0 0'}}>Instagram requires manual posting</p>
-                            </div>
-                          )}
-                          {card.key === 'flyer' && (
-                            <button onClick={() => handleDownloadPdf('flyer')} style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(249,115,22,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(249,115,22,0.1)',color:'#f97316',fontWeight:'500'}}>📥 Download PDF</button>
-                          )}
+                          {card.platform === 'facebook' && (<><button onClick={() => handleShare('facebook', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2'}}>Facebook</button><button onClick={() => handleShare('linkedin', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(10,102,194,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(10,102,194,0.1)',color:'#0a66c2'}}>LinkedIn</button></>)}
+                          {card.platform === 'instagram' && (<div><button onClick={() => handleCopy(card.key+'_ig', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(225,48,108,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(225,48,108,0.1)',color:'#e1306c'}}>Copy for Instagram</button><p style={{fontSize:'10px',color:'#444',margin:'3px 0 0'}}>Instagram requires manual posting</p></div>)}
+                          {card.key === 'flyer' && (<button onClick={() => handleDownloadPdf('flyer')} style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(249,115,22,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(249,115,22,0.1)',color:'#f97316',fontWeight:'500'}}>📥 Download PDF</button>)}
                         </div>
                       </div>
                     ))}
@@ -826,7 +737,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* ============ HISTORY PAGE ============ */}
+          {/* HISTORY PAGE */}
           {activePage === 'history' && (
             <div style={{maxWidth:'760px'}}>
               <div style={{marginBottom:'1.5rem'}}>
@@ -844,8 +755,7 @@ export default function Dashboard() {
                     <div key={listing.id} style={{...styles.card}}
                       onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
                       onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}}
-                        onClick={() => { setOutputs(listing.outputs); setActivePage('results') }}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}} onClick={() => { setOutputs(listing.outputs); setActivePage('results') }}>
                         <div>
                           <p style={{margin:'0',fontSize:'14px',fontWeight:'600',color:'#f0f0f0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
                           <p style={{margin:'4px 0 0',fontSize:'12px',color:'#8b8fa8'}}>{listing.beds_baths} · {listing.sqft} sq ft · {listing.price}</p>
@@ -871,56 +781,97 @@ export default function Dashboard() {
       {/* REMINDER POPUP */}
       {showReminderPopup && dueReminders.length > 0 && (
         <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.9)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
-          <div style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.4)',padding:'2.5rem',maxWidth:'500px',width:'100%',boxShadow:'0 0 80px rgba(212,175,55,0.15)',position:'relative'}}>
+          <div style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.4)',padding:'2.5rem',maxWidth:'500px',width:'100%',boxShadow:'0 0 80px rgba(212,175,55,0.15)'}}>
             <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'1.5rem'}}>
               <div style={{width:'44px',height:'44px',borderRadius:'12px',background:'rgba(212,175,55,0.15)',border:'1px solid rgba(212,175,55,0.3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',flexShrink:0}}>⏰</div>
               <div>
-                <h2 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 4px'}}>
-                  You have {dueReminders.length} reminder{dueReminders.length > 1 ? 's' : ''} due
-                </h2>
+                <h2 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 4px'}}>You have {dueReminders.length} reminder{dueReminders.length > 1 ? 's' : ''} due</h2>
                 <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>Take care of these before you get started</p>
               </div>
             </div>
-
             <div style={{display:'flex',flexDirection:'column',gap:'10px',marginBottom:'1.5rem'}}>
               {dueReminders.map(reminder => (
                 <div key={reminder.id} style={{background:'rgba(0,0,0,0.25)',borderRadius:'12px',border:'1px solid rgba(212,175,55,0.15)',padding:'1rem 1.25rem'}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'8px'}}>
-                    <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>
-                      {reminder.contact_name || 'Follow up'}
-                    </p>
-                    <span style={{fontSize:'11px',color:'#d4af37',background:'rgba(212,175,55,0.1)',padding:'2px 8px',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.2)',whiteSpace:'nowrap',marginLeft:'8px'}}>
-                      {new Date(reminder.remind_at).toLocaleString()}
-                    </span>
+                    <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>{reminder.contact_name || 'Follow up'}</p>
+                    <span style={{fontSize:'11px',color:'#d4af37',background:'rgba(212,175,55,0.1)',padding:'2px 8px',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.2)',whiteSpace:'nowrap',marginLeft:'8px'}}>{new Date(reminder.remind_at).toLocaleString()}</span>
                   </div>
-                  <p style={{fontSize:'12px',color:'#8b8fa8',margin:'0 0 10px',lineHeight:'1.6',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical' as const,overflow:'hidden'}}>
-                    {reminder.content}
-                  </p>
-                  <button
-                    onClick={async () => {
-                      await supabase.from('reminders').update({sent: true}).eq('id', reminder.id)
-                      const remaining = dueReminders.filter(r => r.id !== reminder.id)
-                      setDueReminders(remaining)
-                      if (remaining.length === 0) setShowReminderPopup(false)
-                    }}
-                    style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(29,158,117,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(29,158,117,0.1)',color:'#1D9E75',fontWeight:'600'}}>
-                    ✓ Mark as Done
-                  </button>
+                  <p style={{fontSize:'12px',color:'#8b8fa8',margin:'0 0 10px',lineHeight:'1.6',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical' as const,overflow:'hidden'}}>{reminder.content}</p>
+                  <button onClick={async () => { await supabase.from('reminders').update({sent: true}).eq('id', reminder.id); const remaining = dueReminders.filter(r => r.id !== reminder.id); setDueReminders(remaining); if (remaining.length === 0) setShowReminderPopup(false) }}
+                    style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(29,158,117,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(29,158,117,0.1)',color:'#1D9E75',fontWeight:'600'}}>✓ Mark as Done</button>
                 </div>
               ))}
             </div>
-
-            <button
-              onClick={() => setShowReminderPopup(false)}
-              style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,#d4af37,#a08040)',color:'#000',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>
-              Dismiss All & Continue
-            </button>
-            <p style={{fontSize:'11px',color:'#444',textAlign:'center',marginTop:'10px',margin:'10px 0 0'}}>
-              Dismissed reminders are marked as done and won't show again
-            </p>
+            <button onClick={() => setShowReminderPopup(false)} style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,#d4af37,#a08040)',color:'#000',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>Dismiss All & Continue</button>
+            <p style={{fontSize:'11px',color:'#444',textAlign:'center',margin:'10px 0 0'}}>Dismissed reminders are marked as done and won't show again</p>
           </div>
         </div>
       )}
+
+      {/* CHAT WIDGET */}
+      <div style={{position:'fixed',bottom:'24px',right:'24px',zIndex:1500}}>
+        {showChat && (
+          <div style={{position:'absolute',bottom:'70px',right:'0',width:'360px',height:'500px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+            <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>✦</div>
+                <div>
+                  <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Listing Whisperer AI</p>
+                  <p style={{fontSize:'10px',color:'#1D9E75',margin:'0'}}>Real estate assistant</p>
+                </div>
+              </div>
+              <button onClick={() => setShowChat(false)} style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
+            </div>
+            <div style={{flex:1,overflowY:'auto',padding:'1rem',display:'flex',flexDirection:'column',gap:'10px'}}>
+              {chatMessages.length === 0 && (
+                <div style={{textAlign:'center',padding:'2rem 1rem'}}>
+                  <div style={{fontSize:'2rem',marginBottom:'8px'}}>✦</div>
+                  <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 6px'}}>How can I help you?</p>
+                  <p style={{fontSize:'12px',color:'#5a5f72',margin:'0 0 1.5rem'}}>Ask me anything about real estate or how to use Listing Whisperer</p>
+                  <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                    {['How do I use Snap & Start?','How should I price this listing?','What is the 7-Day Launch Kit?','How do I handle a lowball offer?'].map(q => (
+                      <button key={q} onClick={() => setChatInput(q)}
+                        style={{padding:'8px 12px',background:'rgba(29,158,117,0.08)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'8px',color:'#8b8fa8',fontSize:'11px',cursor:'pointer',textAlign:'left',transition:'all 0.15s'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.4)';e.currentTarget.style.color='#1D9E75'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.15)';e.currentTarget.style.color='#8b8fa8'}}>
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {chatMessages.map((msg, i) => (
+                <div key={i} style={{display:'flex',justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'}}>
+                  <div style={{maxWidth:'85%',padding:'10px 14px',borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',background: msg.role === 'user' ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',border: msg.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.07)',fontSize:'13px',lineHeight:'1.6',color:'#f0f0f0',whiteSpace:'pre-wrap'}}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              {chatLoading && (
+                <div style={{display:'flex',justifyContent:'flex-start'}}>
+                  <div style={{padding:'10px 14px',borderRadius:'14px 14px 14px 4px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.07)',display:'flex',gap:'4px',alignItems:'center'}}>
+                    {[0,1,2].map(i => <div key={i} style={{width:'6px',height:'6px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>)}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div style={{padding:'0.875rem',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',gap:'8px'}}>
+              <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChatMessage()} placeholder="Ask anything..."
+                style={{flex:1,padding:'10px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',fontSize:'13px',color:'#f0f0f0',outline:'none'}}/>
+              <button onClick={sendChatMessage} disabled={chatLoading || !chatInput.trim()}
+                style={{width:'40px',height:'40px',borderRadius:'10px',background: chatInput.trim() ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',border:'none',color:'#fff',fontSize:'16px',cursor: chatInput.trim() ? 'pointer' : 'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                ↑
+              </button>
+            </div>
+          </div>
+        )}
+        <button onClick={() => setShowChat(!showChat)}
+          style={{width:'56px',height:'56px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'none',color:'#fff',fontSize:'24px',cursor:'pointer',boxShadow:'0 4px 20px rgba(29,158,117,0.4)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s'}}
+          onMouseOver={e => e.currentTarget.style.transform='scale(1.1)'}
+          onMouseOut={e => e.currentTarget.style.transform='scale(1)'}>
+          {showChat ? '✕' : '✦'}
+        </button>
+      </div>
 
       {/* UPGRADE MODAL */}
       {showUpgradeModal && (
