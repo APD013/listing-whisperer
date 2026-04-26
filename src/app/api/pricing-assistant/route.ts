@@ -34,7 +34,7 @@ Generate a comprehensive pricing strategy report for the agent. Return ONLY a va
 Be specific, professional, and genuinely useful for a real estate agent. Do not include any text outside the JSON object.`
 
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }]
     })
