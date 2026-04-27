@@ -78,10 +78,10 @@ export default function SignupPage() {
             </p>
             <div style={{background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.2)',borderRadius:'10px',padding:'1rem',marginBottom:'1.5rem'}}>
               <p style={{fontSize:'12px',color:'#1D9E75',margin:'0',lineHeight:'1.8'}}>
-                ✓ 2 free listings included<br/>
-                ✓ 11 copy formats per listing<br/>
-                ✓ Seller Meeting Prep<br/>
-                ✓ Snap & Start on-site drafts
+                ✓ 24 hours of full Pro access<br/>
+                ✓ 2 listings included in your trial<br/>
+                ✓ All AI assistant tools unlocked<br/>
+                ✓ No credit card required
                 {refCode && <><br/>✓ <strong>Referral bonus — 24 hours of Pro free!</strong></>}
               </p>
             </div>
@@ -93,11 +93,11 @@ export default function SignupPage() {
           <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.07)',padding:'2rem',boxShadow:'0 24px 48px rgba(0,0,0,0.4)'}}>
 
             <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>Create your account</h1>
-            <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'1.5rem'}}>Free to start · No credit card required</p>
+            <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'1.5rem'}}>24 hours of Pro free · No credit card required</p>
 
             {/* FEATURE PILLS */}
             <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'1.5rem'}}>
-              {['2 free listings','11 formats','Seller prep','Snap & Start'].map(f => (
+              {['24hr Pro trial','2 listings free','All AI tools','No credit card'].map(f => (
                 <span key={f} style={{fontSize:'11px',background:'rgba(29,158,117,0.1)',color:'#1D9E75',padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.2)'}}>✓ {f}</span>
               ))}
             </div>
