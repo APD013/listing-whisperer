@@ -511,7 +511,7 @@ export default function Dashboard() {
               {pastListings.length > 0 && (
                 <div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
-                    <p style={{fontSize:'10px',fontWeight:'700',color:'#2a2a2a',letterSpacing:'1px',margin:'0'}}>RECENT WORK</p>
+                    <p style={{fontSize:'10px',fontWeight:'700',color:'#6b7280',letterSpacing:'1px',margin:'0'}}>RECENT WORK</p>
                     <button onClick={() => setActivePage('history')} style={{background:'none',border:'none',color:'#333',fontSize:'11px',cursor:'pointer',padding:'0'}}>View all →</button>
                   </div>
                   <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
@@ -522,8 +522,8 @@ export default function Dashboard() {
                         onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.2)';e.currentTarget.style.background='rgba(29,158,117,0.03)'}}
                         onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.04)';e.currentTarget.style.background='rgba(255,255,255,0.015)'}}>
                         <div>
-                          <p style={{margin:'0',fontSize:'12px',fontWeight:'600',color:'#c0c0c0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
-                          <p style={{margin:'2px 0 0',fontSize:'10px',color:'#2a2a2a'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
+                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'#e0e0e0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
+                          <p style={{margin:'2px 0 0',fontSize:'11px',color:'#4a4f62'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
                         </div>
                         <span style={{fontSize:'11px',color:'#1D9E75',fontWeight:'500'}}>View →</span>
                       </div>
@@ -650,7 +650,21 @@ export default function Dashboard() {
                       <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Marketing Suite Ready</h1>
                       <span style={{background:'rgba(29,158,117,0.2)',color:'#1D9E75',fontSize:'11px',fontWeight:'700',padding:'4px 12px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.4)'}}>✓ 11 FORMATS</span>
                     </div>
-                    <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>{form.neighborhood || form.name || 'Your listing'}{form.price ? ` · ${form.price}` : ''} · {form.beds || ''} · {form.sqft ? `${form.sqft} sq ft` : ''}</p>
+                    <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>
+                      <input
+                        placeholder="Name this listing..."
+                        defaultValue={form.name || form.neighborhood || ''}
+                        onBlur={async (e) => {
+                          setForm({...form, name: e.target.value})
+                          if (outputs && userId) {
+                            const { data: listings } = await supabase.from('listings').select('id').eq('user_id', userId).order('created_at', { ascending: false }).limit(1)
+                            if (listings && listings[0]) await supabase.from('listings').update({ name: e.target.value }).eq('id', listings[0].id)
+                          }
+                        }}
+                        style={{background:'transparent',border:'none',borderBottom:'1px solid rgba(255,255,255,0.1)',color:'#8b8fa8',fontSize:'14px',outline:'none',width:'200px',padding:'2px 4px'}}
+                      />
+                      {form.price ? ` · ${form.price}` : ''} · {form.beds || ''} · {form.sqft ? `${form.sqft} sq ft` : ''}
+                    </p>
                   </div>
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
                     <button onClick={() => handleDownloadPdf('mls')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
