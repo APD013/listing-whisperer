@@ -52,7 +52,7 @@ export default function LoginPage() {
         </div>
 
         {/* CARD */}
-        <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.07)',padding:'2rem',boxShadow:'0 24px 48px rgba(0,0,0,0.4)'}}>
+        <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.2)',padding:'2rem',boxShadow:'0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(29,158,117,0.05), 0 0 40px rgba(29,158,117,0.06)'}}>
           
           <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>Welcome back</h1>
           <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'1.5rem'}}>Sign in to your workspace</p>
@@ -70,7 +70,10 @@ export default function LoginPage() {
           </div>
 
           <div style={{marginBottom:'1.5rem'}}>
-            <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Password</label>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'5px'}}>
+              <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',letterSpacing:'0.5px',textTransform:'uppercase'}}>Password</label>
+              <a href="/forgot-password" style={{fontSize:'11px',color:'#1D9E75',textDecoration:'none',fontWeight:'500'}}>Forgot password?</a>
+            </div>
             <input
               type="password"
               placeholder="••••••••"
@@ -103,7 +106,7 @@ export default function LoginPage() {
         {/* FOOTER */}
         <div style={{textAlign:'center',marginTop:'1.5rem'}}>
           <p style={{fontSize:'12px',color:'#444'}}>
-            No credit card required · 2 free listings to start
+            🔒 Secure login · No credit card required · 24hr free trial
           </p>
         </div>
       </div>
