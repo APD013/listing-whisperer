@@ -264,8 +264,8 @@ export default function Dashboard() {
   ]
 
   const styles = {
-    page: { minHeight: '100vh', background: '#0d1117', fontFamily: "'Inter', sans-serif", display: 'flex' as const },
-    sidebar: { width: '210px', background: '#0a0d14', borderRight: '1px solid rgba(255,255,255,0.04)', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-210px)' },
+    page: { minHeight: '100vh', background: '#111318', fontFamily: "'Inter', sans-serif", display: 'flex' as const },
+    sidebar: { width: '210px', background: '#0d1018', borderRight: '1px solid rgba(255,255,255,0.04)', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-210px)' },
     main: { flex: 1, minHeight: '100vh', display: 'flex' as const, flexDirection: 'column' as const },
     card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' },
     input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
@@ -423,7 +423,7 @@ export default function Dashboard() {
           <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0'}}>
             Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
             {planLoaded && plan === 'pro' && (
-              <span style={{marginLeft:'5px',fontSize:'10px',fontWeight:'700',color:'#d4af37',verticalAlign:'middle'}}>Pro</span>
+              <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
             )}
           </div>
           <a href="/pricing" style={{fontSize:'11px',color: plan === 'pro' ? '#d4af37' : '#444',textDecoration:'none',fontWeight:'600'}}>
