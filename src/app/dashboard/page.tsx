@@ -656,6 +656,7 @@ export default function Dashboard() {
                     </div>
                     <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>
                       <input
+                        key={currentListingId || 'new'}
                         placeholder="Name this listing..."
                         defaultValue={form.name || form.neighborhood || ''}
                         onBlur={async (e) => {
