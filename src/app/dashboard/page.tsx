@@ -34,6 +34,7 @@ export default function Dashboard() {
   const [dueReminders, setDueReminders] = useState<any[]>([])
   const [showReminderPopup, setShowReminderPopup] = useState(false)
   const [showChat, setShowChat] = useState(false)
+  const [currentListingId, setCurrentListingId] = useState<string | null>(null)
   const [chatMessages, setChatMessages] = useState<{role:string,content:string}[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
@@ -517,7 +518,7 @@ export default function Dashboard() {
                   <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
                     {pastListings.slice(0, 3).map(listing => (
                       <div key={listing.id}
-                        onClick={() => { setOutputs(listing.outputs); setActivePage('results') }}
+                        onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setActivePage('results') }}
                         style={{background:'rgba(255,255,255,0.015)',borderRadius:'9px',border:'1px solid rgba(255,255,255,0.04)',padding:'0.8rem 1rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all 0.15s'}}
                         onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.2)';e.currentTarget.style.background='rgba(29,158,117,0.03)'}}
                         onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.04)';e.currentTarget.style.background='rgba(255,255,255,0.015)'}}>
@@ -656,9 +657,9 @@ export default function Dashboard() {
                         defaultValue={form.name || form.neighborhood || ''}
                         onBlur={async (e) => {
                           setForm({...form, name: e.target.value})
-                          if (outputs && userId) {
-                            const { data: listings } = await supabase.from('listings').select('id').eq('user_id', userId).order('created_at', { ascending: false }).limit(1)
-                            if (listings && listings[0]) await supabase.from('listings').update({ name: e.target.value }).eq('id', listings[0].id)
+                          if (outputs && userId && currentListingId) {
+                            await supabase.from('listings').update({ name: e.target.value }).eq('id', currentListingId)
+                            setPastListings(prev => prev.map(l => l.id === currentListingId ? {...l, name: e.target.value} : l))
                           }
                         }}
                         style={{background:'transparent',border:'none',borderBottom:'1px solid rgba(255,255,255,0.1)',color:'#8b8fa8',fontSize:'14px',outline:'none',width:'200px',padding:'2px 4px'}}
@@ -778,7 +779,7 @@ export default function Dashboard() {
                     <div key={listing.id} style={{...styles.card}}
                       onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
                       onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}} onClick={() => { setOutputs(listing.outputs); setActivePage('results') }}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}} onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setActivePage('results') }}>
                         <div>
                           <p style={{margin:'0',fontSize:'14px',fontWeight:'600',color:'#f0f0f0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
                           <p style={{margin:'4px 0 0',fontSize:'12px',color:'#8b8fa8'}}>{listing.beds_baths} · {listing.sqft} sq ft · {listing.price}</p>
