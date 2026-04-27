@@ -170,8 +170,15 @@ export default function TermsOfService() {
               </p>
             </div>
 
+            <div id="governing" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>13. Governing Law</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                These Terms shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be resolved exclusively in the state or federal courts located in Orange County, California. You consent to the personal jurisdiction of such courts.
+              </p>
+            </div>
+
             <div id="contact" style={{...styles.card}}>
-              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>13. Contact</h2>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 14px'}}>14. Contact</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 If you have any questions about these Terms, please contact us at:<br/><br/>
                 <strong style={{color:'#f0f0f0'}}>Listing Whisperer</strong><br/>
