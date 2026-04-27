@@ -82,7 +82,7 @@ export default function SignupPage() {
                 ✓ 11 copy formats per listing<br/>
                 ✓ Seller Meeting Prep<br/>
                 ✓ Snap & Start on-site drafts
-                {refCode && <><br/>✓ <strong>+1 bonus listing credit from referral!</strong></>}
+                {refCode && <><br/>✓ <strong>Referral bonus — 24 hours of Pro free!</strong></>}
               </p>
             </div>
             <a href="/login" style={{display:'block',padding:'12px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>
