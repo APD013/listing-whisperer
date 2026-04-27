@@ -626,8 +626,8 @@ export default function Dashboard() {
                   <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                     <span style={{fontSize:'1.5rem'}}>🎁</span>
                     <div>
-                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share with a fellow agent — you both get a free listing!</p>
-                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get a free trial · You get 1 listing credit</p>
+                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share with a fellow agent — they get 24 hours of Pro free!</p>
+                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 24 hours of full Pro access · You get 1 listing credit</p>
                     </div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
@@ -671,10 +671,18 @@ export default function Dashboard() {
                       <span style={{fontSize:'11px',color:'#6b7280'}}>Primary listing copy — MLS ready</span>
                     </div>
                   </div>
-                  <button onClick={() => handleCopy(featuredKey, outputs[featuredKey] || '')}
-                    style={{padding:'8px 20px',borderRadius:'8px',border:'1px solid',fontSize:'13px',cursor:'pointer',fontWeight:'600',background: copied === featuredKey ? '#d4af37' : 'rgba(212,175,55,0.1)',color: copied === featuredKey ? '#000' : '#d4af37',borderColor: copied === featuredKey ? '#d4af37' : 'rgba(212,175,55,0.3)'}}>
-                    {copied === featuredKey ? '✓ Copied!' : '📋 Copy'}
-                  </button>
+                  <div style={{display:'flex',gap:'8px'}}>
+                    {featuredKey !== 'mls_standard' && (
+                      <button onClick={() => setFeaturedKey('mls_standard')}
+                        style={{padding:'8px 16px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.1)',fontSize:'12px',cursor:'pointer',fontWeight:'500',background:'rgba(255,255,255,0.05)',color:'#6b7280'}}>
+                        ↩ Reset
+                      </button>
+                    )}
+                    <button onClick={() => handleCopy(featuredKey, outputs[featuredKey] || '')}
+                      style={{padding:'8px 20px',borderRadius:'8px',border:'1px solid',fontSize:'13px',cursor:'pointer',fontWeight:'600',background: copied === featuredKey ? '#d4af37' : 'rgba(212,175,55,0.1)',color: copied === featuredKey ? '#000' : '#d4af37',borderColor: copied === featuredKey ? '#d4af37' : 'rgba(212,175,55,0.3)'}}>
+                      {copied === featuredKey ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                  </div>
                 </div>
                 <p style={{fontSize:'15px',lineHeight:'1.9',color:'#e8e8e8',margin:'0',borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'1rem',whiteSpace:'pre-wrap'}}>{outputs[featuredKey] || ''}</p>
               </div>
