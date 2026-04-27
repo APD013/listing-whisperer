@@ -18,7 +18,7 @@ Open House Details:
 - Agent Name: ${form.agentName || 'Your Agent'}
 - Agent Phone: ${form.phone || ''}
 
-Use ALL the specific details above in every output. Do not use placeholder text.
+CRITICAL: You MUST use the exact agent name and phone number provided above in every single output. Never write "Your Agent", "Contact Agent", or any placeholder. If agent name is provided, use it exactly. Same for phone number.
 
 Respond ONLY with valid JSON. All string values must be on a single line with no newline characters. Use \\n for line breaks within strings.
 
