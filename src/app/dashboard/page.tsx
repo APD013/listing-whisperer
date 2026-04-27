@@ -660,10 +660,11 @@ export default function Dashboard() {
                         placeholder="Name this listing..."
                         defaultValue={form.name || form.neighborhood || ''}
                         onBlur={async (e) => {
-                          setForm({...form, name: e.target.value})
-                          if (outputs && userId && currentListingId) {
-                            await supabase.from('listings').update({ name: e.target.value }).eq('id', currentListingId)
-                            setPastListings(prev => prev.map(l => l.id === currentListingId ? {...l, name: e.target.value} : l))
+                          const newName = e.target.value
+                          setForm(prev => ({...prev, name: newName}))
+                          if (userId && currentListingId && newName) {
+                            await supabase.from('listings').update({ name: newName }).eq('id', currentListingId)
+                            setPastListings(prev => prev.map(l => l.id === currentListingId ? {...l, name: newName} : l))
                           }
                         }}
                         style={{background:'transparent',border:'none',borderBottom:'1px solid rgba(255,255,255,0.1)',color:'#8b8fa8',fontSize:'14px',outline:'none',width:'200px',padding:'2px 4px'}}
