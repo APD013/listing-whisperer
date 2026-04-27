@@ -309,6 +309,7 @@ export default function Dashboard() {
       cards: [
         { icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline and contacts', color: '#10b981', href: '/leads' },
         { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up' },
+        { icon: '💰', title: 'Seller Net Sheet', desc: 'Estimate seller proceeds before closing', color: '#1D9E75', href: '/seller-net-sheet' },
       ]
     },
   ]
@@ -626,8 +627,8 @@ export default function Dashboard() {
                   <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                     <span style={{fontSize:'1.5rem'}}>🎁</span>
                     <div>
-                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share with a fellow agent — they get 24 hours of Pro free!</p>
-                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 24 hours of full Pro access · You get 1 listing credit</p>
+                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share Listing Whisperer — you both get a reward!</p>
+                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 24 hours of Pro free · You get 25% off your next month</p>
                     </div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
