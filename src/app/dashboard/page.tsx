@@ -135,7 +135,10 @@ export default function Dashboard() {
         const { data: listings } = await supabase
           .from('listings').select('*').eq('user_id', userId)
           .order('created_at', { ascending: false }).limit(10)
-        if (listings) setPastListings(listings)
+        if (listings) {
+          setPastListings(listings)
+          if (listings[0]) setCurrentListingId(listings[0].id)
+        }
       }
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
