@@ -55,6 +55,16 @@ export default function SellerNetSheetPage() {
 
   return (
     <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
+      <style>{`
+        @media print {
+          body { background: white !important; }
+          nav, .no-print { display: none !important; }
+          main { background: white !important; }
+          * { color: black !important; border-color: #ddd !important; background: white !important; box-shadow: none !important; }
+          .print-green { color: #1D9E75 !important; }
+          .print-red { color: #dc2626 !important; }
+        }
+      `}</style>
 
       <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
