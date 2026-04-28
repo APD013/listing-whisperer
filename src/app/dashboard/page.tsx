@@ -379,6 +379,7 @@ export default function Dashboard() {
             { href: '/launch-kit', icon: '🚀', label: 'Launch Plan' },
             { href: '/leads', icon: '👥', label: 'Leads & Clients' },
             { href: '/photos', icon: '🖼️', label: 'Photo Library' },
+            { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
             { href: '/settings', icon: '⚙️', label: 'Settings' },
           ].map(item => (
             <a key={item.href} href={item.href}
@@ -493,7 +494,7 @@ export default function Dashboard() {
                             onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.05)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
                             <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
                             <div style={{fontSize:'13px',fontWeight:'700',color:'#e0e0e0',marginBottom:'3px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color:'#3a3f52',lineHeight:'1.5'}}>{card.desc}</div>
+                            <div style={{fontSize:'11px',color:'#6b7280',lineHeight:'1.5'}}>{card.desc}</div>
                           </a>
                         ) : (
                           <div key={ci} onClick={card.action}
@@ -502,7 +503,7 @@ export default function Dashboard() {
                             onMouseOut={e => {e.currentTarget.style.borderColor=`${card.color}20`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
                             <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}15`,border:`1px solid ${card.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
                             <div style={{fontSize:'13px',fontWeight:'700',color:'#e0e0e0',marginBottom:'3px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color:'#3a3f52',lineHeight:'1.5'}}>{card.desc}</div>
+                            <div style={{fontSize:'11px',color:'#6b7280',lineHeight:'1.5'}}>{card.desc}</div>
                             <div style={{marginTop:'8px',fontSize:'11px',fontWeight:'600',color:card.color}}>Start now →</div>
                           </div>
                         )
