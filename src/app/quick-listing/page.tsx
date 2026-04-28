@@ -27,6 +27,7 @@ export default function QuickListingPage() {
     price: '',
     neighborhood: '',
     beds: '',
+    baths: '',
   })
 
   useEffect(() => {
@@ -102,7 +103,7 @@ export default function QuickListingPage() {
     try {
       const property = {
         type: aiAnalysis?.property_type || 'Single family',
-        beds: answers.beds,
+        beds: `${answers.beds}${answers.baths ? ' bed / ' + answers.baths + ' bath' : ''}`,
         sqft: aiAnalysis?.sqft || '',
         price: answers.price,
         neighborhood: answers.neighborhood,
@@ -273,8 +274,11 @@ export default function QuickListingPage() {
             </div>
 
             <div style={{...cardStyle, marginBottom:'1.5rem'}}>
-              <label style={{fontSize:'13px',fontWeight:'600',color:'#1D9E75',display:'block',marginBottom:'10px'}}>3️⃣ How many beds and baths?</label>
-              <input placeholder="e.g. 3 bed / 2 bath" value={answers.beds} onChange={e => setAnswers({...answers, beds: e.target.value})} style={inputStyle}/>
+              <label style={{fontSize:'13px',fontWeight:'600',color:'#1D9E75',display:'block',marginBottom:'10px'}}>3️⃣ Beds & Baths?</label>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
+                <input placeholder="Beds: 3" value={answers.beds} onChange={e => setAnswers({...answers, beds: e.target.value})} style={inputStyle}/>
+                <input placeholder="Baths: 2" value={answers.baths} onChange={e => setAnswers({...answers, baths: e.target.value})} style={inputStyle}/>
+              </div>
             </div>
 
             <button onClick={handleGenerate}
