@@ -41,7 +41,7 @@ export default function Dashboard() {
   const [chatLoading, setChatLoading] = useState(false)
 
   const [form, setForm] = useState({
-    type: 'Single family', beds: '', sqft: '', price: '',
+    type: 'Single family', beds: '', baths: '', sqft: '', price: '',
     neighborhood: '', features: '', tone: 'Professional', buyer: 'Move-up families',
     notes: '', name: ''
   })
@@ -124,7 +124,7 @@ export default function Dashboard() {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property: form, userId })
+        body: JSON.stringify({ property: {...form, beds: `${form.beds} bed${form.baths ? ' / ' + form.baths + ' bath' : ''}`}, userId })
       })
       const data = await res.json()
       if (data.error === 'LIMIT_REACHED') { setShowUpgradeModal(true); setLoading(false); return }
@@ -471,7 +471,7 @@ export default function Dashboard() {
       label: 'BUILD THE LISTING',
       color: '#1D9E75',
       cards: [
-        { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) } },
+        { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) } },
         { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing' },
         { icon: '📸', title: 'Snap & Start', desc: 'On-site? Start from photos instantly', color: '#e1306c', href: '/snap-start' },
         { icon: '✍️', title: 'Rewrite Listing', desc: 'Polish and improve existing copy', color: '#6366f1', href: '/rewrite' },
@@ -740,7 +740,8 @@ export default function Dashboard() {
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))',gap:'12px',marginBottom:'12px'}}>
                   <div><label style={styles.label}>Listing name</label><input placeholder="123 Oak Street" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Type</label><select value={form.type} onChange={e => setForm({...form, type: e.target.value})} style={styles.select}><option>Single family</option><option>Condo</option><option>Townhome</option><option>Luxury estate</option><option>Multi-family</option></select></div>
-                  <div><label style={styles.label}>Beds / Baths</label><input placeholder="3 bed / 2 bath" value={form.beds} onChange={e => setForm({...form, beds: e.target.value})} style={styles.input}/></div>
+                  <div><label style={styles.label}>Beds</label><input placeholder="3" value={form.beds} onChange={e => setForm({...form, beds: e.target.value})} style={styles.input}/></div>
+                  <div><label style={styles.label}>Baths</label><input placeholder="2" value={form.baths} onChange={e => setForm({...form, baths: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Sq Ft</label><input placeholder="1,850" value={form.sqft} onChange={e => setForm({...form, sqft: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Price</label><input placeholder="$899,000" value={form.price} onChange={e => setForm({...form, price: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Neighborhood</label><input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({...form, neighborhood: e.target.value})} style={styles.input}/></div>
@@ -863,7 +864,7 @@ export default function Dashboard() {
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
                     <button onClick={() => handleDownloadPdf('mls')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
                     <button onClick={() => handleDownloadPdf('flyer')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>🏠 Flyer PDF</button>
-                    <button onClick={() => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) }} style={{padding:'8px 16px',background:'rgba(29,158,117,0.15)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'8px',color:'#1D9E75',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>+ New Listing</button>
+                    <button onClick={() => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) }} style={{padding:'8px 16px',background:'rgba(29,158,117,0.15)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'8px',color:'#1D9E75',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>+ New Listing</button>
                   </div>
                 </div>
               </div>
