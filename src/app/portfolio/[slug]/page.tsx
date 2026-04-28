@@ -38,6 +38,11 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
     load()
   }, [params.slug])
 
+  if (params.slug === 'setup') {
+    window.location.href = '/portfolio/setup'
+    return null
+  }
+
   if (loading) return (
     <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Inter', sans-serif"}}>
       <p style={{color:'#6b7280'}}>Loading portfolio...</p>
