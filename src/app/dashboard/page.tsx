@@ -382,6 +382,8 @@ export default function Dashboard() {
             { href: '/leads', icon: '👥', label: 'Leads & Clients' },
             { href: '/photos', icon: '🖼️', label: 'Photo Library' },
             { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
+            { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
+            { href: '/social-planner', icon: '📅', label: 'Social Planner' },
             { href: '/settings', icon: '⚙️', label: 'Settings' },
           ].map(item => (
             <a key={item.href} href={item.href}
