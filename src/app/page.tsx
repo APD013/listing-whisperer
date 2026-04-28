@@ -77,7 +77,7 @@ export default function Home() {
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
-          {['11 copy formats','Seller meeting prep','Pricing assistant','On-site photo drafts','7-day launch kit'].map(item => (
+          {['11 copy formats','Seller meeting prep','Pricing assistant','On-site photo drafts','7-day launch kit','Objection handler','Social content planner','Seller net sheet','Agent portfolio','Commission calculator'].map(item => (
             <span key={item} style={{color:'#fff',fontSize:'13px',fontWeight:'600'}}>✓ {item}</span>
           ))}
         </div>
@@ -117,6 +117,12 @@ export default function Home() {
               {icon:'🚀',title:'7-Day Launch Kit',desc:'A complete day-by-day marketing plan with social posts, email sequences, and pro tips.'},
               {icon:'✨',title:'Listing Rewriter',desc:'Paste any boring MLS description and get a polished, buyer-ready rewrite instantly.'},
               {icon:'🎙️',title:'Brand Voice Memory',desc:'Save your tone, style, and CTA preferences so every listing sounds like you.'},
+              {icon:'🛡️',title:'Objection Handler',desc:'Turn any seller or buyer objection into a confident, professional response — instantly.'},
+              {icon:'📅',title:'Social Content Planner',desc:'Generate a full 7-day social media calendar for any listing — Instagram, Facebook, LinkedIn, Twitter and SMS.'},
+              {icon:'💰',title:'Seller Net Sheet',desc:'Estimate your seller\'s take-home proceeds before closing. Fast, clear, and easy to share.'},
+              {icon:'🏆',title:'Agent Portfolio',desc:'A shareable public portfolio page with all your past listings. Send it to any potential client. Pro only.'},
+              {icon:'👥',title:'Leads & CRM',desc:'Track your pipeline, manage contacts, and stay on top of every client relationship.'},
+              {icon:'✦',title:'AI Chat Assistant',desc:'Ask anything about real estate or your listings. Your always-on AI assistant built for agents.'},
             ].map(({icon,title,desc}) => (
               <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
                 onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}
@@ -281,6 +287,11 @@ export default function Home() {
                 <li>Tone & buyer targeting</li>
                 <li>Saved listing history</li>
                 <li>Pricing assistant</li>
+                <li>Objection handler</li>
+                <li>Social content planner</li>
+                <li>Seller net sheet</li>
+                <li>Agent portfolio page</li>
+                <li>AI chat assistant</li>
                 <li>Follow-up tools</li>
               </ul>
             </div>
@@ -328,6 +339,11 @@ export default function Home() {
               <li>✅ Snap & start on-site</li>
               <li>✅ 7-day launch kit</li>
               <li>✅ Pricing assistant</li>
+              <li>✅ Objection handler</li>
+              <li>✅ Social content planner</li>
+              <li>✅ Seller net sheet</li>
+              <li>✅ Agent portfolio page</li>
+              <li>✅ AI chat assistant</li>
               <li>✅ Brand voice memory</li>
               <li>✅ Priority support</li>
             </ul>
@@ -352,6 +368,10 @@ export default function Home() {
             {q:'How is this different from ChatGPT?',a:'Listing Whisperer is built specifically for real estate agents. It covers the entire listing workflow — seller prep, on-site photo drafts, full marketing launch, and pricing strategy — not just copy generation. No prompt writing required.'},
             {q:'Can I cancel anytime?',a:'Yes. No contracts, no commitments. Cancel your Pro subscription anytime from your account settings.'},
             {q:'How good is the copy quality?',a:'Our AI is trained specifically for real estate marketing and produces MLS-ready, professional copy that sounds like it was written by an experienced agent.'},
+            {q:'What is the Objection Handler?',a:'Type in any objection you\'re hearing from a seller or buyer — like "your commission is too high" or "Zillow says it\'s worth more" — and get a confident, professional response instantly.'},
+            {q:'What is the Seller Net Sheet?',a:'A fast proceeds estimator. Enter the sale price, mortgage balance, commission, and closing costs — and instantly see how much your seller will walk away with. Easy to print and share.'},
+            {q:'What is the Agent Portfolio?',a:'A shareable public page at listingwhisperer.com/portfolio/yourname that shows all your past listings and brand info. Send it to any potential client to showcase your work. Pro only.'},
+            {q:'Does it have an AI chat assistant?',a:'Yes. The AI chat widget is available on your dashboard. Ask it anything about real estate, your listings, or how to use any tool in the app.'},
           ].map(({q,a}) => (
             <div key={q} style={{borderBottom:'1px solid #e5e7eb',paddingBottom:'1.5rem',marginBottom:'1.5rem'}}>
               <p style={{fontWeight:'700',fontSize:'15px',marginBottom:'8px',color:'#111'}}>{q}</p>
