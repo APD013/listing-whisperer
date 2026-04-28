@@ -145,13 +145,39 @@ export default function PricingAssistant() {
           </div>
 
           <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'16px'}}>
-            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 12px'}}>MARKET CONTEXT (OPTIONAL)</p>
-            <label style={styles.label}>Recent comparable sales</label>
-            <textarea placeholder="123 Oak St — 3bd/2ba — 1,800sf — sold $850k&#10;456 Pine Ave — 4bd/3ba — 2,100sf — sold $920k" value={form.comps} onChange={e => setForm({...form, comps: e.target.value})}
-              style={{...styles.input, minHeight:'80px', resize:'vertical' as const, marginBottom:'12px'}}/>
-            <label style={styles.label}>Additional notes</label>
-            <textarea placeholder="Seller expects $1.2M, market has been slow, corner lot..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})}
-              style={{...styles.input, minHeight:'60px', resize:'vertical' as const, marginBottom:'16px'}}/>
+            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 4px'}}>COMPARABLE SALES (OPTIONAL)</p>
+            <p style={{fontSize:'12px',color:'#6b7280',marginBottom:'12px'}}>Enter up to 3 recent sold properties nearby for a more accurate analysis.</p>
+
+            {[0,1,2].map(i => (
+              <div key={i} style={{background:'rgba(0,0,0,0.2)',borderRadius:'10px',padding:'12px',marginBottom:'8px',border:'1px solid rgba(255,255,255,0.05)'}}>
+                <p style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',margin:'0 0 8px',letterSpacing:'0.5px'}}>COMP {i+1}</p>
+                <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr',gap:'8px'}}>
+                  <input placeholder="123 Oak St" 
+                    value={(form as any)[`comp${i}_address`] || ''} 
+                    onChange={e => setForm({...form, [`comp${i}_address`]: e.target.value} as any)}
+                    style={{...styles.input, fontSize:'12px', padding:'8px 10px'}}/>
+                  <input placeholder="Beds/Ba" 
+                    value={(form as any)[`comp${i}_beds`] || ''} 
+                    onChange={e => setForm({...form, [`comp${i}_beds`]: e.target.value} as any)}
+                    style={{...styles.input, fontSize:'12px', padding:'8px 10px'}}/>
+                  <input placeholder="Sq Ft" 
+                    value={(form as any)[`comp${i}_sqft`] || ''} 
+                    onChange={e => setForm({...form, [`comp${i}_sqft`]: e.target.value} as any)}
+                    style={{...styles.input, fontSize:'12px', padding:'8px 10px'}}/>
+                  <input placeholder="Sold $" 
+                    value={(form as any)[`comp${i}_price`] || ''} 
+                    onChange={e => setForm({...form, [`comp${i}_price`]: e.target.value} as any)}
+                    style={{...styles.input, fontSize:'12px', padding:'8px 10px'}}/>
+                </div>
+              </div>
+            ))}
+
+            <div style={{marginTop:'12px',marginBottom:'16px'}}>
+              <label style={styles.label}>Additional notes</label>
+              <textarea placeholder="Seller expects $1.2M, market has been slow, corner lot..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})}
+                style={{...styles.input, minHeight:'60px', resize:'vertical' as const}}/>
+            </div>
+
             <button onClick={generate} disabled={loading}
               style={{width:'100%',padding:'15px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 30px rgba(29,158,117,0.3)',transition:'all 0.2s'}}>
               {loading ? '⏳ Analyzing...' : '💲 Generate Pricing Strategy'}
