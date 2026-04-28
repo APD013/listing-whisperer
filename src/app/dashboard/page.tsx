@@ -303,6 +303,7 @@ export default function Dashboard() {
       color: '#f59e0b',
       cards: [
         { icon: '🚀', title: 'Launch Plan', desc: '7-day marketing rollout strategy', color: '#f59e0b', href: '/launch-kit' },
+        { icon: '📅', title: 'Social Planner', desc: '7-day social media content calendar', color: '#e1306c', href: '/social-planner' },
         { icon: '🏡', title: 'Open House Kit', desc: 'Flyer, posts, and follow-up emails', color: '#10b981', href: '/open-house' },
         { icon: '💰', title: 'Price Drop Kit', desc: 'Price improvement announcement suite', color: '#ef4444', href: '/price-drop' },
       ]
