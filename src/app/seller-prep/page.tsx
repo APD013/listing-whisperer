@@ -19,7 +19,7 @@ export default function SellerPrepPage() {
   const [copied, setCopied] = useState(false)
 
   const [form, setForm] = useState({
-    address: '', neighborhood: '', type: 'Single family', beds: '',
+    address: '', neighborhood: '', type: 'Single family', beds: '', baths: '',
     sqft: '', estimatedPrice: '', sellerGoals: '', timeframe: '',
     propertyCondition: 'Good', notes: '', agentName: '',
   })
