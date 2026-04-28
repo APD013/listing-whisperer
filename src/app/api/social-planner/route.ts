@@ -25,6 +25,8 @@ Generate a 7-day content calendar. For each day provide:
 5. Twitter/X post (max 280 chars)
 6. SMS blast (max 160 chars)
 
+Keep each post concise. Instagram max 300 chars, Facebook max 200 chars, LinkedIn max 300 chars, Twitter max 250 chars, SMS max 140 chars.
+
 Respond ONLY with valid JSON in this exact format, no other text:
 {
   "days": [
@@ -43,7 +45,7 @@ Generate all 7 days. Make each day feel fresh and different. Vary the angles: li
 
     const message = await anthropic.messages.create({
       model: 'claude-opus-4-5',
-      max_tokens: 4000,
+      max_tokens: 8000,
       messages: [{ role: 'user', content: prompt }]
     })
 
