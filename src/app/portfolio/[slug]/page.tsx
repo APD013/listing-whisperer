@@ -16,12 +16,13 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
 
   useEffect(() => {
     const load = async () => {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('portfolio_slug', params.slug)
-        .single()
+        .maybeSingle()
 
+      console.log('Portfolio lookup:', params.slug, profile, error)
       if (!profile) { setNotFound(true); setLoading(false); return }
       setAgent(profile)
 
