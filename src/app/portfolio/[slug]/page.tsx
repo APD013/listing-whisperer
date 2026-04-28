@@ -1,24 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { use } from 'react'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function PortfolioPage({ params }: { params: { slug: string } }) {
+export default function PortfolioPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params)
   const [agent, setAgent] = useState<any>(null)
   const [listings, setListings] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [activeTab, setActiveTab] = useState('listings')
-  const [slug, setSlug] = useState('')
-
-  useEffect(() => {
-    const resolvedSlug = typeof params === 'object' && params !== null ? (params as any).slug : ''
-    setSlug(resolvedSlug)
-  }, [params])
 
   useEffect(() => {
     if (!slug) return
@@ -44,12 +40,7 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
       setLoading(false)
     }
     load()
-  }, [params.slug])
-
-  if (slug === 'setup') {
-    window.location.href = '/agent-portfolio'
-    return null
-  }
+  }, [slug])
 
   if (loading) return (
     <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Inter', sans-serif"}}>
@@ -70,7 +61,7 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
     </main>
   )
 
-  const brandVoice = agent.brand_voice ? (() => { try { return JSON.parse(agent.brand_voice) } catch(e) { return {} } })() : {}
+  const brandVoice = agent?.brand_voice ? (() => { try { return JSON.parse(agent.brand_voice) } catch(e) { return {} } })() : {}
 
   return (
     <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
@@ -92,10 +83,10 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
         {/* AGENT HERO */}
         <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.2)',padding:'2.5rem',marginBottom:'2rem',boxShadow:'0 0 40px rgba(29,158,117,0.08)',textAlign:'center'}}>
           <div style={{width:'80px',height:'80px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'2rem',margin:'0 auto 1rem',boxShadow:'0 0 24px rgba(29,158,117,0.4)'}}>
-            {(brandVoice.agentName || agent.full_name || 'A').charAt(0).toUpperCase()}
+            {(brandVoice.agentName || agent?.full_name || 'A').charAt(0).toUpperCase()}
           </div>
           <h1 style={{fontSize:'1.75rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 6px'}}>
-            {brandVoice.agentName || agent.full_name || 'Real Estate Agent'}
+            {brandVoice.agentName || agent?.full_name || 'Real Estate Agent'}
           </h1>
           {brandVoice.brokerage && (
             <p style={{fontSize:'14px',color:'#1D9E75',fontWeight:'600',margin:'0 0 12px'}}>{brandVoice.brokerage}</p>
@@ -115,7 +106,7 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
                 🌐 {brandVoice.website}
               </a>
             )}
-            {agent.email && (
+            {agent?.email && (
               <a href={`mailto:${agent.email}`} style={{display:'flex',alignItems:'center',gap:'6px',color:'#6b7280',textDecoration:'none',fontSize:'13px'}}>
                 ✉️ {agent.email}
               </a>
@@ -194,7 +185,7 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
         {/* ABOUT TAB */}
         {activeTab === 'about' && (
           <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.07)',padding:'2rem',boxShadow:'0 4px 24px rgba(0,0,0,0.3)'}}>
-            <h2 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'1.5rem'}}>About {brandVoice.agentName || agent.full_name}</h2>
+            <h2 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'1.5rem'}}>About {brandVoice.agentName || agent?.full_name}</h2>
             {brandVoice.uniqueStyle && (
               <div style={{marginBottom:'1.5rem'}}>
                 <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'8px'}}>STYLE & APPROACH</p>
