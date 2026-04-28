@@ -285,7 +285,7 @@ export default function Dashboard() {
         { icon: '📋', title: 'Seller Prep', desc: 'Prepare for your listing appointment', color: '#8b5cf6', href: '/seller-prep' },
         { icon: '💲', title: 'Pricing Assistant', desc: 'Get a data-backed price range and strategy', color: '#d4af37', href: '/pricing-assistant' },
         { icon: '🎯', title: 'Listing Presentation', desc: 'Build your full seller appointment deck', color: '#a78bfa', href: '/listing-presentation' },
-        { icon: '🏆', title: 'Agent Portfolio', desc: 'Your shareable listing portfolio page', color: '#d4af37', href: '/portfolio-setup' },
+        { icon: '🏆', title: 'Agent Portfolio', desc: 'Your shareable listing portfolio page', color: '#d4af37', href: '/agent-portfolio' },
       ]
     },
     {
@@ -316,6 +316,7 @@ export default function Dashboard() {
         { icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline and contacts', color: '#10b981', href: '/leads' },
         { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up' },
         { icon: '💰', title: 'Seller Net Sheet', desc: 'Estimate seller proceeds before closing', color: '#1D9E75', href: '/seller-net-sheet' },
+        { icon: '🧮', title: 'Commission Calculator', desc: 'Calculate your real take-home after splits and fees', color: '#d4af37', href: '/commission-calculator' },
         { icon: '🛡️', title: 'Objection Handler', desc: 'Turn any objection into a confident response', color: '#8b5cf6', href: '/objection-handler' },
       ]
     },
@@ -383,7 +384,8 @@ export default function Dashboard() {
             { href: '/leads', icon: '👥', label: 'Leads & Clients' },
             { href: '/photos', icon: '🖼️', label: 'Photo Library' },
             { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
-            { href: '/portfolio-setup', icon: '🏆', label: 'Agent Portfolio' },
+            { href: '/commission-calculator', icon: '🧮', label: 'Commission Calculator' },
+            { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
             { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
             { href: '/social-planner', icon: '📅', label: 'Social Planner' },
             { href: '/settings', icon: '⚙️', label: 'Settings' },
