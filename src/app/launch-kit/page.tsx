@@ -14,7 +14,7 @@ export default function LaunchKitPage() {
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
   const [form, setForm] = useState({
-    type: 'Single family', beds: '', sqft: '', price: '',
+    type: 'Single family', beds: '', baths: '', sqft: '', price: '',
     neighborhood: '', features: '', notes: ''
   })
   const [launchPlan, setLaunchPlan] = useState<any>(null)
@@ -122,8 +122,12 @@ export default function LaunchKitPage() {
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Beds / Baths</label>
-              <input placeholder="3 bed / 2 bath" value={form.beds} onChange={e=>setForm({...form,beds:e.target.value})} style={inputStyle}/>
+              <label style={labelStyle}>Beds</label>
+              <input placeholder="3" value={form.beds} onChange={e=>setForm({...form,beds:e.target.value})} style={inputStyle}/>
+            </div>
+            <div>
+              <label style={labelStyle}>Baths</label>
+              <input placeholder="2" value={form.baths || ''} onChange={e=>setForm({...form,baths:e.target.value})} style={inputStyle}/>
             </div>
             <div>
               <label style={labelStyle}>Sq Ft</label>
