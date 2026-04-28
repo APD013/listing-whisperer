@@ -25,7 +25,7 @@ export default function PortfolioPage({ params }: { params: Promise<{ slug: stri
         .eq('portfolio_slug', slug)
         .maybeSingle()
 
-      console.log('Portfolio lookup:', slug, profile, error)
+      
       if (!profile) { setNotFound(true); setLoading(false); return }
       setAgent(profile)
 
