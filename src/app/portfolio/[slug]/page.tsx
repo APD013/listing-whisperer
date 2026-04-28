@@ -13,16 +13,23 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [activeTab, setActiveTab] = useState('listings')
+  const [slug, setSlug] = useState('')
 
   useEffect(() => {
+    const resolvedSlug = typeof params === 'object' && params !== null ? (params as any).slug : ''
+    setSlug(resolvedSlug)
+  }, [params])
+
+  useEffect(() => {
+    if (!slug) return
     const load = async () => {
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('portfolio_slug', params.slug)
+        .eq('portfolio_slug', slug)
         .maybeSingle()
 
-      console.log('Portfolio lookup:', params.slug, profile, error)
+      console.log('Portfolio lookup:', slug, profile, error)
       if (!profile) { setNotFound(true); setLoading(false); return }
       setAgent(profile)
 
@@ -39,8 +46,8 @@ export default function PortfolioPage({ params }: { params: { slug: string } }) 
     load()
   }, [params.slug])
 
-  if (params.slug === 'setup') {
-    window.location.href = '/portfolio/setup'
+  if (slug === 'setup') {
+    window.location.href = '/agent-portfolio'
     return null
   }
 
