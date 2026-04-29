@@ -106,7 +106,11 @@ export async function POST(request: Request) {
     // INTENT DETECTION — Create Reminder
     const reminderMatch = lastMessage.match(/remind\s+me\s+to\s+(.+?)\s+on\s+(.+)/i) ||
       lastMessage.match(/set\s+a\s+reminder\s+(.+?)\s+on\s+(.+)/i) ||
-      lastMessage.match(/remind\s+me\s+to\s+(.+)/i)
+      lastMessage.match(/remind\s+me\s+to\s+(.+)/i) ||
+      lastMessage.match(/^(.+?)\s+on\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday|today|tomorrow)/i) ||
+      lastMessage.match(/^(.+?)\s+at\s+(\d+(?:am|pm)?)/i) ||
+      lastMessage.match(/add\s+reminder\s+(.+?)\s+on\s+(.+)/i) ||
+      lastMessage.match(/add\s+reminder\s+(.+)/i)
     if (reminderMatch && userId) {
       const content = reminderMatch[1]
       const dateStr = reminderMatch[2] || 'tomorrow'
