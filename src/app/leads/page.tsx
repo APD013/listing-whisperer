@@ -47,6 +47,9 @@ export default function LeadsPage() {
       if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
       else { setPlanLoaded(true) }
       await loadLeads(user.id)
+
+      // Auto-refresh when lead added via chat
+      window.addEventListener('lead_added', () => loadLeads(user.id))
     }
     getUser()
   }, [])
