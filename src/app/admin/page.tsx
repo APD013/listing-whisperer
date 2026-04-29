@@ -211,23 +211,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* RECENT LISTINGS */}
-            {listings.length > 0 && (
-              <div style={{...cardStyle, marginBottom:'1.5rem'}}>
-                <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'12px'}}>🏠 RECENT LISTINGS GENERATED</p>
-                <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                  {listings.slice(0,5).map(listing => (
-                    <div key={listing.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',background:'rgba(0,0,0,0.2)',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.04)'}}>
-                      <div>
-                        <p style={{fontSize:'13px',color:'#f0f0f0',margin:'0',fontWeight:'500'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
-                        <p style={{fontSize:'11px',color:'#6b7280',margin:'0'}}>{listing.price} · {listing.neighborhood}</p>
-                      </div>
-                      <p style={{fontSize:'11px',color:'#444',margin:'0',whiteSpace:'nowrap'}}>{new Date(listing.created_at).toLocaleDateString()}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            
 
             {/* USER TABLE */}
             <div style={{marginBottom:'12px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'10px'}}>
