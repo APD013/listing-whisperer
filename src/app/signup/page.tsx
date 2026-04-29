@@ -43,7 +43,9 @@ export default function SignupPage() {
           })
         }
         trackSignupCompleted('new_user')
-        setSuccess(true)
+        // Auto sign in after signup
+        await supabase.auth.signInWithPassword({ email, password })
+        window.location.href = '/dashboard'
       }
     } catch(e) {
       setMessage('Something went wrong, try again.')
