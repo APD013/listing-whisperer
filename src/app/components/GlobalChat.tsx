@@ -83,12 +83,14 @@ export default function GlobalChat() {
         }
 
         if (action.type === 'lead_added' && userId) {
-          const { error } = await supabase.from('leads').insert({
+          console.log('Attempting lead insert for userId:', userId)
+          const { data, error } = await supabase.from('leads').insert({
             user_id: userId,
             name: action.name || 'New Lead',
             email: action.email || null,
             status: 'New Lead',
-          })
+          }).select()
+          console.log('Lead insert result:', data, error)
           if (!error) {
             setMessages(prev => [...prev, {
               role: 'assistant',
@@ -96,6 +98,10 @@ export default function GlobalChat() {
             }])
           } else {
             console.error('Lead insert error:', error)
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: `❌ Could not add lead: ${error.message}`
+            }])
           }
         }
 
