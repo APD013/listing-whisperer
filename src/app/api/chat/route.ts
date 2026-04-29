@@ -90,11 +90,43 @@ export async function POST(request: Request) {
 
     // INTENT DETECTION — Create Reminder
     const reminderMatch = lastMessage.match(/remind\s+me\s+to\s+(.+?)\s+on\s+(.+)/i) ||
-      lastMessage.match(/set\s+a\s+reminder\s+(.+?)\s+on\s+(.+)/i)
+      lastMessage.match(/set\s+a\s+reminder\s+(.+?)\s+on\s+(.+)/i) ||
+      lastMessage.match(/remind\s+me\s+to\s+(.+)/i)
     if (reminderMatch && userId) {
       const content = reminderMatch[1]
-      const dateStr = reminderMatch[2]
-      const remindAt = new Date(dateStr)
+      const dateStr = reminderMatch[2] || 'tomorrow'
+      
+      // Parse relative dates
+      const now = new Date()
+      let remindAt = new Date()
+      const dateStrLower = dateStr.toLowerCase().trim()
+      
+      if (dateStrLower.includes('today')) {
+        remindAt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0)
+      } else if (dateStrLower.includes('tomorrow')) {
+        remindAt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 9, 0, 0)
+      } else if (dateStrLower.includes('monday')) {
+        const day = now.getDay(); remindAt.setDate(now.getDate() + (1 + 7 - day) % 7 || 7)
+      } else if (dateStrLower.includes('tuesday')) {
+        const day = now.getDay(); remindAt.setDate(now.getDate() + (2 + 7 - day) % 7 || 7)
+      } else if (dateStrLower.includes('wednesday')) {
+        const day = now.getDay(); remindAt.setDate(now.getDate() + (3 + 7 - day) % 7 || 7)
+      } else if (dateStrLower.includes('thursday')) {
+        const day = now.getDay(); remindAt.setDate(now.getDate() + (4 + 7 - day) % 7 || 7)
+      } else if (dateStrLower.includes('friday')) {
+        const day = now.getDay(); remindAt.setDate(now.getDate() + (5 + 7 - day) % 7 || 7)
+      } else if (dateStrLower.includes('saturday')) {
+        const day = now.getDay(); remindAt.setDate(now.getDate() + (6 + 7 - day) % 7 || 7)
+      } else if (dateStrLower.includes('sunday')) {
+        const day = now.getDay(); remindAt.setDate(now.getDate() + (7 + 7 - day) % 7 || 7)
+      } else if (dateStrLower.includes('next week')) {
+        remindAt.setDate(now.getDate() + 7)
+      } else {
+        const parsed = new Date(dateStr)
+        if (!isNaN(parsed.getTime())) remindAt = parsed
+        else remindAt.setDate(now.getDate() + 1)
+      }
+      remindAt.setHours(9, 0, 0, 0)
 
       if (!isNaN(remindAt.getTime())) {
         const { error } = await supabase
