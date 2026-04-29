@@ -48,10 +48,8 @@ export async function POST(request: Request) {
       lastMessage.includes('open ' + key) ||
       lastMessage.includes('navigate to ' + key) ||
       lastMessage.includes('show me ' + key) ||
-      lastMessage.includes('how do i use ' + key) ||
       lastMessage.includes('how do i get to ' + key) ||
-      lastMessage.includes(key + ' page') ||
-      lastMessage.includes('use ' + key)
+      lastMessage.includes(key + ' page')
     )
     if (navigateMatch) {
       return NextResponse.json({
