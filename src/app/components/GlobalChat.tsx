@@ -2,6 +2,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
 const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/terms', '/privacy', '/contact']
 
 export default function GlobalChat() {
@@ -11,7 +18,16 @@ export default function GlobalChat() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setUserId(user.id)
+    }
+    getUser()
+  }, [])
 
   // Hide on public pages
   if (HIDDEN_PATHS.includes(pathname)) return null
@@ -46,9 +62,6 @@ export default function GlobalChat() {
     setInput('')
     setLoading(true)
     try {
-      // Get userId from localStorage
-      const userId = localStorage.getItem('lw_user_id') || null
-
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
