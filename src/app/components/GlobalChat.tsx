@@ -6,7 +6,7 @@ const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-pass
 
 export default function GlobalChat() {
   const pathname = usePathname()
-  const [showChat, setShowChat] = useState(false)
+  const [showChat, setShowChat] = useState(true)
   const [messages, setMessages] = useState<{role:string,content:string}[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -166,8 +166,8 @@ export default function GlobalChat() {
       {/* TOGGLE BUTTON */}
       <button
         onClick={() => setShowChat(!showChat)}
-        style={{position:'fixed',bottom:'24px',right:'24px',width:'56px',height:'56px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'none',color:'#fff',fontSize:'24px',cursor:'pointer',boxShadow:'0 4px 20px rgba(29,158,117,0.4)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500}}
-        onMouseOver={e => e.currentTarget.style.transform='scale(1.1)'}
+        style={{position:'fixed',bottom:'24px',right:'24px',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'26px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6), 0 0 0 0 rgba(29,158,117,0.4)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500,animation: showChat ? 'none' : 'pulse-ring 2s infinite'}}
+        onMouseOver={e => e.currentTarget.style.transform='scale(1.12)'}
         onMouseOut={e => e.currentTarget.style.transform='scale(1)'}>
         {showChat ? '✕' : '✦'}
       </button>
@@ -176,6 +176,11 @@ export default function GlobalChat() {
         @keyframes pulse-dot {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        @keyframes pulse-ring {
+          0% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 0 rgba(29,158,117,0.4); }
+          70% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 14px rgba(29,158,117,0); }
+          100% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 0 rgba(29,158,117,0); }
         }
       `}</style>
     </>
