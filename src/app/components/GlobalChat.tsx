@@ -46,17 +46,29 @@ export default function GlobalChat() {
     setInput('')
     setLoading(true)
     try {
+      // Get userId from localStorage
+      const userId = localStorage.getItem('lw_user_id') || null
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           messages: updatedMessages,
-          currentPage: pathname
+          currentPage: pathname,
+          userId
         })
       })
       const data = await res.json()
       if (data.message) {
         setMessages([...updatedMessages, { role: 'assistant', content: data.message }])
+      }
+      // Handle actions
+      if (data.action) {
+        if (data.action.type === 'navigate') {
+          setTimeout(() => { 
+            window.location.assign(data.action.url)
+          }, 1000)
+        }
       }
     } catch(e) {
       setMessages([...updatedMessages, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
