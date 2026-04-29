@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -17,7 +16,6 @@ export default function GlobalChat() {
   const [messages, setMessages] = useState<{role:string,content:string}[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [copied, setCopied] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -29,10 +27,6 @@ export default function GlobalChat() {
     getUser()
   }, [])
 
-  // Hide on public pages
-  if (HIDDEN_PATHS.includes(pathname)) return null
-
-  // Load chat history from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem('lw_chat_history')
@@ -40,7 +34,6 @@ export default function GlobalChat() {
     } catch(e) {}
   }, [])
 
-  // Save chat history to localStorage
   useEffect(() => {
     try {
       if (messages.length > 0) {
@@ -49,10 +42,11 @@ export default function GlobalChat() {
     } catch(e) {}
   }, [messages])
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  if (HIDDEN_PATHS.includes(pathname)) return null
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return
@@ -61,30 +55,65 @@ export default function GlobalChat() {
     setMessages(updatedMessages)
     setInput('')
     setLoading(true)
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           messages: updatedMessages,
           currentPage: pathname,
           userId
         })
       })
       const data = await res.json()
+
       if (data.message) {
-        setMessages([...updatedMessages, { role: 'assistant', content: data.message }])
+        setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
       }
-      // Handle actions
+
+      // Handle actions client-side with authenticated supabase
       if (data.action) {
-        if (data.action.type === 'navigate') {
-          setTimeout(() => { 
-            window.location.assign(data.action.url)
-          }, 1000)
+        const action = data.action
+
+        if (action.type === 'navigate') {
+          setTimeout(() => { window.location.assign(action.url) }, 1000)
+        }
+
+        if (action.type === 'lead_added' && userId) {
+          const { error } = await supabase.from('leads').insert({
+            user_id: userId,
+            name: action.name || 'New Lead',
+            email: action.email || null,
+            status: 'New Lead',
+          })
+          if (!error) {
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: `✅ **${action.name || 'New Lead'}** has been added to your Leads & Clients!`
+            }])
+          } else {
+            console.error('Lead insert error:', error)
+          }
+        }
+
+        if (action.type === 'reminder_created' && userId) {
+          const { error } = await supabase.from('reminders').insert({
+            user_id: userId,
+            content: action.content,
+            remind_at: action.remind_at,
+            sent: false,
+          })
+          if (!error) {
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: `✅ Reminder set for **${action.display_date}**!`
+            }])
+          }
         }
       }
     } catch(e) {
-      setMessages([...updatedMessages, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
     }
     setLoading(false)
   }
@@ -96,14 +125,13 @@ export default function GlobalChat() {
 
   const suggestions = [
     'How do I use Seller Prep?',
-    'How does Snap & Start work?',
-    'What is the Objection Handler?',
-    'How do I create my portfolio?',
+    'Take me to the objection handler',
+    'Add John Smith, john@email.com as a lead',
+    'Remind me to call Sarah on Friday',
   ]
 
   return (
     <>
-      {/* CHAT WINDOW */}
       {showChat && (
         <div style={{position:'fixed',bottom:'84px',right:'24px',width:'360px',height:'520px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500}}>
 
@@ -118,13 +146,9 @@ export default function GlobalChat() {
             </div>
             <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
               {messages.length > 0 && (
-                <button onClick={clearHistory}
-                  style={{background:'none',border:'none',color:'#444',fontSize:'11px',cursor:'pointer',padding:'2px 6px'}}>
-                  Clear
-                </button>
+                <button onClick={clearHistory} style={{background:'none',border:'none',color:'#444',fontSize:'11px',cursor:'pointer',padding:'2px 6px'}}>Clear</button>
               )}
-              <button onClick={() => setShowChat(false)}
-                style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
+              <button onClick={() => setShowChat(false)} style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
             </div>
           </div>
 
@@ -134,7 +158,7 @@ export default function GlobalChat() {
               <div style={{textAlign:'center',padding:'1.5rem 1rem'}}>
                 <div style={{fontSize:'2rem',marginBottom:'8px'}}>✦</div>
                 <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>How can I help you?</p>
-                <p style={{fontSize:'11px',color:'#5a5f72',margin:'0 0 1rem'}}>Ask me anything about Listing Whisperer or real estate</p>
+                <p style={{fontSize:'11px',color:'#5a5f72',margin:'0 0 1rem'}}>Ask me anything or give me a command</p>
                 <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
                   {suggestions.map(q => (
                     <button key={q} onClick={() => setInput(q)}
@@ -177,7 +201,7 @@ export default function GlobalChat() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-              placeholder="Ask anything..."
+              placeholder="Ask anything or give a command..."
               style={{flex:1,padding:'10px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',fontSize:'13px',color:'#f0f0f0',outline:'none'}}
             />
             <button onClick={sendMessage} disabled={loading || !input.trim()}
@@ -191,7 +215,7 @@ export default function GlobalChat() {
       {/* TOGGLE BUTTON */}
       <button
         onClick={() => setShowChat(!showChat)}
-        style={{position:'fixed',bottom:'24px',right:'24px',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'26px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6), 0 0 0 0 rgba(29,158,117,0.4)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500,animation: showChat ? 'none' : 'pulse-ring 2s infinite'}}
+        style={{position:'fixed',bottom:'24px',right:'24px',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'26px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500,animation: showChat ? 'none' : 'pulse-ring 2s infinite'}}
         onMouseOver={e => e.currentTarget.style.transform='scale(1.12)'}
         onMouseOut={e => e.currentTarget.style.transform='scale(1)'}>
         {showChat ? '✕' : '✦'}

@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
       if (!error) {
         return NextResponse.json({
-          message: `✅ Done! I've added **${name || 'New Lead'}**${email ? ` (${email})` : ''} to your Leads & Clients. You can view them at any time from your dashboard.`,
+          message: `Got it! Adding **${name || 'New Lead'}** as a lead now...`,
           action: { type: 'lead_added', name, email }
         })
       }
@@ -106,7 +106,12 @@ export async function POST(request: Request) {
         if (!error) {
           return NextResponse.json({
             message: `✅ Reminder set! I'll remind you to **${content}** on ${remindAt.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })}. You'll see it as a popup when you log in.`,
-            action: { type: 'reminder_created' }
+            action: { 
+              type: 'reminder_created',
+              content: content,
+              remind_at: remindAt.toISOString(),
+              display_date: remindAt.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })
+            }
           })
         }
       }
