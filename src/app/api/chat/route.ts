@@ -145,7 +145,17 @@ export async function POST(request: Request) {
         if (!isNaN(parsed.getTime())) remindAt = parsed
         else remindAt.setDate(now.getDate() + 1)
       }
-      remindAt.setHours(9, 0, 0, 0)
+      // Parse time if mentioned
+      const timeMatch = lastMessage.match(/(\d+)\s*(am|pm)/i)
+      if (timeMatch) {
+        let hour = parseInt(timeMatch[1])
+        const meridiem = timeMatch[2].toLowerCase()
+        if (meridiem === 'pm' && hour !== 12) hour += 12
+        if (meridiem === 'am' && hour === 12) hour = 0
+        remindAt.setHours(hour, 0, 0, 0)
+      } else {
+        remindAt.setHours(9, 0, 0, 0)
+      }
 
       if (!isNaN(remindAt.getTime())) {
         const { error } = await supabase
