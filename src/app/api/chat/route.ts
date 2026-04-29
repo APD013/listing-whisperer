@@ -73,7 +73,6 @@ export async function POST(request: Request) {
           name: name || 'New Lead',
           email: email || null,
           status: 'New Lead',
-          created_at: new Date().toISOString()
         })
 
       if (!error) {
