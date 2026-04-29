@@ -1,11 +1,118 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export const maxDuration = 30
 
+const PAGES: Record<string, string> = {
+  'dashboard': '/dashboard',
+  'new listing': '/dashboard',
+  'quick listing': '/quick-listing',
+  'snap and start': '/snap-start',
+  'snap & start': '/snap-start',
+  'seller prep': '/seller-prep',
+  'seller meeting': '/seller-prep',
+  'pricing assistant': '/pricing-assistant',
+  'rewrite': '/rewrite',
+  'launch kit': '/launch-kit',
+  'open house': '/open-house',
+  'price drop': '/price-drop',
+  'follow up': '/follow-up',
+  'leads': '/leads',
+  'photos': '/photos',
+  'settings': '/settings',
+  'objection handler': '/objection-handler',
+  'objection': '/objection-handler',
+  'social planner': '/social-planner',
+  'social content': '/social-planner',
+  'seller net sheet': '/seller-net-sheet',
+  'commission calculator': '/commission-calculator',
+  'transaction checklist': '/transaction-checklist',
+  'portfolio': '/agent-portfolio',
+  'pricing': '/pricing',
+}
+
 export async function POST(request: Request) {
   try {
-    const { messages, currentPage } = await request.json()
+    const { messages, currentPage, userId } = await request.json()
+    const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || ''
 
+    // INTENT DETECTION — Navigate
+    const navigateMatch = Object.keys(PAGES).find(key =>
+      lastMessage.includes('go to ' + key) ||
+      lastMessage.includes('take me to ' + key) ||
+      lastMessage.includes('open ' + key) ||
+      lastMessage.includes('navigate to ' + key) ||
+      lastMessage.includes('show me ' + key)
+    )
+    if (navigateMatch) {
+      return NextResponse.json({
+        message: `Sure! Taking you to ${navigateMatch} now. 🚀`,
+        action: { type: 'navigate', url: PAGES[navigateMatch] }
+      })
+    }
+
+    // INTENT DETECTION — Add Lead
+    const addLeadMatch = lastMessage.match(/add\s+(.+?)\s+as\s+a\s+lead/i) ||
+      lastMessage.match(/add\s+lead\s+(.+)/i) ||
+      lastMessage.match(/new\s+lead\s+(.+)/i)
+    if (addLeadMatch && userId) {
+      const namePart = addLeadMatch[1]
+      const emailMatch = namePart.match(/[\w.-]+@[\w.-]+\.\w+/)
+      const email = emailMatch ? emailMatch[0] : null
+      const name = namePart.replace(email || '', '').replace(/,/g, '').trim()
+
+      const { error } = await supabase
+        .from('leads')
+        .insert({
+          user_id: userId,
+          name: name || 'New Lead',
+          email: email || null,
+          status: 'New Lead',
+          created_at: new Date().toISOString()
+        })
+
+      if (!error) {
+        return NextResponse.json({
+          message: `✅ Done! I've added **${name || 'New Lead'}**${email ? ` (${email})` : ''} to your Leads & Clients. You can view them at any time from your dashboard.`,
+          action: { type: 'lead_added', name, email }
+        })
+      }
+    }
+
+    // INTENT DETECTION — Create Reminder
+    const reminderMatch = lastMessage.match(/remind\s+me\s+to\s+(.+?)\s+on\s+(.+)/i) ||
+      lastMessage.match(/set\s+a\s+reminder\s+(.+?)\s+on\s+(.+)/i)
+    if (reminderMatch && userId) {
+      const content = reminderMatch[1]
+      const dateStr = reminderMatch[2]
+      const remindAt = new Date(dateStr)
+
+      if (!isNaN(remindAt.getTime())) {
+        const { error } = await supabase
+          .from('reminders')
+          .insert({
+            user_id: userId,
+            content: content,
+            remind_at: remindAt.toISOString(),
+            sent: false,
+            created_at: new Date().toISOString()
+          })
+
+        if (!error) {
+          return NextResponse.json({
+            message: `✅ Reminder set! I'll remind you to **${content}** on ${remindAt.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })}. You'll see it as a popup when you log in.`,
+            action: { type: 'reminder_created' }
+          })
+        }
+      }
+    }
+
+    // DEFAULT — Normal chat response
     const systemPrompt = `You are the Listing Whisperer AI Assistant — a smart, friendly assistant built specifically for real estate agents.
 
 You have two roles:
@@ -13,44 +120,26 @@ You have two roles:
 2. REAL ESTATE EXPERT: You answer real estate questions, provide advice, and help agents succeed
 
 About Listing Whisperer:
-- It is an AI assistant for real estate agents
-- It helps agents before, during, and after every listing
-- Pricing: Free 24-hour Pro trial (2 listings included), then $20/month for Pro
+- AI assistant for real estate agents
+- Pricing: Free 24-hour Pro trial (2 listings), then $20/month Pro
 - No credit card required to start
 
-Tools available in Listing Whisperer:
-- New Listing: Full guided listing creation → generates 11 marketing formats (MLS, Instagram, Facebook, Email, Open House, Video Script, SMS, Flyer, Price Drop, SEO, Luxury MLS)
-- Quick Listing: Faster manual listing workflow with fewer inputs
-- Snap & Start: Upload property photos on-site and generate listing drafts instantly
-- Seller Meeting Prep: Complete prep kit for listing appointments — talking points, questions, follow-up emails
-- Rewrite Listing: Improve and polish existing MLS copy
-- 7-Day Launch Kit: Full marketing rollout plan for new listings
-- Pricing Assistant: Data-backed price range, seller talking points, objection responses
-- Open House Kit: Flyer copy, social posts, reminder texts, follow-up emails
-- Price Drop Kit: Price improvement announcements across MLS, social, email, SMS
-- Follow-Up Assistant: Post-meeting and post-showing follow-up emails and texts with reminders
-- Leads & Clients: CRM to manage pipeline and contacts
-- Photo Library: Manage saved property photos
-- Objection Handler: Turn any seller or buyer objection into a confident response instantly
-- Social Content Planner: Generate a 7-day social media calendar for any listing
-- Seller Net Sheet: Estimate seller proceeds before closing
-- Commission Calculator: Calculate take-home commission after splits and fees
-- Transaction Checklist: Track every step from listing to closing day
-- Agent Portfolio: Shareable public portfolio page at listingwhisperer.com/portfolio/username (Pro only)
+Tools available:
+- New Listing, Quick Listing, Snap & Start, Seller Prep, Rewrite
+- 7-Day Launch Kit, Pricing Assistant, Open House Kit, Price Drop Kit
+- Follow-Up Assistant, Leads & Clients, Photo Library, Settings
+- Objection Handler, Social Content Planner, Seller Net Sheet
+- Commission Calculator, Transaction Checklist, Agent Portfolio
 
-Personality:
-- Warm, professional, and knowledgeable
-- Concise but thorough
-- Real estate focused
-- Never robotic or overly formal
-- Always helpful and action-oriented
+You can take actions for the agent:
+- Navigate: "take me to seller prep", "go to leads", "open objection handler"
+- Add leads: "add John Smith, john@email.com as a lead"
+- Set reminders: "remind me to call Sarah on Friday"
 
-If someone asks about pricing, always mention the 24-hour free Pro trial at $0, then $20/month.
-If someone asks how to do something in the product, give them clear step-by-step guidance.
-If someone asks a real estate question, answer it like an experienced real estate coach would.
-Keep responses concise — 2-4 paragraphs max unless more detail is needed.
+Personality: Warm, professional, concise, real estate focused.
+Keep responses to 2-3 paragraphs max.
 
-${currentPage ? `The agent is currently on the page: ${currentPage}. Use this context to give more relevant help. For example if they are on /seller-prep, focus on helping them use that tool. If they are on /objection-handler, help them handle objections.` : ''}`
+${currentPage ? `Agent is currently on: ${currentPage}. Give contextually relevant help.` : ''}`
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

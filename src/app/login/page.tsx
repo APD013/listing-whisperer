@@ -22,6 +22,7 @@ export default function LoginPage() {
       setMessage(error.message)
     } else {
       trackLoginCompleted(data.user?.id || 'unknown')
+      localStorage.setItem('lw_user_id', data.user?.id || '')
       const redirect = localStorage.getItem('post_payment_redirect')
       if (redirect) {
         localStorage.removeItem('post_payment_redirect')
