@@ -47,13 +47,30 @@ export async function POST(request: Request) {
       lastMessage.includes('take me to ' + key) ||
       lastMessage.includes('open ' + key) ||
       lastMessage.includes('navigate to ' + key) ||
-      lastMessage.includes('show me ' + key)
+      lastMessage.includes('show me ' + key) ||
+      lastMessage.includes('how do i use ' + key) ||
+      lastMessage.includes('how do i get to ' + key) ||
+      lastMessage.includes(key + ' page') ||
+      lastMessage.includes('use ' + key)
     )
     if (navigateMatch) {
       return NextResponse.json({
         message: `Sure! Taking you to ${navigateMatch} now. 🚀`,
         action: { type: 'navigate', url: PAGES[navigateMatch] }
       })
+    }
+
+    // INTENT DETECTION — Yes/Confirm navigation from previous message
+    const prevMessage = messages[messages.length - 2]?.content?.toLowerCase() || ''
+    const isConfirm = ['yes', 'yeah', 'yep', 'sure', 'ok', 'okay', 'please', 'yes please', 'go ahead'].some(w => lastMessage.trim() === w || lastMessage.trim().startsWith(w))
+    if (isConfirm) {
+      const prevNavMatch = Object.keys(PAGES).find(key => prevMessage.includes(key))
+      if (prevNavMatch) {
+        return NextResponse.json({
+          message: `Taking you to ${prevNavMatch} now! 🚀`,
+          action: { type: 'navigate', url: PAGES[prevNavMatch] }
+        })
+      }
     }
 
     // INTENT DETECTION — Add Lead
