@@ -1,0 +1,183 @@
+'use client'
+import { useState, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
+
+const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/terms', '/privacy', '/contact']
+
+export default function GlobalChat() {
+  const pathname = usePathname()
+  const [showChat, setShowChat] = useState(false)
+  const [messages, setMessages] = useState<{role:string,content:string}[]>([])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Hide on public pages
+  if (HIDDEN_PATHS.includes(pathname)) return null
+
+  // Load chat history from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('lw_chat_history')
+      if (saved) setMessages(JSON.parse(saved))
+    } catch(e) {}
+  }, [])
+
+  // Save chat history to localStorage
+  useEffect(() => {
+    try {
+      if (messages.length > 0) {
+        localStorage.setItem('lw_chat_history', JSON.stringify(messages.slice(-20)))
+      }
+    } catch(e) {}
+  }, [messages])
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return
+    const userMessage = { role: 'user', content: input }
+    const updatedMessages = [...messages, userMessage]
+    setMessages(updatedMessages)
+    setInput('')
+    setLoading(true)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          messages: updatedMessages,
+          currentPage: pathname
+        })
+      })
+      const data = await res.json()
+      if (data.message) {
+        setMessages([...updatedMessages, { role: 'assistant', content: data.message }])
+      }
+    } catch(e) {
+      setMessages([...updatedMessages, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
+    }
+    setLoading(false)
+  }
+
+  const clearHistory = () => {
+    setMessages([])
+    localStorage.removeItem('lw_chat_history')
+  }
+
+  const suggestions = [
+    'How do I use Seller Prep?',
+    'How does Snap & Start work?',
+    'What is the Objection Handler?',
+    'How do I create my portfolio?',
+  ]
+
+  return (
+    <>
+      {/* CHAT WINDOW */}
+      {showChat && (
+        <div style={{position:'fixed',bottom:'84px',right:'24px',width:'360px',height:'520px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500}}>
+
+          {/* HEADER */}
+          <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+              <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>✦</div>
+              <div>
+                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Listing Whisperer AI</p>
+                <p style={{fontSize:'10px',color:'#1D9E75',margin:'0'}}>Your real estate assistant</p>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
+              {messages.length > 0 && (
+                <button onClick={clearHistory}
+                  style={{background:'none',border:'none',color:'#444',fontSize:'11px',cursor:'pointer',padding:'2px 6px'}}>
+                  Clear
+                </button>
+              )}
+              <button onClick={() => setShowChat(false)}
+                style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
+            </div>
+          </div>
+
+          {/* MESSAGES */}
+          <div style={{flex:1,overflowY:'auto',padding:'1rem',display:'flex',flexDirection:'column',gap:'10px'}}>
+            {messages.length === 0 && (
+              <div style={{textAlign:'center',padding:'1.5rem 1rem'}}>
+                <div style={{fontSize:'2rem',marginBottom:'8px'}}>✦</div>
+                <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>How can I help you?</p>
+                <p style={{fontSize:'11px',color:'#5a5f72',margin:'0 0 1rem'}}>Ask me anything about Listing Whisperer or real estate</p>
+                <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                  {suggestions.map(q => (
+                    <button key={q} onClick={() => setInput(q)}
+                      style={{padding:'8px 12px',background:'rgba(29,158,117,0.08)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'8px',color:'#8b8fa8',fontSize:'11px',cursor:'pointer',textAlign:'left',transition:'all 0.15s'}}
+                      onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.4)';e.currentTarget.style.color='#1D9E75'}}
+                      onMouseOut={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.15)';e.currentTarget.style.color='#8b8fa8'}}>
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {messages.map((msg, i) => (
+              <div key={i} style={{display:'flex',justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'}}>
+                <div style={{maxWidth:'85%',padding:'10px 14px',borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                  background: msg.role === 'user' ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',
+                  border: msg.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.07)',
+                  fontSize:'13px',lineHeight:'1.6',color:'#f0f0f0',whiteSpace:'pre-wrap'}}>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+
+            {loading && (
+              <div style={{display:'flex',justifyContent:'flex-start'}}>
+                <div style={{padding:'10px 14px',borderRadius:'14px 14px 14px 4px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.07)',display:'flex',gap:'4px',alignItems:'center'}}>
+                  {[0,1,2].map(i => (
+                    <div key={i} style={{width:'6px',height:'6px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef}/>
+          </div>
+
+          {/* INPUT */}
+          <div style={{padding:'0.875rem',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',gap:'8px'}}>
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+              placeholder="Ask anything..."
+              style={{flex:1,padding:'10px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',fontSize:'13px',color:'#f0f0f0',outline:'none'}}
+            />
+            <button onClick={sendMessage} disabled={loading || !input.trim()}
+              style={{width:'40px',height:'40px',borderRadius:'10px',background: input.trim() ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',border:'none',color:'#fff',fontSize:'16px',cursor: input.trim() ? 'pointer' : 'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              ↑
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* TOGGLE BUTTON */}
+      <button
+        onClick={() => setShowChat(!showChat)}
+        style={{position:'fixed',bottom:'24px',right:'24px',width:'56px',height:'56px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'none',color:'#fff',fontSize:'24px',cursor:'pointer',boxShadow:'0 4px 20px rgba(29,158,117,0.4)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500}}
+        onMouseOver={e => e.currentTarget.style.transform='scale(1.1)'}
+        onMouseOut={e => e.currentTarget.style.transform='scale(1)'}>
+        {showChat ? '✕' : '✦'}
+      </button>
+
+      <style>{`
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.8); }
+        }
+      `}</style>
+    </>
+  )
+}

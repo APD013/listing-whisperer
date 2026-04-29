@@ -7,6 +7,7 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
 });
 import "./globals.css";
+import GlobalChat from "./components/GlobalChat";
 import Script from "next/script";
 
 const geistSans = Geist({
@@ -67,6 +68,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col" style={{fontFamily: 'var(--font-inter), sans-serif'}}>
         {children}
+        <GlobalChat />
       </body>
     </html>
   );
