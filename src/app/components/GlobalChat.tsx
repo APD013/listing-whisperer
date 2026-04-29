@@ -89,8 +89,9 @@ export default function GlobalChat() {
           if (!error) {
             setMessages(prev => [...prev, {
               role: 'assistant',
-              content: `✅ **${action.name || 'New Lead'}** has been added to your Leads & Clients!`
+              content: `✅ **${action.name || 'New Lead'}** has been added to your Leads & Clients! Taking you there now...`
             }])
+            setTimeout(() => { window.location.assign('/leads') }, 1500)
           } else {
             console.error('Lead insert error:', error)
             setMessages(prev => [...prev, {
