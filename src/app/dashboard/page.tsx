@@ -1028,8 +1028,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* CHAT WIDGET */}
-      <div style={{position:'fixed',bottom:'24px',right:'24px',zIndex:1500}}>
+      {/* CHAT WIDGET MOVED TO GLOBAL LAYOUT */}
+      <div style={{display:'none'}}>
         {showChat && (
           <div style={{position:'absolute',bottom:'70px',right:'0',width:'360px',height:'500px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden'}}>
             <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
