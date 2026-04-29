@@ -81,6 +81,11 @@ export async function POST(request: Request) {
           message: `Got it! Adding **${name || 'New Lead'}** as a lead now...`,
           action: { type: 'lead_added', name, email }
         })
+      } else {
+        console.error('Lead insert error:', error)
+        return NextResponse.json({
+          message: `Sorry I couldn't add that lead. Error: ${error.message}`
+        })
       }
     }
 
