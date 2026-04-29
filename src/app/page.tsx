@@ -18,8 +18,16 @@ export default function Home() {
   return (
     <main style={{fontFamily:"'Inter', sans-serif",color:'#111'}}>
 
+      {/* STICKY TOP BAR */}
+      <div style={{background:'linear-gradient(135deg,#1D9E75,#085041)',padding:'10px 1.5rem',textAlign:'center',position:'sticky',top:0,zIndex:101}}>
+        <p style={{margin:'0',fontSize:'13px',color:'#fff',fontWeight:'600'}}>
+          🎉 Limited offer — Use code <strong style={{color:'#d4af37'}}>WELCOME50</strong> for 50% off Pro · 
+          <a href="/signup" style={{color:'#fff',textDecoration:'underline',marginLeft:'8px',fontWeight:'700'}}>Start free trial →</a>
+        </p>
+      </div>
+
       {/* NAV */}
-      <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:0,zIndex:100}}>
+      <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:'41px',zIndex:100}}>
         <div style={{fontSize:'18px',fontWeight:'700'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
           <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
