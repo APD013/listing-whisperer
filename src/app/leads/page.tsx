@@ -57,7 +57,7 @@ export default function LeadsPage() {
       .from('leads')
       .select('*')
       .eq('user_id', uid)
-      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
     if (data) setLeads(data)
     setLoading(false)
   }
