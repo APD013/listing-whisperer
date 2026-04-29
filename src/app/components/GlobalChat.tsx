@@ -102,18 +102,11 @@ export default function GlobalChat() {
         }
 
         if (action.type === 'reminder_created' && userId) {
-          const { error } = await supabase.from('reminders').insert({
-            user_id: userId,
-            content: action.content,
-            remind_at: action.remind_at,
-            sent: false,
-          })
-          if (!error) {
-            setMessages(prev => [...prev, {
-              role: 'assistant',
-              content: `✅ Reminder set for **${action.display_date}**!`
-            }])
-          }
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: `✅ Reminder set! Taking you to your reminders now...`
+          }])
+          setTimeout(() => { window.location.assign('/reminders') }, 1500)
         }
       }
     } catch(e) {
