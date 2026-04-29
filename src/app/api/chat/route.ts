@@ -38,7 +38,7 @@ const PAGES: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
-    const { messages, currentPage, userId } = await request.json()
+    const { messages, currentPage, userId, timezone } = await request.json()
     const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || ''
 
     // INTENT DETECTION — Navigate
@@ -147,14 +147,25 @@ export async function POST(request: Request) {
       }
       // Parse time if mentioned
       const timeMatch = lastMessage.match(/(\d+)\s*(am|pm)/i)
+      const userTimezone = timezone || 'America/Los_Angeles'
       if (timeMatch) {
         let hour = parseInt(timeMatch[1])
         const meridiem = timeMatch[2].toLowerCase()
         if (meridiem === 'pm' && hour !== 12) hour += 12
         if (meridiem === 'am' && hour === 12) hour = 0
-        remindAt.setHours(hour, 0, 0, 0)
+        const dateStr = remindAt.toLocaleDateString('en-CA')
+        const localDateStr = `${dateStr}T${String(hour).padStart(2,'0')}:00:00`
+        const utcDate = new Date(new Date(localDateStr).toLocaleString('en-US', { timeZone: 'UTC' }))
+        const tzDate = new Date(new Date(localDateStr).toLocaleString('en-US', { timeZone: userTimezone }))
+        const offset = utcDate.getTime() - tzDate.getTime()
+        remindAt = new Date(new Date(localDateStr).getTime() + offset)
       } else {
-        remindAt.setHours(9, 0, 0, 0)
+        const dateStr = remindAt.toLocaleDateString('en-CA')
+        const localDateStr = `${dateStr}T09:00:00`
+        const utcDate = new Date(new Date(localDateStr).toLocaleString('en-US', { timeZone: 'UTC' }))
+        const tzDate = new Date(new Date(localDateStr).toLocaleString('en-US', { timeZone: userTimezone }))
+        const offset = utcDate.getTime() - tzDate.getTime()
+        remindAt = new Date(new Date(localDateStr).getTime() + offset)
       }
 
       if (!isNaN(remindAt.getTime())) {
