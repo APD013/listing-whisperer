@@ -493,6 +493,7 @@ export default function Dashboard() {
       color: '#10b981',
       cards: [
         { icon: '✅', title: 'Transaction Checklist', desc: 'Track every step from listing to closing', color: '#1D9E75', href: '/transaction-checklist' },
+        { icon: '⏰', title: 'Reminders', desc: 'Never miss a follow-up or deadline', color: '#f59e0b', href: '/reminders' },
         { icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline and contacts', color: '#10b981', href: '/leads' },
         { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up' },
         { icon: '💰', title: 'Seller Net Sheet', desc: 'Estimate seller proceeds before closing', color: '#1D9E75', href: '/seller-net-sheet' },
@@ -566,6 +567,7 @@ export default function Dashboard() {
             { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
             { href: '/commission-calculator', icon: '🧮', label: 'Commission Calculator' },
             { href: '/transaction-checklist', icon: '✅', label: 'Transaction Checklist' },
+            { href: '/reminders', icon: '⏰', label: 'Reminders' },
             { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
             { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
             { href: '/social-planner', icon: '📅', label: 'Social Planner' },
