@@ -189,6 +189,41 @@ export default function Home() {
         </div>
       </section>
 
+      {/* AI CHAT FEATURE HIGHLIGHT */}
+      <section style={{padding:'5rem 2rem',background:'linear-gradient(135deg,#0d1117 0%,#1a1d2e 100%)'}}>
+        <div style={{maxWidth:'860px',margin:'0 auto',textAlign:'center'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(29,158,117,0.15)',color:'#1D9E75',fontSize:'12px',fontWeight:'700',padding:'5px 14px',borderRadius:'20px',marginBottom:'1.5rem',letterSpacing:'0.5px',border:'1px solid rgba(29,158,117,0.3)'}}>
+            <span style={{width:'6px',height:'6px',borderRadius:'50%',background:'#1D9E75',display:'inline-block'}}/>
+            PRO FEATURE
+          </div>
+          <h2 style={{fontSize:'clamp(1.75rem, 4vw, 2.5rem)',fontWeight:'800',color:'#f0f0f0',marginBottom:'1rem',letterSpacing:'-0.3px'}}>
+            Your always-on AI assistant.<br/>
+            <span style={{color:'#1D9E75'}}>Built for real estate agents.</span>
+          </h2>
+          <p style={{fontSize:'15px',color:'#8b8fa8',maxWidth:'560px',margin:'0 auto 3rem',lineHeight:'1.8'}}>
+            Ask real estate questions, navigate your tools, add leads, set reminders — all from one smart chat widget available on every page.
+          </p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'1.25rem',marginBottom:'3rem'}}>
+            {[
+              {icon:'💬',title:'Ask anything',desc:'"What\'s the average days on market in Newport Beach right now?"'},
+              {icon:'🧭',title:'Navigate instantly',desc:'"Take me to Seller Prep" — and it takes you there.'},
+              {icon:'👥',title:'Add leads by voice',desc:'"Add John Smith, john@email.com as a lead" — done.'},
+              {icon:'⏰',title:'Set reminders',desc:'"Remind me to call Sarah on Friday at 10AM" — saved.'},
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{background:'rgba(255,255,255,0.04)',borderRadius:'14px',padding:'1.5rem',border:'1px solid rgba(255,255,255,0.08)',textAlign:'left'}}>
+                <div style={{fontSize:'1.75rem',marginBottom:'10px'}}>{icon}</div>
+                <h3 style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#5a5f72',lineHeight:'1.7',margin:'0',fontStyle:'italic'}}>{desc}</p>
+              </div>
+            ))}
+          </div>
+          <a href="/signup" onClick={() => trackCTAClick('chat_feature_cta', 'homepage')}
+            style={{display:'inline-block',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',padding:'14px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'15px',boxShadow:'0 4px 24px rgba(29,158,117,0.4)'}}>
+            Try the AI Assistant Free →
+          </a>
+        </div>
+      </section>
+
       {/* BEFORE/AFTER */}
       <section style={{padding:'5rem 2rem',maxWidth:'900px',margin:'0 auto'}}>
         <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>From rough notes to full marketing kit</h2>
