@@ -477,7 +477,7 @@ export default function Home() {
       {/* BOTTOM CTA */}
       <section style={{padding:'5rem 2rem',background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',textAlign:'center',borderTop:'1px solid #bbf0d9'}}>
         <h2 style={{fontSize:'2rem',fontWeight:'800',marginBottom:'0.75rem',letterSpacing:'-0.3px'}}>Your AI listing assistant is ready.</h2>
-        <p style={{fontSize:'15px',color:'#555',marginBottom:'2rem',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 24 hours of full Pro access, 2 listings included. No credit card needed.</p>
+        <p style={{fontSize:'15px',color:'#555',marginBottom:'2rem',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 24 hours of full Pro access, unlimited listings. No credit card needed.</p>
         <a href="/signup" onClick={() => trackCTAClick('bottom_cta', 'homepage')}
           style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'16px 40px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 24px rgba(29,158,117,0.35)'}}>
           Get Started Free →
