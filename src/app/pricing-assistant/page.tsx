@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,6 +27,7 @@ export default function PricingAssistant() {
   })
 
   useEffect(() => {
+    trackEvent('tool_page_view', { tool: 'pricing_assistant' })
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
