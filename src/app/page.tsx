@@ -5,22 +5,29 @@ import { trackCTAClick, trackEvent, preserveUTMs } from './lib/analytics'
 export default function Home() {
   const [activeOutput, setActiveOutput] = useState('mls')
   const [showExitPopup, setShowExitPopup] = useState(false)
-  const [exitPopupShown, setExitPopupShown] = useState(false)
 
   useEffect(() => {
     preserveUTMs()
     trackEvent('landing_page_view')
 
+    // Check if modal was dismissed within last 7 days
+    const lastDismissed = localStorage.getItem('exit_popup_dismissed')
+    const sevenDays = 7 * 24 * 60 * 60 * 1000
+    const alreadyShown = sessionStorage.getItem('exit_popup_shown')
+
+    if (lastDismissed && Date.now() - parseInt(lastDismissed) < sevenDays) return
+    if (alreadyShown) return
+
     const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !exitPopupShown) {
+      if (e.clientY <= 0) {
         setShowExitPopup(true)
-        setExitPopupShown(true)
+        sessionStorage.setItem('exit_popup_shown', 'true')
         trackEvent('exit_intent_shown')
       }
     }
     document.addEventListener('mouseleave', handleMouseLeave)
     return () => document.removeEventListener('mouseleave', handleMouseLeave)
-  }, [exitPopupShown])
+  }, [])
 
   const sampleOutputs: Record<string, string> = {
     mls: `Welcome to this stunning 4-bedroom, 3-bath home nestled in the heart of Newport Beach. Spanning 2,200 sq ft of thoughtfully designed living space, this residence seamlessly blends coastal elegance with modern comfort. The chef's kitchen features quartz countertops, premium stainless appliances, and a large island perfect for entertaining. Retreat to the primary suite with spa-inspired bath and private ocean-view balcony. Three-car garage, solar panels, and smart home system included. Steps from top-rated schools, dining, and the beach. Priced at $1,295,000 — this one won't last.`,
@@ -35,7 +42,7 @@ export default function Home() {
       {showExitPopup && (
         <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.75)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
           <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)',padding:'2.5rem',maxWidth:'480px',width:'100%',boxShadow:'0 0 60px rgba(29,158,117,0.15)',textAlign:'center',position:'relative'}}>
-            <button onClick={() => setShowExitPopup(false)}
+            <button onClick={() => { setShowExitPopup(false); localStorage.setItem('exit_popup_dismissed', Date.now().toString()) }}
               style={{position:'absolute',top:'1rem',right:'1rem',background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',width:'32px',height:'32px',borderRadius:'50%',fontSize:'16px',cursor:'pointer'}}>✕</button>
             <div style={{fontSize:'3rem',marginBottom:'1rem'}}>🎁</div>
             <h2 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Wait — don't leave empty handed!</h2>
@@ -55,7 +62,7 @@ export default function Home() {
               Start Free Trial →
             </a>
             <p style={{fontSize:'12px',color:'#444',margin:'0'}}>Use code <strong style={{color:'#1D9E75'}}>WELCOME50</strong> for 50% off Pro after trial</p>
-            <button onClick={() => setShowExitPopup(false)}
+            <button onClick={() => { setShowExitPopup(false); localStorage.setItem('exit_popup_dismissed', Date.now().toString()) }}
               style={{background:'none',border:'none',color:'#444',fontSize:'12px',cursor:'pointer',marginTop:'10px'}}>
               No thanks, I'll pass
             </button>
