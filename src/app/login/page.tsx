@@ -10,7 +10,11 @@ const supabase = createClient(
 
 export default function LoginPage() {
   useEffect(() => { preserveUTMs() }, [])
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    const params = new URLSearchParams(window.location.search)
+    return params.get('email') || ''
+  })
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
