@@ -180,6 +180,7 @@ export default function Home() {
               {icon:'🏆',title:'Agent Portfolio',desc:'A shareable public portfolio page with all your past listings. Send it to any potential client. Pro only.'},
               {icon:'👥',title:'Leads & CRM',desc:'Track your pipeline, manage contacts, and stay on top of every client relationship.'},
               {icon:'✦',title:'AI Chat Assistant',desc:'Ask anything about real estate or your listings. Your always-on AI assistant built for agents.'},
+              {icon:'📞',title:'Scripts Library',desc:'Cold call, door knock, FSBO, and expired listing scripts — ready to use and AI-customized for your market.'},
             ].map(({icon,title,desc}) => (
               <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
                 onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}
