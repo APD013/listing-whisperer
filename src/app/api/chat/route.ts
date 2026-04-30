@@ -202,7 +202,7 @@ You have two roles:
 
 About Listing Whisperer:
 - AI assistant for real estate agents
-- Pricing: Free 24-hour Pro trial (2 listings), then $20/month Pro
+- Pricing: Free 24-hour Pro trial (unlimited listings), then $20/month Pro
 - No credit card required to start
 
 Tools available:
