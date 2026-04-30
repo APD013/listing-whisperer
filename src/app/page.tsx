@@ -172,7 +172,12 @@ export default function Home() {
       <section id="features" style={{padding:'5rem 2rem',background:'#fff'}}>
         <div style={{maxWidth:'920px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>One assistant. The entire listing workflow.</h2>
-          <p style={{textAlign:'center',color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>Not a generic AI tool — a purpose-built assistant for every stage of the listing process.</p>
+          <p style={{textAlign:'center',color:'#777',marginBottom:'2rem',fontSize:'15px'}}>Not a generic AI tool — a purpose-built assistant for every stage of the listing process.</p>
+          <div style={{maxWidth:'640px',margin:'0 auto 3.5rem',background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 20px',textAlign:'center'}}>
+            <p style={{fontSize:'13px',color:'#6b7280',margin:'0',lineHeight:'1.7'}}>
+              💡 <strong style={{color:'#f0f0f0'}}>Works with your existing tools.</strong> Copy, export, and use content across your MLS, CRM, email platform, and social channels. Direct integrations coming soon.
+            </p>
+          </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))',gap:'1.5rem'}}>
             {[
               {icon:'📋',title:'Seller Meeting Prep',desc:'Meeting outlines, talking points, seller questions, and follow-up emails — before every appointment.'},
