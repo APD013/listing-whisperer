@@ -175,7 +175,7 @@ export default function Home() {
           <p style={{textAlign:'center',color:'#777',marginBottom:'2rem',fontSize:'15px'}}>Not a generic AI tool — a purpose-built assistant for every stage of the listing process.</p>
           <div style={{maxWidth:'640px',margin:'0 auto 3.5rem',background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 20px',textAlign:'center'}}>
             <p style={{fontSize:'13px',color:'#6b7280',margin:'0',lineHeight:'1.7'}}>
-              💡 <strong style={{color:'#f0f0f0'}}>Works with your existing tools.</strong> Copy, export, and use content across your MLS, CRM, email platform, and social channels. Direct integrations coming soon.
+              💡 <strong style={{color:'#1D9E75'}}>Works with your existing tools.</strong> Copy, export, and use content across your MLS, CRM, email platform, and social channels. Direct integrations coming soon.
             </p>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))',gap:'1.5rem'}}>
