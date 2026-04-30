@@ -14,6 +14,7 @@ export default function Dashboard() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
   const [listingsUsed, setListingsUsed] = useState(0)
+  const [trialEndsAt, setTrialEndsAt] = useState('')
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
   const [listingCredits, setListingCredits] = useState(0)
@@ -65,11 +66,12 @@ export default function Dashboard() {
       setUserId(user.id)
       const { data: profile } = await supabase
         .from('profiles')
-        .select('listings_used, plan, listing_credits, brand_voice, full_name, referral_code')
+        .select('listings_used, plan, listing_credits, brand_voice, full_name, referral_code, trial_ends_at')
         .eq('id', user.id)
         .single()
       if (profile) {
         setListingsUsed(profile.listings_used || 0)
+        setTrialEndsAt(profile.trial_ends_at || '')
         setPlan(profile.plan || 'starter')
         setListingCredits(profile.listing_credits || 0)
         setUserName(profile.full_name || '')
@@ -117,7 +119,7 @@ export default function Dashboard() {
 
   const generate = async () => {
     if (!form.features && !form.neighborhood) { alert('Please fill in at least the neighborhood and features!'); return }
-    if (plan === 'starter' && listingsUsed >= 2 && listingCredits <= 0) { setShowUpgradeModal(true); return }
+    if (plan === 'starter' && listingCredits <= 0 && new Date() > new Date((trialEndsAt || ''))) { setShowUpgradeModal(true); return }
     setLoading(true)
     setOutputs(null)
     try {
@@ -593,7 +595,7 @@ export default function Dashboard() {
           )}
           {plan === 'starter' && (
             <div style={{fontSize:'10px',color:'#2a2a2a',textAlign:'center',marginBottom:'8px'}}>
-              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : listingsUsed < 2 ? 'Try free — 24 hours of Pro on us' : '⚠️ Trial ended — upgrade to continue'}
+              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : '✅ 24 hours of Pro — unlimited listings'}
             </div>
           )}
           <div style={{display:'flex',justifyContent:'center',gap:'10px'}}>
@@ -659,7 +661,7 @@ export default function Dashboard() {
                       onMouseOut={e => e.currentTarget.style.borderColor='rgba(255,255,255,0.06)'}>
                       <div>
                         <div style={{fontSize:'11px',fontWeight:'600',color:'#d0d0d0'}}>
-                          {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} left` : listingsUsed < 2 ? '24 hours of Pro — on us' : '⚠️ Trial ended'}
+                          {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} left` : '✅ 24 hours unlimited'}
                         </div>
                         <div style={{fontSize:'10px',color:'#1D9E75',marginTop:'2px',fontWeight:'500'}}>Upgrade to Pro →</div>
                       </div>
