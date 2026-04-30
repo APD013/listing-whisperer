@@ -44,9 +44,9 @@ export default function Home() {
             </p>
             <div style={{background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.2)',borderRadius:'10px',padding:'1rem',marginBottom:'1.5rem'}}>
               <p style={{fontSize:'13px',color:'#1D9E75',margin:'0',lineHeight:'1.8'}}>
+                ✓ Unlimited listings for 24 hours<br/>
                 ✓ 11 copy formats per listing<br/>
                 ✓ Seller meeting prep<br/>
-                ✓ Social content planner<br/>
                 ✓ No credit card needed
               </p>
             </div>
@@ -112,7 +112,7 @@ export default function Home() {
             See Real Output
           </a>
         </div>
-        <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · 2 listings included · Cancel anytime</p>
+        <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · Unlimited listings · Cancel anytime</p>
       </section>
 
       {/* STATS STRIP */}
@@ -405,7 +405,7 @@ export default function Home() {
             <p style={{fontSize:'12px',color:'#bbb',marginBottom:'1.5rem'}}>24 hours of full Pro access</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ 24 hours of Pro access</li>
-              <li>✅ 2 listings included</li>
+              <li>✅ Unlimited listings during trial</li>
               <li>✅ All 11 copy formats</li>
               <li>✅ All AI assistant tools</li>
               <li>✅ No credit card needed</li>
@@ -454,7 +454,7 @@ export default function Home() {
         <div style={{maxWidth:'620px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'3.5rem',letterSpacing:'-0.3px'}}>Frequently asked questions</h2>
           {[
-            {q:'Is this really free to start?',a:'Yes. You get 24 hours of full Pro access and 2 listings completely free — no credit card required. After your trial, Pro is $20/month with unlimited listings and all features.'},
+            {q:'Is this really free to start?',a:'Yes. You get 24 hours of full Pro access — unlimited listings completely free — no credit card required. After your trial, Pro is $20/month with unlimited listings and all features.'},
             {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, SMS, Flyer, Price Drop, and SEO copy — all from one set of notes.'},
             {q:'What is Seller Meeting Prep?',a:'Before your listing appointment, Listing Whisperer generates a complete meeting outline, talking points, questions to ask the seller, and a follow-up email — so you walk in fully prepared.'},
             {q:'What is Snap & Start?',a:'On your phone or tablet, upload property photos on-site. Our AI detects visible features, you confirm the details, and generate your first draft before you leave the property.'},
@@ -482,7 +482,7 @@ export default function Home() {
           style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'16px 40px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 24px rgba(29,158,117,0.35)'}}>
           Get Started Free →
         </a>
-        <p style={{fontSize:'13px',color:'#aaa',marginTop:'1rem'}}>No credit card · 2 listings included · Cancel anytime</p>
+        <p style={{fontSize:'13px',color:'#aaa',marginTop:'1rem'}}>No credit card · Unlimited listings · Cancel anytime</p>
       </section>
 
       {/* FOOTER */}
