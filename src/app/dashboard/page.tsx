@@ -573,6 +573,7 @@ export default function Dashboard() {
             { href: '/reminders', icon: '⏰', label: 'Reminders' },
             { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
             { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
+            { href: '/neighborhood-bio', icon: '🏘️', label: 'Neighborhood Bio' },
             { href: '/social-planner', icon: '📅', label: 'Social Planner' },
             { href: '/settings', icon: '⚙️', label: 'Settings' },
           ].map(item => (
