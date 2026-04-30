@@ -57,7 +57,7 @@ export default function Home() {
                 ✓ No credit card needed
               </p>
             </div>
-            <a href="/signup" onClick={() => { trackEvent('exit_intent_cta_click'); setShowExitPopup(false) }}
+            <a href="/signup" onClick={() => { trackEvent('exit_intent_cta_click'); setShowExitPopup(false); localStorage.setItem('exit_popup_dismissed', Date.now().toString()) }}
               style={{display:'block',padding:'14px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'15px',fontWeight:'700',boxShadow:'0 0 24px rgba(29,158,117,0.3)',marginBottom:'12px'}}>
               Start Free Trial →
             </a>
