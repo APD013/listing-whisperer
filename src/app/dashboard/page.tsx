@@ -694,7 +694,7 @@ export default function Dashboard() {
                       {bucket.cards.map((card: any, ci: number) => (
                         card.href ? (
                           <a key={ci} href={card.href}
-                            style={{background:'linear-gradient(135deg,#111420,#13161f)',borderRadius:'13px',border:'1px solid rgba(255,255,255,0.05)',padding:'1.125rem',textDecoration:'none',display:'block',transition:'all 0.2s'}}
+                            style={{background: isDark ? 'linear-gradient(135deg,#111420,#13161f)' : '#ffffff',borderRadius:'13px',border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)',padding:'1.125rem',textDecoration:'none',display:'block',transition:'all 0.2s',boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'}}
                             onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}30`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
                             onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.05)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
                             <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
