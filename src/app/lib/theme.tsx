@@ -46,11 +46,13 @@ export const themes = {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark')
+  const [theme, setTheme] = useState<Theme>('light')
 
   useEffect(() => {
-    const stored = localStorage.getItem('lw_theme') as Theme
-    if (stored) setTheme(stored)
+    const stored = (localStorage.getItem('lw_theme') as Theme) || 'light'
+    setTheme(stored)
+    document.documentElement.setAttribute('data-theme', stored)
+    document.documentElement.style.background = stored === 'light' ? '#f4f5f7' : '#111318'
 
     const loadTheme = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -72,6 +74,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const newTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(newTheme)
     localStorage.setItem('lw_theme', newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
+    document.documentElement.style.background = newTheme === 'light' ? '#f4f5f7' : '#111318'
 
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
