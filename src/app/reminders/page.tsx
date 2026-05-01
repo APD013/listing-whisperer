@@ -210,6 +210,13 @@ export default function RemindersPage() {
                           ✓ Done
                         </button>
                       )}
+                      {!reminder.sent && (
+                        <a href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(reminder.content)}&dates=${new Date(reminder.remind_at).toISOString().replace(/[-:]/g,'').split('.')[0]}Z/${new Date(new Date(reminder.remind_at).getTime() + 30*60000).toISOString().replace(/[-:]/g,'').split('.')[0]}Z&details=${encodeURIComponent('Reminder from Listing Whisperer')}`}
+                          target="_blank" rel="noopener noreferrer"
+                          style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(66,133,244,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(66,133,244,0.1)',color:'#7baff5',fontWeight:'600',textDecoration:'none',display:'inline-flex',alignItems:'center',gap:'4px'}}>
+                          📅 Google
+                        </a>
+                      )}
                       <button onClick={() => deleteReminder(reminder.id)}
                         style={{padding:'5px 12px',borderRadius:'6px',border:'1px solid rgba(239,68,68,0.2)',fontSize:'11px',cursor:'pointer',background:'rgba(239,68,68,0.1)',color:'#f87171'}}>
                         Delete
