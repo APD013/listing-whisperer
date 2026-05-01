@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { useTheme } from '../lib/theme'
 import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
 import jsPDF from 'jspdf'
 
@@ -12,6 +13,7 @@ const supabase = createClient(
 
 export default function Dashboard() {
   const router = useRouter()
+  const { theme, toggleTheme } = useTheme()
   const [userId, setUserId] = useState<string | null>(null)
   const [listingsUsed, setListingsUsed] = useState(0)
   const [trialEndsAt, setTrialEndsAt] = useState('')
@@ -444,14 +446,15 @@ export default function Dashboard() {
     { key: 'history', icon: '🕐', label: 'History' },
   ]
 
+  const isDark = theme === 'dark'
   const styles = {
-    page: { minHeight: '100vh', background: '#111318', fontFamily: "'Inter', sans-serif", display: 'flex' as const },
-    sidebar: { width: '210px', background: '#0d1018', borderRight: '1px solid rgba(255,255,255,0.04)', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-210px)' },
+    page: { minHeight: '100vh', background: isDark ? '#111318' : '#f4f5f7', fontFamily: "'Inter', sans-serif", display: 'flex' as const, color: isDark ? '#f0f0f0' : '#111318' },
+    sidebar: { width: '210px', background: isDark ? '#0d1018' : '#ffffff', borderRight: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.08)', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-210px)' },
     main: { flex: 1, minHeight: '100vh', display: 'flex' as const, flexDirection: 'column' as const },
-    card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' },
-    input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
-    select: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
-    label: { fontSize: '11px', color: '#6b7280', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
+    card: { background: isDark ? 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)' : '#ffffff', borderRadius: '16px', border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.08)', padding: '1.5rem', boxShadow: isDark ? '0 4px 24px rgba(0,0,0,0.3)' : '0 2px 12px rgba(0,0,0,0.08)' },
+    input: { width: '100%', padding: '11px 14px', background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.04)', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)', borderRadius: '8px', fontSize: '13px', color: isDark ? '#f0f0f0' : '#111318', boxSizing: 'border-box' as const, outline: 'none' },
+    select: { width: '100%', padding: '11px 14px', background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.04)', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)', borderRadius: '8px', fontSize: '13px', color: isDark ? '#f0f0f0' : '#111318' },
+    label: { fontSize: '11px', color: isDark ? '#6b7280' : '#5a6172', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
   }
 
   const hour = new Date().getHours()
@@ -622,9 +625,16 @@ export default function Dashboard() {
               <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
             )}
           </div>
-          <a href="/pricing" style={{fontSize:'11px',color: plan === 'pro' ? '#d4af37' : '#444',textDecoration:'none',fontWeight:'600'}}>
-            {plan === 'pro' ? '✦ Pro' : 'Upgrade'}
-          </a>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <button onClick={toggleTheme}
+              style={{background:'none',border:'1px solid rgba(255,255,255,0.07)',color:'#6b7280',fontSize:'14px',cursor:'pointer',padding:'5px 10px',borderRadius:'7px',transition:'all 0.2s'}}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+            <a href="/pricing" style={{fontSize:'11px',color: plan === 'pro' ? '#d4af37' : '#444',textDecoration:'none',fontWeight:'600'}}>
+              {plan === 'pro' ? '✦ Pro' : 'Upgrade'}
+            </a>
+          </div>
         </div>
 
         <div style={{padding:'2.5rem 1.5rem 3rem',flex:1,maxWidth:'860px',width:'100%',margin:'0 auto'}}>
