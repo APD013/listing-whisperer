@@ -9,6 +9,7 @@ const inter = Inter({
 import "./globals.css";
 import GlobalChat from "./components/GlobalChat";
 import Script from "next/script";
+import { ThemeProvider } from "./lib/theme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,8 +68,10 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="min-h-full flex flex-col" style={{fontFamily: 'var(--font-inter), sans-serif'}}>
-        {children}
-        <GlobalChat />
+        <ThemeProvider>
+          {children}
+          <GlobalChat />
+        </ThemeProvider>
       </body>
     </html>
   );

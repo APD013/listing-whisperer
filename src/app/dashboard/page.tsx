@@ -629,7 +629,7 @@ export default function Dashboard() {
             <button onClick={toggleTheme}
               style={{background:'none',border:'1px solid rgba(255,255,255,0.07)',color:'#6b7280',fontSize:'14px',cursor:'pointer',padding:'5px 10px',borderRadius:'7px',transition:'all 0.2s'}}
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
-              {theme === 'dark' ? '☀️' : '🌙'}
+              {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
             </button>
             <a href="/pricing" style={{fontSize:'11px',color: plan === 'pro' ? '#d4af37' : '#444',textDecoration:'none',fontWeight:'600'}}>
               {plan === 'pro' ? '✦ Pro' : 'Upgrade'}
