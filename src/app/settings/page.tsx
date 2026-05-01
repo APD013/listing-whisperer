@@ -181,6 +181,18 @@ export default function SettingsPage() {
           </select>
         </div>
 
+        {/* VOICE SETTINGS */}
+        <div style={cardStyle}>
+          <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'6px'}}>🎤 VOICE & AI CHAT</p>
+          <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'12px'}}>Voice input is available on all pages via the AI chat widget. Speak your request and the AI will respond.</p>
+          <div style={{background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 16px'}}>
+            <p style={{fontSize:'13px',color:'#f0f0f0',margin:'0 0 6px',fontWeight:'600'}}>💡 For best voice quality</p>
+            <p style={{fontSize:'13px',color:'#6b7280',margin:'0',lineHeight:'1.7'}}>
+              Voice input works on all browsers. For the most natural AI voice responses, use <strong style={{color:'#f0f0f0'}}>Safari on Mac or iPhone</strong> — it has significantly better text-to-speech quality than Chrome.
+            </p>
+          </div>
+        </div>
+
         {/* EMAIL PREFERENCES */}
         <div style={cardStyle}>
           <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'6px'}}>EMAIL PREFERENCES</p>
