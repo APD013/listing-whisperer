@@ -3,6 +3,11 @@ import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 
+// Voice input setup
+const SpeechRecognition = typeof window !== 'undefined' 
+  ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition 
+  : null
+
 const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/terms', '/privacy', '/contact']
 
 export default function GlobalChat() {
@@ -12,7 +17,10 @@ export default function GlobalChat() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+  const [isListening, setIsListening] = useState(false)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const recognitionRef = useRef<any>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -45,6 +53,31 @@ export default function GlobalChat() {
 
   if (HIDDEN_PATHS.includes(pathname)) return null
 
+  const startListening = () => {
+    if (!SpeechRecognition) {
+      alert('Voice input is not supported in this browser. Please use Chrome.')
+      return
+    }
+    const recognition = new SpeechRecognition()
+    recognition.continuous = false
+    recognition.interimResults = false
+    recognition.lang = 'en-US'
+    recognitionRef.current = recognition
+    recognition.onstart = () => setIsListening(true)
+    recognition.onend = () => setIsListening(false)
+    recognition.onerror = () => setIsListening(false)
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript
+      setInput(transcript)
+    }
+    recognition.start()
+  }
+
+  const stopListening = () => {
+    recognitionRef.current?.stop()
+    setIsListening(false)
+  }
+
   const sendMessage = async () => {
     if (!input.trim() || loading) return
     const userMessage = { role: 'user', content: input }
@@ -60,13 +93,23 @@ export default function GlobalChat() {
         body: JSON.stringify({
           messages: updatedMessages,
           currentPage: pathname,
-          userId
+          userId,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
         })
       })
       const data = await res.json()
 
       if (data.message) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+        // Voice output — read response aloud if enabled
+        if (voiceEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
+          const utterance = new SpeechSynthesisUtterance(data.message)
+          utterance.rate = 1.0
+          utterance.pitch = 1.0
+          utterance.volume = 1.0
+          window.speechSynthesis.cancel()
+          window.speechSynthesis.speak(utterance)
+        }
       }
 
       // Handle actions client-side with authenticated supabase
@@ -198,9 +241,13 @@ export default function GlobalChat() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-              placeholder="Ask anything or give a command..."
-              style={{flex:1,padding:'10px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',fontSize:'13px',color:'#f0f0f0',outline:'none'}}
+              placeholder={isListening ? '🎤 Listening...' : 'Ask anything or give a command...'}
+              style={{flex:1,padding:'10px 14px',background: isListening ? 'rgba(29,158,117,0.1)' : 'rgba(0,0,0,0.3)',border: isListening ? '1px solid rgba(29,158,117,0.4)' : '1px solid rgba(255,255,255,0.08)',borderRadius:'10px',fontSize:'13px',color:'#f0f0f0',outline:'none',transition:'all 0.2s'}}
             />
+            <button onClick={isListening ? stopListening : startListening}
+              style={{width:'40px',height:'40px',borderRadius:'10px',background: isListening ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)',border: isListening ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(255,255,255,0.08)',color: isListening ? '#f87171' : '#6b7280',fontSize:'16px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all 0.2s'}}>
+              {isListening ? '⏹' : '🎤'}
+            </button>
             <button onClick={sendMessage} disabled={loading || !input.trim()}
               style={{width:'40px',height:'40px',borderRadius:'10px',background: input.trim() ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',border:'none',color:'#fff',fontSize:'16px',cursor: input.trim() ? 'pointer' : 'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
               ↑
