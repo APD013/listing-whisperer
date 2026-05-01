@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,6 +25,7 @@ export default function SellerNetSheetPage() {
   })
 
   useEffect(() => {
+    trackEvent('tool_page_view', { tool: 'seller_net_sheet' })
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -49,12 +51,12 @@ export default function SellerNetSheetPage() {
 
   const fmt = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
 
-  const inputStyle = { width:'100%', padding:'11px 14px', background:'rgba(0,0,0,0.3)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'8px', fontSize:'13px', color:'#f0f0f0', boxSizing:'border-box' as const, outline:'none' }
-  const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'#6b7280', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
-  const cardStyle = { background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.07)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', marginBottom:'1rem' }
+  const inputStyle = { width:'100%', padding:'11px 14px', background:'var(--lw-input)', border:'1px solid var(--lw-border)', borderRadius:'8px', fontSize:'13px', color:'var(--lw-text)', boxSizing:'border-box' as const, outline:'none' }
+  const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'var(--lw-text-muted)', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
+  const cardStyle = { background:'var(--lw-card)', borderRadius:'16px', border:'1px solid var(--lw-border)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', marginBottom:'1rem' }
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
+    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"'Inter', sans-serif"}}>
       <style>{`
         @media print {
           body { background: white !important; }
@@ -69,8 +71,8 @@ export default function SellerNetSheetPage() {
       <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       {/* NAV */}
-      <div style={{background:'rgba(26,29,46,0.8)',backdropFilter:'blur(10px)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0'}}>
+      <div style={{background:'var(--lw-card)',backdropFilter:'blur(10px)',borderBottom:'1px solid var(--lw-border)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
+        <div style={{fontSize:'16px',fontWeight:'700',color:'var(--lw-text)'}}>
           Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
             <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
@@ -137,9 +139,9 @@ export default function SellerNetSheetPage() {
             <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'16px'}}>ESTIMATED NET PROCEEDS</p>
 
             <div style={{display:'flex',flexDirection:'column',gap:'10px',marginBottom:'16px'}}>
-              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'#a0a0a0'}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'var(--lw-text-muted)'}}>
                 <span>Sale Price</span>
-                <span style={{color:'#f0f0f0',fontWeight:'600'}}>{fmt(salePrice)}</span>
+                <span style={{color:'var(--lw-text)',fontWeight:'600'}}>{fmt(salePrice)}</span>
               </div>
               <div style={{height:'1px',background:'rgba(255,255,255,0.05)'}}/>
               <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'#a0a0a0'}}>
@@ -172,7 +174,7 @@ export default function SellerNetSheetPage() {
               )}
               <div style={{height:'1px',background:'rgba(255,255,255,0.05)'}}/>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <span style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0'}}>Estimated Net Proceeds</span>
+                <span style={{fontSize:'14px',fontWeight:'700',color:'var(--lw-text)'}}>Estimated Net Proceeds</span>
                 <span style={{fontSize:'22px',fontWeight:'700',color: netProceeds >= 0 ? '#1D9E75' : '#f87171'}}>{fmt(netProceeds)}</span>
               </div>
             </div>
