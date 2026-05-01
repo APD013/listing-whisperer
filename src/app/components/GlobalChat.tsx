@@ -18,7 +18,7 @@ export default function GlobalChat() {
   const [loading, setLoading] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [isListening, setIsListening] = useState(false)
-  const [voiceEnabled, setVoiceEnabled] = useState(true)
+  const [voiceEnabled, setVoiceEnabled] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
 
