@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,6 +36,7 @@ export default function ObjectionHandlerPage() {
   const [history, setHistory] = useState<{objection:string, result:any}[]>([])
 
   useEffect(() => {
+    trackEvent('tool_page_view', { tool: 'objection_handler' })
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -68,17 +70,17 @@ export default function ObjectionHandlerPage() {
     setLoading(false)
   }
 
-  const cardStyle = { background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.07)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', marginBottom:'1rem' }
-  const inputStyle = { width:'100%', padding:'11px 14px', background:'rgba(0,0,0,0.3)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'8px', fontSize:'13px', color:'#f0f0f0', boxSizing:'border-box' as const, outline:'none' }
+  const cardStyle = { background:'var(--lw-card)', borderRadius:'16px', border:'1px solid var(--lw-border)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', marginBottom:'1rem' }
+  const inputStyle = { width:'100%', padding:'11px 14px', background:'var(--lw-input)', border:'1px solid var(--lw-border)', borderRadius:'8px', fontSize:'13px', color:'var(--lw-text)', boxSizing:'border-box' as const, outline:'none' }
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
+    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"'Inter', sans-serif"}}>
 
       <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       {/* NAV */}
-      <div style={{background:'rgba(26,29,46,0.8)',backdropFilter:'blur(10px)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0'}}>
+      <div style={{background:'var(--lw-card)',backdropFilter:'blur(10px)',borderBottom:'1px solid var(--lw-border)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
+        <div style={{fontSize:'16px',fontWeight:'700',color:'var(--lw-text)'}}>
           Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
             <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
@@ -154,10 +156,10 @@ export default function ObjectionHandlerPage() {
               { key: 'emailResponse', label: '📧 Email Version', desc: 'Follow up in writing after the conversation', color: '#6366f1' },
               { key: 'psychologyTip', label: '🧠 Psychology Tip', desc: 'Why they said it and how to think about it', color: '#d4af37' },
             ].map(card => result[card.key] && (
-              <div key={card.key} style={{background:'rgba(0,0,0,0.2)',borderRadius:'12px',padding:'1rem',border:'1px solid rgba(255,255,255,0.05)',marginBottom:'10px'}}>
+              <div key={card.key} style={{background:'var(--lw-input)',borderRadius:'12px',padding:'1rem',border:'1px solid rgba(255,255,255,0.05)',marginBottom:'10px'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'8px'}}>
                   <div>
-                    <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>{card.label}</p>
+                    <p style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>{card.label}</p>
                     <p style={{fontSize:'11px',color:'#6b7280',margin:'0'}}>{card.desc}</p>
                   </div>
                   <button onClick={() => { navigator.clipboard.writeText(result[card.key]); setCopied(card.key); setTimeout(() => setCopied(null), 2000) }}
@@ -168,13 +170,13 @@ export default function ObjectionHandlerPage() {
                     {copied === card.key ? '✓ Copied!' : '📋 Copy'}
                   </button>
                 </div>
-                <p style={{fontSize:'13px',lineHeight:'1.8',color:'#c0c0c0',margin:'0',whiteSpace:'pre-wrap'}}>{result[card.key]}</p>
+                <p style={{fontSize:'13px',lineHeight:'1.8',color:'var(--lw-text)',margin:'0',whiteSpace:'pre-wrap'}}>{result[card.key]}</p>
               </div>
             ))}
 
             <div style={{marginTop:'1rem',display:'flex',gap:'8px',flexWrap:'wrap'}}>
               <button onClick={() => { setResult(null); setObjection(''); setContext(''); window.scrollTo({top:0,behavior:'smooth'}) }}
-                style={{fontSize:'12px',padding:'8px 14px',borderRadius:'8px',background:'rgba(0,0,0,0.2)',color:'#6b7280',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer'}}>
+                style={{fontSize:'12px',padding:'8px 14px',borderRadius:'8px',background:'var(--lw-input)',color:'#6b7280',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer'}}>
                 🔄 New Objection
               </button>
               <a href="/seller-prep" style={{fontSize:'12px',padding:'8px 14px',borderRadius:'8px',background:'rgba(29,158,117,0.1)',color:'#1D9E75',border:'1px solid rgba(29,158,117,0.2)',textDecoration:'none',fontWeight:'500'}}>
@@ -191,10 +193,10 @@ export default function ObjectionHandlerPage() {
             <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
               {history.map((h, i) => (
                 <div key={i} onClick={() => { setObjection(h.objection); setResult(h.result) }}
-                  style={{background:'rgba(0,0,0,0.2)',borderRadius:'10px',border:'1px solid rgba(255,255,255,0.06)',padding:'10px 14px',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center'}}
+                  style={{background:'var(--lw-input)',borderRadius:'10px',border:'1px solid rgba(255,255,255,0.06)',padding:'10px 14px',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center'}}
                   onMouseOver={e => e.currentTarget.style.borderColor='rgba(29,158,117,0.3)'}
                   onMouseOut={e => e.currentTarget.style.borderColor='rgba(255,255,255,0.06)'}>
-                  <p style={{fontSize:'13px',color:'#c0c0c0',margin:'0'}}>{h.objection}</p>
+                  <p style={{fontSize:'13px',color:'var(--lw-text)',margin:'0'}}>{h.objection}</p>
                   <span style={{fontSize:'11px',color:'#1D9E75',fontWeight:'500',marginLeft:'12px',whiteSpace:'nowrap'}}>View →</span>
                 </div>
               ))}
