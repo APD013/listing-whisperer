@@ -18,22 +18,42 @@ const PAGES: Record<string, string> = {
   'seller meeting': '/seller-prep',
   'pricing assistant': '/pricing-assistant',
   'rewrite': '/rewrite',
+  'rewrite listing': '/rewrite',
   'launch kit': '/launch-kit',
+  'launch plan': '/launch-kit',
   'open house': '/open-house',
+  'open house kit': '/open-house',
   'price drop': '/price-drop',
+  'price drop kit': '/price-drop',
   'follow up': '/follow-up',
+  'follow up assistant': '/follow-up',
   'leads': '/leads',
+  'leads and clients': '/leads',
+  'crm': '/leads',
   'photos': '/photos',
+  'photo library': '/photos',
   'settings': '/settings',
   'objection handler': '/objection-handler',
   'objection': '/objection-handler',
   'social planner': '/social-planner',
   'social content': '/social-planner',
+  'social content planner': '/social-planner',
   'seller net sheet': '/seller-net-sheet',
+  'net sheet': '/seller-net-sheet',
   'commission calculator': '/commission-calculator',
+  'commission': '/commission-calculator',
   'transaction checklist': '/transaction-checklist',
+  'checklist': '/transaction-checklist',
   'portfolio': '/agent-portfolio',
+  'agent portfolio': '/agent-portfolio',
   'pricing': '/pricing',
+  'neighborhood bio': '/neighborhood-bio',
+  'neighborhood': '/neighborhood-bio',
+  'neighborhood generator': '/neighborhood-bio',
+  'reminders': '/reminders',
+  'reminder': '/reminders',
+  'admin': '/admin',
+  'contact': '/contact',
 }
 
 export async function POST(request: Request) {
@@ -213,6 +233,8 @@ Tools available:
 - Objection Handler, Social Content Planner, Seller Net Sheet
 - Commission Calculator, Transaction Checklist, Agent Portfolio
 - Scripts Library (cold call, door knock, FSBO, expired listings)
+- Neighborhood Bio Generator (GPS location detection, neighborhood descriptions)
+- Reminders (set reminders, view upcoming reminders, add to Google Calendar)
 
 You can take actions for the agent:
 - Navigate: "take me to seller prep", "go to leads", "open objection handler"
