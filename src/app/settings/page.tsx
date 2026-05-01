@@ -63,160 +63,185 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 3000)
   }
 
-  const inputStyle = { width:'100%', padding:'11px 14px', background:'rgba(0,0,0,0.3)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'8px', fontSize:'13px', color:'#f0f0f0', boxSizing:'border-box' as const, outline:'none' }
-  const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'#6b7280', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
-  const cardStyle = { background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.07)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', marginBottom:'1rem' }
+  const inputStyle = {
+    width: '100%', padding: '12px 14px', background: 'var(--lw-input)',
+    border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '14px',
+    fontWeight: '500' as const, color: 'var(--lw-text)', boxSizing: 'border-box' as const,
+    outline: 'none', fontFamily: 'var(--font-plus-jakarta), sans-serif'
+  }
+
+  const labelStyle = {
+    fontSize: '12px', fontWeight: '600' as const, color: 'var(--lw-text-muted)',
+    display: 'block' as const, marginBottom: '6px'
+  }
+
+  const cardStyle = {
+    background: 'var(--lw-card)', borderRadius: '16px',
+    border: '1px solid var(--lw-border)', padding: '1.5rem',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: '1rem'
+  }
+
+  const sectionLabel = {
+    fontSize: '11px', fontWeight: '700' as const, color: '#1D9E75',
+    letterSpacing: '1px', margin: '0 0 4px 0'
+  }
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
-
-      {/* BACKGROUND GLOW */}
-      <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
 
       {/* NAV */}
-      <div style={{background:'rgba(26,29,46,0.8)',backdropFilter:'blur(10px)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0'}}>
-          Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+      <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
+        <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.02em' }}>
+          Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
-            <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
+            <span style={{ marginLeft: '8px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle' }}>PRO</span>
           )}
         </div>
-        <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
-          <a href="/dashboard" style={{fontSize:'13px',color:'#6b7280',textDecoration:'none'}}>← Dashboard</a>
-          <a href="/" style={{fontSize:'13px',color:'#6b7280',textDecoration:'none'}}>Sign out</a>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
+          <a href="/" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>Sign out</a>
         </div>
       </div>
 
-      <div style={{maxWidth:'680px',margin:'0 auto',padding:'2rem'}}>
+      <div style={{ maxWidth: '680px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* HERO */}
-        <div style={{marginBottom:'2rem'}}>
-          <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>⚙️ Settings</h1>
-          <p style={{fontSize:'14px',color:'#6b7280'}}>Customize your brand voice and preferences — saved to every listing you generate.</p>
+        <div style={{ marginBottom: '1.75rem' }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--lw-text)', margin: '0 0 6px', letterSpacing: '-0.03em' }}>⚙️ Settings</h1>
+          <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', margin: 0, lineHeight: '1.6' }}>Customize your brand voice and preferences — saved to every listing you generate.</p>
         </div>
 
         {/* PLAN STATUS */}
-        <div style={{...cardStyle, border: plan === 'pro' ? '1px solid rgba(29,158,117,0.3)' : '1px solid rgba(255,255,255,0.07)'}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div style={{ ...cardStyle, border: plan === 'pro' ? '1px solid rgba(29,158,117,0.25)' : '1px solid var(--lw-border)', boxShadow: plan === 'pro' ? '0 4px 20px rgba(29,158,117,0.08)' : '0 2px 12px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p style={{fontSize:'11px',fontWeight:'700',color:'#6b7280',letterSpacing:'1px',margin:'0 0 4px'}}>CURRENT PLAN</p>
-              <p style={{fontSize:'16px',fontWeight:'700',color: plan === 'pro' ? '#1D9E75' : '#f0f0f0',margin:'0'}}>
+              <p style={sectionLabel}>CURRENT PLAN</p>
+              <p style={{ fontSize: '16px', fontWeight: '700', color: plan === 'pro' ? '#1D9E75' : 'var(--lw-text)', margin: '4px 0 0' }}>
                 {plan === 'pro' ? '✦ Pro Workspace' : 'Free Plan'}
               </p>
             </div>
             {plan === 'starter' && (
-              <a href="/pricing" style={{padding:'8px 16px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'8px',textDecoration:'none',fontSize:'13px',fontWeight:'600',boxShadow:'0 0 16px rgba(29,158,117,0.3)'}}>
+              <a href="/pricing" style={{ padding: '10px 18px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '700', boxShadow: '0 4px 16px rgba(29,158,117,0.3)' }}>
                 Upgrade to Pro
               </a>
             )}
             {plan === 'pro' && (
-              <span style={{background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'11px',fontWeight:'700',padding:'4px 12px',borderRadius:'20px',boxShadow:'0 0 12px rgba(29,158,117,0.3)'}}>PRO</span>
+              <span style={{ background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '11px', fontWeight: '700', padding: '5px 14px', borderRadius: '20px' }}>PRO</span>
             )}
           </div>
         </div>
 
         {/* BRAND VOICE */}
         <div style={cardStyle}>
-          <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'6px'}}>YOUR BRAND VOICE</p>
-          <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'16px',paddingBottom:'16px',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+          <p style={sectionLabel}>YOUR BRAND VOICE</p>
+          <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '4px 0 16px', paddingBottom: '16px', borderBottom: '1px solid var(--lw-border)', lineHeight: '1.6' }}>
             These details are automatically applied to every listing you generate — so every piece of copy sounds like you.
           </p>
 
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'12px'}}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
             <div>
               <label style={labelStyle}>Your Name</label>
-              <input placeholder="Jane Smith" value={brandVoice.agentName} onChange={e=>setBrandVoice({...brandVoice,agentName:e.target.value})} style={inputStyle}/>
+              <input placeholder="Jane Smith" value={brandVoice.agentName} onChange={e => setBrandVoice({ ...brandVoice, agentName: e.target.value })} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Brokerage</label>
-              <input placeholder="Compass, KW, eXp..." value={brandVoice.brokerage} onChange={e=>setBrandVoice({...brandVoice,brokerage:e.target.value})} style={inputStyle}/>
+              <input placeholder="Compass, KW, eXp..." value={brandVoice.brokerage} onChange={e => setBrandVoice({ ...brandVoice, brokerage: e.target.value })} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Phone</label>
-              <input placeholder="(714) 555-0100" value={brandVoice.phone} onChange={e=>setBrandVoice({...brandVoice,phone:e.target.value})} style={inputStyle}/>
+              <input placeholder="(714) 555-0100" value={brandVoice.phone} onChange={e => setBrandVoice({ ...brandVoice, phone: e.target.value })} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Website</label>
-              <input placeholder="yoursite.com" value={brandVoice.website} onChange={e=>setBrandVoice({...brandVoice,website:e.target.value})} style={inputStyle}/>
+              <input placeholder="yoursite.com" value={brandVoice.website} onChange={e => setBrandVoice({ ...brandVoice, website: e.target.value })} style={inputStyle} />
             </div>
           </div>
 
-          <div style={{marginBottom:'12px'}}>
+          <div style={{ marginBottom: '12px' }}>
             <label style={labelStyle}>Preferred Tone</label>
-            <select value={brandVoice.preferredTone} onChange={e=>setBrandVoice({...brandVoice,preferredTone:e.target.value})} style={inputStyle}>
-              <option>Warm & inviting</option><option>Luxury & aspirational</option><option>Modern & minimal</option>
-              <option>Professional</option><option>Family-friendly</option><option>Investment-focused</option>
+            <select value={brandVoice.preferredTone} onChange={e => setBrandVoice({ ...brandVoice, preferredTone: e.target.value })} style={inputStyle}>
+              <option>Warm & inviting</option>
+              <option>Luxury & aspirational</option>
+              <option>Modern & minimal</option>
+              <option>Professional</option>
+              <option>Family-friendly</option>
+              <option>Investment-focused</option>
             </select>
           </div>
 
-          <div style={{marginBottom:'12px'}}>
-            <label style={labelStyle}>Target Buyers <span style={{color:'#444',fontWeight:'400',textTransform:'none'}}>— who do you usually sell to?</span></label>
-            <input placeholder="Move-up families, luxury buyers, investors..." value={brandVoice.targetBuyers} onChange={e=>setBrandVoice({...brandVoice,targetBuyers:e.target.value})} style={inputStyle}/>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={labelStyle}>Target Buyers <span style={{ color: 'var(--lw-text-muted)', fontWeight: '400' }}>— who do you usually sell to?</span></label>
+            <input placeholder="Move-up families, luxury buyers, investors..." value={brandVoice.targetBuyers} onChange={e => setBrandVoice({ ...brandVoice, targetBuyers: e.target.value })} style={inputStyle} />
           </div>
 
-          <div style={{marginBottom:'12px'}}>
-            <label style={labelStyle}>Your Writing Style <span style={{color:'#444',fontWeight:'400',textTransform:'none'}}>— how do you like to sound?</span></label>
-            <input placeholder="Conversational, storytelling, data-driven, aspirational..." value={brandVoice.uniqueStyle} onChange={e=>setBrandVoice({...brandVoice,uniqueStyle:e.target.value})} style={inputStyle}/>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={labelStyle}>Your Writing Style <span style={{ color: 'var(--lw-text-muted)', fontWeight: '400' }}>— how do you like to sound?</span></label>
+            <input placeholder="Conversational, storytelling, data-driven, aspirational..." value={brandVoice.uniqueStyle} onChange={e => setBrandVoice({ ...brandVoice, uniqueStyle: e.target.value })} style={inputStyle} />
           </div>
 
-          <div style={{marginBottom:'12px'}}>
-            <label style={labelStyle}>CTA Style <span style={{color:'#444',fontWeight:'400',textTransform:'none'}}>— how do you close?</span></label>
-            <input placeholder="e.g. Call me today, DM for details, Schedule a private tour..." value={brandVoice.ctaStyle} onChange={e=>setBrandVoice({...brandVoice,ctaStyle:e.target.value})} style={inputStyle}/>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={labelStyle}>CTA Style <span style={{ color: 'var(--lw-text-muted)', fontWeight: '400' }}>— how do you close?</span></label>
+            <input placeholder="e.g. Call me today, DM for details, Schedule a private tour..." value={brandVoice.ctaStyle} onChange={e => setBrandVoice({ ...brandVoice, ctaStyle: e.target.value })} style={inputStyle} />
           </div>
 
-          <div style={{marginBottom:'12px'}}>
-            <label style={labelStyle}>Words to Avoid (optional)</label>
-            <input placeholder="e.g. cozy, charming, unique, nestled..." value={brandVoice.avoidWords} onChange={e=>setBrandVoice({...brandVoice,avoidWords:e.target.value})} style={inputStyle}/>
+          <div>
+            <label style={labelStyle}>Words to Avoid <span style={{ color: 'var(--lw-text-muted)', fontWeight: '400' }}>(optional)</span></label>
+            <input placeholder="e.g. cozy, charming, unique, nestled..." value={brandVoice.avoidWords} onChange={e => setBrandVoice({ ...brandVoice, avoidWords: e.target.value })} style={inputStyle} />
           </div>
         </div>
 
         {/* LANGUAGE */}
         <div style={cardStyle}>
-          <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'6px'}}>OUTPUT LANGUAGE</p>
-          <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'12px'}}>All generated copy will be written in this language.</p>
+          <p style={sectionLabel}>OUTPUT LANGUAGE</p>
+          <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '4px 0 14px', lineHeight: '1.6' }}>All generated copy will be written in this language.</p>
           <select value={language} onChange={e => setLanguage(e.target.value)} style={inputStyle}>
-            <option>English</option><option>Spanish</option><option>Mandarin Chinese</option>
-            <option>Polish</option><option>French</option><option>Vietnamese</option>
-            <option>Korean</option><option>Arabic</option>
+            <option>English</option>
+            <option>Spanish</option>
+            <option>Mandarin Chinese</option>
+            <option>Polish</option>
+            <option>French</option>
+            <option>Vietnamese</option>
+            <option>Korean</option>
+            <option>Arabic</option>
           </select>
         </div>
 
         {/* VOICE SETTINGS */}
         <div style={cardStyle}>
-          <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'6px'}}>🎤 VOICE & AI CHAT</p>
-          <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'12px'}}>Voice input is available on all pages via the AI chat widget. Speak your request and the AI will respond.</p>
-          <div style={{background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 16px'}}>
-            <p style={{fontSize:'13px',color:'#f0f0f0',margin:'0 0 6px',fontWeight:'600'}}>💡 For best voice quality</p>
-            <p style={{fontSize:'13px',color:'#6b7280',margin:'0',lineHeight:'1.7'}}>
-              Voice input works on all browsers. For the most natural AI voice responses, use <strong style={{color:'#f0f0f0'}}>Safari on Mac or iPhone</strong> — it has significantly better text-to-speech quality than Chrome.
+          <p style={sectionLabel}>🎤 VOICE & AI CHAT</p>
+          <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '4px 0 14px', lineHeight: '1.6' }}>Voice input is available on all pages via the AI chat widget. Speak your request and the AI will respond.</p>
+          <div style={{ background: 'rgba(29,158,117,0.06)', border: '1px solid rgba(29,158,117,0.15)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', margin: '0 0 6px' }}>💡 For best voice quality</p>
+            <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: 0, lineHeight: '1.7' }}>
+              Voice input works on all browsers. For the most natural AI voice responses, use <strong style={{ color: 'var(--lw-text)' }}>Safari on Mac or iPhone</strong> — it has significantly better text-to-speech quality than Chrome.
             </p>
           </div>
         </div>
 
         {/* EMAIL PREFERENCES */}
         <div style={cardStyle}>
-          <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'6px'}}>EMAIL PREFERENCES</p>
-          <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'16px'}}>We never share your email. Unsubscribe anytime.</p>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)',borderRadius:'10px',padding:'14px 16px',border:'1px solid rgba(255,255,255,0.06)'}}>
+          <p style={sectionLabel}>EMAIL PREFERENCES</p>
+          <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '4px 0 16px', lineHeight: '1.6' }}>We never share your email. Unsubscribe anytime.</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--lw-input)', borderRadius: '12px', padding: '14px 16px', border: '1px solid var(--lw-border)' }}>
             <div>
-              <p style={{fontSize:'13px',fontWeight:'500',color:'#f0f0f0',margin:'0 0 2px'}}>Product updates & new features</p>
-              <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>Get notified when we launch new tools</p>
+              <p style={{ fontSize: '14px', fontWeight: '600', color: 'var(--lw-text)', margin: '0 0 2px' }}>Product updates & new features</p>
+              <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: 0 }}>Get notified when we launch new tools</p>
             </div>
             <div onClick={() => setMarketingEmails(!marketingEmails)}
-              style={{width:'44px',height:'24px',borderRadius:'12px',background: marketingEmails ? '#1D9E75' : 'rgba(255,255,255,0.1)',cursor:'pointer',position:'relative',transition:'all 0.2s',flexShrink:0,marginLeft:'12px',boxShadow: marketingEmails ? '0 0 12px rgba(29,158,117,0.4)' : 'none'}}>
-              <div style={{width:'20px',height:'20px',borderRadius:'50%',background:'#fff',position:'absolute',top:'2px',left: marketingEmails ? '22px' : '2px',transition:'all 0.2s',boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}}></div>
+              style={{ width: '44px', height: '24px', borderRadius: '12px', background: marketingEmails ? '#1D9E75' : 'rgba(0,0,0,0.15)', cursor: 'pointer', position: 'relative', transition: 'all 0.2s', flexShrink: 0, marginLeft: '16px', border: '1px solid var(--lw-border)' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '1px', left: marketingEmails ? '21px' : '1px', transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
             </div>
           </div>
         </div>
 
         {/* SAVE */}
         <button onClick={save} disabled={saving}
-          style={{width:'100%',padding:'14px',background: saving ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'700',cursor: saving ? 'not-allowed' : 'pointer',boxShadow: saving ? 'none' : '0 0 24px rgba(29,158,117,0.3)',transition:'all 0.2s',marginBottom:'1rem'}}>
+          style={{ width: '100%', padding: '14px', background: saved ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : '0 4px 20px rgba(29,158,117,0.3)', transition: 'all 0.2s', marginBottom: '1rem', fontFamily: 'var(--font-plus-jakarta), sans-serif', letterSpacing: '0.01em' }}>
           {saving ? 'Saving...' : saved ? '✅ Saved!' : 'Save Settings'}
         </button>
 
-        <div style={{textAlign:'center'}}>
-          <a href="/dashboard" style={{fontSize:'13px',color:'#6b7280',textDecoration:'none'}}>← Back to Dashboard</a>
+        <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
+          <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Back to Dashboard</a>
         </div>
       </div>
     </main>
