@@ -12,7 +12,7 @@ const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-pass
 
 export default function GlobalChat() {
   const pathname = usePathname()
-  const [showChat, setShowChat] = useState(true)
+  const [showChat, setShowChat] = useState(false)
   const [messages, setMessages] = useState<{role:string,content:string}[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -30,6 +30,8 @@ export default function GlobalChat() {
       }
     }
     getUser()
+    const dismissed = sessionStorage.getItem('lw_chat_dismissed')
+    if (!dismissed) setShowChat(true)
   }, [])
 
   useEffect(() => {
@@ -201,7 +203,7 @@ export default function GlobalChat() {
               {messages.length > 0 && (
                 <button onClick={clearHistory} style={{background:'none',border:'none',color:'#444',fontSize:'11px',cursor:'pointer',padding:'2px 6px'}}>Clear</button>
               )}
-              <button onClick={() => setShowChat(false)} style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
+              <button onClick={() => { setShowChat(false); sessionStorage.setItem('lw_chat_dismissed', '1') }} style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
             </div>
           </div>
 
