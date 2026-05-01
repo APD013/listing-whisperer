@@ -614,12 +614,12 @@ export default function Dashboard() {
 
       {/* MAIN */}
       <div style={styles.main}>
-        <div style={{background:'rgba(10,13,20,0.98)',borderBottom:'1px solid rgba(255,255,255,0.04)',padding:'0.75rem 1.25rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
+        <div style={{background: isDark ? 'rgba(10,13,20,0.98)' : 'rgba(255,255,255,0.98)',borderBottom: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.08)',padding:'0.75rem 1.25rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
           <button onClick={() => setSidebarOpen(true)}
             style={{background:'none',border:'1px solid rgba(255,255,255,0.07)',color:'#5a5f72',fontSize:'15px',cursor:'pointer',padding:'5px 10px',borderRadius:'7px'}}>
             ☰
           </button>
-          <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0'}}>
+          <div style={{fontSize:'14px',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318'}}>
             Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
             {planLoaded && plan === 'pro' && (
               <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
@@ -645,10 +645,10 @@ export default function Dashboard() {
               <div style={{marginBottom:'3rem'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'16px',marginBottom:'8px'}}>
                   <div>
-                    <h1 style={{fontSize:'2rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 8px',letterSpacing:'-0.5px'}}>
+                    <h1 style={{fontSize:'2rem',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318',margin:'0 0 8px',letterSpacing:'-0.5px'}}>
                       {greeting}{firstName ? `, ${firstName}` : ''} 👋
                     </h1>
-                    <p style={{fontSize:'15px',color:'#3a3f52',margin:'0',fontWeight:'400'}}>
+                    <p style={{fontSize:'15px',color: isDark ? '#8b8fa8' : '#5a6172',margin:'0',fontWeight:'400'}}>
                       What would you like to do today?
                     </p>
                   </div>
@@ -698,8 +698,8 @@ export default function Dashboard() {
                             onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}30`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
                             onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.05)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
                             <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color:'#e0e0e0',marginBottom:'3px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color:'#6b7280',lineHeight:'1.5'}}>{card.desc}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'3px'}}>{card.title}</div>
+                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.5'}}>{card.desc}</div>
                           </a>
                         ) : (
                           <div key={ci} onClick={card.action}
@@ -707,8 +707,8 @@ export default function Dashboard() {
                             onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}45`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
                             onMouseOut={e => {e.currentTarget.style.borderColor=`${card.color}20`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
                             <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}15`,border:`1px solid ${card.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color:'#e0e0e0',marginBottom:'3px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color:'#6b7280',lineHeight:'1.5'}}>{card.desc}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'3px'}}>{card.title}</div>
+                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.5'}}>{card.desc}</div>
                             <div style={{marginTop:'8px',fontSize:'11px',fontWeight:'600',color:card.color}}>Start now →</div>
                           </div>
                         )
