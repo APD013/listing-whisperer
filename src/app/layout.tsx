@@ -44,6 +44,19 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
+        <script dangerouslySetInnerHTML={{__html: `
+          (function() {
+            try {
+              var theme = localStorage.getItem('lw_theme') || 'light';
+              document.documentElement.setAttribute('data-theme', theme);
+              if (theme === 'light') {
+                document.documentElement.style.background = '#f4f5f7';
+              } else {
+                document.documentElement.style.background = '#111318';
+              }
+            } catch(e) {}
+          })();
+        `}}/>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-50NE5KHLE3"
           strategy="afterInteractive"
