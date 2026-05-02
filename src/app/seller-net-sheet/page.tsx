@@ -56,7 +56,7 @@ export default function SellerNetSheetPage() {
   const cardStyle = { background:'var(--lw-card)', borderRadius:'16px', border:'1px solid var(--lw-border)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', marginBottom:'1rem' }
 
   return (
-    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"'Inter', sans-serif"}}>
+    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>
       <style>{`
         @media print {
           body { background: white !important; }
@@ -144,30 +144,30 @@ export default function SellerNetSheetPage() {
                 <span style={{color:'var(--lw-text)',fontWeight:'600'}}>{fmt(salePrice)}</span>
               </div>
               <div style={{height:'1px',background:'rgba(255,255,255,0.05)'}}/>
-              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'#a0a0a0'}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'var(--lw-text-muted)'}}>
                 <span>Mortgage Payoff</span>
                 <span style={{color:'#f87171'}}>− {fmt(mortgageBalance)}</span>
               </div>
-              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'#a0a0a0'}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'var(--lw-text-muted)'}}>
                 <span>Commission ({form.commission}%)</span>
                 <span style={{color:'#f87171'}}>− {fmt(commissionAmt)}</span>
               </div>
-              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'#a0a0a0'}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'var(--lw-text-muted)'}}>
                 <span>Title Fees</span>
                 <span style={{color:'#f87171'}}>− {fmt(titleFees)}</span>
               </div>
-              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'#a0a0a0'}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'var(--lw-text-muted)'}}>
                 <span>Escrow Fees</span>
                 <span style={{color:'#f87171'}}>− {fmt(escrowFees)}</span>
               </div>
               {repairCredits > 0 && (
-                <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'#a0a0a0'}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'var(--lw-text-muted)'}}>
                   <span>Repair Credits</span>
                   <span style={{color:'#f87171'}}>− {fmt(repairCredits)}</span>
                 </div>
               )}
               {otherCosts > 0 && (
-                <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'#a0a0a0'}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'var(--lw-text-muted)'}}>
                   <span>Other Costs</span>
                   <span style={{color:'#f87171'}}>− {fmt(otherCosts)}</span>
                 </div>
@@ -181,7 +181,7 @@ export default function SellerNetSheetPage() {
 
             <div style={{background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 14px'}}>
               <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>
-                💡 <strong style={{color:'#a0a0a0'}}>Disclaimer:</strong> This is an estimate only. Actual proceeds may vary based on prorations, liens, HOA fees, and other closing items.
+                💡 <strong style={{color:'var(--lw-text-muted)'}}>Disclaimer:</strong> This is an estimate only. Actual proceeds may vary based on prorations, liens, HOA fees, and other closing items.
               </p>
             </div>
           </div>

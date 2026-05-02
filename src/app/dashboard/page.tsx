@@ -448,7 +448,7 @@ export default function Dashboard() {
 
   const isDark = theme === 'dark'
   const styles = {
-    page: { minHeight: '100vh', background: isDark ? '#111318' : '#f4f5f7', fontFamily: "'Inter', sans-serif", display: 'flex' as const, color: isDark ? '#f0f0f0' : '#111318' },
+    page: { minHeight: '100vh', background: isDark ? '#111318' : '#f4f5f7', fontFamily: "var(--font-plus-jakarta), sans-serif", display: 'flex' as const, color: isDark ? '#f0f0f0' : '#111318' },
     sidebar: { width: '210px', background: isDark ? '#0d1018' : '#ffffff', borderRight: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.08)', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-210px)' },
     main: { flex: 1, minHeight: '100vh', display: 'flex' as const, flexDirection: 'column' as const },
     card: { background: isDark ? 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)' : '#ffffff', borderRadius: '16px', border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.08)', padding: '1.5rem', boxShadow: isDark ? '0 4px 24px rgba(0,0,0,0.3)' : '0 2px 12px rgba(0,0,0,0.08)' },
