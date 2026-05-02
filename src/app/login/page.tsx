@@ -39,45 +39,42 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif",display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
-      
-      {/* BACKGROUND GLOW */}
-      <div style={{position:'fixed',top:'20%',left:'50%',transform:'translateX(-50%)',width:'600px',height:'600px',background:'radial-gradient(circle, rgba(29,158,117,0.08) 0%, transparent 70%)',pointerEvents:'none'}}/>
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
 
-      <div style={{width:'100%',maxWidth:'420px',position:'relative',zIndex:1}}>
-        
+      <div style={{ width: '100%', maxWidth: '420px', position: 'relative', zIndex: 1 }}>
+
         {/* LOGO */}
-        <div style={{textAlign:'center',marginBottom:'2rem'}}>
-          <a href="/" style={{textDecoration:'none'}}>
-            <div style={{fontSize:'24px',fontWeight:'700',color:'#f0f0f0'}}>
-              Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <a href="/" style={{ textDecoration: 'none' }}>
+            <div style={{ fontSize: '26px', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.03em' }}>
+              Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
             </div>
-            <div style={{fontSize:'12px',color:'#6b7280',marginTop:'4px'}}>AI Assistant for Real Estate Agents</div>
+            <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--lw-text-muted)', marginTop: '4px' }}>AI Assistant for Real Estate Agents</div>
           </a>
         </div>
 
         {/* CARD */}
-        <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.2)',padding:'2rem',boxShadow:'0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(29,158,117,0.05), 0 0 40px rgba(29,158,117,0.06)'}}>
-          
-          <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>Welcome back</h1>
-          <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'1.5rem'}}>Sign in to your workspace</p>
+        <div style={{ background: 'var(--lw-card)', borderRadius: '20px', border: '1px solid rgba(29,158,117,0.2)', padding: '2rem', boxShadow: '0 8px 40px rgba(0,0,0,0.1), 0 0 0 1px rgba(29,158,117,0.05)' }}>
 
-          <div style={{marginBottom:'12px'}}>
-            <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Email</label>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--lw-text)', margin: '0 0 6px', letterSpacing: '-0.02em' }}>Welcome back</h1>
+          <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '0 0 1.5rem' }}>Sign in to your workspace</p>
+
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)', display: 'block', marginBottom: '6px' }}>Email</label>
             <input
               type="email"
               placeholder="you@example.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}
+              style={{ width: '100%', padding: '12px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '14px', fontWeight: '500', color: 'var(--lw-text)', boxSizing: 'border-box', outline: 'none', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}
             />
           </div>
 
-          <div style={{marginBottom:'1.5rem'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'5px'}}>
-              <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',letterSpacing:'0.5px',textTransform:'uppercase'}}>Password</label>
-              <a href="/forgot-password" style={{fontSize:'11px',color:'#1D9E75',textDecoration:'none',fontWeight:'500'}}>Forgot password?</a>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)' }}>Password</label>
+              <a href="/forgot-password" style={{ fontSize: '12px', color: '#1D9E75', textDecoration: 'none', fontWeight: '600' }}>Forgot password?</a>
             </div>
             <input
               type="password"
@@ -85,32 +82,32 @@ export default function LoginPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}
+              style={{ width: '100%', padding: '12px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '14px', fontWeight: '500', color: 'var(--lw-text)', boxSizing: 'border-box', outline: 'none', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}
             />
           </div>
 
           {message && (
-            <div style={{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'8px',padding:'10px 14px',marginBottom:'16px'}}>
-              <p style={{fontSize:'13px',color:'#f87171',margin:'0'}}>{message}</p>
+            <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', padding: '10px 14px', marginBottom: '16px' }}>
+              <p style={{ fontSize: '13px', color: '#ef4444', margin: 0, fontWeight: '500' }}>{message}</p>
             </div>
           )}
 
           <button onClick={handleLogin} disabled={loading}
-            style={{width:'100%',padding:'13px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 24px rgba(29,158,117,0.3)',transition:'all 0.2s',letterSpacing:'0.3px'}}>
+            style={{ width: '100%', padding: '13px', background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 20px rgba(29,158,117,0.3)', transition: 'all 0.2s', letterSpacing: '0.01em', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
             {loading ? 'Signing in...' : 'Sign In →'}
           </button>
 
-          <div style={{marginTop:'1.5rem',paddingTop:'1.5rem',borderTop:'1px solid rgba(255,255,255,0.06)',textAlign:'center'}}>
-            <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--lw-border)', textAlign: 'center' }}>
+            <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: 0 }}>
               Don't have an account?{' '}
-              <a href="/signup" style={{color:'#1D9E75',textDecoration:'none',fontWeight:'600'}}>Sign up free</a>
+              <a href="/signup" style={{ color: '#1D9E75', textDecoration: 'none', fontWeight: '700' }}>Sign up free</a>
             </p>
           </div>
         </div>
 
         {/* FOOTER */}
-        <div style={{textAlign:'center',marginTop:'1.5rem'}}>
-          <p style={{fontSize:'12px',color:'#444'}}>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <p style={{ fontSize: '12px', fontWeight: '500', color: 'var(--lw-text-muted)', margin: 0 }}>
             🔒 Secure login · No credit card required · 24hr free trial
           </p>
         </div>

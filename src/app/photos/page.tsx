@@ -23,18 +23,10 @@ export default function PhotosPage() {
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
       const { data: profile } = await supabase
-        .from('profiles')
-        .select('plan')
-        .eq('id', user.id)
-        .single()
-      if (profile) {
-        setPlan(profile.plan || 'starter')
-        setPlanLoaded(true)
-      } else {
-        setPlanLoaded(true)
-      }
+        .from('profiles').select('plan').eq('id', user.id).single()
+      if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
+      else { setPlanLoaded(true) }
 
-      // Load photos from Supabase Storage
       const { data: files } = await supabase.storage
         .from('listing-photos')
         .list(user.id, { sortBy: { column: 'created_at', order: 'desc' } })
@@ -53,57 +45,58 @@ export default function PhotosPage() {
     getUser()
   }, [])
 
-  const cardStyle = { background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.07)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)' }
+  const cardStyle = {
+    background: 'var(--lw-card)', borderRadius: '16px',
+    border: '1px solid var(--lw-border)', padding: '1.5rem',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.05)'
+  }
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
-
-      {/* BACKGROUND GLOW */}
-      <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
 
       {/* NAV */}
-      <div style={{background:'rgba(26,29,46,0.8)',backdropFilter:'blur(10px)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0'}}>
-          Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+      <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
+        <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.02em' }}>
+          Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
-            <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
+            <span style={{ marginLeft: '8px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle' }}>PRO</span>
           )}
         </div>
-        <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
-          <a href="/dashboard" style={{fontSize:'13px',color:'#6b7280',textDecoration:'none'}}>← Dashboard</a>
-          <a href="/snap-start" style={{fontSize:'13px',color:'#1D9E75',textDecoration:'none',fontWeight:'500'}}>📸 Snap & Start</a>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
+          <a href="/snap-start" style={{ fontSize: '13px', fontWeight: '600', color: '#1D9E75', textDecoration: 'none' }}>📸 Snap & Start</a>
         </div>
       </div>
 
-      <div style={{maxWidth:'900px',margin:'0 auto',padding:'2rem'}}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* HEADER */}
-        <div style={{marginBottom:'2rem',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div style={{ marginBottom: '1.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>📸 Photo Library</h1>
-            <p style={{fontSize:'14px',color:'#6b7280'}}>All property photos uploaded via Snap & Start</p>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--lw-text)', margin: '0 0 4px', letterSpacing: '-0.03em' }}>📸 Photo Library</h1>
+            <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', margin: 0 }}>All property photos uploaded via Snap & Start</p>
           </div>
           <a href="/snap-start"
-            style={{padding:'10px 20px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'13px',fontWeight:'600',boxShadow:'0 0 16px rgba(29,158,117,0.3)'}}>
+            style={{ padding: '11px 22px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '700', boxShadow: '0 4px 16px rgba(29,158,117,0.3)' }}>
             + Upload Photos
           </a>
         </div>
 
         {/* LOADING */}
         {loading && (
-          <div style={{...cardStyle,textAlign:'center',padding:'3rem'}}>
-            <p style={{color:'#6b7280'}}>Loading your photos...</p>
+          <div style={{ ...cardStyle, textAlign: 'center', padding: '3rem' }}>
+            <p style={{ color: 'var(--lw-text-muted)', fontWeight: '500', margin: 0 }}>Loading your photos...</p>
           </div>
         )}
 
         {/* EMPTY STATE */}
         {!loading && photos.length === 0 && (
-          <div style={{...cardStyle,textAlign:'center',padding:'3rem'}}>
-            <div style={{fontSize:'3rem',marginBottom:'1rem'}}>📸</div>
-            <h2 style={{fontSize:'1.25rem',fontWeight:'600',color:'#f0f0f0',marginBottom:'8px'}}>No photos yet</h2>
-            <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'1.5rem'}}>Upload property photos via Snap & Start and they'll appear here.</p>
+          <div style={{ ...cardStyle, textAlign: 'center', padding: '3rem' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📸</div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--lw-text)', marginBottom: '8px' }}>No photos yet</h2>
+            <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', marginBottom: '1.5rem' }}>Upload property photos via Snap & Start and they'll appear here.</p>
             <a href="/snap-start"
-              style={{display:'inline-block',padding:'10px 24px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'14px',fontWeight:'600',boxShadow:'0 0 16px rgba(29,158,117,0.3)'}}>
+              style={{ display: 'inline-block', padding: '11px 24px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700', boxShadow: '0 4px 16px rgba(29,158,117,0.3)' }}>
               Go to Snap & Start
             </a>
           </div>
@@ -112,17 +105,17 @@ export default function PhotosPage() {
         {/* PHOTO GRID */}
         {!loading && photos.length > 0 && (
           <div>
-            <p style={{fontSize:'12px',color:'#6b7280',marginBottom:'1rem'}}>{photos.length} photo{photos.length > 1 ? 's' : ''} saved</p>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px'}}>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', marginBottom: '1rem' }}>{photos.length} photo{photos.length > 1 ? 's' : ''} saved</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
               {photos.map((photo, i) => (
                 <div key={i}
                   onClick={() => setSelectedPhoto(photo.url)}
-                  style={{borderRadius:'12px',overflow:'hidden',border:'1px solid rgba(255,255,255,0.07)',cursor:'pointer',transition:'all 0.2s',position:'relative'}}
-                  onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
-                  onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                  <img src={photo.url} alt="" style={{width:'100%',height:'160px',objectFit:'cover',display:'block'}}/>
-                  <div style={{padding:'8px 10px',background:'rgba(26,29,46,0.95)'}}>
-                    <p style={{fontSize:'11px',color:'#6b7280',margin:'0',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                  style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--lw-border)', cursor: 'pointer', transition: 'all 0.2s', position: 'relative', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}
+                  onMouseOver={e => { e.currentTarget.style.borderColor = '#1D9E75'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(29,158,117,0.15)' }}
+                  onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--lw-border)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)' }}>
+                  <img src={photo.url} alt="" style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ padding: '8px 10px', background: 'var(--lw-card)', borderTop: '1px solid var(--lw-border)' }}>
+                    <p style={{ fontSize: '11px', fontWeight: '500', color: 'var(--lw-text-muted)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {new Date(photo.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -137,11 +130,11 @@ export default function PhotosPage() {
       {selectedPhoto && (
         <div
           onClick={() => setSelectedPhoto(null)}
-          style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.9)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
-          <img src={selectedPhoto} alt="" style={{maxWidth:'100%',maxHeight:'90vh',borderRadius:'12px',objectFit:'contain'}}/>
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <img src={selectedPhoto} alt="" style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: '12px', objectFit: 'contain' }} />
           <button
             onClick={() => setSelectedPhoto(null)}
-            style={{position:'absolute',top:'1rem',right:'1rem',background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',width:'40px',height:'40px',borderRadius:'50%',fontSize:'18px',cursor:'pointer'}}>
+            style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', width: '40px', height: '40px', borderRadius: '50%', fontSize: '18px', cursor: 'pointer' }}>
             ✕
           </button>
         </div>

@@ -143,73 +143,79 @@ export default function TransactionChecklistPage() {
     if (confirm('Reset all checkboxes?')) setChecked({})
   }
 
-  const cardStyle = { background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.07)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', marginBottom:'1rem' }
+  const cardStyle = {
+    background: 'var(--lw-card)', borderRadius: '16px',
+    border: '1px solid var(--lw-border)', padding: '1.5rem',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: '1rem'
+  }
+
   const total = totalProgress()
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
-
-      <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
 
       {/* NAV */}
-      <div style={{background:'rgba(26,29,46,0.8)',backdropFilter:'blur(10px)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0'}}>
-          Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+      <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
+        <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.02em' }}>
+          Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
-            <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
+            <span style={{ marginLeft: '8px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle' }}>PRO</span>
           )}
         </div>
-        <a href="/dashboard" style={{fontSize:'13px',color:'#6b7280',textDecoration:'none'}}>← Dashboard</a>
+        <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
       </div>
 
-      <div style={{maxWidth:'720px',margin:'0 auto',padding:'2rem'}}>
+      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* HERO */}
-        <div style={{background:'linear-gradient(135deg,#1D9E75,#085041)',borderRadius:'16px',padding:'1.5rem 2rem',marginBottom:'1.5rem',boxShadow:'0 0 40px rgba(29,158,117,0.2)'}}>
-          <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#fff',marginBottom:'6px'}}>✅ Transaction Checklist</h1>
-          <p style={{fontSize:'14px',color:'#a8f0d4',margin:'0',lineHeight:'1.6'}}>
+        <div style={{ background: 'linear-gradient(135deg, #1D9E75 0%, #085041 100%)', borderRadius: '20px', padding: '1.75rem 2rem', marginBottom: '1.75rem', boxShadow: '0 8px 32px rgba(29,158,117,0.25)' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✅</div>
+          <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.03em' }}>Transaction Checklist</h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0, lineHeight: '1.6' }}>
             Never miss a deadline. Track every step from pre-listing to closing day.
           </p>
         </div>
 
         {/* LISTING NAME + PROGRESS */}
         <div style={cardStyle}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px',flexWrap:'wrap',gap:'10px'}}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
             <input
               placeholder="Name this transaction (e.g. 123 Main St)"
               value={listingName}
               onChange={e => setListingName(e.target.value)}
-              style={{flex:1,padding:'10px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',outline:'none',minWidth:'200px'}}
+              style={{ flex: 1, padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '14px', fontWeight: '500', color: 'var(--lw-text)', outline: 'none', minWidth: '200px', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}
             />
             <button onClick={resetAll}
-              style={{padding:'10px 16px',background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'8px',color:'#f87171',fontSize:'12px',cursor:'pointer',fontWeight:'500',whiteSpace:'nowrap'}}>
+              style={{ padding: '11px 16px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', color: '#ef4444', fontSize: '12px', cursor: 'pointer', fontWeight: '600', whiteSpace: 'nowrap', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
               🔄 Reset All
             </button>
           </div>
 
-          {/* OVERALL PROGRESS */}
-          <div style={{marginBottom:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:'12px',color:'#6b7280',fontWeight:'600'}}>Overall Progress</span>
-            <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'700'}}>{total.done} / {total.total} tasks · {total.pct}%</span>
+          <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)' }}>Overall Progress</span>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: '#1D9E75' }}>{total.done} / {total.total} tasks · {total.pct}%</span>
           </div>
-          <div style={{background:'rgba(0,0,0,0.3)',borderRadius:'20px',height:'8px',overflow:'hidden'}}>
-            <div style={{height:'100%',background:'linear-gradient(90deg,#1D9E75,#085041)',borderRadius:'20px',width:`${total.pct}%`,transition:'width 0.3s ease'}}/>
+          <div style={{ background: 'var(--lw-input)', borderRadius: '20px', height: '8px', overflow: 'hidden' }}>
+            <div style={{ height: '100%', background: 'linear-gradient(90deg,#1D9E75,#085041)', borderRadius: '20px', width: `${total.pct}%`, transition: 'width 0.3s ease' }} />
           </div>
         </div>
 
         {/* PHASE TABS */}
-        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'1rem'}}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '1rem' }}>
           {CHECKLIST.map((phase, i) => {
             const prog = phaseProgress(phase.phase, phase.items)
             return (
               <button key={i} onClick={() => setActivePhase(i)}
-                style={{fontSize:'11px',padding:'6px 12px',borderRadius:'8px',border:'1px solid',cursor:'pointer',transition:'all 0.15s',
-                  borderColor: activePhase === i ? phase.color : 'rgba(255,255,255,0.08)',
-                  background: activePhase === i ? `${phase.color}20` : 'rgba(0,0,0,0.2)',
-                  color: activePhase === i ? phase.color : '#6b7280',
-                  fontWeight: activePhase === i ? '600' : '400'}}>
+                style={{
+                  fontSize: '11px', padding: '7px 12px', borderRadius: '8px', border: '1px solid', cursor: 'pointer', transition: 'all 0.15s',
+                  borderColor: activePhase === i ? phase.color : 'var(--lw-border)',
+                  background: activePhase === i ? `${phase.color}15` : 'var(--lw-input)',
+                  color: activePhase === i ? phase.color : 'var(--lw-text-muted)',
+                  fontWeight: activePhase === i ? '700' : '500',
+                  fontFamily: 'var(--font-plus-jakarta), sans-serif'
+                }}>
                 {phase.icon} {phase.phase}
-                {prog.done > 0 && <span style={{marginLeft:'4px',fontSize:'10px',opacity:0.8}}>({prog.done}/{prog.total})</span>}
+                {prog.done > 0 && <span style={{ marginLeft: '4px', fontSize: '10px', opacity: 0.8 }}>({prog.done}/{prog.total})</span>}
               </button>
             )
           })}
@@ -220,38 +226,41 @@ export default function TransactionChecklistPage() {
           const phase = CHECKLIST[activePhase]
           const prog = phaseProgress(phase.phase, phase.items)
           return (
-            <div style={{...cardStyle, border:`1px solid ${phase.color}25`}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}}>
+            <div style={{ ...cardStyle, border: `1px solid ${phase.color}25` }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div>
-                  <p style={{fontSize:'11px',fontWeight:'700',color:phase.color,letterSpacing:'1px',margin:'0 0 4px'}}>{phase.icon} {phase.phase}</p>
-                  <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>{prog.done} of {prog.total} complete</p>
+                  <p style={{ fontSize: '11px', fontWeight: '700', color: phase.color, letterSpacing: '1px', margin: '0 0 4px' }}>{phase.icon} {phase.phase}</p>
+                  <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: 0, fontWeight: '500' }}>{prog.done} of {prog.total} complete</p>
                 </div>
-                <div style={{textAlign:'right'}}>
-                  <p style={{fontSize:'22px',fontWeight:'700',color: prog.pct === 100 ? '#1D9E75' : phase.color,margin:'0'}}>{prog.pct}%</p>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '26px', fontWeight: '800', color: prog.pct === 100 ? '#1D9E75' : phase.color, margin: 0, letterSpacing: '-0.03em' }}>{prog.pct}%</p>
                 </div>
               </div>
 
-              {/* PHASE PROGRESS BAR */}
-              <div style={{background:'rgba(0,0,0,0.3)',borderRadius:'20px',height:'4px',overflow:'hidden',marginBottom:'16px'}}>
-                <div style={{height:'100%',background:phase.color,borderRadius:'20px',width:`${prog.pct}%`,transition:'width 0.3s ease'}}/>
+              <div style={{ background: 'var(--lw-input)', borderRadius: '20px', height: '4px', overflow: 'hidden', marginBottom: '16px' }}>
+                <div style={{ height: '100%', background: phase.color, borderRadius: '20px', width: `${prog.pct}%`, transition: 'width 0.3s ease' }} />
               </div>
 
-              {/* CHECKLIST ITEMS */}
-              <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {phase.items.map((item, j) => {
                   const done = isChecked(phase.phase, item)
                   return (
                     <div key={j}
                       onClick={() => toggleItem(phase.phase, item)}
-                      style={{display:'flex',alignItems:'center',gap:'12px',padding:'12px 14px',borderRadius:'10px',cursor:'pointer',transition:'all 0.15s',
-                        background: done ? `${phase.color}10` : 'rgba(0,0,0,0.15)',
-                        border: done ? `1px solid ${phase.color}30` : '1px solid rgba(255,255,255,0.04)'}}>
-                      <div style={{width:'22px',height:'22px',borderRadius:'6px',border:`2px solid`,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s',
-                        borderColor: done ? phase.color : 'rgba(255,255,255,0.15)',
-                        background: done ? phase.color : 'transparent'}}>
-                        {done && <span style={{color:'#fff',fontSize:'13px',fontWeight:'700'}}>✓</span>}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.15s',
+                        background: done ? `${phase.color}08` : 'var(--lw-input)',
+                        border: done ? `1px solid ${phase.color}30` : '1px solid var(--lw-border)'
+                      }}>
+                      <div style={{
+                        width: '22px', height: '22px', borderRadius: '6px', border: '2px solid', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',
+                        borderColor: done ? phase.color : 'var(--lw-border)',
+                        background: done ? phase.color : 'transparent'
+                      }}>
+                        {done && <span style={{ color: '#fff', fontSize: '13px', fontWeight: '700' }}>✓</span>}
                       </div>
-                      <span style={{fontSize:'13px',color: done ? '#6b7280' : '#e0e0e0',textDecoration: done ? 'line-through' : 'none',transition:'all 0.15s'}}>
+                      <span style={{ fontSize: '13px', fontWeight: '500', color: done ? 'var(--lw-text-muted)' : 'var(--lw-text)', textDecoration: done ? 'line-through' : 'none', transition: 'all 0.15s' }}>
                         {item}
                       </span>
                     </div>
@@ -260,8 +269,8 @@ export default function TransactionChecklistPage() {
               </div>
 
               {prog.pct === 100 && (
-                <div style={{marginTop:'16px',padding:'12px 16px',background:'rgba(29,158,117,0.1)',borderRadius:'10px',border:'1px solid rgba(29,158,117,0.2)',textAlign:'center'}}>
-                  <p style={{fontSize:'13px',color:'#1D9E75',fontWeight:'600',margin:'0'}}>✅ {phase.phase} complete!</p>
+                <div style={{ marginTop: '16px', padding: '12px 16px', background: 'rgba(29,158,117,0.08)', borderRadius: '10px', border: '1px solid rgba(29,158,117,0.2)', textAlign: 'center' }}>
+                  <p style={{ fontSize: '13px', color: '#1D9E75', fontWeight: '700', margin: 0 }}>✅ {phase.phase} complete!</p>
                 </div>
               )}
             </div>
@@ -269,19 +278,19 @@ export default function TransactionChecklistPage() {
         })()}
 
         {/* NAVIGATION */}
-        <div style={{display:'flex',gap:'8px',justifyContent:'space-between',marginBottom:'1rem'}}>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginBottom: '1rem' }}>
           <button onClick={() => setActivePhase(prev => Math.max(0, prev - 1))} disabled={activePhase === 0}
-            style={{flex:1,padding:'10px',background:'rgba(0,0,0,0.2)',color: activePhase === 0 ? '#333' : '#6b7280',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'8px',fontSize:'13px',cursor: activePhase === 0 ? 'not-allowed' : 'pointer'}}>
+            style={{ flex: 1, padding: '11px', background: 'var(--lw-input)', color: activePhase === 0 ? 'var(--lw-border)' : 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: activePhase === 0 ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
             ← Previous Phase
           </button>
           <button onClick={() => setActivePhase(prev => Math.min(CHECKLIST.length - 1, prev + 1))} disabled={activePhase === CHECKLIST.length - 1}
-            style={{flex:1,padding:'10px',background: activePhase === CHECKLIST.length - 1 ? 'rgba(0,0,0,0.2)' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'8px',fontSize:'13px',fontWeight:'600',cursor: activePhase === CHECKLIST.length - 1 ? 'not-allowed' : 'pointer'}}>
+            style={{ flex: 1, padding: '11px', background: activePhase === CHECKLIST.length - 1 ? 'var(--lw-input)' : 'linear-gradient(135deg,#1D9E75,#085041)', color: activePhase === CHECKLIST.length - 1 ? 'var(--lw-text-muted)' : '#fff', border: activePhase === CHECKLIST.length - 1 ? '1px solid var(--lw-border)' : 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: activePhase === CHECKLIST.length - 1 ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
             Next Phase →
           </button>
         </div>
 
-        <div style={{textAlign:'center'}}>
-          <a href="/dashboard" style={{fontSize:'13px',color:'#6b7280',textDecoration:'none'}}>← Back to Dashboard</a>
+        <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
+          <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Back to Dashboard</a>
         </div>
       </div>
     </main>
