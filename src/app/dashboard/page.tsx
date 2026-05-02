@@ -865,7 +865,7 @@ export default function Dashboard() {
                       <input
                         key={currentListingId || 'new'}
                         placeholder="Name this listing..."
-                        defaultValue={form.name || form.neighborhood || ''}
+                        defaultValue={pastListings.find(l => l.id === currentListingId)?.name || form.name || form.neighborhood || ''}
                         onBlur={async (e) => {
                           const newName = e.target.value
                           setForm(prev => ({...prev, name: newName}))
@@ -993,7 +993,7 @@ export default function Dashboard() {
                       onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}} onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setActivePage('results') }}>
                         <div>
-                          <p style={{margin:'0',fontSize:'14px',fontWeight:'600',color:'#f0f0f0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
+                          <p style={{margin:'0',fontSize:'14px',fontWeight:'600',color: isDark ? '#f0f0f0' : '#111318'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
                           <p style={{margin:'4px 0 0',fontSize:'12px',color:'#8b8fa8'}}>{listing.beds_baths} · {listing.sqft} sq ft · {listing.price}</p>
                         </div>
                         <div style={{textAlign:'right'}}>
