@@ -727,7 +727,7 @@ export default function Dashboard() {
                   <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
                     {pastListings.slice(0, 3).map(listing => (
                       <div key={listing.id}
-                        onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setActivePage('results') }}
+                        onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setForm(prev => ({...prev, name: listing.name || '', neighborhood: listing.neighborhood || '', price: listing.price || '', beds: listing.beds_baths || '', sqft: listing.sqft || ''})); setActivePage('results') }}
                         style={{background:'rgba(255,255,255,0.015)',borderRadius:'9px',border:'1px solid rgba(255,255,255,0.04)',padding:'0.8rem 1rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all 0.15s'}}
                         onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.2)';e.currentTarget.style.background='rgba(29,158,117,0.03)'}}
                         onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.04)';e.currentTarget.style.background='rgba(255,255,255,0.015)'}}>
@@ -861,23 +861,26 @@ export default function Dashboard() {
                       <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Marketing Suite Ready</h1>
                       <span style={{background:'rgba(29,158,117,0.2)',color:'#1D9E75',fontSize:'11px',fontWeight:'700',padding:'4px 12px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.4)'}}>✓ 11 FORMATS</span>
                     </div>
-                    <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'8px',marginTop:'8px'}}>
                       <input
                         key={currentListingId || 'new'}
                         placeholder="Name this listing..."
                         defaultValue={pastListings.find(l => l.id === currentListingId)?.name || form.name || form.neighborhood || ''}
                         onBlur={async (e) => {
-                          const newName = e.target.value
+                          const newName = e.target.value.trim()
+                          if (!newName) return
                           setForm(prev => ({...prev, name: newName}))
-                          if (userId && currentListingId && newName) {
-                            await supabase.from('listings').update({ name: newName }).eq('id', currentListingId)
-                            setPastListings(prev => prev.map(l => l.id === currentListingId ? {...l, name: newName} : l))
+                          if (userId && currentListingId) {
+                            const { error } = await supabase.from('listings').update({ name: newName }).eq('id', currentListingId)
+                            if (!error) {
+                              setPastListings(prev => prev.map(l => l.id === currentListingId ? {...l, name: newName} : l))
+                            }
                           }
                         }}
-                        style={{background:'transparent',border:'none',borderBottom:'1px solid rgba(255,255,255,0.1)',color:'#8b8fa8',fontSize:'14px',outline:'none',width:'200px',padding:'2px 4px'}}
+                        style={{background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',color:'var(--lw-text)',fontSize:'13px',fontWeight:'600',outline:'none',width:'220px',padding:'6px 10px',fontFamily:'var(--font-plus-jakarta),sans-serif'}}
                       />
-                      {form.price ? ` · ${form.price}` : ''} · {form.beds || ''} · {form.sqft ? `${form.sqft} sq ft` : ''}
-                    </p>
+                      {form.price && <span style={{fontSize:'13px',color:'var(--lw-text-muted)'}}>· {form.price}</span>}
+                    </div>
                   </div>
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
                     <button onClick={() => handleDownloadPdf('mls')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
@@ -991,7 +994,7 @@ export default function Dashboard() {
                     <div key={listing.id} style={{...styles.card}}
                       onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
                       onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}} onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setActivePage('results') }}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}} onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setForm(prev => ({...prev, name: listing.name || '', neighborhood: listing.neighborhood || '', price: listing.price || '', beds: listing.beds_baths || '', sqft: listing.sqft || ''})); setActivePage('results') }}>
                         <div>
                           <p style={{margin:'0',fontSize:'14px',fontWeight:'600',color: isDark ? '#f0f0f0' : '#111318'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
                           <p style={{margin:'4px 0 0',fontSize:'12px',color:'#8b8fa8'}}>{listing.beds_baths} · {listing.sqft} sq ft · {listing.price}</p>
