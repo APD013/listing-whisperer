@@ -72,13 +72,13 @@ export default function SellerNetSheetPage() {
 
       {/* NAV */}
       <div style={{background:'var(--lw-card)',backdropFilter:'blur(10px)',borderBottom:'1px solid var(--lw-border)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
+        <a href="/dashboard" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Dashboard</a>
         <div style={{fontSize:'16px',fontWeight:'700',color:'var(--lw-text)'}}>
           Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
             <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
           )}
         </div>
-        <a href="/dashboard" style={{fontSize:'13px',color:'#6b7280',textDecoration:'none'}}>← Dashboard</a>
       </div>
 
       <div style={{maxWidth:'640px',margin:'0 auto',padding:'2rem'}}>

@@ -71,7 +71,6 @@ export default function OpenHouseKit() {
       <div style={{background:'var(--lw-card)',borderBottom:'1px solid var(--lw-border)',padding:'0.875rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
         <a href="/dashboard" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Dashboard</a>
         <div style={{fontSize:'14px',fontWeight:'700',color:'var(--lw-text)'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
-        <div style={{width:'80px'}}/>
       </div>
 
       <div style={{maxWidth:'760px',margin:'0 auto',padding:'2.5rem 1.5rem'}}>
