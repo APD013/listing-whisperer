@@ -732,8 +732,8 @@ export default function Dashboard() {
                         onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.2)';e.currentTarget.style.background='rgba(29,158,117,0.03)'}}
                         onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.04)';e.currentTarget.style.background='rgba(255,255,255,0.015)'}}>
                         <div>
-                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'#e0e0e0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
-                          <p style={{margin:'2px 0 0',fontSize:'11px',color:'#4a4f62'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
+                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color: isDark ? '#e0e0e0' : '#111318'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
+                          <p style={{margin:'2px 0 0',fontSize:'11px',color: isDark ? '#4a4f62' : '#5a6172'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
                         </div>
                         <span style={{fontSize:'11px',color:'#1D9E75',fontWeight:'500'}}>View →</span>
                       </div>
@@ -977,7 +977,7 @@ export default function Dashboard() {
           {activePage === 'history' && (
             <div style={{maxWidth:'760px'}}>
               <div style={{marginBottom:'1.5rem'}}>
-                <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>Listing History</h1>
+                <h1 style={{fontSize:'1.5rem',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318',marginBottom:'6px'}}>Listing History</h1>
                 <p style={{fontSize:'14px',color:'#8b8fa8'}}>{pastListings.length} most recent listings</p>
               </div>
               {pastListings.length === 0 ? (
