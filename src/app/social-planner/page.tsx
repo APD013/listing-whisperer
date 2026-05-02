@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,6 +29,7 @@ export default function SocialPlannerPage() {
   })
 
   useEffect(() => {
+    trackEvent('tool_page_view', { tool: 'social_planner' })
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -75,18 +77,18 @@ export default function SocialPlannerPage() {
     { key: 'sms', label: 'SMS Blast', icon: '📱', color: '#10b981' },
   ]
 
-  const inputStyle = { width:'100%', padding:'11px 14px', background:'rgba(0,0,0,0.3)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'8px', fontSize:'13px', color:'#f0f0f0', boxSizing:'border-box' as const, outline:'none' }
-  const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'#6b7280', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
-  const cardStyle = { background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.07)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', marginBottom:'1rem' }
+  const inputStyle = { width:'100%', padding:'11px 14px', background:'var(--lw-input)', border:'1px solid var(--lw-border)', borderRadius:'8px', fontSize:'13px', color:'var(--lw-text)', boxSizing:'border-box' as const, outline:'none' }
+  const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'var(--lw-text-muted)', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
+  const cardStyle = { background:'var(--lw-card)', borderRadius:'16px', border:'1px solid var(--lw-border)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', marginBottom:'1rem' }
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
+    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>
 
       <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       {/* NAV */}
-      <div style={{background:'rgba(26,29,46,0.8)',backdropFilter:'blur(10px)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0'}}>
+      <div style={{background:'var(--lw-card)',backdropFilter:'blur(10px)',borderBottom:'1px solid var(--lw-border)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
+        <div style={{fontSize:'16px',fontWeight:'700',color:'var(--lw-text)'}}>
           Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
             <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
@@ -161,7 +163,7 @@ export default function SocialPlannerPage() {
         {loading && (
           <div style={{...cardStyle,textAlign:'center',padding:'2rem'}}>
             <div style={{fontSize:'2rem',marginBottom:'12px'}}>📅</div>
-            <p style={{color:'#f0f0f0',fontWeight:'600',marginBottom:'6px'}}>Building your 7-day content calendar...</p>
+            <p style={{color:'var(--lw-text)',fontWeight:'600',marginBottom:'6px'}}>Building your 7-day content calendar...</p>
             <p style={{color:'#6b7280',fontSize:'13px'}}>Creating posts for Instagram, Facebook, LinkedIn, Twitter and SMS...</p>
           </div>
         )}
@@ -177,9 +179,9 @@ export default function SocialPlannerPage() {
                 {calendar.days.map((day: any, i: number) => (
                   <button key={i} onClick={() => setActiveDay(i)}
                     style={{fontSize:'11px',padding:'6px 12px',borderRadius:'8px',border:'1px solid',cursor:'pointer',transition:'all 0.15s',
-                      borderColor: activeDay === i ? '#1D9E75' : 'rgba(255,255,255,0.08)',
-                      background: activeDay === i ? 'rgba(29,158,117,0.2)' : 'rgba(0,0,0,0.2)',
-                      color: activeDay === i ? '#1D9E75' : '#6b7280',
+                      borderColor: activeDay === i ? '#1D9E75' : 'var(--lw-border)',
+                      background: activeDay === i ? 'rgba(29,158,117,0.1)' : 'var(--lw-input)',
+                      color: activeDay === i ? '#1D9E75' : 'var(--lw-text-muted)',
                       fontWeight: activeDay === i ? '600' : '400'}}>
                     Day {i + 1} — {getDayDate(i)}
                   </button>
@@ -191,12 +193,12 @@ export default function SocialPlannerPage() {
                 <div>
                   <div style={{marginBottom:'12px',padding:'10px 14px',background:'rgba(29,158,117,0.06)',borderRadius:'10px',border:'1px solid rgba(29,158,117,0.1)'}}>
                     <p style={{fontSize:'12px',fontWeight:'600',color:'#1D9E75',margin:'0 0 2px'}}>🎯 Day {activeDay + 1} Theme</p>
-                    <p style={{fontSize:'13px',color:'#e0e0e0',margin:'0'}}>{calendar.days[activeDay].theme}</p>
+                    <p style={{fontSize:'13px',color:'var(--lw-text)',margin:'0'}}>{calendar.days[activeDay].theme}</p>
                   </div>
 
                   <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
                     {platforms.map(platform => (
-                      <div key={platform.key} style={{background:'rgba(0,0,0,0.2)',borderRadius:'12px',padding:'1rem',border:'1px solid rgba(255,255,255,0.05)'}}>
+                      <div key={platform.key} style={{background:'var(--lw-input)',borderRadius:'12px',padding:'1rem',border:'1px solid var(--lw-border)'}}>
                         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'8px'}}>
                           <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
                             <span style={{fontSize:'16px'}}>{platform.icon}</span>
@@ -214,7 +216,7 @@ export default function SocialPlannerPage() {
                             {copied === `${activeDay}-${platform.key}` ? '✓ Copied!' : '📋 Copy'}
                           </button>
                         </div>
-                        <p style={{fontSize:'13px',lineHeight:'1.7',color:'#c0c0c0',margin:'0',whiteSpace:'pre-wrap'}}>
+                        <p style={{fontSize:'13px',lineHeight:'1.7',color:'var(--lw-text)',margin:'0',whiteSpace:'pre-wrap'}}>
                           {calendar.days[activeDay][platform.key] || ''}
                         </p>
                       </div>

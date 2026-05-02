@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,6 +28,7 @@ export default function FollowUpAssistant() {
   })
 
   useEffect(() => {
+    trackEvent('tool_page_view', { tool: 'follow_up' })
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) setUserId(user.id)
@@ -35,11 +37,11 @@ export default function FollowUpAssistant() {
   }, [])
 
   const styles = {
-    page: { minHeight: '100vh', background: '#0d1117', fontFamily: "'Inter', sans-serif", color: '#f0f0f0' },
-    card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' },
-    input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
-    select: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
-    label: { fontSize: '11px', color: '#6b7280', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
+    page: { minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: "var(--font-plus-jakarta), sans-serif", color: 'var(--lw-text)' },
+    card: { background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' },
+    input: { width: '100%', padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '13px', color: 'var(--lw-text)', boxSizing: 'border-box' as const, outline: 'none' },
+    select: { width: '100%', padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '13px', color: 'var(--lw-text)' },
+    label: { fontSize: '11px', color: 'var(--lw-text-muted)', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
   }
 
   const handleAddReminder = async (key: string, content: string, subject: string) => {
@@ -91,9 +93,9 @@ export default function FollowUpAssistant() {
 
   return (
     <div style={styles.page}>
-      <div style={{background:'rgba(10,13,20,0.98)',borderBottom:'1px solid rgba(255,255,255,0.05)',padding:'0.875rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
-        <a href="/dashboard" style={{fontSize:'13px',color:'#5a5f72',textDecoration:'none'}}>← Dashboard</a>
-        <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
+      <div style={{background:'var(--lw-card)',borderBottom:'1px solid var(--lw-border)',padding:'0.875rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
+        <a href="/dashboard" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Dashboard</a>
+        <div style={{fontSize:'14px',fontWeight:'700',color:'var(--lw-text)'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{width:'80px'}}/>
       </div>
 
@@ -102,7 +104,7 @@ export default function FollowUpAssistant() {
           <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'8px'}}>
             <div style={{width:'44px',height:'44px',borderRadius:'12px',background:'rgba(99,102,241,0.12)',border:'1px solid rgba(99,102,241,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px'}}>📩</div>
             <div>
-              <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',margin:'0',letterSpacing:'-0.3px'}}>Follow-Up Assistant</h1>
+              <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'var(--lw-text)',margin:'0',letterSpacing:'-0.3px'}}>Follow-Up Assistant</h1>
               <p style={{fontSize:'13px',color:'#5a5f72',margin:'0'}}>Post-meeting and post-showing follow-up emails and texts</p>
             </div>
           </div>
@@ -175,16 +177,16 @@ export default function FollowUpAssistant() {
             <div style={{display:'flex',gap:'4px'}}>
               {[0,1,2].map(i => <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#6366f1',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>)}
             </div>
-            <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>Writing your follow-up messages...</p>
+            <p style={{color:'var(--lw-text)',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>Writing your follow-up messages...</p>
           </div>
         )}
 
         {/* REMINDER MODAL */}
         {showReminderModal && (
           <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
-            <div style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.3)',padding:'2rem',maxWidth:'420px',width:'100%',boxShadow:'0 0 60px rgba(212,175,55,0.1)'}}>
+            <div style={{background:'var(--lw-card)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.3)',padding:'2rem',maxWidth:'420px',width:'100%',boxShadow:'0 0 60px rgba(212,175,55,0.1)'}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.5rem'}}>
-                <h3 style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>⏰ Set a Reminder</h3>
+                <h3 style={{fontSize:'16px',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>⏰ Set a Reminder</h3>
                 <button onClick={() => setShowReminderModal(null)} style={{background:'none',border:'none',color:'#555',fontSize:'20px',cursor:'pointer'}}>✕</button>
               </div>
               <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'1.5rem'}}>
@@ -195,7 +197,7 @@ export default function FollowUpAssistant() {
                 type="datetime-local"
                 value={reminderDate}
                 onChange={e => setReminderDate(e.target.value)}
-                style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'13px',color:'#f0f0f0',boxSizing:'border-box' as const,outline:'none',marginBottom:'1.5rem'}}
+                style={{width:'100%',padding:'11px 14px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'13px',color:'var(--lw-text)',boxSizing:'border-box' as const,outline:'none',marginBottom:'1.5rem'}}
               />
               <button
                 onClick={() => {
@@ -229,13 +231,13 @@ export default function FollowUpAssistant() {
                   <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
                     <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}15`,border:`1px solid ${card.color}25`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px'}}>{card.icon}</div>
                     <div>
-                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>{card.label}</p>
+                      <p style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>{card.label}</p>
                       <p style={{fontSize:'11px',color:'#5a5f72',margin:'0'}}>{card.desc}</p>
                     </div>
                   </div>
                   <div style={{display:'flex',gap:'6px'}}>
                     <button onClick={() => handleCopy(card.key, result[card.key])}
-                      style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                      style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'var(--lw-input)',color: copied === card.key ? '#fff' : 'var(--lw-text-muted)',borderColor: copied === card.key ? card.color : 'var(--lw-border)'}}>
                       {copied === card.key ? '✓ Copied!' : '📋 Copy'}
                     </button>
                     <button onClick={() => setShowReminderModal(card.key)}
@@ -244,13 +246,13 @@ export default function FollowUpAssistant() {
                     </button>
                   </div>
                 </div>
-                <p style={{fontSize:'13px',lineHeight:'1.85',color:'#c0c0c0',margin:'0',whiteSpace:'pre-wrap'}}>{result[card.key]}</p>
+                <p style={{fontSize:'13px',lineHeight:'1.85',color:'var(--lw-text)',margin:'0',whiteSpace:'pre-wrap'}}>{result[card.key]}</p>
               </div>
             ))}
             <div style={{display:'flex',gap:'10px',flexWrap:'wrap',paddingTop:'8px'}}>
               <a href="/dashboard" style={{padding:'10px 20px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'13px',fontWeight:'600'}}>← Back to Dashboard</a>
               <button onClick={() => { setResult(null); window.scrollTo({top:0,behavior:'smooth'}) }}
-                style={{padding:'10px 20px',background:'rgba(0,0,0,0.2)',color:'#8b8fa8',borderRadius:'10px',border:'1px solid rgba(255,255,255,0.08)',fontSize:'13px',cursor:'pointer'}}>
+                style={{padding:'10px 20px',background:'var(--lw-input)',color:'var(--lw-text-muted)',borderRadius:'10px',border:'1px solid var(--lw-border)',fontSize:'13px',cursor:'pointer'}}>
                 ↺ New Follow-Up
               </button>
             </div>

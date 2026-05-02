@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,11 +28,12 @@ export default function SnapStartPage() {
 
   const [form, setForm] = useState({
     address: '', neighborhood: '', type: 'Single family',
-    beds: '', sqft: '', price: '', notes: '',
+    beds: '', baths: '', sqft: '', price: '', notes: '',
     tone: 'Warm & inviting', buyer: 'Move-up families',
   })
 
   useEffect(() => {
+    trackEvent('tool_page_view', { tool: 'snap_start' })
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -149,19 +151,19 @@ export default function SnapStartPage() {
     { key: 'text_message', label: 'SMS', icon: '📱' },
   ]
 
-  const inputStyle = { width:'100%', padding:'11px 14px', background:'rgba(0,0,0,0.3)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'8px', fontSize:'13px', color:'#f0f0f0', boxSizing:'border-box' as const, outline:'none' }
-  const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'#6b7280', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
-  const cardStyle = { background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.07)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', marginBottom:'1rem' }
+  const inputStyle = { width:'100%', padding:'11px 14px', background:'var(--lw-input)', border:'1px solid var(--lw-border)', borderRadius:'8px', fontSize:'13px', color:'var(--lw-text)', boxSizing:'border-box' as const, outline:'none' }
+  const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'var(--lw-text-muted)', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
+  const cardStyle = { background:'var(--lw-card)', borderRadius:'16px', border:'1px solid var(--lw-border)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', marginBottom:'1rem' }
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
+    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>
 
       {/* BACKGROUND GLOW */}
       <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       {/* NAV */}
-      <div style={{background:'rgba(26,29,46,0.8)',backdropFilter:'blur(10px)',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0'}}>
+      <div style={{background:'var(--lw-card)',backdropFilter:'blur(10px)',borderBottom:'1px solid var(--lw-border)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
+        <div style={{fontSize:'16px',fontWeight:'700',color:'var(--lw-text)'}}>
           Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
             <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
@@ -187,7 +189,7 @@ export default function SnapStartPage() {
             <div style={{...cardStyle, textAlign:'center', cursor:'pointer', border: analyzing ? '2px solid #1D9E75' : '2px dashed rgba(29,158,117,0.3)'}}
               onClick={() => fileInputRef.current?.click()}>
               <div style={{fontSize:'3rem',marginBottom:'1rem'}}>📸</div>
-              <p style={{fontSize:'16px',fontWeight:'600',color:'#f0f0f0',marginBottom:'8px'}}>Upload Property Photos</p>
+              <p style={{fontSize:'16px',fontWeight:'600',color:'var(--lw-text)',marginBottom:'8px'}}>Upload Property Photos</p>
               <p style={{fontSize:'13px',color:'#6b7280',marginBottom:'16px'}}>Upload 1-10 photos — AI will suggest visible features</p>
               <button style={{background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'8px',padding:'10px 24px',fontSize:'14px',fontWeight:'600',cursor:'pointer',boxShadow:'0 0 16px rgba(29,158,117,0.3)'}}>
                 {analyzing ? '🔍 Analyzing photos...' : 'Choose Photos'}
@@ -250,7 +252,7 @@ export default function SnapStartPage() {
             </div>
 
             <button onClick={() => setStep('confirm')}
-              style={{width:'100%',padding:'12px',background:'rgba(0,0,0,0.2)',color:'#6b7280',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',cursor:'pointer'}}>
+              style={{width:'100%',padding:'12px',background:'var(--lw-input)',color:'var(--lw-text-muted)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'14px',cursor:'pointer'}}>
               Skip photos → Enter details manually
             </button>
           </div>
@@ -307,8 +309,12 @@ export default function SnapStartPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>Beds / Baths</label>
-                  <input placeholder="3 bed / 2 bath" value={form.beds} onChange={e=>setForm({...form,beds:e.target.value})} style={inputStyle}/>
+                  <label style={labelStyle}>Beds</label>
+                  <input placeholder="3" value={form.beds} onChange={e=>setForm({...form,beds:e.target.value})} style={inputStyle}/>
+                </div>
+                <div>
+                  <label style={labelStyle}>Baths</label>
+                  <input placeholder="2" value={form.baths || ''} onChange={e=>setForm({...form,baths:e.target.value})} style={inputStyle}/>
                 </div>
                 <div>
                   <label style={labelStyle}>Sq Ft</label>
@@ -354,7 +360,7 @@ export default function SnapStartPage() {
             {generating && (
               <div style={{...cardStyle,textAlign:'center'}}>
                 <div style={{fontSize:'2rem',marginBottom:'8px'}}>⏳</div>
-                <p style={{fontSize:'14px',fontWeight:'600',color:'#f0f0f0',marginBottom:'4px'}}>Generating your listing draft...</p>
+                <p style={{fontSize:'14px',fontWeight:'600',color:'var(--lw-text)',marginBottom:'4px'}}>Generating your listing draft...</p>
                 <p style={{fontSize:'12px',color:'#6b7280'}}>This takes about 15-20 seconds.</p>
               </div>
             )}
@@ -367,7 +373,7 @@ export default function SnapStartPage() {
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem',paddingBottom:'12px',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
               <div>
                 <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 4px'}}>DRAFT READY</p>
-                <h2 style={{fontSize:'1rem',fontWeight:'600',color:'#f0f0f0',margin:'0'}}>🎉 Your listing draft is ready!</h2>
+                <h2 style={{fontSize:'1rem',fontWeight:'600',color:'var(--lw-text)',margin:'0'}}>🎉 Your listing draft is ready!</h2>
               </div>
               <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'500'}}>6 formats</span>
             </div>
@@ -386,12 +392,12 @@ export default function SnapStartPage() {
               ))}
             </div>
 
-            <div style={{background:'rgba(0,0,0,0.2)',borderRadius:'12px',padding:'1.5rem',border:'1px solid rgba(255,255,255,0.06)',position:'relative',minHeight:'120px'}}>
+            <div style={{background:'var(--lw-input)',borderRadius:'12px',padding:'1.5rem',border:'1px solid var(--lw-border)',position:'relative',minHeight:'120px'}}>
               <button onClick={() => { navigator.clipboard.writeText(outputs[activeTab] || ''); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
                 style={{position:'absolute',top:'12px',right:'12px',fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background: copied ? '#1D9E75' : 'rgba(0,0,0,0.3)',color: copied ? '#fff' : '#6b7280',border:'1px solid',borderColor: copied ? '#1D9E75' : 'rgba(255,255,255,0.08)',cursor:'pointer',fontWeight:'500'}}>
                 {copied ? '✓ Copied!' : '📋 Copy'}
               </button>
-              <p style={{fontSize:'13px',lineHeight:'1.9',whiteSpace:'pre-wrap',color:'#e0e0e0',margin:'0',paddingRight:'80px'}}>
+              <p style={{fontSize:'13px',lineHeight:'1.9',whiteSpace:'pre-wrap',color:'var(--lw-text)',margin:'0',paddingRight:'80px'}}>
                 {outputs[activeTab] || ''}
               </p>
             </div>

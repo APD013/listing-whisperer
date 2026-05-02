@@ -29,10 +29,7 @@ export default function NeighborhoodBioPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       const { data: profile } = await supabase
-        .from('profiles')
-        .select('plan')
-        .eq('id', user.id)
-        .single()
+        .from('profiles').select('plan').eq('id', user.id).single()
       if (profile) setPlan(profile.plan || 'starter')
       setPlanLoaded(true)
     }
@@ -51,25 +48,20 @@ export default function NeighborhoodBioPage() {
       async (position) => {
         const { latitude, longitude } = position.coords
         try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-          )
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
           const data = await res.json()
           const suburb = data.address?.suburb || data.address?.neighbourhood || data.address?.residential || ''
-          const city = data.address?.city || data.address?.town || data.address?.village || ''
+          const cityName = data.address?.city || data.address?.town || data.address?.village || ''
           const state = data.address?.state || ''
           if (suburb) setNeighborhood(suburb)
-          if (city) setCity(`${city}, ${state}`)
+          if (cityName) setCity(`${cityName}, ${state}`)
           trackEvent('location_detected', { tool: 'neighborhood_bio' })
         } catch(e) {
           setLocationError('Could not detect neighborhood. Please enter manually.')
         }
         setLocating(false)
       },
-      (error) => {
-        setLocationError('Location access denied. Please enter neighborhood manually.')
-        setLocating(false)
-      }
+      () => { setLocationError('Location access denied. Please enter neighborhood manually.'); setLocating(false) }
     )
   }
 
@@ -79,27 +71,20 @@ export default function NeighborhoodBioPage() {
     setOutput('')
     try {
       const prompt = `Write a compelling neighborhood bio for ${neighborhood}${city ? ` in ${city}` : ''}.
-
-${highlights ? `Agent notes about this neighborhood: ${highlights}` : ''}
-
+${highlights ? `\nAgent notes about this neighborhood: ${highlights}` : ''}
 Tone: ${tone}
-
 Write a professional neighborhood bio that includes:
 - What makes this neighborhood unique and desirable
 - Lifestyle and community feel
 - Nearby amenities, schools, parks, dining, shopping
-- Who this neighborhood is perfect for (families, young professionals, retirees, etc.)
+- Who this neighborhood is perfect for
 - Real estate appeal and value proposition
-
-Format it as 3-4 engaging paragraphs. Make it sound like it was written by a local expert who loves this neighborhood. Do not use generic filler — make it specific and compelling.`
+Format it as 3-4 engaging paragraphs. Make it sound like it was written by a local expert.`
 
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: prompt }],
-          currentPage: '/neighborhood-bio'
-        })
+        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }], currentPage: '/neighborhood-bio' })
       })
       const data = await res.json()
       setOutput(data.message || '')
@@ -117,77 +102,97 @@ Format it as 3-4 engaging paragraphs. Make it sound like it was written by a loc
     trackEvent('output_copied', { tool: 'neighborhood_bio' })
   }
 
+  const inputStyle = {
+    width: '100%', padding: '12px 14px', background: 'var(--lw-input)',
+    border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '14px',
+    fontWeight: '500' as const, color: 'var(--lw-text)', boxSizing: 'border-box' as const,
+    outline: 'none', fontFamily: 'var(--font-plus-jakarta), sans-serif'
+  }
+
+  const labelStyle = {
+    fontSize: '12px', fontWeight: '600' as const, color: 'var(--lw-text-muted)',
+    display: 'block' as const, marginBottom: '6px'
+  }
+
   if (!planLoaded) return (
-    <div style={{minHeight:'100vh',background:'#111318',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div style={{width:'40px',height:'40px',border:'3px solid rgba(29,158,117,0.3)',borderTop:'3px solid #1D9E75',borderRadius:'50%',animation:'spin 1s linear infinite'}}/>
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '40px', height: '40px', border: '3px solid rgba(29,158,117,0.3)', borderTop: '3px solid #1D9E75', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
     </div>
   )
 
   return (
-    <main style={{minHeight:'100vh',background:'#111318',color:'#f0f0f0',fontFamily:"'Inter', sans-serif"}}>
-      <div style={{maxWidth:'800px',margin:'0 auto',padding:'2rem 1.5rem'}}>
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
 
-        {/* HEADER */}
-        <div style={{marginBottom:'2rem'}}>
-          <a href="/dashboard" style={{color:'#1D9E75',textDecoration:'none',fontSize:'13px',display:'inline-flex',alignItems:'center',gap:'6px',marginBottom:'1.5rem'}}>← Back to Dashboard</a>
-          <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'8px'}}>
-            <div style={{width:'44px',height:'44px',background:'linear-gradient(135deg,#1D9E75,#085041)',borderRadius:'12px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px'}}>🏘️</div>
-            <div>
-              <h1 style={{fontSize:'1.5rem',fontWeight:'700',margin:'0'}}>Neighborhood Bio Generator</h1>
-              <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>Generate compelling neighborhood descriptions for listings, websites, and client emails</p>
-            </div>
-          </div>
+      {/* NAV */}
+      <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
+        <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.02em' }}>
+          Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
+          {planLoaded && plan === 'pro' && (
+            <span style={{ marginLeft: '8px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle' }}>PRO</span>
+          )}
+        </div>
+        <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
+      </div>
+
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+
+        {/* HERO */}
+        <div style={{ background: 'linear-gradient(135deg, #1D9E75 0%, #085041 100%)', borderRadius: '20px', padding: '1.75rem 2rem', marginBottom: '1.75rem', boxShadow: '0 8px 32px rgba(29,158,117,0.25)' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🏘️</div>
+          <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.03em' }}>Neighborhood Bio Generator</h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0, lineHeight: '1.6' }}>
+            Generate compelling neighborhood descriptions for listings, websites, and client emails.
+          </p>
         </div>
 
         {/* FORM CARD */}
-        <div style={{background:'#1a1d2e',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.5rem',marginBottom:'1.5rem'}}>
+        <div style={{ background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
 
           {/* LOCATION BUTTON */}
-          <div style={{marginBottom:'1.5rem',padding:'1rem',background:'rgba(29,158,117,0.06)',borderRadius:'12px',border:'1px solid rgba(29,158,117,0.15)'}}>
-            <p style={{fontSize:'12px',color:'#1D9E75',fontWeight:'700',margin:'0 0 8px',letterSpacing:'0.5px'}}>📍 AUTO-DETECT LOCATION</p>
-            <p style={{fontSize:'12px',color:'#6b7280',margin:'0 0 12px',lineHeight:'1.6'}}>Tap below while you're in the neighborhood — we'll detect it instantly.</p>
+          <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(29,158,117,0.06)', borderRadius: '12px', border: '1px solid rgba(29,158,117,0.15)' }}>
+            <p style={{ fontSize: '12px', color: '#1D9E75', fontWeight: '700', margin: '0 0 6px', letterSpacing: '0.5px' }}>📍 AUTO-DETECT LOCATION</p>
+            <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: '0 0 12px', lineHeight: '1.6' }}>Tap below while you're in the neighborhood — we'll detect it instantly.</p>
             <button onClick={detectLocation} disabled={locating}
-              style={{padding:'10px 20px',background: locating ? 'rgba(29,158,117,0.3)' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'8px',fontSize:'13px',fontWeight:'600',cursor: locating ? 'not-allowed' : 'pointer',display:'flex',alignItems:'center',gap:'8px'}}>
+              style={{ padding: '10px 20px', background: locating ? 'rgba(29,158,117,0.3)' : 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: locating ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
               {locating ? '📍 Detecting...' : '📍 Detect My Location'}
             </button>
-            {locationError && <p style={{fontSize:'12px',color:'#f87171',margin:'8px 0 0'}}>{locationError}</p>}
+            {locationError && <p style={{ fontSize: '12px', color: '#ef4444', margin: '8px 0 0', fontWeight: '500' }}>{locationError}</p>}
           </div>
 
-          {/* NEIGHBORHOOD */}
-          <div style={{marginBottom:'1rem'}}>
-            <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Neighborhood Name *</label>
+          <div style={{ marginBottom: '14px' }}>
+            <label style={labelStyle}>Neighborhood Name *</label>
             <input value={neighborhood} onChange={e => setNeighborhood(e.target.value)}
               placeholder="e.g. Newport Heights, Balboa Island, Turtle Rock"
-              style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}/>
+              style={inputStyle} />
           </div>
 
-          {/* CITY */}
-          <div style={{marginBottom:'1rem'}}>
-            <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>City / Area</label>
+          <div style={{ marginBottom: '14px' }}>
+            <label style={labelStyle}>City / Area</label>
             <input value={city} onChange={e => setCity(e.target.value)}
               placeholder="e.g. Newport Beach, CA"
-              style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none'}}/>
+              style={inputStyle} />
           </div>
 
-          {/* HIGHLIGHTS */}
-          <div style={{marginBottom:'1rem'}}>
-            <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'5px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Your Notes (optional)</label>
+          <div style={{ marginBottom: '14px' }}>
+            <label style={labelStyle}>Your Notes (optional)</label>
             <textarea value={highlights} onChange={e => setHighlights(e.target.value)}
-              placeholder="e.g. Great schools, walking distance to beach, lots of young families, new coffee shops opening up, quiet streets..."
+              placeholder="e.g. Great schools, walking distance to beach, lots of young families..."
               rows={3}
-              style={{width:'100%',padding:'11px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',fontSize:'14px',color:'#f0f0f0',boxSizing:'border-box',outline:'none',resize:'vertical'}}/>
+              style={{ ...inputStyle, resize: 'vertical' as const }} />
           </div>
 
-          {/* TONE */}
-          <div style={{marginBottom:'1.5rem'}}>
-            <label style={{fontSize:'11px',fontWeight:'600',color:'#6b7280',display:'block',marginBottom:'8px',letterSpacing:'0.5px',textTransform:'uppercase'}}>Tone</label>
-            <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
-              {['Professional','Warm & Friendly','Luxury','Energetic'].map(t => (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={labelStyle}>Tone</label>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {['Professional', 'Warm & Friendly', 'Luxury', 'Energetic'].map(t => (
                 <button key={t} onClick={() => setTone(t)}
-                  style={{padding:'7px 16px',borderRadius:'20px',border:'1px solid',fontSize:'12px',cursor:'pointer',fontWeight:'600',
-                    borderColor: tone === t ? '#1D9E75' : 'rgba(255,255,255,0.1)',
-                    background: tone === t ? 'rgba(29,158,117,0.15)' : 'transparent',
-                    color: tone === t ? '#1D9E75' : '#6b7280'}}>
+                  style={{
+                    padding: '7px 16px', borderRadius: '20px', border: '1px solid', fontSize: '12px', cursor: 'pointer', fontWeight: '600',
+                    borderColor: tone === t ? '#1D9E75' : 'var(--lw-border)',
+                    background: tone === t ? 'rgba(29,158,117,0.1)' : 'var(--lw-input)',
+                    color: tone === t ? '#1D9E75' : 'var(--lw-text-muted)',
+                    fontFamily: 'var(--font-plus-jakarta), sans-serif'
+                  }}>
                   {t}
                 </button>
               ))}
@@ -195,25 +200,24 @@ Format it as 3-4 engaging paragraphs. Make it sound like it was written by a loc
           </div>
 
           <button onClick={generate} disabled={loading || !neighborhood.trim()}
-            style={{width:'100%',padding:'13px',background: loading || !neighborhood.trim() ? 'rgba(29,158,117,0.3)' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor: loading || !neighborhood.trim() ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 24px rgba(29,158,117,0.3)'}}>
+            style={{ width: '100%', padding: '13px', background: loading || !neighborhood.trim() ? 'rgba(29,158,117,0.3)' : 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: loading || !neighborhood.trim() ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 20px rgba(29,158,117,0.3)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
             {loading ? 'Generating neighborhood bio...' : '✨ Generate Neighborhood Bio'}
           </button>
         </div>
 
         {/* OUTPUT */}
         {output && (
-          <div style={{background:'#1a1d2e',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.2)',padding:'1.5rem'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
-              <p style={{fontSize:'13px',fontWeight:'700',color:'#1D9E75',margin:'0'}}>✅ Neighborhood Bio Ready</p>
+          <div style={{ background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid rgba(29,158,117,0.2)', padding: '1.5rem', boxShadow: '0 4px 20px rgba(29,158,117,0.08)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <p style={{ fontSize: '13px', fontWeight: '700', color: '#1D9E75', margin: 0 }}>✅ Neighborhood Bio Ready</p>
               <button onClick={copy}
-                style={{padding:'7px 16px',background: copied ? 'rgba(29,158,117,0.2)' : 'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color: copied ? '#1D9E75' : '#f0f0f0',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>
+                style={{ padding: '7px 16px', background: copied ? 'rgba(29,158,117,0.1)' : 'var(--lw-input)', border: '1px solid', borderColor: copied ? '#1D9E75' : 'var(--lw-border)', borderRadius: '8px', color: copied ? '#1D9E75' : 'var(--lw-text)', fontSize: '12px', cursor: 'pointer', fontWeight: '600', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
                 {copied ? '✅ Copied!' : '📋 Copy'}
               </button>
             </div>
-            <p style={{fontSize:'14px',lineHeight:'1.9',color:'#d1d5db',whiteSpace:'pre-wrap',margin:'0'}}>{output}</p>
+            <p style={{ fontSize: '14px', lineHeight: '1.9', color: 'var(--lw-text)', whiteSpace: 'pre-wrap', margin: 0 }}>{output}</p>
           </div>
         )}
-
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </main>
