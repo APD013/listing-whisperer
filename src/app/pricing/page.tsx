@@ -40,7 +40,7 @@ export default function PricingPage() {
   }
 
   return (
-    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"'Inter', sans-serif"}}>
+    <main style={{minHeight:'100vh',background:'linear-gradient(135deg, #0d1117 0%, #0f1420 100%)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>
 
       <div style={{position:'fixed',top:'20%',left:'50%',transform:'translateX(-50%)',width:'800px',height:'600px',background:'radial-gradient(circle, rgba(29,158,117,0.06) 0%, transparent 70%)',pointerEvents:'none'}}/>
 

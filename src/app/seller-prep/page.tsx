@@ -88,7 +88,7 @@ export default function SellerPrepPage() {
   const cardStyle = { background:'var(--lw-card)', borderRadius:'16px', border:'1px solid var(--lw-border)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', marginBottom:'1rem' }
 
   return (
-    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"'Inter', sans-serif"}}>
+    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>
 
       {/* BACKGROUND GLOW */}
       <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>

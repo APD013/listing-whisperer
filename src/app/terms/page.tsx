@@ -21,7 +21,7 @@ export default function TermsOfService() {
   ]
 
   const styles = {
-    page: { minHeight: '100vh', background: '#0d1117', fontFamily: "'Inter', sans-serif", color: '#f0f0f0' },
+    page: { minHeight: '100vh', background: '#0d1117', fontFamily: "var(--font-plus-jakarta), sans-serif", color: '#f0f0f0' },
     card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' },
   }
 

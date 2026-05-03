@@ -74,7 +74,7 @@ export default function ObjectionHandlerPage() {
   const inputStyle = { width:'100%', padding:'11px 14px', background:'var(--lw-input)', border:'1px solid var(--lw-border)', borderRadius:'8px', fontSize:'13px', color:'var(--lw-text)', boxSizing:'border-box' as const, outline:'none' }
 
   return (
-    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"'Inter', sans-serif"}}>
+    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>
 
       <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 

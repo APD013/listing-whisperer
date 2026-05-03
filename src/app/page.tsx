@@ -36,7 +36,7 @@ export default function Home() {
   }
 
   return (
-    <main style={{fontFamily:"'Inter', sans-serif",color:'#111'}}>
+    <main style={{fontFamily:"var(--font-plus-jakarta), sans-serif",color:'#111'}}>
 
       {/* EXIT INTENT POPUP */}
       {showExitPopup && (
