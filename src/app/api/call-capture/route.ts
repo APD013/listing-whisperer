@@ -55,7 +55,21 @@ export async function POST(request: Request) {
         max_tokens: 1000,
         messages: [{
           role: 'user',
-          content: `You are analyzing a real estate call transcript. Extract the following information and return ONLY a JSON object with no other text:
+          content: `You are analyzing a real estate agent's phone call transcript. Your job is to extract lead information accurately. Pay close attention to names — the caller will usually introduce themselves. Extract the following and return ONLY a valid JSON object with no other text, no markdown, no backticks:
+
+Keys to extract:
+- "name": The full name of the person calling (look for "my name is", "this is", "I'm" — be thorough)
+- "phone": Any phone number mentioned
+- "email": Any email address mentioned  
+- "address": Any property address mentioned
+- "est_price": Any price or price range mentioned
+- "notes": A detailed summary of the call — motivation, timeline, concerns, next steps, anything important
+- "status": Always set to "New Lead"
+
+Return ONLY the JSON object. Example:
+{"name":"John Smith","phone":"714-555-0100","email":"","address":"123 Main St Newport Beach","est_price":"$900,000","notes":"Wants to sell in 60 days, motivated by relocation","status":"New Lead"}
+
+Transcript:
 
 {
   "name": "caller's full name or empty string",
@@ -93,6 +107,7 @@ ${transcript}`
       est_price: leadData.est_price || '',
       notes: leadData.notes || '',
       status: 'New Lead',
+      source: 'call_capture',
     }).select().single()
 
     if (error) {

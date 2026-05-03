@@ -206,6 +206,11 @@ export default function LeadsPage() {
                       <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 10px', borderRadius: '20px', background: `${STATUS_COLORS[lead.status]}18`, color: STATUS_COLORS[lead.status], border: `1px solid ${STATUS_COLORS[lead.status]}35` }}>
                         {lead.status}
                       </span>
+                      {lead.source === 'call_capture' && (
+                        <span style={{ fontSize: '10px', fontWeight: '700', padding: '3px 8px', borderRadius: '20px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                          📞 Call Capture
+                        </span>
+                      )}
                     </div>
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                       {lead.phone && <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', fontWeight: '500' }}>📞 {lead.phone}</span>}
