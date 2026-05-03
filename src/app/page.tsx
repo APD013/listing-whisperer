@@ -193,6 +193,7 @@ export default function Home() {
               {icon:'👥',title:'Leads & CRM',desc:'Track your pipeline, manage contacts, and stay on top of every client relationship.'},
               {icon:'✦',title:'AI Chat Assistant',desc:'Ask anything about real estate or your listings. Your always-on AI assistant built for agents.'},
               {icon:'📞',title:'Scripts Library',desc:'Cold call, door knock, FSBO, and expired listing scripts — ready to use and AI-customized for your market.'},
+              {icon:'🎙️',title:'Call Capture',desc:'Answer your phone, close more deals. Record client calls, auto-transcribe, and instantly log lead details to your CRM. Pro only.',},
             ].map(({icon,title,desc}) => (
               <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
                 onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}
@@ -238,6 +239,54 @@ export default function Home() {
             style={{display:'inline-block',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',padding:'14px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'15px',boxShadow:'0 4px 24px rgba(29,158,117,0.4)'}}>
             Try the AI Assistant Free →
           </a>
+        </div>
+      </section>
+
+      {/* CALL CAPTURE SECTION */}
+      <section style={{padding:'5rem 2rem',background:'#fff'}}>
+        <div style={{maxWidth:'860px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',marginBottom:'1.5rem'}}>
+            <div style={{width:'52px',height:'52px',background:'linear-gradient(135deg,#ef4444,#b91c1c)',borderRadius:'16px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',boxShadow:'0 4px 16px rgba(239,68,68,0.3)'}}>📞</div>
+            <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(239,68,68,0.08)',color:'#ef4444',fontSize:'12px',fontWeight:'700',padding:'5px 14px',borderRadius:'20px',letterSpacing:'0.5px',border:'1px solid rgba(239,68,68,0.2)'}}>
+              PRO EXCLUSIVE FEATURE
+            </div>
+          </div>
+          <h2 style={{textAlign:'center',fontSize:'clamp(1.75rem, 4vw, 2.5rem)',fontWeight:'800',marginBottom:'1rem',letterSpacing:'-0.3px'}}>
+            Answer your phone.<br/>
+            <span style={{color:'#ef4444'}}>Close more deals.</span>
+          </h2>
+          <p style={{textAlign:'center',fontSize:'15px',color:'#777',maxWidth:'560px',margin:'0 auto 3rem',lineHeight:'1.8'}}>
+            Call Capture records your client calls, automatically transcribes them, extracts the lead details, and logs everything directly into your CRM — while you're still on the call.
+          </p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'1.5rem',marginBottom:'3rem'}}>
+            {[
+              {icon:'🔴',title:'One tap to record',desc:'Hit record when you answer. Place your phone on speaker. Call Capture listens to both sides of the conversation.'},
+              {icon:'🤖',title:'AI transcribes instantly',desc:'When the call ends, Whisper AI transcribes every word with near-perfect accuracy — even with background noise.'},
+              {icon:'👤',title:'Lead auto-extracted',desc:'Claude pulls out the caller\'s name, phone, property address, price range, timeline, and motivation automatically.'},
+              {icon:'📋',title:'Saved to your CRM',desc:'The lead is instantly added to Leads & Clients with full notes from the call. Ready to follow up in one click.'},
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
+                onMouseOver={e => {e.currentTarget.style.borderColor='#ef4444';e.currentTarget.style.boxShadow='0 4px 20px rgba(239,68,68,0.08)'}}
+                onMouseOut={e => {e.currentTarget.style.borderColor='#eee';e.currentTarget.style.boxShadow='none'}}>
+                <div style={{fontSize:'2rem',marginBottom:'12px'}}>{icon}</div>
+                <h3 style={{fontSize:'15px',fontWeight:'700',marginBottom:'8px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{background:'linear-gradient(135deg,#fff5f5,#fff8f8)',border:'1px solid rgba(239,68,68,0.15)',borderRadius:'16px',padding:'2rem',marginBottom:'2rem'}}>
+            <p style={{fontSize:'13px',fontWeight:'700',color:'#ef4444',margin:'0 0 12px',letterSpacing:'0.5px'}}>⚖️ BUILT FOR COMPLIANCE</p>
+            <p style={{fontSize:'14px',color:'#555',lineHeight:'1.8',margin:'0'}}>
+              Call Capture automatically detects your state's recording laws. In two-party consent states like California, Illinois, and Washington, it provides ready-to-use consent scripts you can read to your client before recording starts — keeping you fully compliant.
+            </p>
+          </div>
+          <div style={{textAlign:'center'}}>
+            <a href="/signup"
+              style={{display:'inline-block',background:'linear-gradient(135deg,#ef4444,#b91c1c)',color:'#fff',padding:'14px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'15px',boxShadow:'0 4px 24px rgba(239,68,68,0.3)',marginBottom:'12px'}}>
+              Try Call Capture Free →
+            </a>
+            <p style={{fontSize:'12px',color:'#aaa',margin:'0'}}>Available on Pro plan · 24 hour free trial · No credit card</p>
+          </div>
         </div>
       </section>
 
@@ -398,6 +447,7 @@ export default function Home() {
                 <li>Agent portfolio page</li>
                 <li>AI chat assistant</li>
                 <li>Follow-up tools</li>
+                <li>Call Capture — auto-log calls</li>
               </ul>
             </div>
           </div>
@@ -450,6 +500,7 @@ export default function Home() {
               <li>✅ Agent portfolio page</li>
               <li>✅ AI chat assistant</li>
               <li>✅ Brand voice memory</li>
+              <li>✅ Call Capture — auto-log calls to CRM</li>
               <li>✅ Priority support</li>
             </ul>
             <a href="/signup" onClick={() => trackCTAClick('pricing_pro_cta', 'homepage')}
