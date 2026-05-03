@@ -3,9 +3,16 @@ import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 
-// Voice input setup
-const SpeechRecognition = typeof window !== 'undefined' 
-  ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition 
+const CALL_CAPTURE_ENABLED = true
+
+const TWO_PARTY_STATES = [
+  'California', 'Illinois', 'Washington', 'Pennsylvania', 'Michigan',
+  'Maryland', 'Massachusetts', 'Montana', 'Nevada', 'New Hampshire',
+  'Oregon', 'Connecticut', 'Delaware'
+]
+
+const SpeechRecognition = typeof window !== 'undefined'
+  ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
   : null
 
 const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/terms', '/privacy', '/contact']
@@ -17,16 +24,43 @@ export default function GlobalChat() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+  const [userPlan, setUserPlan] = useState('starter')
+  const [userState, setUserState] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [voiceEnabled, setVoiceEnabled] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
+
+  // Call Capture state
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordingTime, setRecordingTime] = useState(0)
+  const [showCallCapture, setShowCallCapture] = useState(false)
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(false)
+  const [callProcessing, setCallProcessing] = useState(false)
+  const [callResult, setCallResult] = useState<any>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const timerRef = useRef<any>(null)
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         setUserId(session.user.id)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('plan, brand_voice')
+          .eq('id', session.user.id)
+          .single()
+        if (profile) {
+          setUserPlan(profile.plan || 'starter')
+          if (profile.brand_voice) {
+            try {
+              const bv = JSON.parse(profile.brand_voice)
+              setUserState(bv.state || '')
+            } catch(e) {}
+          }
+        }
       }
     }
     getUser()
@@ -53,7 +87,84 @@ export default function GlobalChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  useEffect(() => {
+    if (isRecording) {
+      timerRef.current = setInterval(() => setRecordingTime(prev => prev + 1), 1000)
+    } else {
+      clearInterval(timerRef.current)
+      setRecordingTime(0)
+    }
+    return () => clearInterval(timerRef.current)
+  }, [isRecording])
+
   if (HIDDEN_PATHS.includes(pathname)) return null
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+    const s = (seconds % 60).toString().padStart(2, '0')
+    return `${m}:${s}`
+  }
+
+  const isTwoPartyState = TWO_PARTY_STATES.includes(userState)
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mediaRecorder = new MediaRecorder(stream)
+      mediaRecorderRef.current = mediaRecorder
+      audioChunksRef.current = []
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data)
+      }
+
+      mediaRecorder.start(1000)
+      setIsRecording(true)
+    } catch(e) {
+      alert('Could not access microphone. Please allow microphone access and try again.')
+    }
+  }
+
+  const stopRecording = async () => {
+    if (!mediaRecorderRef.current) return
+    setIsRecording(false)
+    setCallProcessing(true)
+
+    mediaRecorderRef.current.stop()
+    mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop())
+
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+    const formData = new FormData()
+    formData.append('audio', audioBlob, 'call.webm')
+    formData.append('userId', userId || '')
+
+    try {
+      const res = await fetch('/api/call-capture', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (data.success) {
+        setCallResult(data)
+      } else {
+        alert('Error processing call: ' + data.error)
+      }
+    } catch(e: any) {
+      alert('Error: ' + e.message)
+    }
+    setCallProcessing(false)
+  }
+
+  const handleCallCaptureClick = () => {
+    if (userPlan !== 'pro') {
+      alert('Call Capture is a Pro feature. Upgrade to Pro to use it!')
+      return
+    }
+    if (isTwoPartyState) {
+      setShowDisclaimerModal(true)
+    } else {
+      setShowCallCapture(true)
+    }
+  }
 
   const startListening = () => {
     if (!SpeechRecognition) {
@@ -103,62 +214,43 @@ export default function GlobalChat() {
 
       if (data.message) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
-        // Voice output — read response aloud if enabled
         if (voiceEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
-          // Strip emojis and markdown before speaking
           const cleanText = data.message
-            .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F000}-\u{1F02F}]|[\u{1F0A0}-\u{1F0FF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1F004}]|[\u{1F0CF}]|[\u{1F170}-\u{1F171}]|[\u{1F17E}-\u{1F17F}]|[\u{1F18E}]|[\u{3030}]|[\u{2B50}]|[\u{2B55}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{3297}]|[\u{3299}]|[\u{303D}]|[\u{00A9}]|[\u{00AE}]|[\u{2122}]|[\u{23F3}]|[\u{24C2}]|[\u{23E9}-\u{23F3}]|[\u{25AA}-\u{25AB}]|[\u{25B6}]|[\u{25C0}]|[\u{25FB}-\u{25FE}]|[\u{2600}-\u{2604}]|[\u{260E}]|[\u{2611}]|[\u{2614}-\u{2615}]|[\u{2618}]|[\u{261D}]|[\u{2620}]|[\u{2622}-\u{2623}]|[\u{2626}]|[\u{262A}]|[\u{262E}-\u{262F}]|[\u{2638}-\u{263A}]|[\u{2640}]|[\u{2642}]|[\u{2648}-\u{2653}]|[\u{2660}]|[\u{2663}]|[\u{2665}-\u{2666}]|[\u{2668}]|[\u{267B}]|[\u{267F}]|[\u{2692}-\u{2697}]|[\u{2699}]|[\u{269B}-\u{269C}]|[\u{26A0}-\u{26A1}]|[\u{26AA}-\u{26AB}]|[\u{26B0}-\u{26B1}]|[\u{26BD}-\u{26BE}]|[\u{26C4}-\u{26C5}]|[\u{26CE}-\u{26CF}]|[\u{26D1}]|[\u{26D3}-\u{26D4}]|[\u{26E9}-\u{26EA}]|[\u{26F0}-\u{26F5}]|[\u{26F7}-\u{26FA}]|[\u{26FD}]|[\u{2702}]|[\u{2705}]|[\u{2708}-\u{270D}]|[\u{270F}]|[\u{2712}]|[\u{2714}]|[\u{2716}]|[\u{271D}]|[\u{2721}]|[\u{2728}]|[\u{2733}-\u{2734}]|[\u{2744}]|[\u{2747}]|[\u{274C}]|[\u{274E}]|[\u{2753}-\u{2755}]|[\u{2757}]|[\u{2763}-\u{2764}]|[\u{2795}-\u{2797}]|[\u{27A1}]|[\u{27B0}]|[\u{27BF}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{2B50}]|[\u{2B55}]|[\u{3030}]|[\u{303D}]|[\u{3297}]|[\u{3299}]/gu, '')
-            .replace(/\*\*/g, '')
-            .replace(/\*/g, '')
-            .replace(/#{1,6}\s/g, '')
-            .replace(/---/g, '')
-            .replace(/\n+/g, ' ')
-            .trim()
+            .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+            .replace(/\*\*/g, '').replace(/\*/g, '')
+            .replace(/#{1,6}\s/g, '').replace(/---/g, '')
+            .replace(/\n+/g, ' ').trim()
           const utterance = new SpeechSynthesisUtterance(cleanText)
-          // Pick a friendly natural voice
           const voices = window.speechSynthesis.getVoices()
-          const preferred = voices.find(v => v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Moira') || v.name.includes('Google US English') || v.name.includes('Alex'))
+          const preferred = voices.find(v => v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Google US English'))
           if (preferred) utterance.voice = preferred
           utterance.rate = 1.05
           utterance.pitch = 1.1
-          utterance.volume = 1.0
           window.speechSynthesis.cancel()
           window.speechSynthesis.speak(utterance)
         }
       }
 
-      // Handle actions client-side with authenticated supabase
       if (data.action) {
         const action = data.action
-
         if (action.type === 'navigate') {
           setTimeout(() => { window.location.assign(action.url) }, 1000)
         }
-
         if (action.type === 'lead_added' && userId) {
-          console.log('Attempting lead insert for userId:', userId)
-          const { data, error } = await supabase.from('leads').insert({
+          const { data: leadData, error } = await supabase.from('leads').insert({
             user_id: userId,
             name: action.name || 'New Lead',
             email: action.email || null,
             status: 'New Lead',
           }).select()
-          console.log('Lead insert result:', data, error)
           if (!error) {
             setMessages(prev => [...prev, {
               role: 'assistant',
               content: `✅ **${action.name || 'New Lead'}** has been added to your Leads & Clients! Taking you there now...`
             }])
             setTimeout(() => { window.location.assign('/leads') }, 1500)
-          } else {
-            console.error('Lead insert error:', error)
-            setMessages(prev => [...prev, {
-              role: 'assistant',
-              content: `❌ Could not add lead: ${error.message}`
-            }])
           }
         }
-
         if (action.type === 'reminder_created' && userId) {
           setMessages(prev => [...prev, {
             role: 'assistant',
@@ -187,6 +279,108 @@ export default function GlobalChat() {
 
   return (
     <>
+      {/* TWO-PARTY DISCLAIMER MODAL */}
+      {showDisclaimerModal && (
+        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.7)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
+          <div style={{background:'#1a1d2e',borderRadius:'20px',border:'1px solid rgba(239,68,68,0.3)',padding:'2rem',maxWidth:'400px',width:'100%',boxShadow:'0 20px 60px rgba(0,0,0,0.5)'}}>
+            <div style={{fontSize:'2rem',marginBottom:'12px',textAlign:'center'}}>⚠️</div>
+            <h3 style={{fontSize:'16px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 12px',textAlign:'center'}}>Two-Party Consent Required</h3>
+            <p style={{fontSize:'13px',color:'#8b8fa8',lineHeight:'1.7',margin:'0 0 20px'}}>
+              You are in <strong style={{color:'#f0f0f0'}}>{userState}</strong>, a two-party consent state. You must inform the other party that this call is being recorded before continuing.
+            </p>
+            <div style={{background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'10px',padding:'12px 14px',marginBottom:'20px'}}>
+              <p style={{fontSize:'12px',color:'#f87171',margin:'0',lineHeight:'1.6'}}>
+                By continuing, you confirm that you have informed all parties on this call that it will be recorded.
+              </p>
+            </div>
+            <div style={{display:'flex',gap:'8px'}}>
+              <button onClick={() => setShowDisclaimerModal(false)}
+                style={{flex:1,padding:'11px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'10px',color:'#6b7280',fontSize:'13px',cursor:'pointer',fontWeight:'600'}}>
+                Cancel
+              </button>
+              <button onClick={() => { setShowDisclaimerModal(false); setShowCallCapture(true) }}
+                style={{flex:2,padding:'11px',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'none',borderRadius:'10px',color:'#fff',fontSize:'13px',cursor:'pointer',fontWeight:'700'}}>
+                I've Notified All Parties →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CALL CAPTURE UI */}
+      {showCallCapture && (
+        <div style={{position:'fixed',bottom:'84px',right:'24px',width:'320px',background:'#1a1d2e',borderRadius:'20px',border:'1px solid rgba(239,68,68,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',overflow:'hidden',zIndex:1500}}>
+          <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+              <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#ef4444,#b91c1c)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>📞</div>
+              <div>
+                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Call Capture</p>
+                <p style={{fontSize:'10px',color:'#ef4444',margin:'0'}}>Pro Feature</p>
+              </div>
+            </div>
+            <button onClick={() => { setShowCallCapture(false); setCallResult(null); setIsRecording(false) }}
+              style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
+          </div>
+
+          <div style={{padding:'1.25rem'}}>
+            {!callResult && !callProcessing && (
+              <>
+                <p style={{fontSize:'12px',color:'#8b8fa8',margin:'0 0 16px',lineHeight:'1.6',textAlign:'center'}}>
+                  {isRecording ? 'Recording in progress — place your phone on speaker' : 'Tap Record when you answer the call. Place phone on speaker so both sides are captured.'}
+                </p>
+
+                {isRecording && (
+                  <div style={{textAlign:'center',marginBottom:'16px'}}>
+                    <div style={{fontSize:'2rem',marginBottom:'4px'}}>🔴</div>
+                    <p style={{fontSize:'20px',fontWeight:'700',color:'#ef4444',margin:'0',fontFamily:'monospace'}}>{formatTime(recordingTime)}</p>
+                    <p style={{fontSize:'11px',color:'#6b7280',margin:'4px 0 0'}}>Recording...</p>
+                  </div>
+                )}
+
+                <button onClick={isRecording ? stopRecording : startRecording}
+                  style={{width:'100%',padding:'14px',background: isRecording ? 'linear-gradient(135deg,#ef4444,#b91c1c)' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'12px',fontSize:'14px',fontWeight:'700',cursor:'pointer',boxShadow: isRecording ? '0 4px 20px rgba(239,68,68,0.4)' : '0 4px 20px rgba(29,158,117,0.3)'}}>
+                  {isRecording ? '⏹ Stop & Analyze Call' : '🔴 Start Recording'}
+                </button>
+
+                <p style={{fontSize:'10px',color:'#444',textAlign:'center',margin:'8px 0 0',lineHeight:'1.5'}}>
+                  By recording you agree to comply with your local recording laws.
+                </p>
+              </>
+            )}
+
+            {callProcessing && (
+              <div style={{textAlign:'center',padding:'1rem 0'}}>
+                <div style={{fontSize:'2rem',marginBottom:'12px'}}>🤖</div>
+                <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 6px'}}>Analyzing your call...</p>
+                <p style={{fontSize:'11px',color:'#6b7280',margin:'0'}}>Transcribing and extracting lead details</p>
+              </div>
+            )}
+
+            {callResult && (
+              <div>
+                <div style={{background:'rgba(29,158,117,0.08)',border:'1px solid rgba(29,158,117,0.2)',borderRadius:'12px',padding:'1rem',marginBottom:'12px'}}>
+                  <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',margin:'0 0 8px',letterSpacing:'1px'}}>✅ LEAD CAPTURED</p>
+                  {callResult.lead.name && <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>👤 {callResult.lead.name}</p>}
+                  {callResult.lead.phone && <p style={{fontSize:'12px',color:'#8b8fa8',margin:'0 0 4px'}}>📞 {callResult.lead.phone}</p>}
+                  {callResult.lead.address && <p style={{fontSize:'12px',color:'#8b8fa8',margin:'0 0 4px'}}>🏠 {callResult.lead.address}</p>}
+                  {callResult.lead.est_price && <p style={{fontSize:'12px',color:'#1D9E75',fontWeight:'600',margin:'0 0 4px'}}>💰 {callResult.lead.est_price}</p>}
+                  {callResult.lead.notes && <p style={{fontSize:'12px',color:'#8b8fa8',margin:'8px 0 0',lineHeight:'1.5',fontStyle:'italic'}}>"{callResult.lead.notes}"</p>}
+                </div>
+                <div style={{display:'flex',gap:'8px'}}>
+                  <a href="/leads" style={{flex:1,padding:'10px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'12px',fontWeight:'700',textAlign:'center'}}>
+                    View in Leads →
+                  </a>
+                  <button onClick={() => { setCallResult(null); setIsRecording(false) }}
+                    style={{padding:'10px 14px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',color:'#6b7280',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>
+                    New Call
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {showChat && (
         <div style={{position:'fixed',bottom:'84px',right:'24px',width:'360px',height:'520px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500}}>
 
@@ -200,6 +394,13 @@ export default function GlobalChat() {
               </div>
             </div>
             <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
+              {CALL_CAPTURE_ENABLED && (
+                <button onClick={handleCallCaptureClick}
+                  title="Call Capture — Record & analyze calls"
+                  style={{width:'32px',height:'32px',borderRadius:'8px',background: showCallCapture ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)',border: showCallCapture ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(255,255,255,0.08)',color: showCallCapture ? '#ef4444' : '#6b7280',fontSize:'14px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  📞
+                </button>
+              )}
               {messages.length > 0 && (
                 <button onClick={clearHistory} style={{background:'none',border:'none',color:'#444',fontSize:'11px',cursor:'pointer',padding:'2px 6px'}}>Clear</button>
               )}
@@ -214,6 +415,12 @@ export default function GlobalChat() {
                 <div style={{fontSize:'2rem',marginBottom:'8px'}}>✦</div>
                 <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>How can I help you?</p>
                 <p style={{fontSize:'11px',color:'#5a5f72',margin:'0 0 1rem'}}>Ask me anything or give me a command</p>
+                {CALL_CAPTURE_ENABLED && userPlan === 'pro' && (
+                  <div style={{background:'rgba(239,68,68,0.06)',border:'1px solid rgba(239,68,68,0.15)',borderRadius:'10px',padding:'10px 12px',marginBottom:'12px',cursor:'pointer'}} onClick={handleCallCaptureClick}>
+                    <p style={{fontSize:'12px',color:'#ef4444',fontWeight:'600',margin:'0 0 2px'}}>📞 Call Capture</p>
+                    <p style={{fontSize:'11px',color:'#8b8fa8',margin:'0'}}>Tap to record & auto-log your next call</p>
+                  </div>
+                )}
                 <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
                   {suggestions.map(q => (
                     <button key={q} onClick={() => setInput(q)}

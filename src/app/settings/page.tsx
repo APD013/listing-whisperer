@@ -20,7 +20,7 @@ export default function SettingsPage() {
   const [brandVoice, setBrandVoice] = useState({
     agentName: '', brokerage: '', phone: '', website: '',
     preferredTone: 'Warm & inviting', targetBuyers: '',
-    uniqueStyle: '', ctaStyle: '', avoidWords: '',
+    uniqueStyle: '', ctaStyle: '', avoidWords: '', state: '',
   })
 
   useEffect(() => {
@@ -154,6 +154,25 @@ export default function SettingsPage() {
             <div>
               <label style={labelStyle}>Website</label>
               <input placeholder="yoursite.com" value={brandVoice.website} onChange={e => setBrandVoice({ ...brandVoice, website: e.target.value })} style={inputStyle} />
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Your State <span style={{ color: 'var(--lw-text-muted)', fontWeight: '400' }}>— used for Call Capture recording compliance</span></label>
+              <select value={brandVoice.state} onChange={e => setBrandVoice({ ...brandVoice, state: e.target.value })} style={inputStyle}>
+                <option value="">Select your state...</option>
+                <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option>
+                <option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option>
+                <option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+                <option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option>
+                <option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option>
+                <option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+                <option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option>
+                <option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option>
+                <option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+                <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option>
+                <option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option>
+                <option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option>
+                <option>Wisconsin</option><option>Wyoming</option>
+              </select>
             </div>
           </div>
 
