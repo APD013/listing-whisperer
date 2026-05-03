@@ -194,6 +194,7 @@ export default function Home() {
               {icon:'✦',title:'AI Chat Assistant',desc:'Ask anything about real estate or your listings. Your always-on AI assistant built for agents.'},
               {icon:'📞',title:'Scripts Library',desc:'Cold call, door knock, FSBO, and expired listing scripts — ready to use and AI-customized for your market.'},
               {icon:'🎙️',title:'Call Capture',desc:'Answer your phone, close more deals. Record client calls, auto-transcribe, and instantly log lead details to your CRM. Pro only.',},
+              {icon:'⭐',title:'Career Highlights',desc:'Capture your favorite closing moments with photos and memories. Market the listing today — remember the moment tomorrow.'},
             ].map(({icon,title,desc}) => (
               <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
                 onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}
