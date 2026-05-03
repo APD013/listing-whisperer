@@ -262,7 +262,7 @@ export default function Home() {
             {[
               {icon:'🔴',title:'One tap to record',desc:'Hit record when you answer. Place your phone on speaker. Call Capture listens to both sides of the conversation.'},
               {icon:'🤖',title:'AI transcribes instantly',desc:'When the call ends, Whisper AI transcribes every word with near-perfect accuracy — even with background noise.'},
-              {icon:'👤',title:'Lead auto-extracted',desc:'Claude pulls out the caller\'s name, phone, property address, price range, timeline, and motivation automatically.'},
+              {icon:'👤',title:'Lead auto-extracted',desc:'Our AI pulls out the caller\'s name, phone, property address, price range, timeline, and motivation automatically.'},
               {icon:'📋',title:'Saved to your CRM',desc:'The lead is instantly added to Leads & Clients with full notes from the call. Ready to follow up in one click.'},
             ].map(({icon,title,desc}) => (
               <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
