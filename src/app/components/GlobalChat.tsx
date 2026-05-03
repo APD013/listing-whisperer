@@ -288,10 +288,25 @@ export default function GlobalChat() {
             <p style={{fontSize:'13px',color:'#8b8fa8',lineHeight:'1.7',margin:'0 0 20px'}}>
               You are in <strong style={{color:'#f0f0f0'}}>{userState}</strong>, a two-party consent state. You must inform the other party that this call is being recorded before continuing.
             </p>
-            <div style={{background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'10px',padding:'12px 14px',marginBottom:'20px'}}>
+            <div style={{background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:'10px',padding:'12px 14px',marginBottom:'16px'}}>
               <p style={{fontSize:'12px',color:'#f87171',margin:'0',lineHeight:'1.6'}}>
                 By continuing, you confirm that you have informed all parties on this call that it will be recorded.
               </p>
+            </div>
+            <div style={{marginBottom:'20px'}}>
+              <p style={{fontSize:'11px',fontWeight:'700',color:'#8b8fa8',letterSpacing:'1px',margin:'0 0 10px'}}>💬 SCRIPTS TO ASK CONSENT</p>
+              {[
+                { label: 'Casual', script: '"Hey, just so you know I\'m going to record this call so I can follow up accurately — is that okay?"' },
+                { label: 'Professional', script: '"Before we get started, I want to let you know this call may be recorded for note-taking purposes. Do you consent to that?"' },
+                { label: 'Quick', script: '"I record my calls to make sure I capture all the details — totally fine with you?"' },
+              ].map((s, i) => (
+                <div key={i} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'8px',padding:'10px 12px',marginBottom:'8px',cursor:'pointer'}}
+                  onClick={() => navigator.clipboard.writeText(s.script)}
+                  title="Click to copy">
+                  <p style={{fontSize:'10px',fontWeight:'700',color:'#1D9E75',margin:'0 0 4px',letterSpacing:'0.5px'}}>{s.label} — click to copy</p>
+                  <p style={{fontSize:'12px',color:'#c0c0c0',margin:'0',lineHeight:'1.6',fontStyle:'italic'}}>{s.script}</p>
+                </div>
+              ))}
             </div>
             <div style={{display:'flex',gap:'8px'}}>
               <button onClick={() => setShowDisclaimerModal(false)}
