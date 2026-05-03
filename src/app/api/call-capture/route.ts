@@ -36,10 +36,11 @@ export async function POST(request: Request) {
     })
 
     const whisperData = await whisperRes.json()
+    console.log('Whisper response:', JSON.stringify(whisperData))
     const transcript = whisperData.text || ''
 
     if (!transcript) {
-      return NextResponse.json({ error: 'Could not transcribe audio' }, { status: 400 })
+      return NextResponse.json({ error: 'Could not transcribe audio. Whisper said: ' + JSON.stringify(whisperData) }, { status: 400 })
     }
 
     // Send transcript to Claude to extract lead details
