@@ -481,6 +481,7 @@ export default function Dashboard() {
         { icon: '💲', title: 'Pricing Assistant', desc: 'Get a data-backed price range and strategy', color: '#d4af37', href: '/pricing-assistant' },
         { icon: '🎯', title: 'Listing Presentation', desc: 'Build your full seller appointment deck', color: '#a78bfa', href: '/listing-presentation' },
         { icon: '🏆', title: 'Agent Portfolio', desc: 'Your shareable listing portfolio page', color: '#d4af37', href: '/agent-portfolio' },
+        { icon: '⭐', title: 'Career Highlights', desc: 'Capture your favorite closing moments forever', color: '#f59e0b', href: '/career-highlights' },
       ]
     },
     {
