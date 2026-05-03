@@ -309,7 +309,7 @@ export default function GlobalChat() {
 
       {/* CALL CAPTURE UI */}
       {showCallCapture && (
-        <div style={{position:'fixed',bottom:'84px',right:'24px',width:'320px',background:'#1a1d2e',borderRadius:'20px',border:'1px solid rgba(239,68,68,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',overflow:'hidden',zIndex:1500}}>
+        <div style={{position:'fixed',bottom:'84px',right: showChat ? '400px' : '24px',width:'320px',background:'#1a1d2e',borderRadius:'20px',border:'1px solid rgba(239,68,68,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',overflow:'hidden',zIndex:1600}}>
           <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
             <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
               <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#ef4444,#b91c1c)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>📞</div>
