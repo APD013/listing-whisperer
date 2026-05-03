@@ -991,8 +991,11 @@ export default function Dashboard() {
           {activePage === 'history' && (
             <div style={{maxWidth:'760px'}}>
               <div style={{marginBottom:'1.5rem'}}>
-                <h1 style={{fontSize:'1.5rem',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318',marginBottom:'6px'}}>Listing History</h1>
-                <p style={{fontSize:'14px',color:'#8b8fa8'}}>{pastListings.length} most recent listings</p>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'6px'}}>
+                  <h1 style={{fontSize:'1.5rem',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318',margin:'0'}}>Listing History</h1>
+                  <button onClick={() => setActivePage('home')} style={{padding:'8px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontWeight:'600',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>← Back to Dashboard</button>
+                </div>
+                <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>{pastListings.length} most recent listings</p>
               </div>
               {pastListings.length === 0 ? (
                 <div style={{...styles.card,textAlign:'center',padding:'3rem'}}>
@@ -1018,7 +1021,7 @@ export default function Dashboard() {
                       <textarea placeholder="Agent notes..." defaultValue={listing.agent_notes || ''}
                         onBlur={async (e) => { await supabase.from('listings').update({agent_notes: e.target.value}).eq('id', listing.id) }}
                         onClick={e => e.stopPropagation()}
-                        style={{width:'100%',padding:'8px',background:'rgba(0,0,0,0.2)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'8px',fontSize:'12px',color:'#8b8fa8',minHeight:'60px',resize:'vertical',boxSizing:'border-box'}}/>
+                        style={{width:'100%',padding:'8px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',color:'var(--lw-text-muted)',minHeight:'60px',resize:'vertical',boxSizing:'border-box',fontFamily:'var(--font-plus-jakarta),sans-serif'}}/>
                     </div>
                   ))}
                 </div>
