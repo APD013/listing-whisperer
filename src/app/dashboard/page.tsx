@@ -67,9 +67,10 @@ export default function Dashboard() {
     const leadNeighborhood = params.get('neighborhood')
     const leadPrice = params.get('price')
     const leadName = params.get('name')
-    if (generateFromLead && leadNeighborhood) {
+    if (generateFromLead) {
       setForm(prev => ({...prev, neighborhood: decodeURIComponent(leadNeighborhood || ''), price: decodeURIComponent(leadPrice || ''), name: decodeURIComponent(leadName || '')}))
       setActivePage('generate')
+      window.scrollTo({top:0,behavior:'smooth'})
     }
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
