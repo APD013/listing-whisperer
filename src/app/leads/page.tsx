@@ -64,9 +64,11 @@ export default function LeadsPage() {
     if (!form.name) { alert('Please enter a name!'); return }
     setSaving(true)
     if (editingLead) {
-      await supabase.from('leads').update(form).eq('id', editingLead.id)
+      const { error } = await supabase.from('leads').update(form).eq('id', editingLead.id)
+      if (error) { alert('Error saving: ' + error.message); setSaving(false); return }
     } else {
-      await supabase.from('leads').insert({ ...form, user_id: userId })
+      const { error } = await supabase.from('leads').insert({ ...form, user_id: userId })
+      if (error) { alert('Error saving: ' + error.message); setSaving(false); return }
     }
     await loadLeads(userId!)
     setShowForm(false)
@@ -219,7 +221,7 @@ export default function LeadsPage() {
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: '6px', marginLeft: '12px', flexShrink: 0 }}>
-                    <a href="/dashboard"
+                    <a href={`/dashboard?generate=true&neighborhood=${encodeURIComponent(lead.address || '')}&price=${encodeURIComponent(lead.est_price || '')}&name=${encodeURIComponent(lead.name || '')}`}
                       style={{ fontSize: '11px', padding: '7px 11px', borderRadius: '8px', background: 'rgba(29,158,117,0.08)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', textDecoration: 'none', fontWeight: '700', whiteSpace: 'nowrap' }}>
                       ✨ Generate
                     </a>
