@@ -291,6 +291,51 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CAREER HIGHLIGHTS SECTION */}
+      <section style={{padding:'5rem 2rem',background:'#f9fafb'}}>
+        <div style={{maxWidth:'860px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',marginBottom:'1.5rem'}}>
+            <div style={{width:'52px',height:'52px',background:'linear-gradient(135deg,#f59e0b,#d97706)',borderRadius:'16px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',boxShadow:'0 4px 16px rgba(245,158,11,0.3)'}}>⭐</div>
+          </div>
+          <h2 style={{textAlign:'center',fontSize:'clamp(1.75rem, 4vw, 2.5rem)',fontWeight:'800',marginBottom:'1rem',letterSpacing:'-0.3px'}}>
+            Market the listing today.<br/>
+            <span style={{color:'#f59e0b'}}>Remember the moment tomorrow.</span>
+          </h2>
+          <p style={{textAlign:'center',fontSize:'15px',color:'#777',maxWidth:'560px',margin:'0 auto 3rem',lineHeight:'1.8'}}>
+            Every closing has a story. Career Highlights lets you capture your favorite moments — the first-time buyers who cried at the table, the record sale, the client who became a friend — with a photo and a memory, saved forever.
+          </p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'1.5rem',marginBottom:'3rem'}}>
+            {[
+              {icon:'📸',title:'Add a photo',desc:'Upload a photo from any closing — the property, the clients, the moment. Your highlight reel, your way.'},
+              {icon:'✍️',title:'Write your memory',desc:'Capture the story behind the sale. First-time buyers, record prices, referrals — the moments that made your career.'},
+              {icon:'🏆',title:'Your highlight reel',desc:'All your best closings in one beautiful place. A private gallery of everything you\'ve built.'},
+              {icon:'🔗',title:'Share on your portfolio',desc:'Your Career Highlights appear on your public Agent Portfolio — showing clients the human behind the agent.'},
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{background:'#fff',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
+                onMouseOver={e => {e.currentTarget.style.borderColor='#f59e0b';e.currentTarget.style.boxShadow='0 4px 20px rgba(245,158,11,0.1)'}}
+                onMouseOut={e => {e.currentTarget.style.borderColor='#eee';e.currentTarget.style.boxShadow='none'}}>
+                <div style={{fontSize:'2rem',marginBottom:'12px'}}>{icon}</div>
+                <h3 style={{fontSize:'15px',fontWeight:'700',marginBottom:'8px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{background:'linear-gradient(135deg,#fffbeb,#fef3c7)',border:'1px solid rgba(245,158,11,0.2)',borderRadius:'16px',padding:'2rem',marginBottom:'2rem',textAlign:'center'}}>
+            <p style={{fontSize:'1.25rem',fontStyle:'italic',color:'#92400e',lineHeight:'1.8',margin:'0 0 12px'}}>
+              "First-time buyers — they cried at the closing table. One of my favorite moments in 10 years of real estate."
+            </p>
+            <p style={{fontSize:'13px',color:'#a16207',margin:'0',fontWeight:'600'}}>— The kind of moment Career Highlights was built to capture</p>
+          </div>
+          <div style={{textAlign:'center'}}>
+            <a href="/signup"
+              style={{display:'inline-block',background:'linear-gradient(135deg,#f59e0b,#d97706)',color:'#fff',padding:'14px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'15px',boxShadow:'0 4px 24px rgba(245,158,11,0.3)',marginBottom:'12px'}}>
+              Start Capturing Your Moments →
+            </a>
+            <p style={{fontSize:'12px',color:'#aaa',margin:'0'}}>Free to start · No credit card required</p>
+          </div>
+        </div>
+      </section>
+
       {/* BEFORE/AFTER */}
       <section style={{padding:'5rem 2rem',maxWidth:'900px',margin:'0 auto'}}>
         <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>From rough notes to full marketing kit</h2>
