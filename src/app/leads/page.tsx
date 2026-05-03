@@ -63,11 +63,15 @@ export default function LeadsPage() {
   const saveLead = async () => {
     if (!form.name) { alert('Please enter a name!'); return }
     setSaving(true)
+    const cleanForm = {
+      ...form,
+      last_contacted: form.last_contacted || null,
+    }
     if (editingLead) {
-      const { error } = await supabase.from('leads').update(form).eq('id', editingLead.id)
+      const { error } = await supabase.from('leads').update(cleanForm).eq('id', editingLead.id)
       if (error) { alert('Error saving: ' + error.message); setSaving(false); return }
     } else {
-      const { error } = await supabase.from('leads').insert({ ...form, user_id: userId })
+      const { error } = await supabase.from('leads').insert({ ...cleanForm, user_id: userId })
       if (error) { alert('Error saving: ' + error.message); setSaving(false); return }
     }
     await loadLeads(userId!)
