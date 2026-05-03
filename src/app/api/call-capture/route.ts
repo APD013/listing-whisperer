@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     })
 
     const whisperData = await whisperRes.json()
-    console.log('Whisper response:', JSON.stringify(whisperData))
+    
     const transcript = whisperData.text || ''
 
     if (!transcript) {
