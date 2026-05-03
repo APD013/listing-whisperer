@@ -477,6 +477,7 @@ export default function Dashboard() {
       color: '#8b5cf6',
       cards: [
         { icon: '📋', title: 'Seller Prep', desc: 'Prepare for your listing appointment', color: '#8b5cf6', href: '/seller-prep' },
+        { icon: '🏠', title: 'Buyer Consultation', desc: 'Prepare for your buyer appointments', color: '#6366f1', href: '/buyer-consultation' },
         { icon: '💲', title: 'Pricing Assistant', desc: 'Get a data-backed price range and strategy', color: '#d4af37', href: '/pricing-assistant' },
         { icon: '🎯', title: 'Listing Presentation', desc: 'Build your full seller appointment deck', color: '#a78bfa', href: '/listing-presentation' },
         { icon: '🏆', title: 'Agent Portfolio', desc: 'Your shareable listing portfolio page', color: '#d4af37', href: '/agent-portfolio' },
