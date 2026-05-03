@@ -63,6 +63,14 @@ export default function Dashboard() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const upgraded = params.get('upgraded')
+    const generateFromLead = params.get('generate')
+    const leadNeighborhood = params.get('neighborhood')
+    const leadPrice = params.get('price')
+    const leadName = params.get('name')
+    if (generateFromLead && leadNeighborhood) {
+      setForm(prev => ({...prev, neighborhood: decodeURIComponent(leadNeighborhood || ''), price: decodeURIComponent(leadPrice || ''), name: decodeURIComponent(leadName || '')}))
+      setActivePage('generate')
+    }
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
