@@ -548,6 +548,10 @@ export default function Home() {
               <li>✅ Agent portfolio page</li>
               <li>✅ AI chat assistant</li>
               <li>✅ Brand voice memory</li>
+              <li>✅ Buyer consultation kit</li>
+              <li>✅ Postcard copy generator</li>
+              <li>✅ Referral request scripts</li>
+              <li>✅ Career highlights page</li>
               <li>✅ Call Capture — auto-log calls to CRM</li>
               <li>✅ Priority support</li>
             </ul>
