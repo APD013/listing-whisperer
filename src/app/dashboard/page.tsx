@@ -503,6 +503,7 @@ export default function Dashboard() {
         { icon: '📅', title: 'Social Planner', desc: '7-day social media content calendar', color: '#e1306c', href: '/social-planner' },
         { icon: '🏡', title: 'Open House Kit', desc: 'Flyer, posts, and follow-up emails', color: '#10b981', href: '/open-house' },
         { icon: '💰', title: 'Price Drop Kit', desc: 'Price improvement announcement suite', color: '#ef4444', href: '/price-drop' },
+        { icon: '📬', title: 'Postcard Copy', desc: 'Just Listed & Just Sold postcard copy generator', color: '#6366f1', href: '/postcard-copy' },
       ]
     },
     {
