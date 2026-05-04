@@ -15,6 +15,7 @@ export default function PortfolioPage({ params }: { params: Promise<{ slug: stri
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [activeTab, setActiveTab] = useState('listings')
+  const [highlights, setHighlights] = useState<any[]>([])
 
   useEffect(() => {
     if (!slug) return
@@ -27,6 +28,10 @@ export default function PortfolioPage({ params }: { params: Promise<{ slug: stri
         .from('listings').select('*').eq('user_id', profile.id)
         .order('created_at', { ascending: false }).limit(20)
       if (agentListings) setListings(agentListings)
+      const { data: agentHighlights } = await supabase
+        .from('career_highlights').select('*').eq('user_id', profile.id)
+        .order('created_at', { ascending: false })
+      if (agentHighlights) setHighlights(agentHighlights)
       setLoading(false)
     }
     load()
@@ -129,7 +134,7 @@ export default function PortfolioPage({ params }: { params: Promise<{ slug: stri
 
         {/* TABS */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem' }}>
-          {['listings', 'about'].map(tab => (
+          {['listings', 'highlights', 'about'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               style={{
                 padding: '9px 20px', borderRadius: '8px', border: '1px solid', cursor: 'pointer', fontSize: '13px', fontWeight: '600', transition: 'all 0.15s',
@@ -138,7 +143,7 @@ export default function PortfolioPage({ params }: { params: Promise<{ slug: stri
                 color: activeTab === tab ? '#1D9E75' : 'var(--lw-text-muted)',
                 fontFamily: 'var(--font-plus-jakarta), sans-serif'
               }}>
-              {tab === 'listings' ? `🏠 Listings (${listings.length})` : '👤 About'}
+              {tab === 'listings' ? `🏠 Listings (${listings.length})` : tab === 'highlights' ? `⭐ Highlights (${highlights.length})` : '👤 About'}
             </button>
           ))}
         </div>
@@ -172,6 +177,39 @@ export default function PortfolioPage({ params }: { params: Promise<{ slug: stri
                         {listing.outputs.mls_standard}
                       </p>
                     )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* HIGHLIGHTS TAB */}
+        {activeTab === 'highlights' && (
+          <div>
+            {highlights.length === 0 ? (
+              <div style={{ ...cardStyle, textAlign: 'center', padding: '3rem' }}>
+                <p style={{ color: 'var(--lw-text-muted)', fontWeight: '500', margin: 0 }}>No highlights yet.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                {highlights.map(h => (
+                  <div key={h.id} style={{ ...cardStyle, padding: '0', overflow: 'hidden', transition: 'all 0.2s' }}
+                    onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(245,158,11,0.4)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(245,158,11,0.1)' }}
+                    onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--lw-border)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.05)' }}>
+                    {h.photo_url ? (
+                      <img src={h.photo_url} alt={h.address} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '140px', background: 'linear-gradient(135deg,rgba(245,158,11,0.1),rgba(217,119,6,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>🏠</div>
+                    )}
+                    <div style={{ padding: '1.25rem' }}>
+                      <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--lw-text)', margin: '0 0 4px' }}>{h.address}</p>
+                      <div style={{ display: 'flex', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                        {h.price && <span style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '700' }}>{h.price}</span>}
+                        {h.closing_date && <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', fontWeight: '500' }}>📅 {new Date(h.closing_date).toLocaleDateString()}</span>}
+                      </div>
+                      {h.quote && <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', fontStyle: 'italic', lineHeight: '1.6', margin: 0 }}>"{h.quote}"</p>}
+                    </div>
                   </div>
                 ))}
               </div>
