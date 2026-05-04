@@ -141,7 +141,7 @@ export default function Home() {
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
-          {['11 copy formats','Seller meeting prep','Pricing assistant','On-site photo drafts','7-day launch kit','Objection handler','Social content planner','Seller net sheet','Agent portfolio','Commission calculator'].map(item => (
+          {['11 copy formats','Seller meeting prep','Buyer consultation','Pricing assistant','On-site photo drafts','7-day launch kit','Objection handler','Social content planner','Seller net sheet','Agent portfolio','Postcard copy','Referral request','Career highlights','Call Capture','Commission calculator'].map(item => (
             <span key={item} style={{color:'#fff',fontSize:'13px',fontWeight:'600'}}>✓ {item}</span>
           ))}
         </div>
