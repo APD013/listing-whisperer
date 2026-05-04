@@ -20,6 +20,8 @@ export default function PortfolioSetupPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [highlightsCount, setHighlightsCount] = useState(0)
+  const [listingsCount, setListingsCount] = useState(0)
 
   useEffect(() => {
     const getUser = async () => {
@@ -36,6 +38,12 @@ export default function PortfolioSetupPage() {
           setCurrentSlug(profile.portfolio_slug)
         }
       } else { setPlanLoaded(true) }
+      const { count: hCount } = await supabase
+        .from('career_highlights').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
+      setHighlightsCount(hCount || 0)
+      const { count: lCount } = await supabase
+        .from('listings').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
+      setListingsCount(lCount || 0)
     }
     getUser()
   }, [])
@@ -171,11 +179,24 @@ export default function PortfolioSetupPage() {
         {/* INFO */}
         <div style={cardStyle}>
           <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 12px' }}>WHAT'S ON YOUR PORTFOLIO</p>
+
+          {/* STATS ROW */}
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ flex: 1, background: 'rgba(29,158,117,0.06)', border: '1px solid rgba(29,158,117,0.15)', borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
+              <p style={{ fontSize: '2rem', fontWeight: '800', color: '#1D9E75', margin: '0', letterSpacing: '-0.03em' }}>{listingsCount}</p>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: 'var(--lw-text-muted)', margin: '4px 0 0' }}>Listings</p>
+            </div>
+            <div style={{ flex: 1, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
+              <p style={{ fontSize: '2rem', fontWeight: '800', color: '#f59e0b', margin: '0', letterSpacing: '-0.03em' }}>{highlightsCount}</p>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: 'var(--lw-text-muted)', margin: '4px 0 0' }}>Career Highlights</p>
+            </div>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
               { icon: '👤', text: 'Your name, brokerage, phone and website from Settings' },
-              { icon: '🏠', text: 'All your past listings with MLS descriptions' },
-              { icon: '📊', text: 'Your listing count and specialty' },
+              { icon: '🏠', text: `${listingsCount} listing${listingsCount !== 1 ? 's' : ''} with MLS descriptions` },
+              { icon: '⭐', text: `${highlightsCount} career highlight${highlightsCount !== 1 ? 's' : ''} with photos and memories` },
               { icon: '🔗', text: 'A clean shareable link you can send to any seller' },
               { icon: '✦', text: '"Powered by ListingWhisperer" — drives referrals for you' },
             ].map((item, i) => (
