@@ -742,12 +742,12 @@ export default function Dashboard() {
                     {pastListings.slice(0, 3).map(listing => (
                       <div key={listing.id}
                         onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setForm(prev => ({...prev, name: listing.name || '', neighborhood: listing.neighborhood || '', price: listing.price || '', beds: listing.beds_baths || '', sqft: listing.sqft || ''})); setListingNameInput(listing.name || listing.neighborhood || ''); setActivePage('results'); window.scrollTo({top:0,behavior:'smooth'}) }}
-                        style={{background:'rgba(255,255,255,0.015)',borderRadius:'9px',border:'1px solid rgba(255,255,255,0.04)',padding:'0.8rem 1rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all 0.15s'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.2)';e.currentTarget.style.background='rgba(29,158,117,0.03)'}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.04)';e.currentTarget.style.background='rgba(255,255,255,0.015)'}}>
+                        style={{background:'var(--lw-input)',borderRadius:'9px',border:'1px solid var(--lw-border)',padding:'0.8rem 1rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all 0.15s'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.3)';e.currentTarget.style.background='rgba(29,158,117,0.04)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.background='var(--lw-input)'}}>
                         <div>
-                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color: isDark ? '#e0e0e0' : '#111318'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
-                          <p style={{margin:'2px 0 0',fontSize:'11px',color: isDark ? '#4a4f62' : '#5a6172'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
+                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'var(--lw-text)'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
+                          <p style={{margin:'2px 0 0',fontSize:'11px',color:'var(--lw-text-muted)'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
                         </div>
                         <span style={{fontSize:'11px',color:'#1D9E75',fontWeight:'500'}}>View →</span>
                       </div>
