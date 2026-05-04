@@ -16,6 +16,7 @@ const SpeechRecognition = typeof window !== 'undefined'
   : null
 
 const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/terms', '/privacy', '/contact']
+const HIDDEN_PATH_PREFIXES = ['/portfolio/']
 
 export default function GlobalChat() {
   const pathname = usePathname()
@@ -98,6 +99,7 @@ export default function GlobalChat() {
   }, [isRecording])
 
   if (HIDDEN_PATHS.includes(pathname)) return null
+  if (HIDDEN_PATH_PREFIXES.some(prefix => pathname.startsWith(prefix))) return null
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0')
