@@ -46,7 +46,12 @@ Respond ONLY with valid JSON, no markdown, no backticks. Return exactly this str
 
     const data = await res.json()
     const text = data.content?.[0]?.text || ''
-    const result = JSON.parse(text.replace(/```json|```/g, '').trim())
+    const cleaned = text.replace(/```json|```/g, '').trim()
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      return NextResponse.json({ error: 'Failed to parse AI response', raw: cleaned }, { status: 500 })
+    }
+    const result = JSON.parse(jsonMatch[0])
 
     return NextResponse.json({ result })
 
