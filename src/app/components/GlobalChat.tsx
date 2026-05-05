@@ -16,7 +16,7 @@ const SpeechRecognition = typeof window !== 'undefined'
   : null
 
 const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/terms', '/privacy', '/contact']
-const HIDDEN_PATH_PREFIXES = ['/portfolio/']
+const HIDDEN_PATH_PREFIXES = ['/portfolio/', '/open-house-signin/']
 
 export default function GlobalChat() {
   const pathname = usePathname()
