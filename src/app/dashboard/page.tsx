@@ -112,8 +112,12 @@ export default function Dashboard() {
           .eq('sent', false)
           .lte('remind_at', new Date().toISOString())
         if (reminders && reminders.length > 0) {
-          setDueReminders(reminders)
-          setShowReminderPopup(true)
+          const dismissed = JSON.parse(sessionStorage.getItem('lw_dismissed_reminders') || '[]')
+          const undismissed = reminders.filter((r: any) => !dismissed.includes(r.id))
+          if (undismissed.length > 0) {
+            setDueReminders(undismissed)
+            setShowReminderPopup(true)
+          }
         }
       }
       checkReminders()
@@ -1112,7 +1116,7 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowReminderPopup(false)} style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,#d4af37,#a08040)',color:'#000',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>Dismiss All & Continue</button>
+            <button onClick={() => { const ids = dueReminders.map(r => r.id); const existing = JSON.parse(sessionStorage.getItem('lw_dismissed_reminders') || '[]'); sessionStorage.setItem('lw_dismissed_reminders', JSON.stringify([...existing, ...ids])); setShowReminderPopup(false) }} style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,#d4af37,#a08040)',color:'#000',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>Dismiss All & Continue</button>
             <p style={{fontSize:'11px',color:'#444',textAlign:'center',margin:'10px 0 0'}}>Dismissed reminders are marked as done and won't show again</p>
           </div>
         </div>
