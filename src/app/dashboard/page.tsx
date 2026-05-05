@@ -700,7 +700,47 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div style={{display:'flex',flexDirection:'column',gap:'2.5rem',marginBottom:'3rem'}}>
+              {/* ACTION-FIRST SECTION */}
+              <div style={{marginBottom:'2.5rem'}}>
+                <p style={{fontSize:'12px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1px',margin:'0 0 12px'}}>WHAT DO YOU NEED TO DO RIGHT NOW?</p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))',gap:'12px'}}>
+                  {[
+                    { icon:'🏠', label:'Start a Listing', desc:'Generate full marketing kit', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
+                    { icon:'📋', label:'Prep a Meeting', desc:'Seller or buyer appointment', color:'#8b5cf6', href:'/seller-prep' },
+                    { icon:'💬', label:'Ask AI', desc:'Get instant answers', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() } },
+                    { icon:'👥', label:'Follow Up a Lead', desc:'Manage your pipeline', color:'#f59e0b', href:'/leads' },
+                  ].map((item, i) => (
+                    item.href ? (
+                      <a key={i} href={item.href}
+                        style={{display:'block',background:'var(--lw-card)',borderRadius:'14px',border:'1px solid var(--lw-border)',padding:'1.25rem',textDecoration:'none',transition:'all 0.15s',boxShadow:'0 2px 8px rgba(0,0,0,0.04)',cursor:'pointer'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 4px 20px ${item.color}18`}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'}}>
+                        <div style={{fontSize:'1.75rem',marginBottom:'10px'}}>{item.icon}</div>
+                        <p style={{fontSize:'14px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 4px'}}>{item.label}</p>
+                        <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0',fontWeight:'500'}}>{item.desc}</p>
+                      </a>
+                    ) : (
+                      <div key={i}
+                        onClick={item.action}
+                        style={{background:'var(--lw-card)',borderRadius:'14px',border:'1px solid var(--lw-border)',padding:'1.25rem',transition:'all 0.15s',boxShadow:'0 2px 8px rgba(0,0,0,0.04)',cursor:'pointer'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 4px 20px ${item.color}18`}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'}}>
+                        <div style={{fontSize:'1.75rem',marginBottom:'10px'}}>{item.icon}</div>
+                        <p style={{fontSize:'14px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 4px'}}>{item.label}</p>
+                        <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0',fontWeight:'500'}}>{item.desc}</p>
+                      </div>
+                    )
+                  ))}
+                </div>
+                <div style={{textAlign:'center',marginTop:'16px'}}>
+                  <button onClick={() => document.getElementById('all-tools')?.scrollIntoView({behavior:'smooth'})}
+                    style={{padding:'10px 24px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'20px',color:'var(--lw-text-muted)',fontSize:'13px',fontWeight:'600',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                    Browse All Tools ↓
+                  </button>
+                </div>
+              </div>
+
+              <div id="all-tools" style={{display:'flex',flexDirection:'column',gap:'2.5rem',marginBottom:'3rem'}}>
                 {buckets.map((bucket, bi) => (
                   <div key={bi}>
                     <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'14px'}}>
