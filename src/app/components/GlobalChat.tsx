@@ -326,7 +326,7 @@ export default function GlobalChat() {
 
       {/* CALL CAPTURE UI */}
       {showCallCapture && (
-        <div style={{position:'fixed',bottom:'84px',right: showChat ? '400px' : '24px',width:'320px',background:'#1a1d2e',borderRadius:'20px',border:'1px solid rgba(239,68,68,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',overflow:'hidden',zIndex:1600}}>
+        <div style={{position:'fixed',bottom:'100px',left: showChat ? 'calc(50% + 200px)' : '50%',transform:'translateX(-50%)',width:'320px',background:'#1a1d2e',borderRadius:'20px',border:'1px solid rgba(239,68,68,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',overflow:'hidden',zIndex:1600}}>
           <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
             <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
               <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#ef4444,#b91c1c)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>📞</div>
@@ -399,7 +399,7 @@ export default function GlobalChat() {
       )}
 
       {showChat && (
-        <div style={{position:'fixed',bottom:'84px',right:'24px',width:'360px',height:'520px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500}}>
+        <div style={{position:'fixed',bottom:'100px',left:'50%',transform:'translateX(-50%)',width:'min(360px, calc(100vw - 48px))',height:'520px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500}}>
 
           {/* HEADER */}
           <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
@@ -498,7 +498,7 @@ export default function GlobalChat() {
       {/* TOGGLE BUTTON */}
       <button
         onClick={() => setShowChat(!showChat)}
-        style={{position:'fixed',bottom:'24px',right:'24px',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'26px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500,animation: showChat ? 'none' : 'pulse-ring 2s infinite'}}
+        style={{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'26px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500,animation: showChat ? 'none' : 'pulse-ring 2s infinite'}}
         onMouseOver={e => e.currentTarget.style.transform='scale(1.12)'}
         onMouseOut={e => e.currentTarget.style.transform='scale(1)'}>
         {showChat ? '✕' : '✦'}
