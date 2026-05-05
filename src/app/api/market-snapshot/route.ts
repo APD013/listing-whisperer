@@ -17,11 +17,11 @@ export async function POST(request: Request) {
 Respond ONLY with valid JSON, no markdown, no backticks. Return exactly this structure:
 
 {
-  "market_summary": "2–3 sentences summarizing current market conditions and what buyers or sellers can expect.",
-  "price_trends": "1–2 short paragraphs covering recent price movement and where prices appear to be heading.",
-  "inventory_analysis": "1–2 short paragraphs covering inventory levels, days on market, and whether supply is rising or falling.",
-  "buyer_seller_assessment": "1–2 short paragraphs on whether this is a buyer's or seller's market and strategic advice.",
-  "client_email": "A complete, professional, ready-to-send email from the agent to their client summarizing the market snapshot. Use a warm but professional tone. Address the client as 'Hi [First Name],' and close with '[Your Name]'. Do not use any placeholder company names or mention any specific AI tools — attribute all insights to your market analysis and local expertise."
+  "market_summary": "2 sentences max on current market conditions.",
+  "price_trends": "2 sentences max on recent price movement and direction.",
+  "inventory_analysis": "2 sentences max on inventory levels and days on market.",
+  "buyer_seller_assessment": "2 sentences max on buyer vs seller leverage and one tip.",
+  "client_email": "A short 3–4 sentence professional email to the client summarizing the market. Address as 'Hi [First Name],' and close with '[Your Name]'."
 }`
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
