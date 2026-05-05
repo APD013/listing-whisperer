@@ -811,7 +811,7 @@ export default function Dashboard() {
             <div style={{maxWidth:'680px'}}>
               <div style={{marginBottom:'1.5rem',display:'flex',alignItems:'center',gap:'12px'}}>
                 <button onClick={() => setActivePage('home')} style={{background:'none',border:'none',color:'#444',fontSize:'13px',cursor:'pointer',padding:'0'}}>← Home</button>
-                <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>New Listing</h1>
+                <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>New Listing</h1>
                 <span style={{background:'rgba(29,158,117,0.15)',color:'#1D9E75',fontSize:'11px',fontWeight:'600',padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)'}}>11 formats</span>
               </div>
 
