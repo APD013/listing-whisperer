@@ -497,6 +497,7 @@ export default function GlobalChat() {
 
       {/* TOGGLE BUTTON */}
       <button
+        data-chat-toggle="true"
         onClick={() => setShowChat(!showChat)}
         style={{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'26px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500,animation: showChat ? 'none' : 'pulse-ring 2s infinite'}}
         onMouseOver={e => e.currentTarget.style.transform='scale(1.12)'}
