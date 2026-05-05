@@ -20,7 +20,6 @@ export async function POST(request: Request) {
       phone: phone?.trim() || '',
       source: 'open_house',
       notes: source_detail || '',
-      listing_id: listing_id || null,
       user_id: null,
       status: 'New Lead',
     })
