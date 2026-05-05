@@ -507,6 +507,7 @@ export default function Dashboard() {
         { icon: '🚀', title: 'Launch Plan', desc: '7-day marketing rollout strategy', color: '#f59e0b', href: '/launch-kit' },
         { icon: '📅', title: 'Social Planner', desc: '7-day social media content calendar', color: '#e1306c', href: '/social-planner' },
         { icon: '🏡', title: 'Open House Kit', desc: 'Flyer, posts, and follow-up emails', color: '#10b981', href: '/open-house' },
+        { icon: '📋', title: 'Open House Sign-In', desc: 'Tablet-friendly visitor sign-in sheet', color: '#1D9E75', href: '/open-house-signin' },
         { icon: '💰', title: 'Price Drop Kit', desc: 'Price improvement announcement suite', color: '#ef4444', href: '/price-drop' },
         { icon: '📬', title: 'Postcard Copy', desc: 'Just Listed & Just Sold postcard copy generator', color: '#6366f1', href: '/postcard-copy' },
         { icon: '🤝', title: 'Referral Request', desc: 'Turn every closing into your next listing', color: '#10b981', href: '/referral-request' },

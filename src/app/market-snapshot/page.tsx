@@ -60,7 +60,7 @@ export default function MarketSnapshotPage() {
       let data
       try { data = JSON.parse(raw) } catch { setError('Raw error: ' + raw.slice(0, 200)); setLoading(false); return }
       if (data.result) setResult(data.result)
-      else setError((data.error || 'Something went wrong.') + (data.raw ? ' | RAW: ' + data.raw.slice(0, 300) : ''))
+      else setError(data.error || 'Something went wrong. Please try again.')
     } catch (e: any) {
       setError(e.message || 'Something went wrong. Please try again.')
     }
