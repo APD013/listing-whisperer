@@ -21,6 +21,8 @@ export async function POST(request: Request) {
         ? 'casual, punchy, and trend-aware — fast hooks, energetic pacing'
         : platform === 'Instagram Reels'
         ? 'visual, aspirational, and story-driven — emotion first, then details'
+        : platform === 'Facebook Reels'
+        ? 'conversational and community-focused — warm, trustworthy, local feel'
         : 'fast, direct, and value-focused — clear benefit in the first 2 seconds'
 
     const userPrompt = `Generate a complete short-form video ad kit for this real estate listing.
