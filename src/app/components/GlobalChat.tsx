@@ -65,7 +65,12 @@ export default function GlobalChat() {
       }
     }
     getUser()
-    
+    const handleChatPrompt = (e: any) => {
+      setShowChat(true)
+      setInput(e.detail)
+    }
+    window.addEventListener('lw-chat-prompt', handleChatPrompt)
+    return () => window.removeEventListener('lw-chat-prompt', handleChatPrompt)
   }, [])
 
   useEffect(() => {
