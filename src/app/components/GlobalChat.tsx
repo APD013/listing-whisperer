@@ -65,8 +65,7 @@ export default function GlobalChat() {
       }
     }
     getUser()
-    const dismissed = sessionStorage.getItem('lw_chat_dismissed')
-    if (!dismissed) setShowChat(true)
+    
   }, [])
 
   useEffect(() => {
