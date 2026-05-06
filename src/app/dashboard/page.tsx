@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTheme } from '../lib/theme'
 import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
 import jsPDF from 'jspdf'
+import OnboardingModal from '../components/OnboardingModal'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -500,7 +501,7 @@ export default function Dashboard() {
       color: '#1D9E75',
       cards: [
         { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) } },
-        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing', popular: true },
+        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing', popular: true, startHere: true, tooltip: 'Upload 1 photo → generate full listing marketing' },
         { icon: '📸', title: 'Snap & Start', desc: 'On-site? Start from photos instantly', color: '#e1306c', href: '/snap-start' },
         { icon: '✍️', title: 'Rewrite Listing', desc: 'Polish and improve existing copy', color: '#6366f1', href: '/rewrite' },
         { icon: '🖼️', title: 'Photo Library', desc: 'Manage your saved property photos', color: '#f97316', href: '/photos' },
@@ -589,6 +590,8 @@ export default function Dashboard() {
 
   return (
     <div style={styles.page}>
+
+      <OnboardingModal />
 
       {sidebarOpen && (
         <div onClick={() => setSidebarOpen(false)}
@@ -780,12 +783,13 @@ export default function Dashboard() {
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'14px'}}>
                   {[
                     { icon:'🏠', label:'Start a Listing', desc:'Create a full listing from photos and notes in seconds', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
-                    { icon:'📋', label:'Prep a Meeting', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep' },
-                    { icon:'✦', label:'Ask AI', desc:'Get instant answers to any real estate question', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() } },
+                    { icon:'📋', label:'Prep a Meeting', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep', tooltip:'Use this before your next listing appointment' },
+                    { icon:'✦', label:'Ask AI', desc:'Get instant answers to any real estate question', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() }, tooltip:'Ask about pricing, strategy, follow-ups, or anything real estate' },
                     { icon:'👥', label:'Follow Up a Lead', desc:'Turn conversations into signed clients', color:'#f59e0b', href:'/leads' },
                   ].map((item, i) => (
                     item.href ? (
                       <a key={i} href={item.href}
+                        title={(item as any).tooltip || undefined}
                         style={{display:'block',background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem',textDecoration:'none',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:'pointer'}}
                         onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 8px 32px ${item.color}22`;e.currentTarget.style.transform='translateY(-2px)'}}
                         onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';e.currentTarget.style.transform='translateY(0)'}}>
@@ -796,6 +800,7 @@ export default function Dashboard() {
                     ) : (
                       <div key={i}
                         onClick={item.action}
+                        title={(item as any).tooltip || undefined}
                         style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:'pointer'}}
                         onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 8px 32px ${item.color}22`;e.currentTarget.style.transform='translateY(-2px)'}}
                         onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';e.currentTarget.style.transform='translateY(0)'}}>
@@ -845,6 +850,7 @@ export default function Dashboard() {
                       {bucket.cards.map((card: any, ci: number) => (
                         card.href ? (
                           <a key={ci} href={card.href}
+                            title={card.tooltip || undefined}
                             style={{background: card.popular ? `linear-gradient(135deg,${card.color}0d,${card.color}04)` : (isDark ? 'linear-gradient(135deg,#111420,#13161f)' : '#ffffff'),borderRadius:'13px',border: card.popular ? `1.5px solid ${card.color}35` : (isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'),padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.2s',boxShadow: card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'),position:'relative' as const}}
                             onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 10px 32px ${card.color}22`}}
                             onMouseOut={e => {e.currentTarget.style.borderColor=card.popular ? `${card.color}35` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)');e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)')}}>
@@ -852,7 +858,10 @@ export default function Dashboard() {
                               <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>MOST POPULAR</div>
                             )}
                             <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px'}}>{card.title}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px',display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}}>
+                              {card.title}
+                              {card.startHere && <span style={{fontSize:'9px',fontWeight:'700',color:'#fff',background:'#1D9E75',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',flexShrink:0}}>START HERE</span>}
+                            </div>
                             <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.55'}}>{card.desc}</div>
                           </a>
                         ) : (
