@@ -34,6 +34,23 @@ export default function VideoStudioPage() {
     videoGoal: 'New Listing',
     platform: 'Instagram Reels',
   })
+  const [imageBase64, setImageBase64] = useState<string | null>(null)
+  const [imageType, setImageType] = useState<string | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string
+      setImagePreview(dataUrl)
+      const base64 = dataUrl.split(',')[1]
+      setImageBase64(base64)
+      setImageType(file.type)
+    }
+    reader.readAsDataURL(file)
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -82,6 +99,8 @@ export default function VideoStudioPage() {
           platform: form.platform,
           brandVoice,
           userId,
+          imageBase64,
+          imageType,
         }),
       })
       const data = await res.json()
@@ -179,6 +198,34 @@ export default function VideoStudioPage() {
         {/* FORM */}
         <div style={cardStyle}>
           <p style={{ fontSize: '11px', fontWeight: '700', color: '#e1306c', letterSpacing: '1px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>LISTING DETAILS</p>
+
+          <div style={{ marginBottom: '12px' }}>
+            <label style={labelStyle}>Listing Photo (optional but recommended)</label>
+            <label style={{ display: 'block', cursor: 'pointer' }}>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageUpload}
+                style={{ display: 'none' }}
+              />
+              {imagePreview ? (
+                <div style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--lw-border)', lineHeight: 0 }}>
+                  <img src={imagePreview} alt="Listing preview" style={{ width: '100%', maxHeight: '220px', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = '0')}>
+                    <span style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: '12px', fontWeight: '600', padding: '6px 14px', borderRadius: '20px' }}>Change photo</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: '20px', border: '1.5px dashed var(--lw-border)', borderRadius: '10px', textAlign: 'center', background: 'var(--lw-input)', transition: 'border-color 0.15s' }}>
+                  <div style={{ fontSize: '1.5rem', marginBottom: '6px' }}>📷</div>
+                  <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: '0' }}>Click to upload a listing photo</p>
+                  <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '4px 0 0', opacity: 0.6 }}>JPG, PNG or WEBP</p>
+                </div>
+              )}
+            </label>
+          </div>
 
           <div style={{ marginBottom: '12px' }}>
             <label style={labelStyle}>Property Notes</label>

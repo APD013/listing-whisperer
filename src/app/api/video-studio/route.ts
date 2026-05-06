@@ -10,7 +10,7 @@ export const maxDuration = 30
 
 export async function POST(request: Request) {
   try {
-    const { propertyNotes, videoGoal, platform, brandVoice, userId } = await request.json()
+    const { propertyNotes, videoGoal, platform, brandVoice, userId, imageBase64, imageType } = await request.json()
 
     const bv = brandVoice || {}
     const agentName = bv.agentName || 'the agent'
@@ -65,6 +65,19 @@ Respond ONLY with valid JSON, no markdown, no backticks:
   "cover_text": "short bold text overlay for the cover frame — 3-5 words max"
 }`
 
+    const systemPrompt = imageBase64
+      ? 'You are a real estate video marketing expert. A listing photo has been provided — analyze its visual details carefully: dominant colors, architectural style, interior/exterior features, lighting, mood, and any standout elements visible. Use these specific visual observations to make every output more vivid and compelling. Return ONLY valid JSON, no markdown, no backticks.'
+      : 'You are a real estate video marketing expert. Return ONLY valid JSON, no markdown, no backticks.'
+
+    const userContent: any[] = []
+    if (imageBase64 && imageType) {
+      userContent.push({
+        type: 'image',
+        source: { type: 'base64', media_type: imageType, data: imageBase64 },
+      })
+    }
+    userContent.push({ type: 'text', text: userPrompt })
+
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -75,8 +88,8 @@ Respond ONLY with valid JSON, no markdown, no backticks:
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: 'You are a real estate video marketing expert. Return ONLY valid JSON, no markdown, no backticks.',
-        messages: [{ role: 'user', content: userPrompt }],
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userContent }],
       }),
     })
 
