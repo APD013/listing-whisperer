@@ -23,6 +23,9 @@ export default function VideoStudioPage() {
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
   const [brandVoice, setBrandVoice] = useState<any>({})
+  const [userId, setUserId] = useState<string | null>(null)
+  const [history, setHistory] = useState<any[]>([])
+  const [showHistory, setShowHistory] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
@@ -36,6 +39,9 @@ export default function VideoStudioPage() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
+      setUserId(user.id)
+      const { data: kits } = await supabase.from('video_kits').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20)
+      if (kits) setHistory(kits)
       const { data: profile } = await supabase
         .from('profiles')
         .select('plan, brand_voice')
@@ -75,6 +81,7 @@ export default function VideoStudioPage() {
           videoGoal: form.videoGoal,
           platform: form.platform,
           brandVoice,
+          userId,
         }),
       })
       const data = await res.json()
@@ -296,7 +303,31 @@ export default function VideoStudioPage() {
               >
                 🔄 New Video Kit
               </button>
+              {history.length > 0 && (
+                <button onClick={() => setShowHistory(!showHistory)}
+                  style={{ fontSize: '12px', padding: '8px 14px', borderRadius: '8px', background: 'transparent', color: 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', cursor: 'pointer' }}>
+                  🕘 {showHistory ? 'Hide' : 'View'} History ({history.length})
+                </button>
+              )}
             </div>
+
+            {showHistory && history.length > 0 && (
+              <div style={cardStyle}>
+                <p style={{ fontSize: '11px', fontWeight: '700', color: '#e1306c', letterSpacing: '1px', marginBottom: '12px' }}>PAST VIDEO KITS</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {history.map((kit: any) => (
+                    <div key={kit.id} onClick={() => { setResult(kit.result); setForm({ propertyNotes: kit.property_notes, videoGoal: kit.video_goal, platform: kit.platform }); setShowHistory(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                      style={{ padding: '12px 14px', background: 'var(--lw-input)', borderRadius: '10px', border: '1px solid var(--lw-border)', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <p style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)', margin: '0 0 2px' }}>{kit.video_goal} · {kit.platform}</p>
+                        <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '0' }}>{new Date(kit.created_at).toLocaleDateString()} · {kit.property_notes?.slice(0, 50)}...</p>
+                      </div>
+                      <span style={{ fontSize: '11px', color: '#e1306c', fontWeight: '600' }}>Load →</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
