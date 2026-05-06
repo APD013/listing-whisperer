@@ -43,6 +43,8 @@ export default function Dashboard() {
   const [chatMessages, setChatMessages] = useState<{role:string,content:string}[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<Record<string,boolean>>({'win':true,'build':true,'launch':true,'manage':true})
+  const [leads, setLeads] = useState<any[]>([])
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', baths: '', sqft: '', price: '',
@@ -102,6 +104,10 @@ export default function Dashboard() {
         .from('listings').select('*').eq('user_id', user.id)
         .order('created_at', { ascending: false }).limit(10)
       if (listings) setPastListings(listings)
+      const { data: leadsData } = await supabase
+        .from('leads').select('id, name, status, created_at').eq('user_id', user.id)
+        .order('created_at', { ascending: false }).limit(5)
+      if (leadsData) setLeads(leadsData)
       if (upgraded) setPlan('pro')
 
       const checkReminders = async () => {
@@ -494,7 +500,7 @@ export default function Dashboard() {
       color: '#1D9E75',
       cards: [
         { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) } },
-        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing' },
+        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing', popular: true },
         { icon: '📸', title: 'Snap & Start', desc: 'On-site? Start from photos instantly', color: '#e1306c', href: '/snap-start' },
         { icon: '✍️', title: 'Rewrite Listing', desc: 'Polish and improve existing copy', color: '#6366f1', href: '/rewrite' },
         { icon: '🖼️', title: 'Photo Library', desc: 'Manage your saved property photos', color: '#f97316', href: '/photos' },
@@ -526,6 +532,57 @@ export default function Dashboard() {
         { icon: '🧮', title: 'Commission Calculator', desc: 'Calculate your real take-home after splits and fees', color: '#d4af37', href: '/commission-calculator' },
         { icon: '🛡️', title: 'Objection Handler', desc: 'Turn any objection into a confident response', color: '#8b5cf6', href: '/objection-handler' },
         { icon: '🏘️', title: 'Neighborhood Bio', desc: 'Generate compelling neighborhood descriptions instantly', color: '#1D9E75', href: '/neighborhood-bio' },
+      ]
+    },
+  ]
+
+  const sidebarSections: Array<{key:string;label:string;color:string;items:Array<{icon:string;label:string;href?:string;action?:()=>void}>}> = [
+    {
+      key: 'win', label: 'Win the Listing', color: '#8b5cf6',
+      items: [
+        { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
+        { href: '/buyer-consultation', icon: '🏠', label: 'Buyer Consultation' },
+        { href: '/pricing-assistant', icon: '💲', label: 'Pricing Assistant' },
+        { href: '/market-snapshot', icon: '📊', label: 'Market Snapshot' },
+        { href: '/listing-presentation', icon: '🎯', label: 'Listing Presentation' },
+        { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
+        { href: '/career-highlights', icon: '⭐', label: 'Career Highlights' },
+      ]
+    },
+    {
+      key: 'build', label: 'Build the Listing', color: '#1D9E75',
+      items: [
+        { action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}); setSidebarOpen(false) }, icon: '✨', label: 'New Listing' },
+        { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
+        { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
+        { href: '/rewrite', icon: '✍️', label: 'Rewrite' },
+        { href: '/photos', icon: '🖼️', label: 'Photo Library' },
+      ]
+    },
+    {
+      key: 'launch', label: 'Launch the Listing', color: '#f59e0b',
+      items: [
+        { href: '/launch-kit', icon: '🚀', label: 'Launch Plan' },
+        { href: '/social-planner', icon: '📅', label: 'Social Planner' },
+        { href: '/open-house', icon: '🏡', label: 'Open House Kit' },
+        { href: '/open-house-signin', icon: '📋', label: 'Open House Sign-In' },
+        { href: '/price-drop', icon: '💰', label: 'Price Drop Kit' },
+        { href: '/postcard-copy', icon: '📬', label: 'Postcard Copy' },
+        { href: '/video-studio', icon: '🎬', label: 'Video Studio' },
+        { href: '/referral-request', icon: '🤝', label: 'Referral Request' },
+      ]
+    },
+    {
+      key: 'manage', label: 'Manage the Relationship', color: '#10b981',
+      items: [
+        { href: '/transaction-checklist', icon: '✅', label: 'Transaction Checklist' },
+        { href: '/reminders', icon: '⏰', label: 'Reminders' },
+        { href: '/leads', icon: '👥', label: 'Leads & Clients' },
+        { href: '/follow-up', icon: '📩', label: 'Follow-Up Assistant' },
+        { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
+        { href: '/commission-calculator', icon: '🧮', label: 'Commission Calculator' },
+        { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
+        { href: '/neighborhood-bio', icon: '🏘️', label: 'Neighborhood Bio' },
       ]
     },
   ]
@@ -580,40 +637,48 @@ export default function Dashboard() {
             </button>
           ))}
 
-          <div style={{margin:'0.75rem 1.25rem',borderTop:'1px solid rgba(255,255,255,0.04)'}}/>
-          <p style={{fontSize:'9px',fontWeight:'700',color:'#2a2a2a',letterSpacing:'1.2px',margin:'0 0 4px',padding:'0 1.25rem'}}>TOOLS</p>
-          {[
-            { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
-            { href: '/pricing-assistant', icon: '💲', label: 'Pricing Assistant' },
-            { href: '/market-snapshot', icon: '📊', label: 'Market Snapshot' },
-            { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
-            { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
-            { href: '/rewrite', icon: '✍️', label: 'Rewrite' },
-            { href: '/launch-kit', icon: '🚀', label: 'Launch Plan' },
-            { href: '/leads', icon: '👥', label: 'Leads & Clients' },
-            { href: '/photos', icon: '🖼️', label: 'Photo Library' },
-            { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
-            { href: '/commission-calculator', icon: '🧮', label: 'Commission Calculator' },
-            { href: '/transaction-checklist', icon: '✅', label: 'Transaction Checklist' },
-            { href: '/reminders', icon: '⏰', label: 'Reminders' },
-            { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
-            { href: '/postcard-copy', icon: '📬', label: 'Postcard Copy' },
-            { href: '/referral-request', icon: '🤝', label: 'Referral Request' },
-            { href: '/career-highlights', icon: '⭐', label: 'Career Highlights' },
-            { href: '/buyer-consultation', icon: '🏠', label: 'Buyer Consultation' },
-            { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
-            { href: '/neighborhood-bio', icon: '🏘️', label: 'Neighborhood Bio' },
-            { href: '/social-planner', icon: '📅', label: 'Social Planner' },
-            { href: '/video-studio', icon: '🎬', label: 'Video Studio' },
-            { href: '/settings', icon: '⚙️', label: 'Settings' },
-          ].map(item => (
-            <a key={item.href} href={item.href}
-              style={{width:'100%',padding:'7px 1.25rem',display:'flex',alignItems:'center',gap:'9px',color:'#3a3f52',fontSize:'12px',textDecoration:'none',borderLeft:'2px solid transparent',transition:'color 0.15s'}}
-              onMouseOver={e => e.currentTarget.style.color='#6b7280'}
-              onMouseOut={e => e.currentTarget.style.color='#3a3f52'}>
-              <span style={{fontSize:'12px'}}>{item.icon}</span> {item.label}
-            </a>
+          <div style={{margin:'0.75rem 1.25rem',borderTop:'1px solid rgba(0,0,0,0.06)'}}/>
+
+          {sidebarSections.map(section => (
+            <div key={section.key}>
+              <button
+                onClick={() => setSidebarCollapsed(prev => ({...prev, [section.key]: !prev[section.key]}))}
+                style={{width:'100%',padding:'8px 1.25rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'none',border:'none',cursor:'pointer',textAlign:'left' as const}}>
+                <span style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                  <span style={{width:'7px',height:'7px',borderRadius:'50%',background:section.color,display:'inline-block',flexShrink:0}}/>
+                  <span style={{fontSize:'10px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'0.8px'}}>{section.label.toUpperCase()}</span>
+                </span>
+                <span style={{fontSize:'11px',color:'var(--lw-text-muted)',transform:sidebarCollapsed[section.key] ? 'rotate(-90deg)' : 'rotate(0deg)',transition:'transform 0.2s',display:'inline-block',lineHeight:1}}>▾</span>
+              </button>
+              <div style={{maxHeight:sidebarCollapsed[section.key] ? '0' : '600px',overflow:'hidden',transition:'max-height 0.3s ease'}}>
+                {section.items.map((item, idx) => (
+                  item.action ? (
+                    <button key={idx} onClick={item.action}
+                      style={{width:'100%',padding:'6px 1.25rem 6px 2.5rem',display:'flex',alignItems:'center',gap:'8px',color:'var(--lw-text-muted)',fontSize:'12px',background:'none',border:'none',borderLeft:'2px solid transparent',cursor:'pointer',textAlign:'left' as const,transition:'color 0.15s',fontFamily:'var(--font-plus-jakarta),sans-serif'}}
+                      onMouseOver={e => {e.currentTarget.style.color='var(--lw-text)';e.currentTarget.style.borderLeftColor=section.color}}
+                      onMouseOut={e => {e.currentTarget.style.color='var(--lw-text-muted)';e.currentTarget.style.borderLeftColor='transparent'}}>
+                      <span style={{fontSize:'12px'}}>{item.icon}</span> {item.label}
+                    </button>
+                  ) : (
+                    <a key={idx} href={item.href}
+                      style={{width:'100%',padding:'6px 1.25rem 6px 2.5rem',display:'flex',alignItems:'center',gap:'8px',color:'var(--lw-text-muted)',fontSize:'12px',textDecoration:'none',borderLeft:'2px solid transparent',transition:'color 0.15s'}}
+                      onMouseOver={e => {e.currentTarget.style.color='var(--lw-text)';e.currentTarget.style.borderLeftColor=section.color}}
+                      onMouseOut={e => {e.currentTarget.style.color='var(--lw-text-muted)';e.currentTarget.style.borderLeftColor='transparent'}}>
+                      <span style={{fontSize:'12px'}}>{item.icon}</span> {item.label}
+                    </a>
+                  )
+                ))}
+              </div>
+            </div>
           ))}
+
+          <div style={{margin:'0.5rem 1.25rem',borderTop:'1px solid rgba(0,0,0,0.06)'}}/>
+          <a href="/settings"
+            style={{width:'100%',padding:'8px 1.25rem',display:'flex',alignItems:'center',gap:'9px',color:'var(--lw-text-muted)',fontSize:'12px',textDecoration:'none',borderLeft:'2px solid transparent',transition:'color 0.15s'}}
+            onMouseOver={e => {e.currentTarget.style.color='var(--lw-text)'}}
+            onMouseOut={e => {e.currentTarget.style.color='var(--lw-text-muted)'}}>
+            <span style={{fontSize:'12px'}}>⚙️</span> Settings
+          </a>
         </div>
 
         <div style={{padding:'1rem 1.25rem',borderTop:'1px solid rgba(255,255,255,0.04)'}}>
@@ -710,38 +775,57 @@ export default function Dashboard() {
               </div>
 
               {/* ACTION-FIRST SECTION */}
-              <div style={{marginBottom:'2.5rem'}}>
-                <p style={{fontSize:'12px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1px',margin:'0 0 12px'}}>WHAT DO YOU NEED TO DO RIGHT NOW?</p>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))',gap:'12px'}}>
+              <div style={{marginBottom:'3rem'}}>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 16px'}}>WHAT DO YOU NEED TO DO RIGHT NOW?</p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'14px'}}>
                   {[
-                    { icon:'🏠', label:'Start a Listing', desc:'Generate full marketing kit', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
-                    { icon:'📋', label:'Prep a Meeting', desc:'Seller or buyer appointment', color:'#8b5cf6', href:'/seller-prep' },
-                    { icon:'💬', label:'Ask AI', desc:'Get instant answers', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() } },
-                    { icon:'👥', label:'Follow Up a Lead', desc:'Manage your pipeline', color:'#f59e0b', href:'/leads' },
+                    { icon:'🏠', label:'Start a Listing', desc:'Create a full listing from photos and notes in seconds', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
+                    { icon:'📋', label:'Prep a Meeting', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep' },
+                    { icon:'✦', label:'Ask AI', desc:'Get instant answers to any real estate question', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() } },
+                    { icon:'👥', label:'Follow Up a Lead', desc:'Turn conversations into signed clients', color:'#f59e0b', href:'/leads' },
                   ].map((item, i) => (
                     item.href ? (
                       <a key={i} href={item.href}
-                        style={{display:'block',background:'var(--lw-card)',borderRadius:'14px',border:'1px solid var(--lw-border)',padding:'1.25rem',textDecoration:'none',transition:'all 0.15s',boxShadow:'0 2px 8px rgba(0,0,0,0.04)',cursor:'pointer'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 4px 20px ${item.color}18`}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'}}>
-                        <div style={{fontSize:'1.75rem',marginBottom:'10px'}}>{item.icon}</div>
-                        <p style={{fontSize:'14px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 4px'}}>{item.label}</p>
-                        <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0',fontWeight:'500'}}>{item.desc}</p>
+                        style={{display:'block',background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem',textDecoration:'none',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:'pointer'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 8px 32px ${item.color}22`;e.currentTarget.style.transform='translateY(-2px)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';e.currentTarget.style.transform='translateY(0)'}}>
+                        <div style={{width:'46px',height:'46px',borderRadius:'13px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',marginBottom:'14px'}}>{item.icon}</div>
+                        <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 7px'}}>{item.label}</p>
+                        <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',lineHeight:'1.6',fontWeight:'400'}}>{item.desc}</p>
                       </a>
                     ) : (
                       <div key={i}
                         onClick={item.action}
-                        style={{background:'var(--lw-card)',borderRadius:'14px',border:'1px solid var(--lw-border)',padding:'1.25rem',transition:'all 0.15s',boxShadow:'0 2px 8px rgba(0,0,0,0.04)',cursor:'pointer'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 4px 20px ${item.color}18`}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'}}>
-                        <div style={{fontSize:'1.75rem',marginBottom:'10px'}}>{item.icon}</div>
-                        <p style={{fontSize:'14px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 4px'}}>{item.label}</p>
-                        <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0',fontWeight:'500'}}>{item.desc}</p>
+                        style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:'pointer'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 8px 32px ${item.color}22`;e.currentTarget.style.transform='translateY(-2px)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';e.currentTarget.style.transform='translateY(0)'}}>
+                        <div style={{width:'46px',height:'46px',borderRadius:'13px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',marginBottom:'14px'}}>{item.icon}</div>
+                        <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 7px'}}>{item.label}</p>
+                        <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',lineHeight:'1.6',fontWeight:'400'}}>{item.desc}</p>
                       </div>
                     )
                   ))}
                 </div>
-                <div style={{textAlign:'center',marginTop:'16px'}}>
+
+                <div style={{marginTop:'14px',display:'flex',flexWrap:'wrap',gap:'8px',alignItems:'center'}}>
+                  <span style={{fontSize:'11px',color:'var(--lw-text-muted)',fontWeight:'600',flexShrink:0}}>Try asking:</span>
+                  {[
+                    'How should I price this listing?',
+                    'What do I say to a hesitant seller?',
+                    'Create a follow-up text after a showing',
+                    'What should I do next with this lead?',
+                  ].map(prompt => (
+                    <button key={prompt}
+                      onClick={() => window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: prompt }))}
+                      style={{padding:'5px 13px',borderRadius:'20px',border:'1px solid var(--lw-border)',background:'var(--lw-input)',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif',transition:'all 0.15s'}}
+                      onMouseOver={e => {e.currentTarget.style.borderColor='#6366f1';e.currentTarget.style.color='#6366f1';e.currentTarget.style.background='rgba(99,102,241,0.06)'}}
+                      onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.color='var(--lw-text-muted)';e.currentTarget.style.background='var(--lw-input)'}}>
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{textAlign:'center',marginTop:'22px'}}>
                   <button onClick={() => document.getElementById('all-tools')?.scrollIntoView({behavior:'smooth'})}
                     style={{padding:'10px 24px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'20px',color:'var(--lw-text-muted)',fontSize:'13px',fontWeight:'600',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
                     Browse All Tools ↓
@@ -749,33 +833,36 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div id="all-tools" style={{display:'flex',flexDirection:'column',gap:'2.5rem',marginBottom:'3rem'}}>
+              <div id="all-tools" style={{display:'flex',flexDirection:'column',gap:'3rem',marginBottom:'3rem'}}>
                 {buckets.map((bucket, bi) => (
                   <div key={bi}>
-                    <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'14px'}}>
-                      <span style={{width:'3px',height:'14px',background:bucket.color,borderRadius:'2px',display:'inline-block',boxShadow:`0 0 8px ${bucket.color}60`}}/>
-                      <p style={{fontSize:'10px',fontWeight:'700',color:bucket.color,letterSpacing:'1.5px',margin:'0',opacity:0.8}}>{bucket.label}</p>
-                      <span style={{flex:1,height:'1px',background:`${bucket.color}12`,display:'inline-block'}}/>
+                    <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'18px'}}>
+                      <span style={{width:'4px',height:'20px',background:bucket.color,borderRadius:'2px',display:'inline-block',boxShadow:`0 0 10px ${bucket.color}50`}}/>
+                      <p style={{fontSize:'11px',fontWeight:'800',color:bucket.color,letterSpacing:'1.2px',margin:'0'}}>{bucket.label}</p>
+                      <span style={{flex:1,height:'1px',background:`${bucket.color}18`,display:'inline-block'}}/>
                     </div>
-                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(190px, 1fr))',gap:'10px'}}>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px'}}>
                       {bucket.cards.map((card: any, ci: number) => (
                         card.href ? (
                           <a key={ci} href={card.href}
-                            style={{background: isDark ? 'linear-gradient(135deg,#111420,#13161f)' : '#ffffff',borderRadius:'13px',border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)',padding:'1.125rem',textDecoration:'none',display:'block',transition:'all 0.2s',boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'}}
-                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}30`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
-                            onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.05)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
-                            <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'3px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.5'}}>{card.desc}</div>
+                            style={{background: card.popular ? `linear-gradient(135deg,${card.color}0d,${card.color}04)` : (isDark ? 'linear-gradient(135deg,#111420,#13161f)' : '#ffffff'),borderRadius:'13px',border: card.popular ? `1.5px solid ${card.color}35` : (isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'),padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.2s',boxShadow: card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'),position:'relative' as const}}
+                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 10px 32px ${card.color}22`}}
+                            onMouseOut={e => {e.currentTarget.style.borderColor=card.popular ? `${card.color}35` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)');e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)')}}>
+                            {card.popular && (
+                              <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>MOST POPULAR</div>
+                            )}
+                            <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{card.icon}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px'}}>{card.title}</div>
+                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.55'}}>{card.desc}</div>
                           </a>
                         ) : (
                           <div key={ci} onClick={card.action}
-                            style={{background:`linear-gradient(135deg,${card.color}0e,${card.color}05)`,borderRadius:'13px',border:`1px solid ${card.color}20`,padding:'1.125rem',cursor:'pointer',transition:'all 0.2s'}}
-                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}45`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
-                            onMouseOut={e => {e.currentTarget.style.borderColor=`${card.color}20`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
-                            <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}15`,border:`1px solid ${card.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'3px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.5'}}>{card.desc}</div>
+                            style={{background:`linear-gradient(135deg,${card.color}0e,${card.color}05)`,borderRadius:'13px',border:`1px solid ${card.color}22`,padding:'1.25rem',cursor:'pointer',transition:'all 0.2s'}}
+                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 10px 32px ${card.color}22`}}
+                            onMouseOut={e => {e.currentTarget.style.borderColor=`${card.color}22`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
+                            <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${card.color}15`,border:`1px solid ${card.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{card.icon}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px'}}>{card.title}</div>
+                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.55'}}>{card.desc}</div>
                             <div style={{marginTop:'8px',fontSize:'11px',fontWeight:'600',color:card.color}}>Start now →</div>
                           </div>
                         )
@@ -808,6 +895,40 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
+
+              {/* LEADS & CLIENTS SECTION */}
+              <div style={{marginTop:'2.5rem',paddingBottom:'1rem'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                    <span style={{width:'4px',height:'18px',background:'#10b981',borderRadius:'2px',display:'inline-block',boxShadow:'0 0 10px rgba(16,185,129,0.5)'}}/>
+                    <p style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>Leads & Clients</p>
+                  </div>
+                  <a href="/leads" style={{fontSize:'11px',color:'#10b981',fontWeight:'600',textDecoration:'none'}}>View all →</a>
+                </div>
+                {leads.length === 0 ? (
+                  <div style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'2.75rem',textAlign:'center',boxShadow:'0 2px 10px rgba(0,0,0,0.04)'}}>
+                    <div style={{fontSize:'2.75rem',marginBottom:'12px'}}>👥</div>
+                    <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 8px'}}>Your first lead starts here.</p>
+                    <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0 0 20px',lineHeight:'1.65',maxWidth:'320px',marginLeft:'auto',marginRight:'auto'}}>Add a buyer, seller, or past client — then let AI handle the follow-up.</p>
+                    <a href="/leads" style={{display:'inline-block',padding:'11px 24px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'13px',fontWeight:'700',boxShadow:'0 0 20px rgba(29,158,117,0.25)'}}>Add Lead</a>
+                  </div>
+                ) : (
+                  <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                    {leads.slice(0,3).map((lead: any) => (
+                      <a key={lead.id} href="/leads"
+                        style={{background:'var(--lw-input)',borderRadius:'10px',border:'1px solid var(--lw-border)',padding:'0.875rem 1rem',display:'flex',justifyContent:'space-between',alignItems:'center',textDecoration:'none',transition:'all 0.15s'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(16,185,129,0.3)';e.currentTarget.style.background='rgba(16,185,129,0.04)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.background='var(--lw-input)'}}>
+                        <div>
+                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'var(--lw-text)'}}>{lead.name}</p>
+                          <p style={{margin:'2px 0 0',fontSize:'11px',color:'var(--lw-text-muted)'}}>{lead.status || 'Lead'}</p>
+                        </div>
+                        <span style={{fontSize:'11px',color:'#10b981',fontWeight:'500'}}>View →</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
