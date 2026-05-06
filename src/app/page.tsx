@@ -19,7 +19,9 @@ export default function Home() {
     if (alreadyShown) return
 
     const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0) {
+      const alreadyShown = sessionStorage.getItem('exit_popup_shown')
+      const dismissed = localStorage.getItem('exit_popup_dismissed')
+      if (e.clientY <= 0 && !alreadyShown && !dismissed) {
         setShowExitPopup(true)
         sessionStorage.setItem('exit_popup_shown', 'true')
         trackEvent('exit_intent_shown')
