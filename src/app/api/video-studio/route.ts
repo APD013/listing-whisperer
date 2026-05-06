@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export const maxDuration = 30
 
 export async function POST(request: Request) {
   try {
-    const { propertyNotes, videoGoal, platform, brandVoice } = await request.json()
+    const { propertyNotes, videoGoal, platform, brandVoice, userId } = await request.json()
 
     const bv = brandVoice || {}
     const agentName = bv.agentName || 'the agent'
@@ -87,7 +93,20 @@ Respond ONLY with valid JSON, no markdown, no backticks:
     }
     const result = JSON.parse(jsonMatch[0])
 
-    return NextResponse.json({ result })
+    let saved = false
+    if (userId) {
+      const { error: insertError } = await supabase.from('video_kits').insert({
+        user_id: userId,
+        property_notes: propertyNotes,
+        video_goal: videoGoal,
+        platform,
+        result,
+      })
+      if (insertError) console.error('video_kits insert error:', insertError.message)
+      else saved = true
+    }
+
+    return NextResponse.json({ result, saved, userId })
 
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
