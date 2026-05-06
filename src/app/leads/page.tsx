@@ -184,14 +184,22 @@ export default function LeadsPage() {
             <p style={{ color: 'var(--lw-text-muted)', fontWeight: '500' }}>Loading leads...</p>
           </div>
         ) : filteredLeads.length === 0 ? (
-          <div style={{ ...cardStyle, textAlign: 'center', padding: '3rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👥</div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--lw-text)', marginBottom: '8px' }}>No leads yet</h2>
-            <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', marginBottom: '1.5rem' }}>Add your first potential client to get started.</p>
-            <button onClick={() => setShowForm(true)}
-              style={{ padding: '11px 24px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
-              + Add First Lead
-            </button>
+          <div style={{ ...cardStyle, textAlign: 'center', padding: '3.5rem 2rem' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>👥</div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--lw-text)', marginBottom: '8px' }}>
+              {leads.length === 0 ? 'Your first lead starts here.' : 'No leads match this filter.'}
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', marginBottom: '1.75rem', lineHeight: '1.65', maxWidth: '340px', margin: '0 auto 1.75rem' }}>
+              {leads.length === 0
+                ? 'Add a buyer, seller, or past client — then let AI handle the follow-up.'
+                : 'Try selecting a different status filter above.'}
+            </p>
+            {leads.length === 0 && (
+              <button onClick={() => { setEditingLead(null); setForm(emptyForm); setShowForm(true) }}
+                style={{ padding: '11px 24px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif', boxShadow: '0 4px 16px rgba(29,158,117,0.3)' }}>
+                Add Lead +
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

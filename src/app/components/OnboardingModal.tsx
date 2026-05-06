@@ -17,8 +17,9 @@ export default function OnboardingModal() {
     setVisible(false)
   }
 
-  const go = (href?: string, chatPrompt?: string) => {
+  const go = (href?: string, chatPrompt?: string, closeOnly?: boolean) => {
     close()
+    if (closeOnly) return
     if (chatPrompt) {
       window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: chatPrompt }))
     } else if (href) {
@@ -53,6 +54,12 @@ export default function OnboardingModal() {
       title: 'Follow Up with a Lead',
       desc: 'Turn conversations into signed clients',
       href: '/leads',
+    },
+    {
+      icon: '🗺️',
+      title: 'Explore All Tools',
+      desc: 'Browse everything Listing Whisperer offers',
+      closeOnly: true,
     },
   ]
 
@@ -90,7 +97,7 @@ export default function OnboardingModal() {
           {options.map((opt, i) => (
             <button
               key={i}
-              onClick={() => go(opt.href, opt.chatPrompt)}
+              onClick={() => go(opt.href, opt.chatPrompt, (opt as any).closeOnly)}
               style={{
                 display: 'flex', alignItems: 'center', gap: '16px',
                 padding: '1.125rem 1.25rem',
@@ -157,7 +164,7 @@ export default function OnboardingModal() {
               textDecoration: 'underline', textUnderlineOffset: '3px',
             }}
           >
-            Skip for now
+            Skip for now →
           </button>
         </div>
       </div>

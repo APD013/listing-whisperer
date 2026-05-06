@@ -6,6 +6,7 @@ import { useTheme } from '../lib/theme'
 import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
 import jsPDF from 'jspdf'
 import OnboardingModal from '../components/OnboardingModal'
+import DashboardChecklist from '../components/DashboardChecklist'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -517,7 +518,7 @@ export default function Dashboard() {
         { icon: '📋', title: 'Open House Sign-In', desc: 'Tablet-friendly visitor sign-in sheet', color: '#1D9E75', href: '/open-house-signin' },
         { icon: '💰', title: 'Price Drop Kit', desc: 'Price improvement announcement suite', color: '#ef4444', href: '/price-drop' },
         { icon: '📬', title: 'Postcard Copy', desc: 'Just Listed & Just Sold postcard copy generator', color: '#6366f1', href: '/postcard-copy' },
-        { icon: '🎬', title: 'Video Studio', desc: 'Turn one listing photo into a complete video ad kit', color: '#e1306c', href: '/video-studio' },
+        { icon: '🎬', title: 'Video Studio', desc: 'Turn one listing photo into a complete video ad kit', color: '#e1306c', href: '/video-studio', pro: true },
         { icon: '🤝', title: 'Referral Request', desc: 'Turn every closing into your next listing', color: '#10b981', href: '/referral-request' },
       ]
     },
@@ -737,6 +738,7 @@ export default function Dashboard() {
           {/* HOME PAGE */}
           {activePage === 'home' && (
             <div>
+              <DashboardChecklist />
               <div style={{marginBottom:'3rem'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'16px',marginBottom:'8px'}}>
                   <div>
@@ -856,6 +858,9 @@ export default function Dashboard() {
                             onMouseOut={e => {e.currentTarget.style.borderColor=card.popular ? `${card.color}35` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)');e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)')}}>
                             {card.popular && (
                               <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>MOST POPULAR</div>
+                            )}
+                            {card.pro && !card.popular && (
+                              <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#d4af37,#a07c20)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(212,175,55,0.35)'}}>PRO</div>
                             )}
                             <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{card.icon}</div>
                             <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px',display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}}>
