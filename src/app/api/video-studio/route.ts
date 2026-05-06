@@ -106,7 +106,7 @@ Respond ONLY with valid JSON, no markdown, no backticks:
       else saved = true
     }
 
-    return NextResponse.json({ result, saved, userId })
+    return NextResponse.json({ result })
 
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
