@@ -604,6 +604,7 @@ export default function Dashboard() {
             { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
             { href: '/neighborhood-bio', icon: '🏘️', label: 'Neighborhood Bio' },
             { href: '/social-planner', icon: '📅', label: 'Social Planner' },
+            { href: '/video-studio', icon: '🎬', label: 'Video Studio' },
             { href: '/settings', icon: '⚙️', label: 'Settings' },
           ].map(item => (
             <a key={item.href} href={item.href}

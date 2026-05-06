@@ -197,6 +197,7 @@ export default function Home() {
               {icon:'⭐',title:'Career Highlights',desc:'Capture your favorite closing moments with photos and memories. Market the listing today — remember the moment tomorrow.'},
               {icon:'📬',title:'Postcard Copy',desc:'Generate Just Listed & Just Sold postcard copy in seconds — ready to send to the neighborhood.'},
               {icon:'🤝',title:'Referral Request',desc:'Turn every closing into your next listing. Email, text, phone and LinkedIn referral scripts — personalized for every client.'},
+              {icon:'🎬',title:'Video Studio',desc:'Turn one listing into a complete short-form video ad kit — script, caption, hashtags, motion prompt, and more.'},
             ].map(({icon,title,desc}) => (
               <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
                 onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}
