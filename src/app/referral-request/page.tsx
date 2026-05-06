@@ -116,6 +116,11 @@ Generate 4 scripts and return ONLY a JSON object with no other text:
     boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: '1rem'
   }
 
+  const sectionHeadStyle = {
+    fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)',
+    letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px',
+  }
+
   if (!planLoaded) return (
     <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: '40px', height: '40px', border: '3px solid rgba(29,158,117,0.3)', borderTop: '3px solid #1D9E75', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
@@ -125,6 +130,8 @@ Generate 4 scripts and return ONLY a JSON object with no other text:
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <div style={{position:'fixed',top:'10%',right:'8%',width:'380px',height:'380px',background:'radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%)',pointerEvents:'none'}}/>
+      <div style={{position:'fixed',bottom:'15%',left:'5%',width:'300px',height:'300px',background:'radial-gradient(circle, rgba(5,150,105,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       {/* NAV */}
       <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
@@ -141,17 +148,40 @@ Generate 4 scripts and return ONLY a JSON object with no other text:
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* HERO */}
-        <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', borderRadius: '20px', padding: '1.75rem 2rem', marginBottom: '1.75rem', boxShadow: '0 8px 32px rgba(16,185,129,0.25)' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🤝</div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.03em' }}>Referral Request Generator</h1>
-          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0, lineHeight: '1.6' }}>
-            Turn every closing into your next listing. Generate personalized referral requests for email, text, phone, and LinkedIn.
-          </p>
+        <div style={{ background: 'linear-gradient(135deg,#10b981,#059669)', borderRadius: '20px', padding: '2.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 60px rgba(16,185,129,0.25)', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '4px 14px', fontSize: '11px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '1px', marginBottom: '14px' }}>REFERRAL SCRIPTS</div>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>Turn every closing into your next listing.</h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: '1.7', maxWidth: '500px', margin: '0 auto 18px' }}>Generate personalized referral requests for email, text, phone, and LinkedIn — in one click.</p>
+          <button onClick={() => document.getElementById('referral-form')?.scrollIntoView({ behavior: 'smooth' })}
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1.5px solid rgba(255,255,255,0.5)', color: '#fff', borderRadius: '10px', padding: '11px 28px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', backdropFilter: 'blur(4px)' }}>
+            Generate My Scripts →
+          </button>
+        </div>
+
+        {/* HOW IT WORKS */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>How It Works</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            {[
+              { s: '1', icon: '🤝', title: 'Enter client details', desc: 'Add your client\'s name, the property, and closing date.' },
+              { s: '2', icon: '✍️', title: 'Add the context', desc: 'Choose the relationship type and add any personal notes.' },
+              { s: '3', icon: '📬', title: 'Get 4 ready-to-send scripts', desc: 'Email, text, phone, and LinkedIn — personalized to each.' },
+            ].map(({ s, icon, title, desc }) => (
+              <div key={s} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '14px', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#10b981,#059669)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>{s}</span>
+                  <span style={{ fontSize: '1rem' }}>{icon}</span>
+                </div>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', lineHeight: '1.4' }}>{title}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* FORM */}
-        <div style={cardStyle}>
-          <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>CLIENT DETAILS</p>
+        <div id="referral-form" style={cardStyle}>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-text-muted)', letterSpacing: '1px', margin: '0 0 16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>CLIENT DETAILS</p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
             <div><label style={labelStyle}>Your Name</label><input placeholder="Jane Smith" value={form.agentName} onChange={e => setForm({ ...form, agentName: e.target.value })} style={inputStyle} /></div>
@@ -180,16 +210,37 @@ Generate 4 scripts and return ONLY a JSON object with no other text:
             </div>
           </div>
 
-          <div style={{ marginBottom: '14px' }}>
+          <div>
             <label style={labelStyle}>Additional Notes</label>
             <input placeholder="e.g. First time buyers, referral from past client, multiple offers..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} style={inputStyle} />
           </div>
-
-          <button onClick={generate} disabled={loading || !form.clientName.trim()}
-            style={{ width: '100%', padding: '13px', background: loading || !form.clientName.trim() ? 'rgba(16,185,129,0.3)' : 'linear-gradient(135deg,#10b981,#059669)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: loading || !form.clientName.trim() ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 20px rgba(16,185,129,0.3)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
-            {loading ? 'Generating referral scripts...' : '🤝 Generate Referral Scripts'}
-          </button>
         </div>
+
+        {/* WHAT YOU'LL GET */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>What You'll Get</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
+            {[
+              { icon: '📧', label: 'Email Script', desc: 'Warm, personal email with subject line — ready to send.' },
+              { icon: '💬', label: 'Text Message', desc: 'Short, casual text to copy and send from your phone.' },
+              { icon: '📞', label: 'Phone Script', desc: 'Natural call script — read before you dial.' },
+              { icon: '💼', label: 'LinkedIn Post', desc: 'Professional post celebrating the closing.' },
+              { icon: '🎯', label: 'Personalized Touch', desc: 'Each script tailored to your relationship and the closing.' },
+            ].map(({ icon, label, desc }) => (
+              <div key={label} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)' }}>{label}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <button onClick={generate} disabled={loading || !form.clientName.trim()}
+          style={{ width: '100%', padding: '16px', background: loading || !form.clientName.trim() ? 'rgba(16,185,129,0.3)' : 'linear-gradient(135deg,#10b981,#059669)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '700', cursor: loading || !form.clientName.trim() ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 0 40px rgba(16,185,129,0.35)', fontFamily: 'var(--font-plus-jakarta), sans-serif', marginBottom: '1.5rem' }}>
+          {loading ? 'Generating referral scripts...' : '🤝 Generate Referral Scripts'}
+        </button>
 
         {/* OUTPUT */}
         {output && (

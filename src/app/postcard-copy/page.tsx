@@ -136,6 +136,11 @@ Generate 4 sections and return ONLY a JSON object with no other text:
     boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: '1rem'
   }
 
+  const sectionHeadStyle = {
+    fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)',
+    letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px',
+  }
+
   if (!planLoaded) return (
     <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: '40px', height: '40px', border: '3px solid rgba(29,158,117,0.3)', borderTop: '3px solid #1D9E75', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
@@ -145,6 +150,8 @@ Generate 4 sections and return ONLY a JSON object with no other text:
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <div style={{position:'fixed',top:'10%',right:'10%',width:'380px',height:'380px',background:'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)',pointerEvents:'none'}}/>
+      <div style={{position:'fixed',bottom:'15%',left:'5%',width:'300px',height:'300px',background:'radial-gradient(circle, rgba(79,70,229,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       {/* NAV */}
       <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
@@ -161,16 +168,39 @@ Generate 4 sections and return ONLY a JSON object with no other text:
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* HERO */}
-        <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)', borderRadius: '20px', padding: '1.75rem 2rem', marginBottom: '1.75rem', boxShadow: '0 8px 32px rgba(99,102,241,0.25)' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📬</div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.03em' }}>Postcard Copy Generator</h1>
-          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0, lineHeight: '1.6' }}>
-            Generate compelling Just Listed & Just Sold postcard copy in seconds — ready to send to the neighborhood.
-          </p>
+        <div style={{ background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: '20px', padding: '2.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 60px rgba(99,102,241,0.25)', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '4px 14px', fontSize: '11px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '1px', marginBottom: '14px' }}>POSTCARD COPY</div>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>Postcard copy that gets doors to open.</h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: '1.7', maxWidth: '500px', margin: '0 auto 18px' }}>Generate compelling Just Listed &amp; Just Sold postcards for the neighborhood in seconds.</p>
+          <button onClick={() => document.getElementById('postcard-form')?.scrollIntoView({ behavior: 'smooth' })}
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1.5px solid rgba(255,255,255,0.5)', color: '#fff', borderRadius: '10px', padding: '11px 28px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', backdropFilter: 'blur(4px)' }}>
+            Create My Postcard →
+          </button>
+        </div>
+
+        {/* HOW IT WORKS */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>How It Works</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            {[
+              { s: '1', icon: '🏠', title: 'Choose your postcard type', desc: 'Select Just Listed or Just Sold and add property details.' },
+              { s: '2', icon: '✍️', title: 'Fill in the details', desc: 'Add beds, baths, price, features, and your agent info.' },
+              { s: '3', icon: '📬', title: 'Get professional copy', desc: 'Front headline, back copy, and call to action — ready to print.' },
+            ].map(({ s, icon, title, desc }) => (
+              <div key={s} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '14px', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>{s}</span>
+                  <span style={{ fontSize: '1rem' }}>{icon}</span>
+                </div>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', lineHeight: '1.4' }}>{title}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* FORM */}
-        <div style={cardStyle}>
+        <div id="postcard-form" style={cardStyle}>
           {/* TYPE SELECTOR */}
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={labelStyle}>Postcard Type</label>
@@ -187,7 +217,7 @@ Generate 4 sections and return ONLY a JSON object with no other text:
             </div>
           </div>
 
-          <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 12px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>PROPERTY DETAILS</p>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-text-muted)', letterSpacing: '1px', margin: '0 0 12px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>PROPERTY DETAILS</p>
 
           <div style={{ marginBottom: '14px' }}>
             <label style={labelStyle}>Property Address *</label>
@@ -207,7 +237,7 @@ Generate 4 sections and return ONLY a JSON object with no other text:
             <input placeholder="Ocean views, pool, updated kitchen, 3-car garage..." value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} style={inputStyle} />
           </div>
 
-          <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 12px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>AGENT DETAILS</p>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-text-muted)', letterSpacing: '1px', margin: '0 0 12px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>AGENT DETAILS</p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '14px' }}>
             <div><label style={labelStyle}>Your Name</label><input placeholder="Jane Smith" value={form.agentName} onChange={e => setForm({ ...form, agentName: e.target.value })} style={inputStyle} /></div>
@@ -215,7 +245,7 @@ Generate 4 sections and return ONLY a JSON object with no other text:
             <div><label style={labelStyle}>Phone</label><input placeholder="(949) 555-0100" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={inputStyle} /></div>
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
+          <div>
             <label style={labelStyle}>Tone</label>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {['Professional', 'Warm & Friendly', 'Luxury', 'Energetic'].map(t => (
@@ -229,12 +259,33 @@ Generate 4 sections and return ONLY a JSON object with no other text:
               ))}
             </div>
           </div>
-
-          <button onClick={generate} disabled={loading || !form.address.trim()}
-            style={{ width: '100%', padding: '13px', background: loading || !form.address.trim() ? 'rgba(99,102,241,0.3)' : 'linear-gradient(135deg,#6366f1,#4338ca)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: loading || !form.address.trim() ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 20px rgba(99,102,241,0.3)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
-            {loading ? 'Generating postcard copy...' : '📬 Generate Postcard Copy'}
-          </button>
         </div>
+
+        {/* WHAT YOU'LL GET */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>What You'll Get</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
+            {[
+              { icon: '🎯', label: 'Front Headline', desc: 'Bold, attention-grabbing headline for the front of the card.' },
+              { icon: '✍️', label: 'Front Subheadline', desc: 'Supporting line that reinforces the headline.' },
+              { icon: '📝', label: 'Back Copy', desc: 'Compelling body copy for the back of the postcard.' },
+              { icon: '📞', label: 'Call to Action', desc: 'A strong closing line that drives inquiries.' },
+              { icon: '🏘️', label: 'Neighborhood Hook', desc: 'A local angle that resonates with neighborhood recipients.' },
+            ].map(({ icon, label, desc }) => (
+              <div key={label} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)' }}>{label}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <button onClick={generate} disabled={loading || !form.address.trim()}
+          style={{ width: '100%', padding: '16px', background: loading || !form.address.trim() ? 'rgba(99,102,241,0.3)' : 'linear-gradient(135deg,#6366f1,#4f46e5)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '700', cursor: loading || !form.address.trim() ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 0 40px rgba(99,102,241,0.35)', fontFamily: 'var(--font-plus-jakarta), sans-serif', marginBottom: '1.5rem' }}>
+          {loading ? 'Generating postcard copy...' : '📬 Generate Postcard Copy'}
+        </button>
 
         {/* OUTPUT */}
         {output && (

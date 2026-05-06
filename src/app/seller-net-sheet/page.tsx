@@ -55,6 +55,11 @@ export default function SellerNetSheetPage() {
   const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'var(--lw-text-muted)', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
   const cardStyle = { background:'var(--lw-card)', borderRadius:'16px', border:'1px solid var(--lw-border)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', marginBottom:'1rem' }
 
+  const sectionHeadStyle = {
+    fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)',
+    letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px',
+  }
+
   return (
     <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>
       <style>{`
@@ -68,11 +73,12 @@ export default function SellerNetSheetPage() {
         }
       `}</style>
 
-      <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
+      <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.07) 0%, transparent 70%)',pointerEvents:'none'}}/>
+      <div style={{position:'fixed',bottom:'20%',left:'5%',width:'300px',height:'300px',background:'radial-gradient(circle, rgba(8,80,65,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       {/* NAV */}
       <div style={{background:'var(--lw-card)',backdropFilter:'blur(10px)',borderBottom:'1px solid var(--lw-border)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <a href="/dashboard" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Dashboard</a>
+        <a href="/dashboard" style={{fontSize:'13px',fontWeight:'600',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Dashboard</a>
         <div style={{fontSize:'16px',fontWeight:'700',color:'var(--lw-text)'}}>
           Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
@@ -81,19 +87,63 @@ export default function SellerNetSheetPage() {
         </div>
       </div>
 
-      <div style={{maxWidth:'640px',margin:'0 auto',padding:'2rem'}}>
+      <div style={{maxWidth:'640px',margin:'0 auto',padding:'2rem 1.5rem'}}>
 
         {/* HERO */}
-        <div style={{background:'linear-gradient(135deg,#1D9E75,#085041)',borderRadius:'16px',padding:'1.5rem 2rem',marginBottom:'1.5rem',boxShadow:'0 0 40px rgba(29,158,117,0.2)'}}>
-          <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#fff',marginBottom:'6px'}}>💰 Seller Net Sheet</h1>
-          <p style={{fontSize:'14px',color:'#a8f0d4',margin:'0',lineHeight:'1.6'}}>
-            Estimate your seller's take-home proceeds before closing. Fast, clear, and easy to share.
-          </p>
+        <div style={{background:'linear-gradient(135deg,#1D9E75,#085041)',borderRadius:'20px',padding:'2.5rem 2rem',marginBottom:'1.5rem',boxShadow:'0 0 60px rgba(29,158,117,0.25)',textAlign:'center'}}>
+          <div style={{display:'inline-block',background:'rgba(255,255,255,0.15)',borderRadius:'20px',padding:'4px 14px',fontSize:'11px',fontWeight:'700',color:'rgba(255,255,255,0.9)',letterSpacing:'1px',marginBottom:'14px'}}>NET SHEET CALCULATOR</div>
+          <h1 style={{fontSize:'2rem',fontWeight:'800',color:'#fff',marginBottom:'10px',letterSpacing:'-0.03em',lineHeight:'1.2'}}>Show your seller the real numbers.</h1>
+          <p style={{fontSize:'14px',color:'rgba(255,255,255,0.88)',lineHeight:'1.7',maxWidth:'500px',margin:'0 auto 18px'}}>A live, accurate net proceeds estimate — built in seconds, printable in one click.</p>
+          <button onClick={() => document.getElementById('net-sheet-form')?.scrollIntoView({ behavior: 'smooth' })}
+            style={{background:'rgba(255,255,255,0.2)',border:'1.5px solid rgba(255,255,255,0.5)',color:'#fff',borderRadius:'10px',padding:'11px 28px',fontSize:'14px',fontWeight:'700',cursor:'pointer',backdropFilter:'blur(4px)'}}>
+            Calculate Now →
+          </button>
+        </div>
+
+        {/* HOW IT WORKS */}
+        <div style={{marginBottom:'1.5rem'}}>
+          <p style={sectionHeadStyle}>How It Works</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))',gap:'10px'}}>
+            {[
+              {s:'1',icon:'💰',title:'Enter the sale price',desc:'Start with the expected sale price and mortgage balance.'},
+              {s:'2',icon:'📊',title:'Add costs and fees',desc:'Commission, title, escrow, and any buyer credits.'},
+              {s:'3',icon:'🖨️',title:'Print or share',desc:'Clean, professional sheet to share with your seller.'},
+            ].map(({s,icon,title,desc}) => (
+              <div key={s} style={{background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'14px',padding:'1.1rem',display:'flex',flexDirection:'column',gap:'6px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'2px'}}>
+                  <span style={{width:'22px',height:'22px',background:'linear-gradient(135deg,#1D9E75,#085041)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px',fontWeight:'800',color:'#fff',flexShrink:0}}>{s}</span>
+                  <span style={{fontSize:'1rem'}}>{icon}</span>
+                </div>
+                <span style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)',lineHeight:'1.4'}}>{title}</span>
+                <span style={{fontSize:'12px',color:'var(--lw-text-muted)',lineHeight:'1.5'}}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* WHAT YOU'LL GET */}
+        <div style={{marginBottom:'1.5rem'}}>
+          <p style={sectionHeadStyle}>What You'll Get</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(210px, 1fr))',gap:'10px'}}>
+            {[
+              {icon:'💰',label:'Net Proceeds Estimate',desc:'Live calculation of what your seller takes home after closing.'},
+              {icon:'📊',label:'Full Cost Breakdown',desc:'Commission, mortgage, title, and escrow — all itemized.'},
+              {icon:'🏦',label:'Mortgage Payoff',desc:'Exact amount owed, subtracted from proceeds automatically.'},
+              {icon:'⚖️',label:'Repair & Credit Deductions',desc:'Easily factor in any buyer credits or repair costs.'},
+              {icon:'🖨️',label:'Printable PDF',desc:'Clean, professional sheet ready to share or print.'},
+            ].map(({icon,label,desc}) => (
+              <div key={label} style={{background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'12px',padding:'14px',display:'flex',flexDirection:'column',gap:'5px'}}>
+                <span style={{fontSize:'1.2rem'}}>{icon}</span>
+                <span style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)'}}>{label}</span>
+                <span style={{fontSize:'12px',color:'var(--lw-text-muted)',lineHeight:'1.5'}}>{desc}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* INPUTS */}
-        <div style={cardStyle}>
-          <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'16px'}}>PROPERTY DETAILS</p>
+        <div id="net-sheet-form" style={cardStyle}>
+          <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1px',marginBottom:'16px'}}>PROPERTY DETAILS</p>
 
           <div style={{marginBottom:'12px'}}>
             <label style={labelStyle}>Sale Price</label>
@@ -112,11 +162,11 @@ export default function SellerNetSheetPage() {
 
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'12px'}}>
             <div>
-              <label style={labelStyle}>Title Fees <span style={{color:'#444',fontWeight:'400',textTransform:'none'}}>(leave blank to estimate)</span></label>
+              <label style={labelStyle}>Title Fees <span style={{color:'var(--lw-text-muted)',fontWeight:'400',textTransform:'none'}}>(leave blank to estimate)</span></label>
               <input placeholder="Auto" value={form.titleFees} onChange={e=>setForm({...form,titleFees:e.target.value})} style={inputStyle}/>
             </div>
             <div>
-              <label style={labelStyle}>Escrow Fees <span style={{color:'#444',fontWeight:'400',textTransform:'none'}}>(leave blank to estimate)</span></label>
+              <label style={labelStyle}>Escrow Fees <span style={{color:'var(--lw-text-muted)',fontWeight:'400',textTransform:'none'}}>(leave blank to estimate)</span></label>
               <input placeholder="Auto" value={form.escrowFees} onChange={e=>setForm({...form,escrowFees:e.target.value})} style={inputStyle}/>
             </div>
           </div>
@@ -143,7 +193,7 @@ export default function SellerNetSheetPage() {
                 <span>Sale Price</span>
                 <span style={{color:'var(--lw-text)',fontWeight:'600'}}>{fmt(salePrice)}</span>
               </div>
-              <div style={{height:'1px',background:'rgba(255,255,255,0.05)'}}/>
+              <div style={{height:'1px',background:'var(--lw-border)'}}/>
               <div style={{display:'flex',justifyContent:'space-between',fontSize:'13px',color:'var(--lw-text-muted)'}}>
                 <span>Mortgage Payoff</span>
                 <span style={{color:'#f87171'}}>− {fmt(mortgageBalance)}</span>
@@ -172,7 +222,7 @@ export default function SellerNetSheetPage() {
                   <span style={{color:'#f87171'}}>− {fmt(otherCosts)}</span>
                 </div>
               )}
-              <div style={{height:'1px',background:'rgba(255,255,255,0.05)'}}/>
+              <div style={{height:'1px',background:'var(--lw-border)'}}/>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                 <span style={{fontSize:'14px',fontWeight:'700',color:'var(--lw-text)'}}>Estimated Net Proceeds</span>
                 <span style={{fontSize:'22px',fontWeight:'700',color: netProceeds >= 0 ? '#1D9E75' : '#f87171'}}>{fmt(netProceeds)}</span>
@@ -180,7 +230,7 @@ export default function SellerNetSheetPage() {
             </div>
 
             <div style={{background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 14px'}}>
-              <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>
+              <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0'}}>
                 💡 <strong style={{color:'var(--lw-text-muted)'}}>Disclaimer:</strong> This is an estimate only. Actual proceeds may vary based on prorations, liens, HOA fees, and other closing items.
               </p>
             </div>
@@ -196,7 +246,7 @@ export default function SellerNetSheetPage() {
         )}
 
         <div style={{textAlign:'center'}}>
-          <a href="/dashboard" style={{fontSize:'13px',color:'#6b7280',textDecoration:'none'}}>← Back to Dashboard</a>
+          <a href="/dashboard" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Back to Dashboard</a>
         </div>
       </div>
     </main>
