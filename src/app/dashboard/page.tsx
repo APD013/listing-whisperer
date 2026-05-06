@@ -510,6 +510,7 @@ export default function Dashboard() {
         { icon: '📋', title: 'Open House Sign-In', desc: 'Tablet-friendly visitor sign-in sheet', color: '#1D9E75', href: '/open-house-signin' },
         { icon: '💰', title: 'Price Drop Kit', desc: 'Price improvement announcement suite', color: '#ef4444', href: '/price-drop' },
         { icon: '📬', title: 'Postcard Copy', desc: 'Just Listed & Just Sold postcard copy generator', color: '#6366f1', href: '/postcard-copy' },
+        { icon: '🎬', title: 'Video Studio', desc: 'Turn one listing photo into a complete video ad kit', color: '#e1306c', href: '/video-studio' },
         { icon: '🤝', title: 'Referral Request', desc: 'Turn every closing into your next listing', color: '#10b981', href: '/referral-request' },
       ]
     },
