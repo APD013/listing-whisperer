@@ -188,11 +188,37 @@ export default function VideoStudioPage() {
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem' }}>
 
         {/* HERO */}
-        <div style={{ background: 'linear-gradient(135deg,#e1306c,#833ab4)', borderRadius: '16px', padding: '1.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 40px rgba(225,48,108,0.2)' }}>
+        <div style={{ background: 'linear-gradient(135deg,#e1306c,#833ab4)', borderRadius: '16px', padding: '1.5rem 2rem', marginBottom: '1rem', boxShadow: '0 0 40px rgba(225,48,108,0.2)' }}>
           <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>🎬 Video Studio</h1>
-          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.82)', margin: '0', lineHeight: '1.6' }}>
-            Turn one listing into a complete short-form video ad kit
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', margin: '0', lineHeight: '1.6' }}>
+            Create TikTok, Reels, and Shorts content without writing scripts, captions, or prompts yourself.
           </p>
+        </div>
+
+        {/* EXPLANATION */}
+        <div style={{ background: 'var(--lw-card)', borderRadius: '12px', border: '1px solid var(--lw-border)', padding: '14px 18px', marginBottom: '1rem', fontSize: '13px', color: 'var(--lw-text-muted)', lineHeight: '1.7' }}>
+          Upload a listing photo, add a few notes, choose your goal, and our AI will create a complete video ad kit: script, motion prompt, caption, hashtags, cover text, and audio direction.
+        </div>
+
+        {/* WHAT YOU'LL GET */}
+        <div style={{ marginBottom: '1rem' }}>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-text-muted)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '10px' }}>What You'll Get</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            {[
+              { icon: '📝', label: '8-Second Script', desc: 'Punchy, natural, under 130 characters' },
+              { icon: '🎬', label: 'Motion Prompt', desc: 'Ready to paste into Kling, Zeely, or Runway' },
+              { icon: '📱', label: 'Caption', desc: 'Platform-optimized for TikTok, Reels, or Shorts' },
+              { icon: '#️⃣', label: 'Hashtags', desc: 'Relevant to your listing and goal' },
+              { icon: '📌', label: 'Cover Text', desc: 'Bold 3-5 word text overlay for your video' },
+              { icon: '🎵', label: 'Audio Direction', desc: 'Genre, tempo, and mood suggestion' },
+            ].map(({ icon, label, desc }) => (
+              <div key={label} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '1.1rem' }}>{icon}</span>
+                <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--lw-text)' }}>{label}</span>
+                <span style={{ fontSize: '11px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* FORM */}
@@ -278,8 +304,15 @@ export default function VideoStudioPage() {
               transition: 'all 0.2s',
             }}
           >
-            {loading ? '⏳ Generating your video kit...' : '🎬 Generate Video Kit'}
+            {loading ? '⏳ Building your video ad kit...' : '🎬 Create My Video Ad Kit'}
           </button>
+
+          <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', textAlign: 'center', marginTop: '10px', lineHeight: '1.6' }}>
+            💡 This creates your video ad kit. Paste the motion prompt into Kling, Zeely, Runway, or Luma to generate the final video.
+          </p>
+          <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', textAlign: 'center', marginTop: '6px', opacity: 0.75 }}>
+            ⭐ Included with Listing Whisperer Pro — built for agents who market listings on social media.
+          </p>
 
           {brandVoice?.agentName && (
             <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', textAlign: 'center', marginTop: '8px' }}>
