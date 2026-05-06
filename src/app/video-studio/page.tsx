@@ -201,6 +201,7 @@ export default function VideoStudioPage() {
               <select value={form.platform} onChange={e => setForm({ ...form, platform: e.target.value })} style={inputStyle}>
                 <option>TikTok</option>
                 <option>Instagram Reels</option>
+                <option>Facebook Reels</option>
                 <option>YouTube Shorts</option>
               </select>
             </div>
