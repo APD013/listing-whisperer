@@ -85,12 +85,18 @@ export default function BuyerConsultationPage() {
   const inputStyle = { width: '100%', padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '13px', color: 'var(--lw-text)', boxSizing: 'border-box' as const, outline: 'none', fontFamily: 'var(--font-plus-jakarta), sans-serif' }
   const labelStyle = { fontSize: '11px', fontWeight: '600' as const, color: 'var(--lw-text-muted)', display: 'block' as const, marginBottom: '5px', letterSpacing: '0.5px', textTransform: 'uppercase' as const }
   const cardStyle = { background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', marginBottom: '1rem' }
+  const sectionHeadStyle = { fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)', letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px' }
+
+  const scrollToForm = () => {
+    document.getElementById('buyer-form')?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
 
-      {/* BACKGROUND GLOW */}
-      <div style={{ position: 'fixed', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      {/* ambient glow */}
+      <div style={{ position: 'fixed', top: '8%', right: '8%', width: '480px', height: '480px', background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'fixed', bottom: '15%', left: '5%', width: '360px', height: '360px', background: 'radial-gradient(circle, rgba(79,70,229,0.05) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
 
       {/* NAV */}
       <div style={{ background: 'var(--lw-card)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -101,22 +107,56 @@ export default function BuyerConsultationPage() {
             <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle', boxShadow: '0 0 10px rgba(29,158,117,0.4)' }}>PRO</span>
           )}
         </div>
-        <div style={{ width: '80px' }} />
       </div>
 
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem' }}>
+      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1.5rem', position: 'relative', zIndex: 1 }}>
 
         {/* HERO */}
-        <div style={{ background: 'linear-gradient(135deg,#1D9E75,#085041)', borderRadius: '16px', padding: '1.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 40px rgba(29,158,117,0.2)' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>🏡 Buyer Consultation Kit</h1>
-          <p style={{ fontSize: '14px', color: '#a8f0d4', margin: '0', lineHeight: '1.6' }}>
-            Walk into every buyer appointment fully prepared. Get a meeting outline, questions to ask, needs assessment, financing talking points, and a follow-up email — all tailored to your buyer.
+        <div style={{ background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: '20px', padding: '2.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 60px rgba(99,102,241,0.25)', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '4px 14px', fontSize: '11px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '1px', marginBottom: '14px' }}>
+            LISTING WHISPERER
+          </div>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>
+            Prepare for your buyer consultation in minutes.
+          </h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', marginBottom: '18px', lineHeight: '1.7', maxWidth: '540px', margin: '0 auto 18px' }}>
+            Tell us about your buyer — we'll create a tailored consultation kit to help you understand their needs and win their trust.
+          </p>
+          <button
+            onClick={scrollToForm}
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1.5px solid rgba(255,255,255,0.5)', color: '#fff', borderRadius: '10px', padding: '11px 28px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', backdropFilter: 'blur(4px)', marginBottom: '16px' }}
+          >
+            🏡 Prepare My Consultation Kit
+          </button>
+          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.65)', margin: '0', letterSpacing: '0.2px' }}>
+            6 sections generated · Takes about 20–30 seconds
           </p>
         </div>
 
+        {/* HOW IT WORKS */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>How It Works</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            {[
+              { step: '1', icon: '👤', title: 'Describe your buyer', desc: "Tell us about the buyer's profile and financing status" },
+              { step: '2', icon: '🎯', title: 'Add their goals and timeline', desc: 'Include must-haves, deal breakers, and when they need to move' },
+              { step: '3', icon: '✅', title: 'Get your buyer consultation kit', desc: '6 tailored sections ready for your appointment' },
+            ].map(({ step, icon, title, desc }) => (
+              <div key={step} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '14px', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>{step}</span>
+                  <span style={{ fontSize: '1rem' }}>{icon}</span>
+                </div>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', lineHeight: '1.4' }}>{title}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* FORM */}
-        <div style={cardStyle}>
-          <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>APPOINTMENT DETAILS</p>
+        <div id="buyer-form" style={{ ...cardStyle, border: '1px solid rgba(99,102,241,0.18)', boxShadow: '0 4px 32px rgba(99,102,241,0.08)' }}>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: '#6366f1', letterSpacing: '1px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>APPOINTMENT DETAILS</p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
             <div>
@@ -186,27 +226,57 @@ export default function BuyerConsultationPage() {
             </div>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
+          <div>
             <label style={labelStyle}>Additional Notes</label>
             <textarea placeholder="Anything else about the buyers or their situation..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
               style={{ ...inputStyle, minHeight: '70px', resize: 'vertical' as const }} />
           </div>
+        </div>
 
-          <div style={{ borderTop: '1px solid var(--lw-border)', paddingTop: '16px' }}>
-            <button onClick={generate} disabled={loading}
-              style={{ width: '100%', padding: '14px', background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 0 24px rgba(29,158,117,0.3)', transition: 'all 0.2s', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
-              {loading ? '⏳ Preparing your consultation kit...' : '🏡 Generate Consultation Kit'}
-            </button>
-            <p style={{ fontSize: '11px', color: '#444', textAlign: 'center', marginTop: '8px' }}>Takes about 20–30 seconds · 6 sections generated</p>
+        {/* WHAT YOU'LL GET */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>What You'll Get</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
+            {[
+              { icon: '👤', label: 'Buyer profile summary', desc: "A clear picture of who your buyer is and what they need" },
+              { icon: '❓', label: 'Needs assessment questions', desc: 'Questions to ask to fully understand their priorities' },
+              { icon: '📈', label: 'Market education talking points', desc: 'Key market context to set expectations early' },
+              { icon: '💰', label: 'Financing overview', desc: 'Talking points around pre-approval and financing steps' },
+              { icon: '📋', label: 'Next steps plan', desc: 'A clear action plan from consultation to offer' },
+            ].map(({ icon, label, desc }) => (
+              <div key={label} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)' }}>{label}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* CTA */}
+        <button
+          onClick={generate}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '15px',
+            background: loading ? '#4f46e5' : 'linear-gradient(135deg,#6366f1,#4f46e5)',
+            color: '#fff', border: 'none', borderRadius: '10px',
+            fontSize: '15px', fontWeight: '700',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            boxShadow: loading ? 'none' : '0 0 28px rgba(99,102,241,0.3)',
+            transition: 'all 0.2s', marginBottom: '1.5rem',
+            fontFamily: 'var(--font-plus-jakarta), sans-serif',
+          }}
+        >
+          {loading ? '⏳ Preparing your consultation kit...' : '🏡 Generate My Consultation Kit'}
+        </button>
 
         {/* LOADING */}
         {loading && (
           <div style={{ ...cardStyle, textAlign: 'center', padding: '2rem' }}>
             <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🏡</div>
             <p style={{ color: 'var(--lw-text)', fontWeight: '600', marginBottom: '6px' }}>Preparing your consultation kit...</p>
-            <p style={{ color: '#6b7280', fontSize: '13px' }}>Creating meeting outline, buyer questions, needs assessment, and follow-up email...</p>
+            <p style={{ color: 'var(--lw-text-muted)', fontSize: '13px' }}>Creating meeting outline, buyer questions, needs assessment, and follow-up email...</p>
           </div>
         )}
 
@@ -259,6 +329,7 @@ export default function BuyerConsultationPage() {
             </div>
           </div>
         )}
+
       </div>
     </main>
   )

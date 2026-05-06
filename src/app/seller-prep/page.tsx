@@ -83,161 +83,232 @@ export default function SellerPrepPage() {
     { key: 'presentation_intro', label: 'Presentation Intro', icon: '📊' },
   ]
 
-  const inputStyle = { width:'100%', padding:'11px 14px', background:'var(--lw-input)', border:'1px solid var(--lw-border)', borderRadius:'8px', fontSize:'13px', color:'var(--lw-text)', boxSizing:'border-box' as const, outline:'none' }
-  const labelStyle = { fontSize:'11px', fontWeight:'600' as const, color:'var(--lw-text-muted)', display:'block' as const, marginBottom:'5px', letterSpacing:'0.5px', textTransform:'uppercase' as const }
-  const cardStyle = { background:'var(--lw-card)', borderRadius:'16px', border:'1px solid var(--lw-border)', padding:'1.5rem', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', marginBottom:'1rem' }
+  const inputStyle = { width: '100%', padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '13px', color: 'var(--lw-text)', boxSizing: 'border-box' as const, outline: 'none' }
+  const labelStyle = { fontSize: '11px', fontWeight: '600' as const, color: 'var(--lw-text-muted)', display: 'block' as const, marginBottom: '5px', letterSpacing: '0.5px', textTransform: 'uppercase' as const }
+  const cardStyle = { background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', marginBottom: '1rem' }
+  const sectionHeadStyle = { fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)', letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px' }
+
+  const scrollToForm = () => {
+    document.getElementById('seller-form')?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
-    <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
 
-      {/* BACKGROUND GLOW */}
-      <div style={{position:'fixed',top:'10%',right:'10%',width:'400px',height:'400px',background:'radial-gradient(circle, rgba(29,158,117,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
+      {/* ambient glow */}
+      <div style={{ position: 'fixed', top: '8%', right: '8%', width: '480px', height: '480px', background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'fixed', bottom: '15%', left: '5%', width: '360px', height: '360px', background: 'radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
 
       {/* NAV */}
-      <div style={{background:'var(--lw-card)',backdropFilter:'blur(10px)',borderBottom:'1px solid var(--lw-border)',padding:'1rem 2rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100}}>
-        <a href="/dashboard" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Dashboard</a>
-        <div style={{fontSize:'16px',fontWeight:'700',color:'var(--lw-text)'}}>
-          Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+      <div style={{ background: 'var(--lw-card)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
+        <a href="/dashboard" style={{ fontSize: '13px', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
+        <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--lw-text)' }}>
+          Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
-            <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
+            <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle', boxShadow: '0 0 10px rgba(29,158,117,0.4)' }}>PRO</span>
           )}
         </div>
       </div>
 
-      <div style={{maxWidth:'720px',margin:'0 auto',padding:'2rem'}}>
+      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1.5rem', position: 'relative', zIndex: 1 }}>
 
         {/* HERO */}
-        <div style={{background:'linear-gradient(135deg,#1D9E75,#085041)',borderRadius:'16px',padding:'1.5rem 2rem',marginBottom:'1.5rem',boxShadow:'0 0 40px rgba(29,158,117,0.2)'}}>
-          <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#fff',marginBottom:'6px'}}>📋 Seller Meeting Prep</h1>
-          <p style={{fontSize:'14px',color:'#a8f0d4',margin:'0',lineHeight:'1.6'}}>
-            Walk into every listing appointment fully prepared. Get a meeting outline, talking points, questions to ask, and a follow-up email — all tailored to the property.
+        <div style={{ background: 'linear-gradient(135deg,#8b5cf6,#6366f1)', borderRadius: '20px', padding: '2.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 60px rgba(139,92,246,0.25)', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '4px 14px', fontSize: '11px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '1px', marginBottom: '14px' }}>
+            LISTING WHISPERER
+          </div>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>
+            Walk into your next listing appointment fully prepared.
+          </h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', marginBottom: '18px', lineHeight: '1.7', maxWidth: '540px', margin: '0 auto 18px' }}>
+            Answer a few questions about the seller and property — we'll create everything you need to win the listing.
+          </p>
+          <button
+            onClick={scrollToForm}
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1.5px solid rgba(255,255,255,0.5)', color: '#fff', borderRadius: '10px', padding: '11px 28px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', backdropFilter: 'blur(4px)', marginBottom: '16px' }}
+          >
+            📋 Prepare My Listing Kit
+          </button>
+          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.65)', margin: '0', letterSpacing: '0.2px' }}>
+            7 sections generated · Takes about 20–30 seconds
           </p>
         </div>
 
-        {/* FORM */}
-        <div style={cardStyle}>
-          <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'16px',paddingBottom:'12px',borderBottom:'1px solid var(--lw-border)'}}>APPOINTMENT DETAILS</p>
+        {/* HOW IT WORKS */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>How It Works</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            {[
+              { step: '1', icon: '📋', title: 'Enter seller details', desc: "Tell us about the seller's goals, timeline, and motivations" },
+              { step: '2', icon: '🏠', title: 'Add property information', desc: 'Include address, type, price expectations, and condition' },
+              { step: '3', icon: '✅', title: 'Get your complete prep kit', desc: '7 tailored sections ready to use in your appointment' },
+            ].map(({ step, icon, title, desc }) => (
+              <div key={step} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '14px', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#8b5cf6,#6366f1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>{step}</span>
+                  <span style={{ fontSize: '1rem' }}>{icon}</span>
+                </div>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', lineHeight: '1.4' }}>{title}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-          <div style={{marginBottom:'12px'}}>
+        {/* FORM */}
+        <div id="seller-form" style={{ ...cardStyle, border: '1px solid rgba(139,92,246,0.18)', boxShadow: '0 4px 32px rgba(139,92,246,0.08)' }}>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: '#8b5cf6', letterSpacing: '1px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>APPOINTMENT DETAILS</p>
+
+          <div style={{ marginBottom: '12px' }}>
             <label style={labelStyle}>Property Address</label>
-            <input placeholder="123 Main St, Newport Beach, CA" value={form.address} onChange={e=>setForm({...form,address:e.target.value})} style={inputStyle}/>
+            <input placeholder="123 Main St, Newport Beach, CA" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} style={inputStyle} />
           </div>
 
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))',gap:'12px',marginBottom:'12px'}}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '12px' }}>
             <div>
               <label style={labelStyle}>Property Type</label>
-              <select value={form.type} onChange={e=>setForm({...form,type:e.target.value})} style={inputStyle}>
+              <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={inputStyle}>
                 <option>Single family</option><option>Condo</option><option>Townhome</option><option>Luxury estate</option><option>Multi-family</option>
               </select>
             </div>
             <div>
               <label style={labelStyle}>Beds</label>
-              <input placeholder="3" value={form.beds} onChange={e=>setForm({...form,beds:e.target.value})} style={inputStyle}/>
+              <input placeholder="3" value={form.beds} onChange={e => setForm({ ...form, beds: e.target.value })} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Baths</label>
-              <input placeholder="2" value={form.baths || ''} onChange={e=>setForm({...form,baths:e.target.value})} style={inputStyle}/>
+              <input placeholder="2" value={form.baths || ''} onChange={e => setForm({ ...form, baths: e.target.value })} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Est. Price Range</label>
-              <input placeholder="$800k - $900k" value={form.estimatedPrice} onChange={e=>setForm({...form,estimatedPrice:e.target.value})} style={inputStyle}/>
+              <input placeholder="$800k - $900k" value={form.estimatedPrice} onChange={e => setForm({ ...form, estimatedPrice: e.target.value })} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Condition</label>
-              <select value={form.propertyCondition} onChange={e=>setForm({...form,propertyCondition:e.target.value})} style={inputStyle}>
+              <select value={form.propertyCondition} onChange={e => setForm({ ...form, propertyCondition: e.target.value })} style={inputStyle}>
                 <option>Excellent</option><option>Good</option><option>Average</option><option>Needs work</option><option>Unknown</option>
               </select>
             </div>
           </div>
 
-          <div style={{marginBottom:'12px'}}>
+          <div style={{ marginBottom: '12px' }}>
             <label style={labelStyle}>Seller Goals</label>
-            <input placeholder="Downsizing, relocating, quick sale, maximize price..." value={form.sellerGoals} onChange={e=>setForm({...form,sellerGoals:e.target.value})} style={inputStyle}/>
+            <input placeholder="Downsizing, relocating, quick sale, maximize price..." value={form.sellerGoals} onChange={e => setForm({ ...form, sellerGoals: e.target.value })} style={inputStyle} />
           </div>
 
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'12px'}}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
             <div>
               <label style={labelStyle}>Timeframe</label>
-              <input placeholder="ASAP, 30 days, flexible..." value={form.timeframe} onChange={e=>setForm({...form,timeframe:e.target.value})} style={inputStyle}/>
+              <input placeholder="ASAP, 30 days, flexible..." value={form.timeframe} onChange={e => setForm({ ...form, timeframe: e.target.value })} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Your Name</label>
-              <input placeholder="Jane Smith" value={form.agentName} onChange={e=>setForm({...form,agentName:e.target.value})} style={inputStyle}/>
+              <input placeholder="Jane Smith" value={form.agentName} onChange={e => setForm({ ...form, agentName: e.target.value })} style={inputStyle} />
             </div>
           </div>
 
-          <div style={{marginBottom:'16px'}}>
+          <div>
             <label style={labelStyle}>Additional Notes</label>
-            <textarea placeholder="Anything else you know about the property or seller..." value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}
-              style={{...inputStyle, minHeight:'70px', resize:'vertical' as const}}/>
-          </div>
-
-          <div style={{borderTop:'1px solid var(--lw-border)',paddingTop:'16px'}}>
-            <button onClick={generate} disabled={loading}
-              style={{width:'100%',padding:'14px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 24px rgba(29,158,117,0.3)',transition:'all 0.2s'}}>
-              {loading ? '⏳ Preparing your meeting kit...' : '📋 Generate Meeting Prep Kit'}
-            </button>
-            <p style={{fontSize:'11px',color:'#444',textAlign:'center',marginTop:'8px'}}>Takes about 20-30 seconds · 7 sections generated</p>
+            <textarea placeholder="Anything else you know about the property or seller..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
+              style={{ ...inputStyle, minHeight: '70px', resize: 'vertical' as const }} />
           </div>
         </div>
 
+        {/* WHAT YOU'LL GET */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>What You'll Get</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
+            {[
+              { icon: '👤', label: 'Seller situation summary', desc: "A clear overview of the seller's goals and motivations" },
+              { icon: '💰', label: 'Pricing strategy talking points', desc: 'Data-backed price positioning for your appointment' },
+              { icon: '🛡️', label: 'Objection responses', desc: 'Ready-made answers to the most common seller pushback' },
+              { icon: '📊', label: 'Listing presentation outline', desc: 'A structured walkthrough for your appointment' },
+              { icon: '📧', label: 'Follow-up plan', desc: 'A complete follow-up sequence after the meeting' },
+            ].map(({ icon, label, desc }) => (
+              <div key={label} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)' }}>{label}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={generate}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '15px',
+            background: loading ? '#6366f1' : 'linear-gradient(135deg,#8b5cf6,#6366f1)',
+            color: '#fff', border: 'none', borderRadius: '10px',
+            fontSize: '15px', fontWeight: '700',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            boxShadow: loading ? 'none' : '0 0 28px rgba(139,92,246,0.3)',
+            transition: 'all 0.2s', marginBottom: '1.5rem',
+          }}
+        >
+          {loading ? '⏳ Preparing your meeting kit...' : '📋 Generate My Prep Kit'}
+        </button>
+
         {/* LOADING */}
         {loading && (
-          <div style={{...cardStyle,textAlign:'center',padding:'2rem'}}>
-            <div style={{fontSize:'2rem',marginBottom:'12px'}}>📋</div>
-            <p style={{color:'var(--lw-text)',fontWeight:'600',marginBottom:'6px'}}>Preparing your meeting kit...</p>
-            <p style={{color:'#6b7280',fontSize:'13px'}}>Creating meeting outline, talking points, seller questions, and follow-up email...</p>
+          <div style={{ ...cardStyle, textAlign: 'center', padding: '2rem' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📋</div>
+            <p style={{ color: 'var(--lw-text)', fontWeight: '600', marginBottom: '6px' }}>Preparing your meeting kit...</p>
+            <p style={{ color: 'var(--lw-text-muted)', fontSize: '13px' }}>Creating meeting outline, talking points, seller questions, and follow-up email...</p>
           </div>
         )}
 
         {/* RESULTS */}
         {outputs && (
           <div id="results" style={cardStyle}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem',paddingBottom:'12px',borderBottom:'1px solid var(--lw-border)'}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>
               <div>
-                <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 4px'}}>MEETING PREP KIT READY</p>
-                <h2 style={{fontSize:'1rem',fontWeight:'600',color:'var(--lw-text)',margin:'0'}}>7 sections generated</h2>
+                <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 4px' }}>MEETING PREP KIT READY</p>
+                <h2 style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--lw-text)', margin: '0' }}>7 sections generated</h2>
               </div>
             </div>
 
-            <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'1.25rem'}}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '1.25rem' }}>
               {tabs.map(t => (
                 <button key={t.key} onClick={() => setActiveTab(t.key)}
-                  style={{fontSize:'12px',padding:'6px 12px',borderRadius:'8px',border:'1px solid',cursor:'pointer',transition:'all 0.15s',
+                  style={{ fontSize: '12px', padding: '6px 12px', borderRadius: '8px', border: '1px solid', cursor: 'pointer', transition: 'all 0.15s',
                     borderColor: activeTab === t.key ? '#1D9E75' : 'var(--lw-border)',
                     background: activeTab === t.key ? 'rgba(29,158,117,0.2)' : 'var(--lw-input)',
                     color: activeTab === t.key ? '#1D9E75' : '#6b7280',
                     boxShadow: activeTab === t.key ? '0 0 12px rgba(29,158,117,0.2)' : 'none',
-                    fontWeight: activeTab === t.key ? '600' : '400'}}>
+                    fontWeight: activeTab === t.key ? '600' : '400' }}>
                   {t.icon} {t.label}
                 </button>
               ))}
             </div>
 
-            <div style={{background:'var(--lw-input)',borderRadius:'12px',padding:'1.5rem',border:'1px solid var(--lw-border)',position:'relative',minHeight:'120px'}}>
+            <div style={{ background: 'var(--lw-input)', borderRadius: '12px', padding: '1.5rem', border: '1px solid var(--lw-border)', position: 'relative', minHeight: '120px' }}>
               <button onClick={() => { navigator.clipboard.writeText(outputs[activeTab] || ''); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-                style={{position:'absolute',top:'12px',right:'12px',fontSize:'12px',padding:'6px 14px',borderRadius:'20px',background: copied ? '#1D9E75' : 'rgba(0,0,0,0.3)',color: copied ? '#fff' : '#6b7280',border:'1px solid',borderColor: copied ? '#1D9E75' : 'rgba(255,255,255,0.08)',cursor:'pointer',fontWeight:'500'}}>
+                style={{ position: 'absolute', top: '12px', right: '12px', fontSize: '12px', padding: '6px 14px', borderRadius: '20px', background: copied ? '#1D9E75' : 'rgba(0,0,0,0.3)', color: copied ? '#fff' : '#6b7280', border: '1px solid', borderColor: copied ? '#1D9E75' : 'rgba(255,255,255,0.08)', cursor: 'pointer', fontWeight: '500' }}>
                 {copied ? '✓ Copied!' : '📋 Copy'}
               </button>
-              <p style={{fontSize:'14px',lineHeight:'1.9',whiteSpace:'pre-wrap',color:'var(--lw-text)',margin:'0',paddingRight:'90px'}}>
+              <p style={{ fontSize: '14px', lineHeight: '1.9', whiteSpace: 'pre-wrap', color: 'var(--lw-text)', margin: '0', paddingRight: '90px' }}>
                 {outputs[activeTab] || ''}
               </p>
             </div>
 
-            <div style={{marginTop:'1rem',display:'flex',gap:'8px',flexWrap:'wrap'}}>
-              <a href="/dashboard" style={{fontSize:'12px',padding:'8px 14px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',textDecoration:'none',fontWeight:'500'}}>
+            <div style={{ marginTop: '1rem', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <a href="/dashboard" style={{ fontSize: '12px', padding: '8px 14px', borderRadius: '8px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', textDecoration: 'none', fontWeight: '500' }}>
                 🏠 Generate Full Marketing Kit
               </a>
-              <a href="/snap-start" style={{fontSize:'12px',padding:'8px 14px',borderRadius:'8px',background:'rgba(29,158,117,0.1)',color:'#1D9E75',border:'1px solid rgba(29,158,117,0.2)',textDecoration:'none',fontWeight:'500'}}>
-                📸 Snap & Start On-Site
+              <a href="/snap-start" style={{ fontSize: '12px', padding: '8px 14px', borderRadius: '8px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', textDecoration: 'none', fontWeight: '500' }}>
+                📸 Snap &amp; Start On-Site
               </a>
               <button onClick={() => setOutputs(null)}
-                style={{fontSize:'12px',padding:'8px 14px',borderRadius:'8px',background:'var(--lw-input)',color:'#6b7280',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer'}}>
+                style={{ fontSize: '12px', padding: '8px 14px', borderRadius: '8px', background: 'var(--lw-input)', color: '#6b7280', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
                 🔄 New Prep Kit
               </button>
             </div>
           </div>
         )}
+
       </div>
     </main>
   )
