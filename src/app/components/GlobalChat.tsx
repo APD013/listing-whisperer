@@ -553,8 +553,8 @@ export default function GlobalChat() {
         </div>
       )}
 
-      {/* QUICK ACTION CHIPS — desktop only, visible when chat is closed */}
-      {!showChat && (
+      {/* QUICK ACTION CHIPS — dashboard only, visible when chat is closed */}
+      {!showChat && pathname === '/dashboard' && (
         <div className="lw-quick-chips" style={{position:'fixed',bottom:'104px',left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',gap:'8px',alignItems:'flex-end',zIndex:1499}}>
           {QUICK_CHIPS.map(chip => (
             <button
