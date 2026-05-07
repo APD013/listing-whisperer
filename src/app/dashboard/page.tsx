@@ -534,6 +534,7 @@ export default function Dashboard() {
         { icon: '🧮', title: 'Commission Calculator', desc: 'Calculate your real take-home after splits and fees', color: '#d4af37', href: '/commission-calculator' },
         { icon: '🛡️', title: 'Objection Handler', desc: 'Turn any objection into a confident response', color: '#8b5cf6', href: '/objection-handler' },
         { icon: '🏘️', title: 'Neighborhood Bio', desc: 'Generate compelling neighborhood descriptions instantly', color: '#1D9E75', href: '/neighborhood-bio' },
+        { icon: '🔄', title: 'Follow-Up Sequence', desc: 'Generate a complete follow-up sequence for any lead', color: '#6366f1', href: '/follow-up-sequence' },
       ]
     },
   ]
@@ -585,6 +586,7 @@ export default function Dashboard() {
         { href: '/commission-calculator', icon: '🧮', label: 'Commission Calculator' },
         { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
         { href: '/neighborhood-bio', icon: '🏘️', label: 'Neighborhood Bio' },
+        { href: '/follow-up-sequence', icon: '🔄', label: 'Follow-Up Sequence' },
       ]
     },
   ]
