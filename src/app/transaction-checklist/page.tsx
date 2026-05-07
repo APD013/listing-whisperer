@@ -146,7 +146,12 @@ export default function TransactionChecklistPage() {
   const cardStyle = {
     background: 'var(--lw-card)', borderRadius: '16px',
     border: '1px solid var(--lw-border)', padding: '1.5rem',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: '1rem'
+    boxShadow: '0 4px 24px rgba(0,0,0,0.08)', marginBottom: '1rem'
+  }
+
+  const sectionHeadStyle = {
+    fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)',
+    letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px',
   }
 
   const total = totalProgress()
@@ -154,30 +159,76 @@ export default function TransactionChecklistPage() {
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
 
+      <div style={{ position: 'fixed', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(29,158,117,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', bottom: '20%', left: '5%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(8,80,65,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
       {/* NAV */}
-      <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-        <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.02em' }}>
+      <div style={{ background: 'var(--lw-card)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
+        <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
+        <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--lw-text)' }}>
           Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
           {planLoaded && plan === 'pro' && (
-            <span style={{ marginLeft: '8px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle' }}>PRO</span>
+            <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle', boxShadow: '0 0 10px rgba(29,158,117,0.4)' }}>PRO</span>
           )}
         </div>
-        <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
       </div>
 
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* HERO */}
-        <div style={{ background: 'linear-gradient(135deg, #1D9E75 0%, #085041 100%)', borderRadius: '20px', padding: '1.75rem 2rem', marginBottom: '1.75rem', boxShadow: '0 8px 32px rgba(29,158,117,0.25)' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>✅</div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#fff', margin: '0 0 6px', letterSpacing: '-0.03em' }}>Transaction Checklist</h1>
-          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', margin: 0, lineHeight: '1.6' }}>
-            Never miss a deadline. Track every step from pre-listing to closing day.
-          </p>
+        <div style={{ background: 'linear-gradient(135deg,#1D9E75,#085041)', borderRadius: '20px', padding: '2.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 60px rgba(29,158,117,0.25)', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '4px 14px', fontSize: '11px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '1px', marginBottom: '14px' }}>TRANSACTION CHECKLIST</div>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>Never miss a deadline.</h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: '1.7', maxWidth: '500px', margin: '0 auto 18px' }}>Track every step from pre-listing to closing day — 6 phases, 48 checkboxes, zero surprises.</p>
+          <button onClick={() => document.getElementById('checklist-form')?.scrollIntoView({ behavior: 'smooth' })}
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1.5px solid rgba(255,255,255,0.5)', color: '#fff', borderRadius: '10px', padding: '11px 28px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', backdropFilter: 'blur(4px)' }}>
+            Start Checklist →
+          </button>
+        </div>
+
+        {/* HOW IT WORKS */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>How It Works</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+            {[
+              { s: '1', icon: '📋', title: 'Name your transaction', desc: 'Label this checklist for a specific property or client.' },
+              { s: '2', icon: '✅', title: 'Check off tasks by phase', desc: 'Work through all 6 phases from pre-listing to closing day.' },
+              { s: '3', icon: '📊', title: 'Track overall progress', desc: 'See exactly how far you are at a glance — never miss a step.' },
+            ].map(({ s, icon, title, desc }) => (
+              <div key={s} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '14px', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#1D9E75,#085041)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>{s}</span>
+                  <span style={{ fontSize: '1rem' }}>{icon}</span>
+                </div>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', lineHeight: '1.4' }}>{title}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* WHAT YOU'LL GET */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>What You'll Get</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
+            {[
+              { icon: '🗂️', label: '6 Transaction Phases', desc: 'Pre-listing, active, under contract, inspections, closing prep, and closing day.' },
+              { icon: '✅', label: '48 Checklist Items', desc: 'Every task you need, organized by phase so nothing slips through.' },
+              { icon: '📊', label: 'Live Progress Tracking', desc: 'Visual progress bar shows your completion percentage in real time.' },
+              { icon: '🏷️', label: 'Named Transactions', desc: 'Label each checklist so you can track multiple deals side by side.' },
+              { icon: '🔄', label: 'One-Click Reset', desc: 'Start fresh for a new listing whenever you're ready.' },
+            ].map(({ icon, label, desc }) => (
+              <div key={label} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)' }}>{label}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* LISTING NAME + PROGRESS */}
-        <div style={cardStyle}>
+        <div id="checklist-form" style={cardStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
             <input
               placeholder="Name this transaction (e.g. 123 Main St)"

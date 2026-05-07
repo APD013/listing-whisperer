@@ -78,7 +78,7 @@ export default function SettingsPage() {
   const cardStyle = {
     background: 'var(--lw-card)', borderRadius: '16px',
     border: '1px solid var(--lw-border)', padding: '1.5rem',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: '1rem'
+    boxShadow: '0 4px 24px rgba(0,0,0,0.08)', marginBottom: '1rem'
   }
 
   const sectionLabel = {
@@ -86,33 +86,67 @@ export default function SettingsPage() {
     letterSpacing: '1px', margin: '0 0 4px 0'
   }
 
+  const sectionHeadStyle = {
+    fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)',
+    letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px',
+  }
+
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
 
+      <div style={{ position: 'fixed', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', bottom: '20%', left: '5%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(79,70,229,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
       {/* NAV */}
-      <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-        <div style={{ fontSize: '17px', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.02em' }}>
-          Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
-          {planLoaded && plan === 'pro' && (
-            <span style={{ marginLeft: '8px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle' }}>PRO</span>
-          )}
-        </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
+      <div style={{ background: 'var(--lw-card)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
+        <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <a href="/" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>Sign out</a>
+          <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--lw-text)' }}>
+            Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
+            {planLoaded && plan === 'pro' && (
+              <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle', boxShadow: '0 0 10px rgba(29,158,117,0.4)' }}>PRO</span>
+            )}
+          </div>
         </div>
       </div>
 
       <div style={{ maxWidth: '680px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* HERO */}
-        <div style={{ marginBottom: '1.75rem' }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--lw-text)', margin: '0 0 6px', letterSpacing: '-0.03em' }}>⚙️ Settings</h1>
-          <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', margin: 0, lineHeight: '1.6' }}>Customize your brand voice and preferences — saved to every listing you generate.</p>
+        <div style={{ background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: '20px', padding: '2.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 60px rgba(99,102,241,0.25)', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '4px 14px', fontSize: '11px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '1px', marginBottom: '14px' }}>SETTINGS</div>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>Your brand voice, your way.</h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: '1.7', maxWidth: '500px', margin: '0 auto 18px' }}>Customize how the AI writes for you — saved across every tool, every listing, every time.</p>
+          <button onClick={() => document.getElementById('brand-voice-section')?.scrollIntoView({ behavior: 'smooth' })}
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1.5px solid rgba(255,255,255,0.5)', color: '#fff', borderRadius: '10px', padding: '11px 28px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', backdropFilter: 'blur(4px)' }}>
+            Update Settings →
+          </button>
+        </div>
+
+        {/* HOW IT WORKS */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>How It Works</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+            {[
+              { s: '1', icon: '👤', title: 'Set your brand voice', desc: 'Enter your name, brokerage, tone, and writing style.' },
+              { s: '2', icon: '🤖', title: 'AI learns your style', desc: 'Every listing and copy tool uses your preferences automatically.' },
+              { s: '3', icon: '✨', title: 'Every output is yours', desc: 'Copy that sounds like you — not like a generic AI.' },
+            ].map(({ s, icon, title, desc }) => (
+              <div key={s} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '14px', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>{s}</span>
+                  <span style={{ fontSize: '1rem' }}>{icon}</span>
+                </div>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', lineHeight: '1.4' }}>{title}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* PLAN STATUS */}
-        <div style={{ ...cardStyle, border: plan === 'pro' ? '1px solid rgba(29,158,117,0.25)' : '1px solid var(--lw-border)', boxShadow: plan === 'pro' ? '0 4px 20px rgba(29,158,117,0.08)' : '0 2px 12px rgba(0,0,0,0.05)' }}>
+        <div style={{ ...cardStyle, border: plan === 'pro' ? '1px solid rgba(29,158,117,0.25)' : '1px solid var(--lw-border)', boxShadow: plan === 'pro' ? '0 4px 20px rgba(29,158,117,0.08)' : '0 4px 24px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <p style={sectionLabel}>CURRENT PLAN</p>
@@ -132,7 +166,7 @@ export default function SettingsPage() {
         </div>
 
         {/* BRAND VOICE */}
-        <div style={cardStyle}>
+        <div id="brand-voice-section" style={cardStyle}>
           <p style={sectionLabel}>YOUR BRAND VOICE</p>
           <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '4px 0 16px', paddingBottom: '16px', borderBottom: '1px solid var(--lw-border)', lineHeight: '1.6' }}>
             These details are automatically applied to every listing you generate — so every piece of copy sounds like you.
@@ -255,7 +289,7 @@ export default function SettingsPage() {
 
         {/* SAVE */}
         <button onClick={save} disabled={saving}
-          style={{ width: '100%', padding: '14px', background: saved ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : '0 4px 20px rgba(29,158,117,0.3)', transition: 'all 0.2s', marginBottom: '1rem', fontFamily: 'var(--font-plus-jakarta), sans-serif', letterSpacing: '0.01em' }}>
+          style={{ width: '100%', padding: '14px', background: saved ? '#4f46e5' : 'linear-gradient(135deg,#6366f1,#4f46e5)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : '0 4px 20px rgba(99,102,241,0.3)', transition: 'all 0.2s', marginBottom: '1rem', fontFamily: 'var(--font-plus-jakarta), sans-serif', letterSpacing: '0.01em' }}>
           {saving ? 'Saving...' : saved ? '✅ Saved!' : 'Save Settings'}
         </button>
 
