@@ -18,6 +18,48 @@ const SpeechRecognition = typeof window !== 'undefined'
 const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/terms', '/privacy', '/contact']
 const HIDDEN_PATH_PREFIXES = ['/portfolio/', '/open-house-signin/']
 
+const SUGGESTIONS_POOL = [
+  'How should I price this listing?',
+  'Write a follow-up text after a showing',
+  'What do I say to a hesitant seller?',
+  'Help me prepare for a listing appointment',
+  'What should I do next with this lead?',
+  'Create social captions for my new listing',
+  'How do I respond to a low offer?',
+  'Help me win this listing',
+  "What's a good opening line for a cold follow-up?",
+  'How do I handle a seller who wants to overprice?',
+  'Write me a just-listed email to my sphere',
+  'What should I do before an open house?',
+  'Help me create a price reduction announcement',
+  'How do I follow up after no response?',
+  'What makes a listing description stand out?',
+  'Give me 3 tips to win more listings this month',
+]
+
+const QUICK_CHIPS = [
+  { label: '✍️ Write Follow-Up', prompt: 'Help me write a follow-up message for a lead' },
+  { label: '💲 Pricing Help', prompt: 'Help me build a pricing strategy for a listing' },
+  { label: '🏠 Listing Strategy', prompt: 'Help me create a marketing strategy for my listing' },
+]
+
+function pickRandom<T>(arr: T[], count: number): T[] {
+  return [...arr].sort(() => Math.random() - 0.5).slice(0, count)
+}
+
+function getPageMessage(pathname: string): string {
+  if (pathname === '/seller-prep') return 'I can help you prep for your listing appointment. What do you need?'
+  if (pathname === '/pricing-assistant') return 'Need help building a pricing strategy? Tell me about the property.'
+  if (pathname.startsWith('/follow-up')) return 'I can write follow-up messages for any situation. Who are you following up with?'
+  if (pathname === '/leads') return 'I can help you follow up with any of your leads. Who do you want to reach out to?'
+  if (pathname === '/market-snapshot') return 'I can help you understand any market. What neighborhood are you researching?'
+  if (pathname === '/video-studio') return 'I can help with your video marketing. What are you working on?'
+  if (pathname === '/open-house') return 'Getting ready for an open house? I can help with prep, posts, or follow-ups.'
+  if (pathname === '/launch-kit') return 'Ready to launch? I can help with your marketing strategy.'
+  if (pathname === '/dashboard') return 'What would you like to work on today?'
+  return 'How can I help you today?'
+}
+
 export default function GlobalChat() {
   const pathname = usePathname()
   const [showChat, setShowChat] = useState(false)
@@ -29,8 +71,10 @@ export default function GlobalChat() {
   const [userState, setUserState] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [voiceEnabled, setVoiceEnabled] = useState(false)
+  const [suggestions, setSuggestions] = useState<string[]>(() => pickRandom(SUGGESTIONS_POOL, 4))
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
+  const prevShowChatRef = useRef(false)
 
   // Call Capture state
   const [isRecording, setIsRecording] = useState(false)
@@ -101,6 +145,20 @@ export default function GlobalChat() {
     }
     return () => clearInterval(timerRef.current)
   }, [isRecording])
+
+  // Rotate suggestions and inject page-aware greeting when chat opens
+  useEffect(() => {
+    if (showChat && !prevShowChatRef.current) {
+      setSuggestions(pickRandom(SUGGESTIONS_POOL, 4))
+      setMessages(current => {
+        if (current.length === 0) {
+          return [{ role: 'assistant', content: getPageMessage(pathname) }]
+        }
+        return current
+      })
+    }
+    prevShowChatRef.current = showChat
+  }, [showChat, pathname])
 
   if (HIDDEN_PATHS.includes(pathname)) return null
   if (HIDDEN_PATH_PREFIXES.some(prefix => pathname.startsWith(prefix))) return null
@@ -276,13 +334,6 @@ export default function GlobalChat() {
     localStorage.removeItem('lw_chat_history')
   }
 
-  const suggestions = [
-    'How do I use Seller Prep?',
-    'Take me to the objection handler',
-    'Add John Smith, john@email.com as a lead',
-    'Remind me to call Sarah on Friday',
-  ]
-
   return (
     <>
       {/* TWO-PARTY DISCLAIMER MODAL */}
@@ -402,11 +453,12 @@ export default function GlobalChat() {
         </div>
       )}
 
+      {/* CHAT WINDOW */}
       {showChat && (
-        <div style={{position:'fixed',bottom:'100px',left:'50%',transform:'translateX(-50%)',width:'min(360px, calc(100vw - 48px))',height:'520px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500}}>
+        <div style={{position:'fixed',bottom:'100px',left:'50%',transform:'translateX(-50%)',width:'min(360px, calc(100vw - 48px))',height:'520px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 32px 80px rgba(0,0,0,0.6)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500,animation:'chat-appear 0.2s ease-out'}}>
 
           {/* HEADER */}
-          <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
+          <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.1)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.25)'}}>
             <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
               <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>✦</div>
               <div>
@@ -432,20 +484,20 @@ export default function GlobalChat() {
           {/* MESSAGES */}
           <div style={{flex:1,overflowY:'auto',padding:'1rem',display:'flex',flexDirection:'column',gap:'10px'}}>
             {messages.length === 0 && (
-              <div style={{textAlign:'center',padding:'1.5rem 1rem'}}>
-                <div style={{fontSize:'2rem',marginBottom:'8px'}}>✦</div>
+              <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'1.5rem 1rem'}}>
+                <div style={{fontSize:'2.5rem',marginBottom:'10px'}}>✦</div>
                 <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>How can I help you?</p>
-                <p style={{fontSize:'11px',color:'#5a5f72',margin:'0 0 1rem'}}>Ask me anything or give me a command</p>
+                <p style={{fontSize:'11px',color:'#5a5f72',margin:'0 0 1.25rem'}}>Ask me anything or give me a command</p>
                 {CALL_CAPTURE_ENABLED && userPlan === 'pro' && (
-                  <div style={{background:'rgba(239,68,68,0.06)',border:'1px solid rgba(239,68,68,0.15)',borderRadius:'10px',padding:'10px 12px',marginBottom:'12px',cursor:'pointer'}} onClick={handleCallCaptureClick}>
+                  <div style={{background:'rgba(239,68,68,0.06)',border:'1px solid rgba(239,68,68,0.15)',borderRadius:'10px',padding:'10px 12px',marginBottom:'12px',cursor:'pointer',width:'100%'}} onClick={handleCallCaptureClick}>
                     <p style={{fontSize:'12px',color:'#ef4444',fontWeight:'600',margin:'0 0 2px'}}>📞 Call Capture</p>
                     <p style={{fontSize:'11px',color:'#8b8fa8',margin:'0'}}>Tap to record & auto-log your next call</p>
                   </div>
                 )}
-                <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                <div style={{display:'flex',flexDirection:'column',gap:'6px',width:'100%'}}>
                   {suggestions.map(q => (
                     <button key={q} onClick={() => setInput(q)}
-                      style={{padding:'8px 12px',background:'rgba(29,158,117,0.08)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'8px',color:'#8b8fa8',fontSize:'11px',cursor:'pointer',textAlign:'left',transition:'all 0.15s'}}
+                      style={{padding:'10px 14px',background:'rgba(29,158,117,0.08)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'8px',color:'#8b8fa8',fontSize:'11px',cursor:'pointer',textAlign:'left',transition:'all 0.15s'}}
                       onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.4)';e.currentTarget.style.color='#1D9E75'}}
                       onMouseOut={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.15)';e.currentTarget.style.color='#8b8fa8'}}>
                       {q}
@@ -457,9 +509,11 @@ export default function GlobalChat() {
 
             {messages.map((msg, i) => (
               <div key={i} style={{display:'flex',justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'}}>
-                <div style={{maxWidth:'85%',padding:'10px 14px',borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                <div style={{maxWidth:'85%',padding:'10px 14px',
+                  borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                   background: msg.role === 'user' ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',
                   border: msg.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.07)',
+                  borderLeft: msg.role === 'user' ? undefined : '2px solid rgba(29,158,117,0.3)',
                   fontSize:'13px',lineHeight:'1.6',color:'#f0f0f0',whiteSpace:'pre-wrap'}}>
                   {msg.content}
                 </div>
@@ -468,7 +522,7 @@ export default function GlobalChat() {
 
             {loading && (
               <div style={{display:'flex',justifyContent:'flex-start'}}>
-                <div style={{padding:'10px 14px',borderRadius:'14px 14px 14px 4px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.07)',display:'flex',gap:'4px',alignItems:'center'}}>
+                <div style={{padding:'10px 14px',borderRadius:'18px 18px 18px 4px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.07)',borderLeft:'2px solid rgba(29,158,117,0.3)',display:'flex',gap:'4px',alignItems:'center'}}>
                   {[0,1,2].map(i => (
                     <div key={i} style={{width:'6px',height:'6px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>
                   ))}
@@ -499,6 +553,22 @@ export default function GlobalChat() {
         </div>
       )}
 
+      {/* QUICK ACTION CHIPS — desktop only, visible when chat is closed */}
+      {!showChat && (
+        <div className="lw-quick-chips" style={{position:'fixed',bottom:'104px',left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',gap:'8px',alignItems:'flex-end',zIndex:1499}}>
+          {QUICK_CHIPS.map(chip => (
+            <button
+              key={chip.label}
+              onClick={() => window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: chip.prompt }))}
+              style={{padding:'7px 14px',background:'rgba(20,24,40,0.85)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'20px',color:'#a0a8b8',fontSize:'12px',fontWeight:'600',cursor:'pointer',backdropFilter:'blur(8px)',whiteSpace:'nowrap',transition:'all 0.15s',boxShadow:'0 2px 12px rgba(0,0,0,0.3)'}}
+              onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.7)';e.currentTarget.style.color='#1D9E75';e.currentTarget.style.background='rgba(29,158,117,0.12)'}}
+              onMouseOut={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.3)';e.currentTarget.style.color='#a0a8b8';e.currentTarget.style.background='rgba(20,24,40,0.85)'}}>
+              {chip.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* TOGGLE BUTTON */}
       <button
         data-chat-toggle="true"
@@ -518,6 +588,13 @@ export default function GlobalChat() {
           0% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 0 rgba(29,158,117,0.4); }
           70% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 14px rgba(29,158,117,0); }
           100% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 0 rgba(29,158,117,0); }
+        }
+        @keyframes chat-appear {
+          from { opacity: 0; transform: translateX(-50%) scale(0.96); }
+          to { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+        @media (max-width: 768px) {
+          .lw-quick-chips { display: none !important; }
         }
       `}</style>
     </>
