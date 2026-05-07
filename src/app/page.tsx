@@ -87,7 +87,7 @@ export default function Home() {
           <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
           <a href="#pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
           <a href="/login" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Sign In</a>
-          <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 16px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',whiteSpace:'nowrap',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>Try Free →</a>
+          <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 16px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',whiteSpace:'nowrap',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>Start Free — No Credit Card</a>
         </div>
       </nav>
 
@@ -98,8 +98,9 @@ export default function Home() {
           BUILT FOR REAL ESTATE AGENTS
         </div>
         <h1 style={{fontSize:'clamp(2rem, 5vw, 3.25rem)',fontWeight:'800',lineHeight:'1.15',maxWidth:'740px',margin:'0 auto 1.25rem',letterSpacing:'-0.5px'}}>
-          The AI assistant built for<br/>
-          <span style={{color:'#1D9E75'}}>real estate agents.</span>
+          Everything you need to win listings,<br/>
+          build marketing, and grow your business —<br/>
+          <span style={{color:'#1D9E75'}}>powered by AI.</span>
         </h1>
         <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'560px',margin:'0 auto 1rem',lineHeight:'1.75'}}>
           From seller meeting prep to on-site photo drafts to full marketing launch — Listing Whisperer is your AI field assistant before, during, and after every listing.
@@ -143,8 +144,15 @@ export default function Home() {
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
-          {['11 copy formats','Seller meeting prep','Buyer consultation','Pricing assistant','On-site photo drafts','7-day launch kit','Objection handler','Social content planner','Seller net sheet','Agent portfolio','Postcard copy','Referral request','Career highlights','Call Capture','Commission calculator'].map(item => (
-            <span key={item} style={{color:'#fff',fontSize:'13px',fontWeight:'600'}}>✓ {item}</span>
+          {[
+            { label: 'Win the listing', items: 'Seller prep · Pricing strategy · Buyer consultation · Scripts' },
+            { label: 'Build the marketing', items: '11 copy formats · Snap & Start · 7-day launch kit · Social planner' },
+            { label: 'Follow up and grow', items: 'Follow-up tools · Reminders · CRM · Referral request · Career highlights' },
+          ].map(({ label, items }) => (
+            <div key={label} style={{textAlign:'center'}}>
+              <span style={{color:'#fff',fontSize:'14px',fontWeight:'800',display:'block'}}>✓ {label}</span>
+              <span style={{color:'rgba(255,255,255,0.75)',fontSize:'11px',fontWeight:'500',display:'block',marginTop:'2px'}}>{items}</span>
+            </div>
           ))}
         </div>
       </section>
@@ -156,9 +164,9 @@ export default function Home() {
           <p style={{color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>From seller appointment to launch day — Listing Whisperer handles it all.</p>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'2rem'}}>
             {[
-              {step:'1',title:'Before the appointment',desc:'Generate a complete seller meeting prep kit — talking points, questions to ask, and a follow-up email — before you walk in the door.',color:'#1D9E75'},
-              {step:'2',title:'On-site with Snap & Start',desc:'Upload property photos from your phone. Our AI detects features and generates your first draft while you\'re still at the property.',color:'#085041'},
-              {step:'3',title:'Full marketing launch',desc:'Generate all 11 copy formats, download PDF flyers, and get a 7-day launch plan — everything ready before you leave your desk.',color:'#1D9E75'},
+              {step:'1',title:'Win the listing',desc:'Generate a complete seller meeting prep kit, pricing strategy, and consultation guide — walk into every appointment ready to close.',color:'#1D9E75'},
+              {step:'2',title:'Build the marketing',desc:'Upload photos on-site, generate 11 copy formats, and get a full 7-day launch plan — your complete marketing kit, ready before you leave your desk.',color:'#085041'},
+              {step:'3',title:'Follow up and grow',desc:'AI-powered follow-up scripts, referral requests, and a CRM to track every lead — turn every closing into your next listing.',color:'#1D9E75'},
             ].map(({step,title,desc,color}) => (
               <div key={step} style={{textAlign:'center',padding:'1.5rem',background:'#fff',borderRadius:'16px',border:'1px solid #eee',boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
                 <div style={{width:'52px',height:'52px',background:color,color:'#fff',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',fontWeight:'800',margin:'0 auto 1.25rem',boxShadow:`0 4px 12px ${color}40`}}>{step}</div>
@@ -173,6 +181,7 @@ export default function Home() {
       {/* FEATURES GRID */}
       <section id="features" style={{padding:'5rem 2rem',background:'#fff'}}>
         <div style={{maxWidth:'920px',margin:'0 auto'}}>
+          <p style={{textAlign:'center',fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'10px'}}>ONE PLATFORM. EVERY TOOL AN AGENT NEEDS.</p>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>One assistant. The entire listing workflow.</h2>
           <p style={{textAlign:'center',color:'#777',marginBottom:'2rem',fontSize:'15px'}}>Not a generic AI tool — a purpose-built assistant for every stage of the listing process.</p>
           <div style={{maxWidth:'640px',margin:'0 auto 3.5rem',background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 20px',textAlign:'center'}}>
@@ -595,10 +604,13 @@ export default function Home() {
       {/* BOTTOM CTA */}
       <section style={{padding:'5rem 2rem',background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',textAlign:'center',borderTop:'1px solid #bbf0d9'}}>
         <h2 style={{fontSize:'2rem',fontWeight:'800',marginBottom:'0.75rem',letterSpacing:'-0.3px'}}>Your AI listing assistant is ready.</h2>
-        <p style={{fontSize:'15px',color:'#555',marginBottom:'2rem',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 24 hours of full Pro access, unlimited listings. No credit card needed.</p>
+        <p style={{fontSize:'16px',color:'#085041',fontWeight:'600',maxWidth:'560px',margin:'0 auto 1.25rem',lineHeight:'1.7',fontStyle:'italic'}}>
+          "From listing appointment to closing — Listing Whisperer handles the marketing, so you can focus on the clients."
+        </p>
+        <p style={{fontSize:'15px',color:'#555',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 24 hours of full Pro access, unlimited listings. No credit card needed.</p>
         <a href="/signup" onClick={() => trackCTAClick('bottom_cta', 'homepage')}
           style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'16px 40px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 24px rgba(29,158,117,0.35)'}}>
-          Get Started Free →
+          Start Free — No Credit Card
         </a>
         <p style={{fontSize:'13px',color:'#aaa',marginTop:'1rem'}}>No credit card · Unlimited listings · Cancel anytime</p>
       </section>
@@ -607,7 +619,7 @@ export default function Home() {
       <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid #eee',background:'#fff'}}>
         <div style={{fontSize:'16px',fontWeight:'700',marginBottom:'8px'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <p style={{fontSize:'13px',color:'#aaa',marginBottom:'8px'}}>The AI assistant for real estate agents. Before the appointment, on-site, and at launch.</p>
-        <p style={{fontSize:'13px',color:'#aaa'}}>© 2026 Listing Whisperer · <a href="/login" style={{color:'#aaa'}}>Sign In</a> · <a href="/signup" style={{color:'#aaa'}}>Get Started Free</a> · <a href="#pricing" style={{color:'#aaa'}}>Pricing</a> · <a href="/contact" style={{color:'#aaa'}}>Contact Us</a> · <a href="/terms" style={{color:'#aaa'}}>Terms</a> · <a href="/privacy" style={{color:'#aaa'}}>Privacy</a></p>
+        <p style={{fontSize:'13px',color:'#aaa'}}>© 2026 Listing Whisperer · <a href="/login" style={{color:'#aaa'}}>Sign In</a> · <a href="/signup" style={{color:'#aaa'}}>Start Free — No Credit Card</a> · <a href="#pricing" style={{color:'#aaa'}}>Pricing</a> · <a href="/contact" style={{color:'#aaa'}}>Contact Us</a> · <a href="/terms" style={{color:'#aaa'}}>Terms</a> · <a href="/privacy" style={{color:'#aaa'}}>Privacy</a></p>
       </footer>
 
     </main>

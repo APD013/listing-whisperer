@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
+import AskAiHint from '../components/AskAiHint'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -146,6 +147,7 @@ export default function ObjectionHandlerPage() {
         </div>
 
         {/* INPUT FORM */}
+        <AskAiHint hint="Facing a specific objection? Describe it to AI for a custom response →" />
         <div id="objection-form" style={cardStyle}>
           <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1px',marginBottom:'16px'}}>THE OBJECTION</p>
 

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
+import AskAiHint from '../components/AskAiHint'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -142,6 +143,7 @@ export default function FollowUpAssistant() {
         </div>
 
         {/* FORM */}
+        <AskAiHint hint="Not sure what to say? Ask AI to write your follow-up →" />
         <div id="follow-up-form" style={{...styles.card, border:'1px solid rgba(99,102,241,0.15)', marginBottom:'1.5rem'}}>
           <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1px',margin:'0 0 16px',paddingBottom:'12px',borderBottom:'1px solid var(--lw-border)'}}>CONTACT & MEETING DETAILS</p>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))',gap:'12px',marginBottom:'16px'}}>

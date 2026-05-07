@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
+import AskAiHint from '../components/AskAiHint'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -142,6 +143,7 @@ export default function PricingAssistant() {
         </div>
 
         {/* FORM */}
+        <AskAiHint hint="Not sure how to price it? Ask AI for a pricing strategy →" />
         <div id="pricing-form" style={{ ...styles.card, marginBottom: '1.5rem', border: '1px solid rgba(212,175,55,0.18)', boxShadow: '0 4px 32px rgba(212,175,55,0.08)' }}>
           <p style={{ fontSize: '11px', fontWeight: '700', color: '#d4af37', letterSpacing: '1px', margin: '0 0 16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>PROPERTY DETAILS</p>
 

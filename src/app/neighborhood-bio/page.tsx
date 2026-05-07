@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
+import AskAiHint from '../components/AskAiHint'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -177,6 +178,7 @@ Format it as 3-4 engaging paragraphs. Make it sound like it was written by a loc
         </div>
 
         {/* FORM CARD */}
+        <AskAiHint hint="Need more neighborhood details? Ask AI →" />
         <div id="neighborhood-form" style={{ background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
 
           {/* LOCATION BUTTON */}

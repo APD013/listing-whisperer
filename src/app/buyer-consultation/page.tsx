@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
+import AskAiHint from '../components/AskAiHint'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -155,6 +156,7 @@ export default function BuyerConsultationPage() {
         </div>
 
         {/* FORM */}
+        <AskAiHint hint="Have a tricky buyer situation? Ask AI for guidance →" />
         <div id="buyer-form" style={{ ...cardStyle, border: '1px solid rgba(99,102,241,0.18)', boxShadow: '0 4px 32px rgba(99,102,241,0.08)' }}>
           <p style={{ fontSize: '11px', fontWeight: '700', color: '#6366f1', letterSpacing: '1px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>APPOINTMENT DETAILS</p>
 

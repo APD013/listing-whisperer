@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import AskAiHint from '../components/AskAiHint'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -155,6 +156,7 @@ export default function MarketSnapshotPage() {
         </div>
 
         {/* FORM */}
+        <AskAiHint hint="Want to understand this market better? Ask AI →" />
         <div id="market-form" style={{ ...s.card, marginBottom: '1.5rem', border: '1px solid rgba(29,158,117,0.18)', boxShadow: '0 4px 32px rgba(29,158,117,0.08)' }}>
           <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>MARKET DETAILS</p>
 
