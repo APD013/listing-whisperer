@@ -359,6 +359,14 @@ function SettingsContent() {
           )}
         </div>
 
+        {/* UNSAVED CHANGES REMINDER */}
+        {!saved && (
+          <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '10px', padding: '10px 14px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '16px' }}>⚠️</span>
+            <p style={{ fontSize: '13px', color: '#f59e0b', fontWeight: '600', margin: 0 }}>Don't forget to save your settings!</p>
+          </div>
+        )}
+
         {/* SAVE */}
         <button onClick={save} disabled={saving}
           style={{ width: '100%', padding: '14px', background: saved ? '#4f46e5' : 'linear-gradient(135deg,#6366f1,#4f46e5)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : '0 4px 20px rgba(99,102,241,0.3)', transition: 'all 0.2s', marginBottom: '1rem', fontFamily: 'var(--font-plus-jakarta), sans-serif', letterSpacing: '0.01em' }}>

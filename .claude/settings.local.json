@@ -4,7 +4,11 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git push *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(Get-ChildItem -Path . -Depth 2)",
+      "Bash(Select-Object FullName)",
+      "Bash(node *)",
+      "Bash(node_modules/.bin/tsc --noEmit)"
     ]
   }
 }
