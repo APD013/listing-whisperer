@@ -216,7 +216,7 @@ export default function TransactionChecklistPage() {
               { icon: '✅', label: '48 Checklist Items', desc: 'Every task you need, organized by phase so nothing slips through.' },
               { icon: '📊', label: 'Live Progress Tracking', desc: 'Visual progress bar shows your completion percentage in real time.' },
               { icon: '🏷️', label: 'Named Transactions', desc: 'Label each checklist so you can track multiple deals side by side.' },
-              { icon: '🔄', label: 'One-Click Reset', desc: 'Start fresh for a new listing whenever you're ready.' },
+              { icon: '🔄', label: 'One-Click Reset', desc: 'Start fresh for a new listing whenever you&apos;re ready.' },
             ].map(({ icon, label, desc }) => (
               <div key={label} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                 <span style={{ fontSize: '1.2rem' }}>{icon}</span>

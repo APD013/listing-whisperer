@@ -152,7 +152,7 @@ export default function RemindersPage() {
           <p style={sectionHeadStyle}>What You'll Get</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
             {[
-              { icon: '⏰', label: 'Upcoming Reminders', desc: 'See everything that's coming up so you can stay ahead.' },
+              { icon: '⏰', label: 'Upcoming Reminders', desc: 'See everything that&apos;s coming up so you can stay ahead.' },
               { icon: '🔴', label: 'Overdue Alerts', desc: 'Overdue items are flagged in red so nothing falls through the cracks.' },
               { icon: '✅', label: 'Mark as Done', desc: 'One click to mark a reminder complete and move it to history.' },
               { icon: '📅', label: 'Google Calendar Sync', desc: 'Add any reminder directly to Google Calendar in one click.' },
