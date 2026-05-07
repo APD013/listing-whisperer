@@ -55,7 +55,7 @@ export default function LeadsPage() {
   const loadLeads = async (uid: string) => {
     setLoading(true)
     const { data } = await supabase
-      .from('leads').select('*').eq('user_id', uid).order('id', { ascending: false })
+      .from('leads').select('*').eq('user_id', uid).order('created_at', { ascending: false })
     if (data) setLeads(data)
     setLoading(false)
   }
@@ -143,10 +143,29 @@ export default function LeadsPage() {
             <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--lw-text)', margin: '0 0 4px', letterSpacing: '-0.03em' }}>👥 Leads & Clients</h1>
             <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', margin: 0 }}>{leads.length} total leads</p>
           </div>
-          <button onClick={() => { setShowForm(true); setEditingLead(null); setForm(emptyForm) }}
-            style={{ padding: '11px 22px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 4px 16px rgba(29,158,117,0.3)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
-            + Add Lead
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {leads.length > 0 && (
+              <button onClick={() => {
+                const headers = ['Name', 'Email', 'Phone', 'Address', 'Est. Price', 'Status', 'Source', 'Notes', 'Last Contacted']
+                const rows = leads.map(l => [l.name, l.email, l.phone, l.address, l.est_price, l.status, l.source, l.notes, l.last_contacted].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`))
+                const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+                const blob = new Blob([csv], { type: 'text/csv' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `leads-${new Date().toISOString().slice(0,10)}.csv`
+                a.click()
+                URL.revokeObjectURL(url)
+              }}
+                style={{ padding: '11px 18px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+                ⬇️ Export CSV
+              </button>
+            )}
+            <button onClick={() => { setShowForm(true); setEditingLead(null); setForm(emptyForm) }}
+              style={{ padding: '11px 22px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 4px 16px rgba(29,158,117,0.3)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+              + Add Lead
+            </button>
+          </div>
         </div>
 
         {/* STATS */}
@@ -184,22 +203,14 @@ export default function LeadsPage() {
             <p style={{ color: 'var(--lw-text-muted)', fontWeight: '500' }}>Loading leads...</p>
           </div>
         ) : filteredLeads.length === 0 ? (
-          <div style={{ ...cardStyle, textAlign: 'center', padding: '3.5rem 2rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>👥</div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--lw-text)', marginBottom: '8px' }}>
-              {leads.length === 0 ? 'Your first lead starts here.' : 'No leads match this filter.'}
-            </h2>
-            <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', marginBottom: '1.75rem', lineHeight: '1.65', maxWidth: '340px', margin: '0 auto 1.75rem' }}>
-              {leads.length === 0
-                ? 'Add a buyer, seller, or past client — then let AI handle the follow-up.'
-                : 'Try selecting a different status filter above.'}
-            </p>
-            {leads.length === 0 && (
-              <button onClick={() => { setEditingLead(null); setForm(emptyForm); setShowForm(true) }}
-                style={{ padding: '11px 24px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif', boxShadow: '0 4px 16px rgba(29,158,117,0.3)' }}>
-                Add Lead +
-              </button>
-            )}
+          <div style={{ ...cardStyle, textAlign: 'center', padding: '3rem' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👥</div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--lw-text)', marginBottom: '8px' }}>No leads yet</h2>
+            <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', marginBottom: '1.5rem' }}>Add your first potential client to get started.</p>
+            <button onClick={() => setShowForm(true)}
+              style={{ padding: '11px 24px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+              + Add First Lead
+            </button>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
