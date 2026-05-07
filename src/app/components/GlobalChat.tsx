@@ -553,14 +553,15 @@ export default function GlobalChat() {
         </div>
       )}
 
-      {/* QUICK ACTION CHIPS — dashboard only, visible when chat is closed */}
+      {/* QUICK ACTION CHIPS — appear on hover over toggle button */}
       {!showChat && pathname === '/dashboard' && (
-        <div className="lw-quick-chips" style={{position:'fixed',bottom:'104px',left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',gap:'8px',alignItems:'flex-end',zIndex:1499}}>
+        <div className="lw-quick-chips" style={{position:'fixed',bottom:'104px',left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',gap:'8px',alignItems:'center',zIndex:1499,opacity:0,transition:'opacity 0.2s ease',pointerEvents:'none'}}
+          id="lw-quick-chips">
           {QUICK_CHIPS.map(chip => (
             <button
               key={chip.label}
               onClick={() => window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: chip.prompt }))}
-              style={{padding:'7px 14px',background:'rgba(20,24,40,0.85)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'20px',color:'#a0a8b8',fontSize:'12px',fontWeight:'600',cursor:'pointer',backdropFilter:'blur(8px)',whiteSpace:'nowrap',transition:'all 0.15s',boxShadow:'0 2px 12px rgba(0,0,0,0.3)'}}
+              style={{padding:'7px 14px',background:'rgba(20,24,40,0.85)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'20px',color:'#a0a8b8',fontSize:'12px',fontWeight:'600',cursor:'pointer',backdropFilter:'blur(8px)',whiteSpace:'nowrap',transition:'all 0.15s',boxShadow:'0 2px 12px rgba(0,0,0,0.3)',pointerEvents:'all'}}
               onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.7)';e.currentTarget.style.color='#1D9E75';e.currentTarget.style.background='rgba(29,158,117,0.12)'}}
               onMouseOut={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.3)';e.currentTarget.style.color='#a0a8b8';e.currentTarget.style.background='rgba(20,24,40,0.85)'}}>
               {chip.label}
@@ -574,8 +575,8 @@ export default function GlobalChat() {
         data-chat-toggle="true"
         onClick={() => setShowChat(!showChat)}
         style={{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'26px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500,animation: showChat ? 'none' : 'pulse-ring 2s infinite'}}
-        onMouseOver={e => e.currentTarget.style.transform='scale(1.12)'}
-        onMouseOut={e => e.currentTarget.style.transform='scale(1)'}>
+        onMouseOver={e => { e.currentTarget.style.transform='scale(1.12)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='1'; chips.style.pointerEvents='all' } }}
+        onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='0'; chips.style.pointerEvents='none' } }}>
         {showChat ? '✕' : '✦'}
       </button>
 
