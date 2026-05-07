@@ -6,6 +6,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+function getFirstName(name: string | undefined, email: string): string {
+  const raw = (name || email.split('@')[0].split('.')[0]).split(' ')[0]
+  return raw.charAt(0).toUpperCase() + raw.slice(1)
+}
+
 function buildDay0Html(firstName: string, userId: string): string {
   const unsubLink = `https://listingwhisperer.com/api/email-sequence/unsubscribe?userId=${userId}`
   return `<!DOCTYPE html><html>
@@ -13,43 +18,45 @@ function buildDay0Html(firstName: string, userId: string): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 </head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-<div style="max-width:560px;margin:0 auto;padding:32px 16px;">
-  <div style="background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e8e8e8;">
-    <div style="padding:24px 36px;border-bottom:1px solid #f0f0f0;">
-      <p style="margin:0;font-size:18px;font-weight:700;color:#111;">Listing<span style="color:#1D9E75;">Whisperer</span></p>
-    </div>
-    <div style="padding:32px 36px;">
-      <p style="margin:0 0 16px;font-size:15px;color:#333;line-height:1.7;">Hey ${firstName},</p>
-      <p style="margin:0 0 16px;font-size:15px;color:#333;line-height:1.7;">
-        You just unlocked something most agents don't have — an AI assistant built specifically for real estate.
-      </p>
-      <p style="margin:0 0 28px;font-size:15px;color:#333;line-height:1.7;">
-        Here's what I'd do first: create your first listing. Upload one photo, add a few notes, and watch what happens.
-      </p>
-      <div style="margin:0 0 28px;">
-        <a href="https://listingwhisperer.com/quick-listing"
-           style="display:inline-block;background:#1D9E75;color:#fff;text-decoration:none;font-size:15px;font-weight:600;padding:13px 28px;border-radius:8px;">
-          Create My First Listing
-        </a>
-      </div>
-      <p style="margin:0 0 32px;font-size:15px;color:#555;line-height:1.7;">
-        Or ask the AI anything — pricing strategy, seller objections, follow-up messages. It's all in there.
-      </p>
-      <p style="margin:0 0 2px;font-size:15px;color:#333;">Adrian</p>
-      <p style="margin:0;font-size:13px;color:#888;">Listing Whisperer</p>
-    </div>
-    <div style="padding:16px 36px;background:#f9fafb;border-top:1px solid #f0f0f0;">
-      <p style="margin:0;font-size:11px;color:#bbb;text-align:center;">
-        Listing Whisperer &middot; <a href="https://listingwhisperer.com" style="color:#bbb;text-decoration:none;">listingwhisperer.com</a>
-        &nbsp;&middot;&nbsp;
-        <a href="${unsubLink}" style="color:#bbb;text-decoration:underline;">Unsubscribe</a>
-      </p>
-    </div>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<div style="max-width:560px;margin:0 auto;padding:32px 24px;">
+  <p style="margin:0 0 32px;font-size:20px;font-weight:700;color:#1D9E75;">ListingWhisperer</p>
+  <p style="margin:0 0 16px;font-size:16px;color:#333333;line-height:1.6;">Hey ${firstName},</p>
+  <p style="margin:0 0 16px;font-size:16px;color:#333333;line-height:1.6;">Glad you're here.</p>
+  <p style="margin:0 0 16px;font-size:16px;color:#333333;line-height:1.6;">The fastest way to see what Listing Whisperer can do is to create a listing. Takes about 60 seconds. Just upload a photo and add a few notes — the AI handles the rest.</p>
+  <p style="margin:0 0 28px;font-size:16px;color:#333333;line-height:1.6;">Give it a try when you have a minute.</p>
+  <div style="margin:0 0 32px;">
+    <a href="https://listingwhisperer.com/quick-listing"
+       style="display:inline-block;background:#1D9E75;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;padding:12px 24px;border-radius:8px;">
+      Create a Listing
+    </a>
   </div>
+  <p style="margin:0 0 4px;font-size:16px;color:#333333;">Adrian</p>
+  <p style="margin:0 0 48px;font-size:14px;color:#999999;">Listing Whisperer</p>
+  <p style="margin:0;font-size:12px;color:#999999;text-align:center;">
+    <a href="${unsubLink}" style="color:#999999;text-decoration:underline;">Unsubscribe</a>
+  </p>
 </div>
 </body>
 </html>`
+}
+
+function buildDay0Text(firstName: string, userId: string): string {
+  const unsubLink = `https://listingwhisperer.com/api/email-sequence/unsubscribe?userId=${userId}`
+  return `Hey ${firstName},
+
+Glad you're here.
+
+The fastest way to see what Listing Whisperer can do is to create a listing. Takes about 60 seconds. Just upload a photo and add a few notes — the AI handles the rest.
+
+Give it a try when you have a minute:
+https://listingwhisperer.com/quick-listing
+
+Adrian
+Listing Whisperer
+
+---
+Unsubscribe: ${unsubLink}`
 }
 
 export async function POST(request: Request) {
@@ -82,7 +89,7 @@ export async function POST(request: Request) {
 
     const { data: authUser } = await supabase.auth.admin.getUserById(userId)
     const fullName = (authUser?.user?.user_metadata?.full_name as string) || ''
-    const firstName = fullName.split(' ')[0] || email.split('@')[0] || 'there'
+    const firstName = getFirstName(fullName || undefined, email)
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -91,10 +98,12 @@ export async function POST(request: Request) {
         'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
       },
       body: JSON.stringify({
-        from: 'Adrian from Listing Whisperer <adrian@listingwhisperer.com>',
+        from: 'Adrian Dabek <adrian@listingwhisperer.com>',
+        reply_to: 'adrian@listingwhisperer.com',
         to: email,
-        subject: 'Welcome to Listing Whisperer 👋',
-        html: buildDay0Html(firstName, userId)
+        subject: "You're in — here's where to start",
+        html: buildDay0Html(firstName, userId),
+        text: buildDay0Text(firstName, userId)
       })
     })
 
