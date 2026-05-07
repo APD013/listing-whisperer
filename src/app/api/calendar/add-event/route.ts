@@ -37,7 +37,11 @@ export async function POST(request: Request) {
   const tokenData = await tokenRes.json()
 
   if (!tokenData.access_token) {
-    return NextResponse.json({ error: 'Failed to get access token' }, { status: 500 })
+    console.error('[calendar/add-event] Token exchange failed:', JSON.stringify(tokenData))
+    return NextResponse.json(
+      { error: 'Failed to get access token', detail: tokenData.error_description || tokenData.error || null },
+      { status: 500 }
+    )
   }
 
   const end = endDateTime || new Date(new Date(startDateTime).getTime() + 60 * 60 * 1000).toISOString()
@@ -62,7 +66,11 @@ export async function POST(request: Request) {
   const event = await eventRes.json()
 
   if (!eventRes.ok) {
-    return NextResponse.json({ error: event.error?.message || 'Failed to create event' }, { status: 500 })
+    console.error('[calendar/add-event] Google Calendar API error:', JSON.stringify(event))
+    return NextResponse.json(
+      { error: 'Failed to create event', detail: event.error?.message || null, googleError: event.error || null },
+      { status: 500 }
+    )
   }
 
   return NextResponse.json({ success: true, eventId: event.id, htmlLink: event.htmlLink })
