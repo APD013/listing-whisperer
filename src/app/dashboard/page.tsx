@@ -47,6 +47,10 @@ export default function Dashboard() {
   const [chatLoading, setChatLoading] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState<Record<string,boolean>>({'win':true,'build':true,'launch':true,'manage':true})
   const [leads, setLeads] = useState<any[]>([])
+  const [workspaceListing, setWorkspaceListing] = useState<any>(null)
+  const [workspaceLeads, setWorkspaceLeads] = useState<number>(0)
+  const [workspaceReminders, setWorkspaceReminders] = useState<number>(0)
+  const [recentActivity, setRecentActivity] = useState<{type:string;text:string;created_at:string}[]>([])
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', baths: '', sqft: '', price: '',
@@ -110,6 +114,25 @@ export default function Dashboard() {
         .from('leads').select('id, name, status, created_at').eq('user_id', user.id)
         .order('created_at', { ascending: false }).limit(5)
       if (leadsData) setLeads(leadsData)
+
+      const { data: wsListing } = await supabase.from('listings').select('id, name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1)
+      if (wsListing && wsListing[0]) setWorkspaceListing(wsListing[0])
+      const { data: wsLeadsAll } = await supabase.from('leads').select('id').eq('user_id', user.id)
+      setWorkspaceLeads(wsLeadsAll ? wsLeadsAll.length : 0)
+      const { data: wsRemindersData } = await supabase.from('reminders').select('id').eq('user_id', user.id).eq('sent', false).lte('remind_at', new Date().toISOString())
+      setWorkspaceReminders(wsRemindersData ? wsRemindersData.length : 0)
+      const [{ data: actListings }, { data: actLeads }, { data: actVideoKits }] = await Promise.all([
+        supabase.from('listings').select('name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
+        supabase.from('leads').select('name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
+        supabase.from('video_kits').select('video_goal, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(2),
+      ])
+      const allActivity = [
+        ...(actListings || []).map((l: any) => ({ type: 'listing', text: `Generated listing: ${l.name || 'Untitled'}`, created_at: l.created_at })),
+        ...(actLeads || []).map((l: any) => ({ type: 'lead', text: `Added lead: ${l.name}`, created_at: l.created_at })),
+        ...(actVideoKits || []).map((v: any) => ({ type: 'video', text: `Created video kit: ${v.video_goal || 'Video Kit'}`, created_at: v.created_at })),
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 5)
+      setRecentActivity(allActivity)
+
       if (upgraded) setPlan('pro')
 
       const checkReminders = async () => {
@@ -483,12 +506,23 @@ export default function Dashboard() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = userName ? userName.split(' ')[0] : ''
 
+  const getRelativeTime = (dateStr: string) => {
+    const diffMs = Date.now() - new Date(dateStr).getTime()
+    const diffHours = Math.floor(diffMs / 3600000)
+    if (diffHours < 1) return 'Just now'
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+    const diffDays = Math.floor(diffHours / 24)
+    if (diffDays === 1) return 'Yesterday'
+    if (diffDays < 7) return `${diffDays} days ago`
+    return new Date(dateStr).toLocaleDateString()
+  }
+
   const buckets = [
     {
       label: 'WIN THE LISTING',
       color: '#8b5cf6',
       cards: [
-        { icon: '📋', title: 'Seller Prep', desc: 'Prepare for your listing appointment', color: '#8b5cf6', href: '/seller-prep' },
+        { icon: '📋', title: 'Seller Prep', desc: 'Prepare for your listing appointment', color: '#8b5cf6', href: '/seller-prep', priority: true },
         { icon: '🏠', title: 'Buyer Consultation', desc: 'Prepare for your buyer appointments', color: '#6366f1', href: '/buyer-consultation' },
         { icon: '💲', title: 'Pricing Assistant', desc: 'Get a data-backed price range and strategy', color: '#d4af37', href: '/pricing-assistant' },
         { icon: '📊', title: 'Market Snapshot', desc: 'Instant market analysis for any neighborhood', color: '#1D9E75', href: '/market-snapshot' },
@@ -502,7 +536,7 @@ export default function Dashboard() {
       color: '#1D9E75',
       cards: [
         { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) } },
-        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing', popular: true, startHere: true, tooltip: 'Upload 1 photo → generate full listing marketing' },
+        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing', popular: true, startHere: true, tooltip: 'Upload 1 photo → generate full listing marketing', priority: true },
         { icon: '📸', title: 'Snap & Start', desc: 'On-site? Start from photos instantly', color: '#e1306c', href: '/snap-start' },
         { icon: '✍️', title: 'Rewrite Listing', desc: 'Polish and improve existing copy', color: '#6366f1', href: '/rewrite' },
         { icon: '🖼️', title: 'Photo Library', desc: 'Manage your saved property photos', color: '#f97316', href: '/photos' },
@@ -529,12 +563,12 @@ export default function Dashboard() {
         { icon: '✅', title: 'Transaction Checklist', desc: 'Track every step from listing to closing', color: '#1D9E75', href: '/transaction-checklist' },
         { icon: '⏰', title: 'Reminders', desc: 'Never miss a follow-up or deadline', color: '#f59e0b', href: '/reminders' },
         { icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline and contacts', color: '#10b981', href: '/leads' },
-        { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up' },
+        { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up', priority: true },
         { icon: '💰', title: 'Seller Net Sheet', desc: 'Estimate seller proceeds before closing', color: '#1D9E75', href: '/seller-net-sheet' },
         { icon: '🧮', title: 'Commission Calculator', desc: 'Calculate your real take-home after splits and fees', color: '#d4af37', href: '/commission-calculator' },
         { icon: '🛡️', title: 'Objection Handler', desc: 'Turn any objection into a confident response', color: '#8b5cf6', href: '/objection-handler' },
         { icon: '🏘️', title: 'Neighborhood Bio', desc: 'Generate compelling neighborhood descriptions instantly', color: '#1D9E75', href: '/neighborhood-bio' },
-        { icon: '🔄', title: 'Follow-Up Sequence', desc: 'Generate a complete follow-up sequence for any lead', color: '#6366f1', href: '/follow-up-sequence' },
+        { icon: '🔄', title: 'Follow-Up Sequence', desc: 'Generate a complete follow-up sequence for any lead', color: '#6366f1', href: '/follow-up-sequence', priority: true },
       ]
     },
   ]
@@ -842,6 +876,92 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* TODAY'S WORKSPACE */}
+              <div style={{marginBottom:'2.5rem',background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem'}}>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 16px',display:'flex',alignItems:'center',gap:'6px'}}>
+                  <span>📋</span> TODAY'S WORKSPACE
+                </p>
+                {(workspaceListing || workspaceLeads > 0 || workspaceReminders > 0) ? (
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'12px'}}>
+                    <div style={{background:'var(--lw-input)',borderRadius:'12px',border:'1px solid var(--lw-border)',padding:'1rem'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'10px',marginBottom:'10px'}}>
+                        <span style={{fontSize:'18px',flexShrink:0}}>🏠</span>
+                        <p style={{margin:'0',fontSize:'13px',color:'var(--lw-text)',fontWeight:'600',lineHeight:'1.5'}}>
+                          {workspaceListing ? `Continue: ${workspaceListing.name || 'Untitled Listing'}` : 'Start your first listing'}
+                        </p>
+                      </div>
+                      {workspaceListing ? (
+                        <button onClick={() => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) }}
+                          style={{padding:'5px 12px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'#1D9E75',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                          → Open
+                        </button>
+                      ) : (
+                        <a href="/quick-listing" style={{display:'inline-block',padding:'5px 12px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'#1D9E75',textDecoration:'none'}}>
+                          → Quick Listing
+                        </a>
+                      )}
+                    </div>
+                    <div style={{background:'var(--lw-input)',borderRadius:'12px',border:'1px solid var(--lw-border)',padding:'1rem'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'10px',marginBottom:'10px'}}>
+                        <span style={{fontSize:'18px',flexShrink:0}}>👥</span>
+                        <p style={{margin:'0',fontSize:'13px',color:'var(--lw-text)',fontWeight:'600',lineHeight:'1.5'}}>
+                          {workspaceLeads > 0 ? `You have ${workspaceLeads} lead${workspaceLeads > 1 ? 's' : ''} — follow up today` : 'No leads yet — add your first client'}
+                        </p>
+                      </div>
+                      <a href="/leads" style={{display:'inline-block',padding:'5px 12px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'#1D9E75',textDecoration:'none'}}>
+                        {workspaceLeads > 0 ? '→ View Leads' : '→ Add Lead'}
+                      </a>
+                    </div>
+                    <div style={{background:'var(--lw-input)',borderRadius:'12px',border:'1px solid var(--lw-border)',padding:'1rem'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'10px',marginBottom:'10px'}}>
+                        <span style={{fontSize:'18px',flexShrink:0}}>⏰</span>
+                        <p style={{margin:'0',fontSize:'13px',color:'var(--lw-text)',fontWeight:'600',lineHeight:'1.5'}}>
+                          {workspaceReminders > 0 ? `${workspaceReminders} reminder${workspaceReminders > 1 ? 's' : ''} due today` : 'No reminders due'}
+                        </p>
+                      </div>
+                      <a href="/reminders" style={{display:'inline-block',padding:'5px 12px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'#1D9E75',textDecoration:'none'}}>
+                        {workspaceReminders > 0 ? '→ View' : '→ Set Reminder'}
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{textAlign:'center',padding:'0.5rem 0 0.25rem'}}>
+                    <p style={{fontSize:'14px',color:'var(--lw-text-muted)',margin:'0 0 16px',lineHeight:'1.6'}}>Your workspace is ready. Start a listing, ask AI, or add your first lead.</p>
+                    <div style={{display:'flex',gap:'8px',justifyContent:'center',flexWrap:'wrap'}}>
+                      <button onClick={() => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) }}
+                        style={{padding:'7px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'var(--lw-text)',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                        Start Listing
+                      </button>
+                      <button onClick={() => window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: '' }))}
+                        style={{padding:'7px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'var(--lw-text)',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                        Ask AI
+                      </button>
+                      <a href="/leads" style={{display:'inline-block',padding:'7px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'var(--lw-text)',textDecoration:'none'}}>
+                        Add Lead
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RECENT ACTIVITY */}
+              <div style={{marginBottom:'2.5rem'}}>
+                <p style={{fontSize:'10px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 12px'}}>RECENT ACTIVITY</p>
+                {recentActivity.length > 0 ? (
+                  <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                    {recentActivity.map((item, i) => (
+                      <div key={i} style={{display:'flex',alignItems:'center',gap:'10px',padding:'8px 12px',borderRadius:'8px',background:'var(--lw-input)',border:'1px solid var(--lw-border)'}}>
+                        <span style={{fontSize:'15px',flexShrink:0}}>{item.type === 'listing' ? '🏠' : item.type === 'lead' ? '👥' : '🎬'}</span>
+                        <span style={{fontSize:'13px',color:'var(--lw-text)',flex:1,fontWeight:'400'}}>{item.text}</span>
+                        <span style={{fontSize:'11px',color:'var(--lw-text-muted)',flexShrink:0,whiteSpace:'nowrap' as const}}>{getRelativeTime(item.created_at)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',fontStyle:'italic'}}>No recent activity yet. Your work will appear here as you use Listing Whisperer.</p>
+                )}
+              </div>
+
               <div id="all-tools" style={{display:'flex',flexDirection:'column',gap:'3rem',marginBottom:'3rem'}}>
                 {buckets.map((bucket, bi) => (
                   <div key={bi}>
@@ -855,9 +975,9 @@ export default function Dashboard() {
                         card.href ? (
                           <a key={ci} href={card.href}
                             title={card.tooltip || undefined}
-                            style={{background: card.popular ? `linear-gradient(135deg,${card.color}0d,${card.color}04)` : (isDark ? 'linear-gradient(135deg,#111420,#13161f)' : '#ffffff'),borderRadius:'13px',border: card.popular ? `1.5px solid ${card.color}35` : (isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'),padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.2s',boxShadow: card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'),position:'relative' as const}}
+                            style={{background: card.priority ? 'rgba(29,158,117,0.03)' : (card.popular ? `linear-gradient(135deg,${card.color}0d,${card.color}04)` : (isDark ? 'linear-gradient(135deg,#111420,#13161f)' : '#ffffff')),borderRadius:'13px',border: card.popular ? `1.5px solid ${card.color}35` : (isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'),borderLeft: card.priority ? '3px solid #1D9E75' : undefined,padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.2s',boxShadow: card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'),position:'relative' as const}}
                             onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 10px 32px ${card.color}22`}}
-                            onMouseOut={e => {e.currentTarget.style.borderColor=card.popular ? `${card.color}35` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)');e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)')}}>
+                            onMouseOut={e => {e.currentTarget.style.borderColor=card.popular ? `${card.color}35` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)');if(card.priority){e.currentTarget.style.borderLeftColor='#1D9E75';e.currentTarget.style.borderLeftWidth='3px'}e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)')}}>
                             {card.popular && (
                               <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>MOST POPULAR</div>
                             )}
