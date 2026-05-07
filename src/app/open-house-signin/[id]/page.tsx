@@ -59,6 +59,13 @@ export default function OpenHouseSignInPage({ params }: { params: Promise<{ id: 
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Something went wrong')
       setSubmitted(true)
+              setTimeout(() => {
+                setSubmitted(false)
+                setName('')
+                setEmail('')
+                setPhone('')
+                setSourceDetail('')
+              }, 5000)
     } catch (e: any) {
       setError(e.message)
     } finally {
