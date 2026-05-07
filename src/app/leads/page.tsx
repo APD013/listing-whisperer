@@ -54,9 +54,8 @@ export default function LeadsPage() {
 
   const loadLeads = async (uid: string) => {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('leads').select('*').eq('user_id', uid).order('created_at', { ascending: false })
-    console.log('leads fetch:', { uid, data, error })
+    const { data } = await supabase
+      .from('leads').select('*').eq('user_id', uid)
     if (data) setLeads(data)
     setLoading(false)
   }
