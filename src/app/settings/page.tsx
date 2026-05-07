@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function SettingsPage() {
+function SettingsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [userId, setUserId] = useState<string | null>(null)
@@ -370,5 +370,13 @@ export default function SettingsPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div />}>
+      <SettingsContent />
+    </Suspense>
   )
 }
