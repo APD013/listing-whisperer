@@ -19,6 +19,9 @@ export default function RemindersPage() {
   const [form, setForm] = useState({ content: '', remind_at: '' })
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('upcoming')
+  const [googleConnected, setGoogleConnected] = useState(false)
+  const [calendarToast, setCalendarToast] = useState<string | null>(null)
+  const [addingToCalendar, setAddingToCalendar] = useState<string | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -26,9 +29,12 @@ export default function RemindersPage() {
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
       const { data: profile } = await supabase
-        .from('profiles').select('plan').eq('id', user.id).single()
-      if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
-      else { setPlanLoaded(true) }
+        .from('profiles').select('plan, google_connected').eq('id', user.id).single()
+      if (profile) {
+        setPlan(profile.plan || 'starter')
+        setGoogleConnected(profile.google_connected || false)
+        setPlanLoaded(true)
+      } else { setPlanLoaded(true) }
       await loadReminders(user.id)
     }
     getUser()
@@ -43,6 +49,31 @@ export default function RemindersPage() {
       .order('remind_at', { ascending: true })
     if (data) setReminders(data)
     setLoading(false)
+  }
+
+  const addToCalendar = async (reminder: any) => {
+    if (!userId) return
+    setAddingToCalendar(reminder.id)
+    const endTime = new Date(new Date(reminder.remind_at).getTime() + 60 * 60 * 1000).toISOString()
+    const res = await fetch('/api/calendar/add-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        title: reminder.content,
+        description: reminder.content,
+        startDateTime: reminder.remind_at,
+        endDateTime: endTime,
+      }),
+    })
+    const data = await res.json()
+    setAddingToCalendar(null)
+    if (data.success) {
+      setCalendarToast('Added to Google Calendar ✅')
+    } else {
+      setCalendarToast('Failed to add to calendar')
+    }
+    setTimeout(() => setCalendarToast(null), 3500)
   }
 
   const addReminder = async () => {
@@ -101,6 +132,12 @@ export default function RemindersPage() {
 
       <div style={{ position: 'fixed', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'fixed', bottom: '20%', left: '5%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(217,119,6,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+      {calendarToast && (
+        <div style={{ position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', background: calendarToast.startsWith('Failed') ? '#ef4444' : '#1D9E75', color: '#fff', padding: '12px 24px', borderRadius: '12px', fontSize: '14px', fontWeight: '700', zIndex: 9999, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', whiteSpace: 'nowrap' }}>
+          {calendarToast}
+        </div>
+      )}
 
       {/* NAV */}
       <div style={{ background: 'var(--lw-card)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -288,12 +325,13 @@ export default function RemindersPage() {
                           ✓ Done
                         </button>
                       )}
-                      {!reminder.sent && (
-                        <a href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(reminder.content)}&dates=${new Date(reminder.remind_at).toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${new Date(new Date(reminder.remind_at).getTime() + 30 * 60000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent('Reminder from Listing Whisperer')}`}
-                          target="_blank" rel="noopener noreferrer"
-                          style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(66,133,244,0.3)', fontSize: '11px', cursor: 'pointer', background: 'rgba(66,133,244,0.08)', color: '#4285f4', fontWeight: '700', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          📅 Google
-                        </a>
+                      {!reminder.sent && googleConnected && (
+                        <button
+                          onClick={() => addToCalendar(reminder)}
+                          disabled={addingToCalendar === reminder.id}
+                          style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(66,133,244,0.3)', fontSize: '11px', cursor: addingToCalendar === reminder.id ? 'not-allowed' : 'pointer', background: 'rgba(66,133,244,0.08)', color: '#4285f4', fontWeight: '700', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+                          {addingToCalendar === reminder.id ? '...' : '📅 Calendar'}
+                        </button>
                       )}
                       <button onClick={() => deleteReminder(reminder.id)}
                         style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(239,68,68,0.2)', fontSize: '11px', cursor: 'pointer', background: 'rgba(239,68,68,0.06)', color: '#ef4444', fontWeight: '600', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

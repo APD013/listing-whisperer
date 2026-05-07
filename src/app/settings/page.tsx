@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,18 +10,33 @@ const supabase = createClient(
 
 export default function SettingsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [userId, setUserId] = useState<string | null>(null)
+  const [googleToast, setGoogleToast] = useState<string | null>(null)
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [language, setLanguage] = useState('English')
   const [marketingEmails, setMarketingEmails] = useState(false)
+  const [googleConnected, setGoogleConnected] = useState(false)
+  const [disconnecting, setDisconnecting] = useState(false)
   const [brandVoice, setBrandVoice] = useState({
     agentName: '', brokerage: '', phone: '', website: '',
     preferredTone: 'Warm & inviting', targetBuyers: '',
     uniqueStyle: '', ctaStyle: '', avoidWords: '', state: '',
   })
+
+  useEffect(() => {
+    const googleParam = searchParams.get('google')
+    if (googleParam === 'connected') {
+      setGoogleToast('Google Calendar connected ✅')
+      setTimeout(() => setGoogleToast(null), 4000)
+    } else if (googleParam === 'error') {
+      setGoogleToast('Failed to connect Google Calendar')
+      setTimeout(() => setGoogleToast(null), 4000)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     const getUser = async () => {
@@ -30,13 +45,14 @@ export default function SettingsPage() {
       setUserId(user.id)
       const { data: profile } = await supabase
         .from('profiles')
-        .select('plan, brand_voice, preferred_language, marketing_emails')
+        .select('plan, brand_voice, preferred_language, marketing_emails, google_connected')
         .eq('id', user.id)
         .single()
       if (profile) {
         setPlan(profile.plan || 'starter')
         setLanguage(profile.preferred_language || 'English')
         setMarketingEmails(profile.marketing_emails || false)
+        setGoogleConnected(profile.google_connected || false)
         setPlanLoaded(true)
         if (profile.brand_voice) {
           try { setBrandVoice(JSON.parse(profile.brand_voice)) } catch(e) {}
@@ -47,6 +63,17 @@ export default function SettingsPage() {
     }
     getUser()
   }, [])
+
+  const disconnectGoogle = async () => {
+    if (!userId) return
+    setDisconnecting(true)
+    await supabase
+      .from('profiles')
+      .update({ google_connected: false, google_refresh_token: null })
+      .eq('id', userId)
+    setGoogleConnected(false)
+    setDisconnecting(false)
+  }
 
   const save = async () => {
     setSaving(true)
@@ -93,6 +120,12 @@ export default function SettingsPage() {
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+
+      {googleToast && (
+        <div style={{ position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', background: googleToast.startsWith('Failed') ? '#ef4444' : '#1D9E75', color: '#fff', padding: '12px 24px', borderRadius: '12px', fontSize: '14px', fontWeight: '700', zIndex: 9999, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', whiteSpace: 'nowrap' }}>
+          {googleToast}
+        </div>
+      )}
 
       <div style={{ position: 'fixed', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'fixed', bottom: '20%', left: '5%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(79,70,229,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -285,6 +318,45 @@ export default function SettingsPage() {
               <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '1px', left: marketingEmails ? '21px' : '1px', transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
             </div>
           </div>
+        </div>
+
+        {/* GOOGLE CALENDAR */}
+        <div style={cardStyle}>
+          <p style={sectionLabel}>📅 GOOGLE CALENDAR</p>
+          <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '4px 0 16px', lineHeight: '1.6' }}>
+            Connect your Google Calendar to add reminders directly from Listing Whisperer.
+          </p>
+          {googleConnected ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(29,158,117,0.06)', border: '1px solid rgba(29,158,117,0.2)', borderRadius: '12px', padding: '14px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '1.25rem' }}>✅</span>
+                <div>
+                  <p style={{ fontSize: '14px', fontWeight: '700', color: '#1D9E75', margin: '0 0 2px' }}>Google Calendar Connected</p>
+                  <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: 0 }}>You can now add reminders directly to your calendar.</p>
+                </div>
+              </div>
+              <button
+                onClick={disconnectGoogle}
+                disabled={disconnecting}
+                style={{ padding: '8px 16px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '12px', fontWeight: '600', cursor: disconnecting ? 'not-allowed' : 'pointer', flexShrink: 0, marginLeft: '12px', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+                {disconnecting ? 'Disconnecting...' : 'Disconnect'}
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '14px 16px' }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '14px', fontWeight: '600', color: 'var(--lw-text)', margin: '0 0 2px' }}>Not connected</p>
+                <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: 0 }}>Connect to sync reminders to your Google Calendar.</p>
+              </div>
+              {userId && (
+                <a
+                  href={`/api/auth/google?userId=${userId}`}
+                  style={{ padding: '10px 20px', background: '#4285f4', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '700', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(66,133,244,0.3)' }}>
+                  Connect Google Calendar
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         {/* SAVE */}
