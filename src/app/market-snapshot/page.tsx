@@ -27,6 +27,7 @@ export default function MarketSnapshotPage() {
 
   const [form, setForm] = useState({
     neighborhood: '',
+    state: '',
     propertyType: 'Single Family',
     bedrooms: '',
     bathrooms: '',
@@ -160,9 +161,18 @@ export default function MarketSnapshotPage() {
         <div id="market-form" style={{ ...s.card, marginBottom: '1.5rem', border: '1px solid rgba(29,158,117,0.18)', boxShadow: '0 4px 32px rgba(29,158,117,0.08)' }}>
           <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>MARKET DETAILS</p>
 
-          <div style={{ marginBottom: '14px' }}>
-            <label style={s.label}>Neighborhood / City *</label>
-            <input value={form.neighborhood} onChange={set('neighborhood')} placeholder="e.g. Midtown Atlanta, GA" style={s.input} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+            <div>
+              <label style={s.label}>Neighborhood / City *</label>
+              <input value={form.neighborhood} onChange={set('neighborhood')} placeholder="e.g. Midtown Atlanta" style={s.input} />
+            </div>
+            <div>
+              <label style={s.label}>State</label>
+              <select value={form.state} onChange={set('state')} style={s.input}>
+                <option value="">Select State</option>
+                {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s2 => <option key={s2}>{s2}</option>)}
+              </select>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '14px' }}>

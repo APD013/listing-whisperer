@@ -27,7 +27,7 @@ export default function SnapStartPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
-    address: '', neighborhood: '', type: 'Single family',
+    address: '', neighborhood: '', city: '', state: '', type: 'Single family',
     beds: '', baths: '', sqft: '', price: '', notes: '',
     tone: 'Warm & inviting', buyer: 'Move-up families',
   })
@@ -121,7 +121,7 @@ export default function SnapStartPage() {
     try {
       const property = {
         type: form.type, beds: form.beds, sqft: form.sqft, price: form.price,
-        neighborhood: form.neighborhood || form.address,
+        neighborhood: `${form.neighborhood || form.address}${form.city ? ', ' + form.city : ''}${form.state ? ', ' + form.state : ''}`,
         features: selectedFeatures.join(', '),
         tone: form.tone, buyer: form.buyer, notes: form.notes, name: form.address,
       }
@@ -353,6 +353,19 @@ export default function SnapStartPage() {
               <div style={{ marginBottom: '10px' }}>
                 <label style={labelStyle}>City / Neighborhood</label>
                 <input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} style={inputStyle} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                <div>
+                  <label style={labelStyle}>City</label>
+                  <input placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>State</label>
+                  <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} style={inputStyle}>
+                    <option value="">Select State</option>
+                    {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+                  </select>
+                </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
                 <div>

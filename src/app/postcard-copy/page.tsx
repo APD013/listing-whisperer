@@ -19,6 +19,8 @@ export default function PostcardCopyPage() {
   const [form, setForm] = useState({
     type: 'Just Listed',
     address: '',
+    city: '',
+    state: '',
     neighborhood: '',
     beds: '',
     baths: '',
@@ -67,6 +69,7 @@ export default function PostcardCopyPage() {
 
 Property Details:
 - Address: ${form.address}
+- Location: ${form.city ? form.city + ', ' : ''}${form.state || ''}
 - Neighborhood: ${form.neighborhood}
 - Beds/Baths: ${form.beds} bed / ${form.baths} bath
 - Square Footage: ${form.sqft} sq ft
@@ -222,6 +225,20 @@ Generate 4 sections and return ONLY a JSON object with no other text:
           <div style={{ marginBottom: '14px' }}>
             <label style={labelStyle}>Property Address *</label>
             <input placeholder="123 Main St, Newport Beach, CA" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} style={inputStyle} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+            <div>
+              <label style={labelStyle}>City</label>
+              <input placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>State</label>
+              <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} style={inputStyle}>
+                <option value="">Select State</option>
+                {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '14px' }}>

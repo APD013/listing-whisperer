@@ -23,6 +23,8 @@ export default function PricingAssistant() {
     condition: 'Good',
     upgrades: '',
     neighborhood: '',
+    city: '',
+    state: '',
     comps: '',
     notes: '',
   })
@@ -175,6 +177,17 @@ export default function PricingAssistant() {
             <div>
               <label style={styles.label}>Neighborhood / City</label>
               <input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} style={styles.input} />
+            </div>
+            <div>
+              <label style={styles.label}>City</label>
+              <input placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} style={styles.input} />
+            </div>
+            <div>
+              <label style={styles.label}>State</label>
+              <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} style={styles.select}>
+                <option value="">Select State</option>
+                {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+              </select>
             </div>
           </div>
 

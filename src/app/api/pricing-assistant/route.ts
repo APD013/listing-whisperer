@@ -20,6 +20,7 @@ Property Details:
 - Square Footage: ${form.sqft}
 - Condition: ${form.condition}
 - Neighborhood: ${form.neighborhood}
+- Location: ${form.city ? form.city + ', ' : ''}${form.state || 'not specified'}
 - Upgrades/Features: ${form.upgrades || 'None specified'}
 - Comparable Sales: ${form.comps || 'None provided'}
 - Additional Notes: ${form.notes || 'None'}

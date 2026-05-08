@@ -11,7 +11,7 @@ export const maxDuration = 30
 export async function POST(request: Request) {
   try {
     const {
-      address, propertyType, beds, baths, listPrice, daysOnMarket,
+      address, city, state, propertyType, beds, baths, listPrice, daysOnMarket,
       originalListPrice, triedSoFar, sellerSituation,
       imageBase64, imageType, brandVoice, userId,
     } = await request.json()
@@ -28,7 +28,8 @@ export async function POST(request: Request) {
     const userPrompt = `Diagnose this stale listing and prescribe a complete rescue plan.
 
 Agent: ${agentName}
-Property: ${address}
+Property: ${address}${city ? ', ' + city : ''}${state ? ', ' + state : ''}
+Location: ${city ? city + ', ' : ''}${state || 'not specified'}
 Type: ${propertyType}${beds ? ` · ${beds} bed` : ''}${baths ? ` / ${baths} bath` : ''}
 ${priceChange}
 Days on Market: ${daysOnMarket}

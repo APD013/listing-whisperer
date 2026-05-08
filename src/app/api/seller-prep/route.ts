@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     const prompt = `You are an expert real estate agent coach. Create a complete seller meeting preparation kit for this listing appointment. Respond ONLY with valid JSON, no markdown, no backticks.
 
 Property: ${form.type}, ${form.beds}, ${form.sqft ? form.sqft + ' sq ft,' : ''} ${form.address}
+Location: ${form.city ? form.city + ', ' : ''}${form.state || 'not specified'}
 Estimated Price: ${form.estimatedPrice || 'unknown'}
 Condition: ${form.propertyCondition}
 Seller Goals: ${form.sellerGoals || 'unknown'}

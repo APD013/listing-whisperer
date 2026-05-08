@@ -15,6 +15,8 @@ export default function PriceDropKit() {
   const [userId, setUserId] = useState<string | null>(null)
   const [form, setForm] = useState({
     address: '',
+    city: '',
+    state: '',
     originalPrice: '',
     newPrice: '',
     beds: '',
@@ -123,6 +125,17 @@ export default function PriceDropKit() {
             <div style={{gridColumn:'1 / -1'}}>
               <label style={styles.label}>Property Address</label>
               <input placeholder="123 Oak Street, Newport Beach, CA" value={form.address} onChange={e => setForm({...form, address: e.target.value})} style={styles.input}/>
+            </div>
+            <div>
+              <label style={styles.label}>City</label>
+              <input placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({...form, city: e.target.value})} style={styles.input}/>
+            </div>
+            <div>
+              <label style={styles.label}>State</label>
+              <select value={form.state} onChange={e => setForm({...form, state: e.target.value})} style={styles.input}>
+                <option value="">Select State</option>
+                {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+              </select>
             </div>
             <div>
               <label style={styles.label}>Original Price</label>

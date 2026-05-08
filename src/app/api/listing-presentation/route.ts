@@ -10,6 +10,7 @@ export async function POST(request: Request) {
 
 Agent: ${form.agentName || 'Agent'} | Brokerage: ${form.brokerage || ''} | Experience: ${form.agentExperience || ''}
 Seller: ${form.sellerName} | Property: ${form.propertyAddress}
+Location: ${form.city ? form.city + ', ' : ''}${form.state || 'not specified'}
 Price: ${form.targetPrice || 'TBD'} | Goal: ${form.sellerGoals || ''} | Timeframe: ${form.timeframe || ''}
 Unique Value: ${form.uniqueValue || ''}
 Competition: ${form.competition || 'None specified'}

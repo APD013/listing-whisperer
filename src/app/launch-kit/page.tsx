@@ -16,7 +16,7 @@ export default function LaunchKitPage() {
   const [planLoaded, setPlanLoaded] = useState(false)
   const [form, setForm] = useState({
     type: 'Single family', beds: '', baths: '', sqft: '', price: '',
-    neighborhood: '', features: '', notes: ''
+    neighborhood: '', city: '', state: '', features: '', notes: ''
   })
   const [launchPlan, setLaunchPlan] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -174,6 +174,20 @@ export default function LaunchKitPage() {
           <div style={{ marginBottom: '12px' }}>
             <label style={labelStyle}>Neighborhood / City</label>
             <input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} style={inputStyle} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+            <div>
+              <label style={labelStyle}>City</label>
+              <input placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>State</label>
+              <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} style={inputStyle}>
+                <option value="">Select State</option>
+                {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
           </div>
 
           <div style={{ marginBottom: '12px' }}>

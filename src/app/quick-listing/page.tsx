@@ -27,6 +27,8 @@ export default function QuickListingPage() {
   const [answers, setAnswers] = useState({
     price: '',
     neighborhood: '',
+    city: '',
+    state: '',
     beds: '',
     baths: '',
   })
@@ -102,7 +104,7 @@ export default function QuickListingPage() {
         beds: `${answers.beds}${answers.baths ? ' bed / ' + answers.baths + ' bath' : ''}`,
         sqft: aiAnalysis?.sqft || '',
         price: answers.price,
-        neighborhood: answers.neighborhood,
+        neighborhood: `${answers.neighborhood}${answers.city ? ', ' + answers.city : ''}${answers.state ? ', ' + answers.state : ''}`,
         features: aiAnalysis?.features || '',
         tone: 'Professional',
         buyer: 'Move-up families',
@@ -326,7 +328,14 @@ export default function QuickListingPage() {
 
             <div style={cardStyle}>
               <label style={{ fontSize: '13px', fontWeight: '700', color: '#1D9E75', display: 'block', marginBottom: '10px' }}>2️⃣ What's the neighborhood or city?</label>
-              <input placeholder="e.g. Newport Beach, CA" value={answers.neighborhood} onChange={e => setAnswers({ ...answers, neighborhood: e.target.value })} style={inputStyle} />
+              <input placeholder="e.g. Newport Beach" value={answers.neighborhood} onChange={e => setAnswers({ ...answers, neighborhood: e.target.value })} style={{ ...inputStyle, marginBottom: '10px' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <input placeholder="City" value={answers.city} onChange={e => setAnswers({ ...answers, city: e.target.value })} style={inputStyle} />
+                <select value={answers.state} onChange={e => setAnswers({ ...answers, state: e.target.value })} style={inputStyle}>
+                  <option value="">State</option>
+                  {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+                </select>
+              </div>
             </div>
 
             <div style={{ ...cardStyle, marginBottom: '1.5rem' }}>

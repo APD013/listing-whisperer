@@ -21,7 +21,7 @@ export default function SellerPrepPage() {
   const [copied, setCopied] = useState(false)
 
   const [form, setForm] = useState({
-    address: '', neighborhood: '', type: 'Single family', beds: '', baths: '',
+    address: '', city: '', state: '', neighborhood: '', type: 'Single family', beds: '', baths: '',
     sqft: '', estimatedPrice: '', sellerGoals: '', timeframe: '',
     propertyCondition: 'Good', notes: '', agentName: '',
   })
@@ -164,6 +164,20 @@ export default function SellerPrepPage() {
           <div style={{ marginBottom: '12px' }}>
             <label style={labelStyle}>Property Address</label>
             <input placeholder="123 Main St, Newport Beach, CA" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} style={inputStyle} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+            <div>
+              <label style={labelStyle}>City</label>
+              <input placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>State</label>
+              <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} style={inputStyle}>
+                <option value="">Select State</option>
+                {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '12px' }}>

@@ -31,6 +31,8 @@ export default function ListingRescuePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [form, setForm] = useState({
     address: '',
+    city: '',
+    state: '',
     propertyType: 'Single Family',
     beds: '',
     baths: '',
@@ -100,6 +102,8 @@ export default function ListingRescuePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           address: form.address,
+          city: form.city,
+          state: form.state,
           propertyType: form.propertyType,
           beds: form.beds,
           baths: form.baths,
@@ -285,14 +289,28 @@ export default function ListingRescuePage() {
           <p style={{ fontSize: '11px', fontWeight: '700', color: '#ef4444', letterSpacing: '1px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>LISTING DETAILS</p>
 
           <div style={{ marginBottom: '14px' }}>
-            <label style={labelStyle}>Property Address</label>
+            <label style={labelStyle}>Street Address</label>
             <input
               type="text"
-              placeholder="123 Main St, City, State 12345"
+              placeholder="123 Main St"
               value={form.address}
               onChange={e => setForm({ ...form, address: e.target.value })}
               style={inputStyle}
             />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+            <div>
+              <label style={labelStyle}>City</label>
+              <input type="text" placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>State</label>
+              <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} style={inputStyle}>
+                <option value="">Select State</option>
+                {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
           </div>
 
           <div style={{ marginBottom: '14px' }}>

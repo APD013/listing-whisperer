@@ -10,6 +10,7 @@ export async function POST(request: Request) {
 
 Open House Details:
 - Address: ${form.address}
+- Location: ${form.city ? form.city + ', ' : ''}${form.state || 'not specified'}
 - Date: ${form.date}
 - Time: ${form.time}
 - Beds: ${form.beds} | Baths: ${form.baths} | Sqft: ${form.sqft}

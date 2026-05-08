@@ -14,7 +14,7 @@ export default function ListingPresentation() {
   const [userId, setUserId] = useState<string | null>(null)
   const [form, setForm] = useState({
     agentName: '', brokerage: '', phone: '', email: '',
-    sellerName: '', propertyAddress: '', propertyType: 'Single family',
+    sellerName: '', propertyAddress: '', city: '', state: '', propertyType: 'Single family',
     beds: '', baths: '', sqft: '', targetPrice: '', neighborhood: '',
     sellerGoals: '', timeframe: '', competition: '', agentExperience: '', uniqueValue: '',
   })
@@ -161,6 +161,8 @@ export default function ListingPresentation() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
               <div><label style={labelStyle}>Seller Name</label><input placeholder="John & Mary Smith" value={form.sellerName} onChange={e => setForm({ ...form, sellerName: e.target.value })} style={inputStyle} /></div>
               <div style={{ gridColumn: 'span 2' }}><label style={labelStyle}>Property Address</label><input placeholder="123 Oak Street, Newport Beach, CA" value={form.propertyAddress} onChange={e => setForm({ ...form, propertyAddress: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>City</label><input placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>State</label><select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} style={inputStyle}><option value="">Select State</option>{['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}</select></div>
               <div>
                 <label style={labelStyle}>Property Type</label>
                 <select value={form.propertyType} onChange={e => setForm({ ...form, propertyType: e.target.value })} style={inputStyle}>
