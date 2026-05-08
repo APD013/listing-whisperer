@@ -38,24 +38,22 @@ Agent's preferred tone: ${preferredTone}
 Words to NEVER use: ${avoidWords.length ? avoidWords.join(', ') : 'none specified'}
 
 Rules:
-- Be specific and honest — generic advice is useless
-- Root cause must name the actual problem, not just "pricing" or "marketing"
-- Buyer profile must be detailed and specific to this property
-- New listing copy must be ready to publish with no placeholders
-- Content strategy must name specific platforms and content types
-- Price & offer strategy must include concrete recommendations
+- Be concise — 2-3 punchy sentences per section, no long essays
+- Name the real problem specifically, not vague generalities
+- New listing copy: 3-4 sentences max, ready to publish
+- Content strategy: 2-3 specific platform actions, no fluff
+- Price strategy: one concrete recommendation with a number or range
 - Never mention Listing Whisperer, Claude, or any AI tool
 - Never use any of the avoid words
-- Write as if ${agentName} is your client and you are their trusted advisor
 
 Respond ONLY with valid JSON, no markdown, no backticks:
 {
-  "root_cause": "Honest, specific diagnosis of why this listing is sitting — 2-3 sentences naming the real problem",
-  "buyer_profile": "Detailed description of the most likely buyer: who they are, what they need, what motivates them, and how to reach them",
-  "repositioning_strategy": "Specific strategy to reframe and reposition this listing — angle, narrative, and key changes to make",
-  "new_listing_copy": "Complete rewritten listing description with fresh angle — ready to publish on MLS",
-  "content_strategy": "Specific platform-by-platform marketing recommendations (TikTok, Instagram, email, open house, etc.) with content ideas",
-  "price_offer_strategy": "Pricing analysis and recommended offer language — specific numbers, ranges, or strategies based on the days on market and price history"
+  "root_cause": "2-3 sentences — specific honest diagnosis of why this listing is sitting",
+  "buyer_profile": "2-3 sentences — who the most likely buyer is and how to reach them",
+  "repositioning_strategy": "2-3 sentences — the new angle and key changes to make",
+  "new_listing_copy": "3-4 sentence MLS description with a fresh hook — ready to publish",
+  "content_strategy": "2-3 specific platform actions with content ideas (e.g. TikTok walkthrough, Instagram before/after, email to past clients)",
+  "price_offer_strategy": "1-2 sentences with a concrete price recommendation or offer strategy"
 }`
 
     const systemPrompt = imageBase64
@@ -80,7 +78,7 @@ Respond ONLY with valid JSON, no markdown, no backticks:
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
+        max_tokens: 1000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userContent }],
       }),
