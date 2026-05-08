@@ -529,6 +529,7 @@ export default function Dashboard() {
         { icon: '🎯', title: 'Listing Presentation', desc: 'Build your full seller appointment deck', color: '#a78bfa', href: '/listing-presentation' },
         { icon: '🏆', title: 'Agent Portfolio', desc: 'Your shareable listing portfolio page', color: '#d4af37', href: '/agent-portfolio' },
         { icon: '⭐', title: 'Career Highlights', desc: 'Capture your favorite closing moments forever', color: '#f59e0b', href: '/career-highlights' },
+        { icon: '🚨', title: 'Listing Rescue', desc: 'Diagnose why your listing is sitting and get a complete rescue plan', color: '#ef4444', href: '/listing-rescue' },
       ]
     },
     {
@@ -584,6 +585,7 @@ export default function Dashboard() {
         { href: '/listing-presentation', icon: '🎯', label: 'Listing Presentation' },
         { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
         { href: '/career-highlights', icon: '⭐', label: 'Career Highlights' },
+        { href: '/listing-rescue', icon: '🚨', label: 'Listing Rescue' },
       ]
     },
     {
