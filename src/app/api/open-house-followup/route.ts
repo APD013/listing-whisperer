@@ -20,13 +20,12 @@ export async function GET(request: Request) {
 
   const { data: leads, error } = await supabase
     .from('leads')
-    .select('id, name, email, notes, user_id')
+    .select('id, name, email, notes, user_id, followup_sent, created_at')
     .eq('source', 'open_house')
     .or('followup_sent.is.null,followup_sent.eq.false')
     .neq('email', '')
     .not('email', 'is', null)
-    .gte('created_at', from)
-    .lte('created_at', to)
+    .or(`and(created_at.gte.${from},created_at.lte.${to}),created_at.is.null`)
 
   if (error) {
     console.error('open-house-followup query error:', error.message)
@@ -41,6 +40,9 @@ export async function GET(request: Request) {
   let failed = 0
 
   for (const lead of leads) {
+    // Leads with no created_at are legacy records — only send if followup_sent was explicitly set to false
+    if (lead.created_at === null && lead.followup_sent !== false) continue
+
     try {
       let agentEmail: string | null = null
       let agentName = 'Your Agent'
