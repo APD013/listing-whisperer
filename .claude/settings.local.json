@@ -8,7 +8,10 @@
       "Bash(Get-ChildItem -Path . -Depth 2)",
       "Bash(Select-Object FullName)",
       "Bash(node *)",
-      "Bash(node_modules/.bin/tsc --noEmit)"
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(Select-String -Path \"D:\\\\listing-whisperer\\\\listing-whisperer\\\\src\\\\app\\\\dashboard\\\\page.tsx\" -Pattern \"activePage === 'home'\")",
+      "Bash(Select-Object LineNumber, Line)",
+      "Bash(Format-Table -AutoSize)"
     ]
   }
 }
