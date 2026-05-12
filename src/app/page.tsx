@@ -98,12 +98,10 @@ export default function Home() {
           BUILT FOR REAL ESTATE AGENTS
         </div>
         <h1 style={{fontSize:'clamp(2rem, 5vw, 3.25rem)',fontWeight:'800',lineHeight:'1.15',maxWidth:'740px',margin:'0 auto 1.25rem',letterSpacing:'-0.5px'}}>
-          Everything you need to win listings,<br/>
-          build marketing, and grow your business —<br/>
-          <span style={{color:'#1D9E75'}}>powered by AI.</span>
+          The AI Assistant Built for Real Estate Agents
         </h1>
         <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'560px',margin:'0 auto 1rem',lineHeight:'1.75'}}>
-          From seller meeting prep to on-site photo drafts to full marketing launch — Listing Whisperer is your AI field assistant before, during, and after every listing.
+          From one listing photo to a full marketing campaign — descriptions, captions, emails, follow-ups, open house content, and more in seconds.
         </p>
         <div style={{display:'inline-flex',alignItems:'center',gap:'8px',background:'#0d1117',borderRadius:'30px',padding:'8px 18px',marginBottom:'0.5rem',border:'1px solid rgba(29,158,117,0.3)'}}>
           <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',boxShadow:'0 0 8px rgba(29,158,117,0.8)',animation:'pulse 2s infinite'}}/>
@@ -123,6 +121,43 @@ export default function Home() {
           </a>
         </div>
         <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · Unlimited listings · Cancel anytime</p>
+      </section>
+
+      {/* SCREENSHOT SHOWCASE */}
+      <section style={{padding:'3rem 1.5rem 0',background:'linear-gradient(180deg,#f0fdf8 0%,#fff 100%)',position:'relative',overflow:'hidden'}}>
+        <div style={{maxWidth:'980px',margin:'0 auto',paddingBottom:'80px'}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))',gap:'1.5rem'}}>
+            <div style={{borderRadius:'16px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',border:'1px solid #eee'}}>
+              <img src="/screenshots/screenshot-dashboard.png" alt="Your Daily Workspace" style={{width:'100%',display:'block',objectFit:'cover'}}/>
+              <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>Your Daily Workspace</div>
+            </div>
+            <div style={{borderRadius:'16px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',border:'1px solid #eee'}}>
+              <img src="/screenshots/screenshot-tool.png" alt="AI-Powered Listing Tools" style={{width:'100%',display:'block',objectFit:'cover'}}/>
+              <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>AI-Powered Listing Tools</div>
+            </div>
+            <div style={{borderRadius:'16px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',border:'1px solid #eee'}}>
+              <div style={{minHeight:'200px',background:'linear-gradient(135deg,rgba(29,158,117,0.08) 0%,rgba(29,158,117,0.02) 100%)',display:'flex',alignItems:'center',justifyContent:'center',padding:'2.5rem 1.5rem'}}>
+                <div style={{textAlign:'center'}}>
+                  <div style={{fontSize:'2.5rem',marginBottom:'12px'}}>🚀</div>
+                  <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text,#111)',margin:'0 0 6px'}}>Full launch content</p>
+                  <p style={{fontSize:'13px',color:'var(--lw-text-muted,#888)',margin:'0'}}>coming soon</p>
+                </div>
+              </div>
+              <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>Coming Soon</div>
+            </div>
+          </div>
+        </div>
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'80px',background:'linear-gradient(180deg,transparent,#fff)',pointerEvents:'none'}}/>
+      </section>
+
+      {/* CREDIBILITY BAR */}
+      <section style={{padding:'1.5rem 2rem 2.5rem',background:'#fff',textAlign:'center'}}>
+        <p style={{fontSize:'15px',fontWeight:'600',color:'var(--lw-text-muted,#888)',margin:'0 0 12px'}}>Built for agents who want listing marketing done faster.</p>
+        <div style={{display:'flex',justifyContent:'center',flexWrap:'wrap',gap:'1.5rem'}}>
+          {['⚡ Instant listing content','🏡 Built for real estate workflows','🔒 Secure & private'].map(label => (
+            <span key={label} style={{fontSize:'12px',color:'var(--lw-text-muted,#888)',fontWeight:'500'}}>{label}</span>
+          ))}
+        </div>
       </section>
 
       {/* SOCIAL PROOF COUNTER */}

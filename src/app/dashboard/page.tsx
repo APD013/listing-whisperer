@@ -51,6 +51,8 @@ export default function Dashboard() {
   const [workspaceLeads, setWorkspaceLeads] = useState<number>(0)
   const [workspaceReminders, setWorkspaceReminders] = useState<number>(0)
   const [recentActivity, setRecentActivity] = useState<{type:string;text:string;created_at:string}[]>([])
+  const [nudgeDismissed, setNudgeDismissed] = useState(false)
+  const [totalReminders, setTotalReminders] = useState<number | null>(null)
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', baths: '', sqft: '', price: '',
@@ -121,6 +123,9 @@ export default function Dashboard() {
       setWorkspaceLeads(wsLeadsAll ? wsLeadsAll.length : 0)
       const { data: wsRemindersData } = await supabase.from('reminders').select('id').eq('user_id', user.id).eq('sent', false).lte('remind_at', new Date().toISOString())
       setWorkspaceReminders(wsRemindersData ? wsRemindersData.length : 0)
+      const { data: allRemindersData } = await supabase.from('reminders').select('id').eq('user_id', user.id)
+      setTotalReminders(allRemindersData ? allRemindersData.length : 0)
+      if (sessionStorage.getItem('lw_nudge_dismissed')) setNudgeDismissed(true)
       const [{ data: actListings }, { data: actLeads }, { data: actVideoKits }] = await Promise.all([
         supabase.from('listings').select('name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
         supabase.from('leads').select('name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
@@ -777,6 +782,23 @@ export default function Dashboard() {
           {activePage === 'home' && (
             <div>
               <DashboardChecklist />
+              {planLoaded && !nudgeDismissed && totalReminders !== null && (() => {
+                const nudge = pastListings.length === 0
+                  ? { msg: 'Ready to build your first listing? Try Quick Listing →', href: '/quick-listing' }
+                  : workspaceLeads === 0
+                  ? { msg: 'Start tracking your clients — add your first lead →', href: '/leads' }
+                  : totalReminders === 0
+                  ? { msg: 'Never miss a follow-up — set your first reminder →', href: '/reminders' }
+                  : null
+                if (!nudge) return null
+                return (
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px',background:'rgba(29,158,117,0.07)',border:'1px solid rgba(29,158,117,0.18)',borderRadius:'12px',padding:'12px 16px',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+                    <a href={nudge.href} style={{fontSize:'14px',fontWeight:'600',color:'#1D9E75',textDecoration:'none',flex:1}}>{nudge.msg}</a>
+                    <button onClick={() => { setNudgeDismissed(true); sessionStorage.setItem('lw_nudge_dismissed','1') }}
+                      style={{background:'none',border:'none',color:'var(--lw-text-muted,#888)',fontSize:'18px',lineHeight:1,cursor:'pointer',padding:'0 4px',flexShrink:0}}>✕</button>
+                  </div>
+                )
+              })()}
               <div style={{marginBottom:'3rem'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'16px',marginBottom:'8px'}}>
                   <div>
