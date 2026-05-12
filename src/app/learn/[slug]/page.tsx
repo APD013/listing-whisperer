@@ -50,6 +50,10 @@ export default async function GuidePage({
 
   return (
     <main style={{ fontFamily: 'var(--font-plus-jakarta), sans-serif', background: 'var(--lw-bg)', minHeight: '100vh' }}>
+      <style>{`
+        .learn-related-card { transition: border-color 0.2s, box-shadow 0.2s; }
+        .learn-related-card:hover { border-color: rgba(29,158,117,0.3) !important; box-shadow: 0 8px 24px rgba(29,158,117,0.1) !important; }
+      `}</style>
 
       {/* NAV */}
       <div style={{ background: 'var(--lw-card)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
@@ -164,15 +168,8 @@ export default async function GuidePage({
                 <a
                   key={related.slug}
                   href={`/learn/${related.slug}`}
-                  style={{ ...cardBase, textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: '10px', transition: 'all 0.2s' }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(29,158,117,0.3)'
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(29,158,117,0.1)'
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--lw-border)'
-                    e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)'
-                  }}
+                  className="learn-related-card"
+                  style={{ ...cardBase, textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}
                 >
                   <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-accent)', letterSpacing: '0.06em', textTransform: 'uppercase', margin: 0 }}>
                     Guide
