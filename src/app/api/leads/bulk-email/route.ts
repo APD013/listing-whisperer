@@ -124,9 +124,8 @@ export async function POST(request: Request) {
     for (const lead of leads) {
       if (!lead.email) continue
 
-      const personalizedMessage = (message || '')
-        .replace(/\{\{name\}\}/gi, lead.name || 'there')
-        .replace(/{{name}}/gi, lead.name || 'there')
+      const firstName = (lead.name || 'there').split(' ')[0]
+      const personalizedMessage = (message || '').replace(/\{\{name\}\}/gi, firstName)
 
       try {
         const res = await fetch('https://api.resend.com/emails', {
