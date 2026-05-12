@@ -136,14 +136,8 @@ export default function Home() {
               <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>AI-Powered Listing Tools</div>
             </div>
             <div style={{borderRadius:'16px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',border:'1px solid #eee'}}>
-              <div style={{minHeight:'200px',background:'linear-gradient(135deg,rgba(29,158,117,0.08) 0%,rgba(29,158,117,0.02) 100%)',display:'flex',alignItems:'center',justifyContent:'center',padding:'2.5rem 1.5rem'}}>
-                <div style={{textAlign:'center'}}>
-                  <div style={{fontSize:'2.5rem',marginBottom:'12px'}}>🚀</div>
-                  <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text,#111)',margin:'0 0 6px'}}>Full launch content</p>
-                  <p style={{fontSize:'13px',color:'var(--lw-text-muted,#888)',margin:'0'}}>coming soon</p>
-                </div>
-              </div>
-              <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>Coming Soon</div>
+              <img src="/screenshots/screenshot-results.png" alt="Career Highlights & Portfolio" style={{width:'100%',display:'block',objectFit:'cover'}}/>
+              <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>Career Highlights & Portfolio</div>
             </div>
           </div>
         </div>
@@ -163,7 +157,7 @@ export default function Home() {
       {/* SOCIAL PROOF COUNTER */}
       <section style={{padding:'0.75rem 1.5rem',background:'#fff',borderBottom:'1px solid #f0f0f0',textAlign:'center'}}>
         <p style={{margin:'0',fontSize:'13px',color:'#888',fontWeight:'500'}}>
-          Join <span style={{fontWeight:'700',color:'#1D9E75'}}>200+</span> real estate agents already using Listing Whisperer
+          Built for agents who want listing marketing done faster.
         </p>
       </section>
 
