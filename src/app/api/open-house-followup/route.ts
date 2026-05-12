@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     .or('followup_sent.is.null,followup_sent.eq.false')
     .neq('email', '')
     .not('email', 'is', null)
-    .or(`created_at.gte.${from},created_at.is.null`)
+    .or(`created_at.lte.${from},created_at.is.null`)
 
   if (error) {
     console.error('open-house-followup query error:', error.message)
