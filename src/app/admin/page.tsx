@@ -19,6 +19,8 @@ export default function AdminPage() {
   const [listings, setListings] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState('overview')
   const [searchQuery, setSearchQuery] = useState('')
+  const [videoKitCounts, setVideoKitCounts] = useState<Record<string, number>>({})
+  const [followUpCounts, setFollowUpCounts] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const getUser = async () => {
@@ -43,6 +45,15 @@ export default function AdminPage() {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(50)
+
+    const { data: videoKitsData } = await supabase.from('video_kits').select('user_id')
+    const { data: followUpData } = await supabase.from('follow_up_sequences').select('user_id')
+    const vkMap: Record<string, number> = {}
+    videoKitsData?.forEach((r: any) => { vkMap[r.user_id] = (vkMap[r.user_id] || 0) + 1 })
+    const fsMap: Record<string, number> = {}
+    followUpData?.forEach((r: any) => { fsMap[r.user_id] = (fsMap[r.user_id] || 0) + 1 })
+    setVideoKitCounts(vkMap)
+    setFollowUpCounts(fsMap)
 
     if (profiles) {
       setUsers(profiles)
@@ -253,7 +264,7 @@ export default function AdminPage() {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--lw-border)' }}>
-                      {['Name / Email', 'Plan', 'Listings', 'Rewrites', 'Email Opt-in', 'Portfolio', 'Joined'].map(h => (
+                      {['Name / Email', 'Plan', 'Listings', 'Rewrites', 'Video Kits', 'Follow-Up Seqs', 'Email Opt-in', 'Portfolio', 'Joined'].map(h => (
                         <th key={h} style={{ fontSize: '11px', fontWeight: '600', color: 'var(--lw-text-muted)', padding: '8px 12px', textAlign: 'left', letterSpacing: '0.5px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                           {h}
                         </th>
@@ -282,6 +293,8 @@ export default function AdminPage() {
                           </td>
                           <td style={{ padding: '10px 12px', fontSize: '13px', color: (user.listings_used || 0) > 0 ? '#f59e0b' : 'var(--lw-border)', fontWeight: (user.listings_used || 0) > 0 ? '600' : '400' }}>{user.listings_used || 0}</td>
                           <td style={{ padding: '10px 12px', fontSize: '13px', color: (user.rewrites_used || 0) > 0 ? '#8b5cf6' : 'var(--lw-border)' }}>{user.rewrites_used || 0}</td>
+                          <td style={{ padding: '10px 12px', fontSize: '13px', color: (videoKitCounts[user.id] || 0) > 0 ? '#f59e0b' : 'var(--lw-border)' }}>{videoKitCounts[user.id] || 0}</td>
+                          <td style={{ padding: '10px 12px', fontSize: '13px', color: (followUpCounts[user.id] || 0) > 0 ? '#3b82f6' : 'var(--lw-border)' }}>{followUpCounts[user.id] || 0}</td>
                           <td style={{ padding: '10px 12px', fontSize: '13px', color: user.marketing_emails ? '#1D9E75' : 'var(--lw-border)' }}>{user.marketing_emails ? '✅' : '—'}</td>
                           <td style={{ padding: '10px 12px', fontSize: '12px', color: user.portfolio_slug ? '#1D9E75' : 'var(--lw-border)' }}>{user.portfolio_slug || '—'}</td>
                           <td style={{ padding: '10px 12px', fontSize: '12px', color: 'var(--lw-text-muted)', whiteSpace: 'nowrap' }}>

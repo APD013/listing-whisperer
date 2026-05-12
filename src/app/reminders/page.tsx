@@ -22,6 +22,9 @@ export default function RemindersPage() {
   const [googleConnected, setGoogleConnected] = useState(false)
   const [calendarToast, setCalendarToast] = useState<string | null>(null)
   const [addingToCalendar, setAddingToCalendar] = useState<string | null>(null)
+  const [pendingDeletes, setPendingDeletes] = useState<Record<string, ReturnType<typeof setTimeout>>>({})
+  const [deletedReminders, setDeletedReminders] = useState<Record<string, any>>({})
+  const [deleteToast, setDeleteToast] = useState<string | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -98,9 +101,32 @@ export default function RemindersPage() {
     setReminders(prev => prev.map(r => r.id === id ? { ...r, sent: true } : r))
   }
 
-  const deleteReminder = async (id: string) => {
-    await supabase.from('reminders').delete().eq('id', id)
+  const deleteReminder = (id: string) => {
+    const reminder = reminders.find(r => r.id === id)
+    if (!reminder) return
     setReminders(prev => prev.filter(r => r.id !== id))
+    setDeletedReminders(prev => ({ ...prev, [id]: reminder }))
+    setDeleteToast(id)
+    const timeoutId = setTimeout(async () => {
+      await supabase.from('reminders').delete().eq('id', id)
+      setPendingDeletes(prev => { const next = { ...prev }; delete next[id]; return next })
+      setDeletedReminders(prev => { const next = { ...prev }; delete next[id]; return next })
+      setDeleteToast(prev => prev === id ? null : prev)
+    }, 5000)
+    setPendingDeletes(prev => ({ ...prev, [id]: timeoutId }))
+  }
+
+  const undoDelete = (id: string) => {
+    clearTimeout(pendingDeletes[id])
+    const reminder = deletedReminders[id]
+    if (reminder) {
+      setReminders(prev => [...prev, reminder].sort((a, b) =>
+        new Date(a.remind_at).getTime() - new Date(b.remind_at).getTime()
+      ))
+    }
+    setPendingDeletes(prev => { const next = { ...prev }; delete next[id]; return next })
+    setDeletedReminders(prev => { const next = { ...prev }; delete next[id]; return next })
+    setDeleteToast(null)
   }
 
   const now = new Date()
@@ -136,6 +162,16 @@ export default function RemindersPage() {
       {calendarToast && (
         <div style={{ position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', background: calendarToast.startsWith('Failed') ? '#ef4444' : '#1D9E75', color: '#fff', padding: '12px 24px', borderRadius: '12px', fontSize: '14px', fontWeight: '700', zIndex: 9999, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', whiteSpace: 'nowrap' }}>
           {calendarToast}
+        </div>
+      )}
+
+      {deleteToast && (
+        <div style={{ position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', background: '#1a1a1a', color: '#fff', padding: '12px 20px', borderRadius: '12px', fontSize: '14px', fontWeight: '600', zIndex: 9999, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          Reminder deleted.
+          <button onClick={() => undoDelete(deleteToast)}
+            style={{ background: 'none', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', borderRadius: '6px', padding: '3px 10px', fontSize: '12px', cursor: 'pointer', fontWeight: '700', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+            Undo
+          </button>
         </div>
       )}
 

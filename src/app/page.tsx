@@ -125,6 +125,13 @@ export default function Home() {
         <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · Unlimited listings · Cancel anytime</p>
       </section>
 
+      {/* SOCIAL PROOF COUNTER */}
+      <section style={{padding:'0.75rem 1.5rem',background:'#fff',borderBottom:'1px solid #f0f0f0',textAlign:'center'}}>
+        <p style={{margin:'0',fontSize:'13px',color:'#888',fontWeight:'500'}}>
+          Join <span style={{fontWeight:'700',color:'#1D9E75'}}>200+</span> real estate agents already using Listing Whisperer
+        </p>
+      </section>
+
       {/* STATS STRIP */}
       <section style={{background:'#fff',padding:'2rem',borderTop:'1px solid #f0f0f0',borderBottom:'1px solid #f0f0f0'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'3rem',flexWrap:'wrap'}}>
