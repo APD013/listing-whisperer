@@ -561,6 +561,9 @@ export default function GlobalChat() {
               animation: avatarState === 'idle' ? 'avatar-float 3s ease-in-out infinite' :
                          avatarState === 'listening' ? 'avatar-glow 1.5s ease-in-out infinite' :
                          avatarState === 'completed' ? 'avatar-complete 0.5s ease-out' : 'none',
+              boxShadow: avatarState === 'listening' ? `0 0 20px ${currentStyleColor}88` :
+                         avatarState === 'completed' ? `0 0 16px ${currentStyleColor}66` : 'none',
+              transform: avatarState === 'listening' ? 'scale(1.05)' : 'scale(1)',
             }}>
               {avatarState === 'thinking' && (
                 <div style={{
