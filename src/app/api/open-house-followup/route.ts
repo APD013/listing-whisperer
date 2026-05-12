@@ -15,8 +15,7 @@ export async function GET(request: Request) {
   }
 
   const now = new Date()
-  const from = new Date(now.getTime() - 28 * 60 * 60 * 1000).toISOString()
-  const to = new Date(now.getTime() - 20 * 60 * 60 * 1000).toISOString()
+  const from = new Date(now.getTime() - 20 * 60 * 60 * 1000).toISOString()
 
   const { data: leads, error } = await supabase
     .from('leads')
@@ -25,7 +24,7 @@ export async function GET(request: Request) {
     .or('followup_sent.is.null,followup_sent.eq.false')
     .neq('email', '')
     .not('email', 'is', null)
-    .or(`and(created_at.gte.${from},created_at.lte.${to}),created_at.is.null`)
+    .or(`created_at.gte.${from},created_at.is.null`)
 
   if (error) {
     console.error('open-house-followup query error:', error.message)
