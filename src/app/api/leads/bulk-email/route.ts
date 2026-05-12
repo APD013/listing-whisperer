@@ -14,19 +14,36 @@ function escapeHtml(text: string): string {
     .replace(/"/g, '&quot;')
 }
 
-function buildHtml(body: string): string {
+function buildHtml(body: string, agentName: string, brokerage: string): string {
   const paragraphs = body
     .split('\n')
-    .map(line => line.trim()
-      ? `<p style="margin:0 0 14px;line-height:1.7;">${escapeHtml(line)}</p>`
-      : ''
+    .map(line =>
+      line.trim()
+        ? `<p style="font-size:16px;line-height:1.6;margin:0 0 16px;">${escapeHtml(line)}</p>`
+        : ''
     )
     .join('')
 
-  return `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#ffffff;color:#333333;">
+  const brokerageLine = brokerage
+    ? `<p style="margin:4px 0 0;font-size:13px;color:#666;">${escapeHtml(brokerage)}</p>`
+    : ''
+
+  return `<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#222;">
+
   ${paragraphs}
-  <hr style="border:none;border-top:1px solid #eeeeee;margin:32px 0;" />
-  <p style="color:#aaaaaa;font-size:12px;margin:0;">Sent via <a href="https://listingwhisperer.com" style="color:#aaaaaa;">Listing Whisperer</a></p>
+
+  <div style="border-top:2px solid #1D9E75;padding-top:20px;margin-top:32px;">
+    <p style="margin:0;font-weight:600;font-size:15px;color:#111;">${escapeHtml(agentName)}</p>
+    ${brokerageLine}
+    <p style="margin:4px 0 0;font-size:13px;color:#666;">Sent via <a href="https://listingwhisperer.com" style="color:#1D9E75;text-decoration:none;">Listing Whisperer</a></p>
+  </div>
+
+  <hr style="border:none;border-top:1px solid #eee;margin:32px 0;"/>
+  <p style="color:#aaa;font-size:11px;text-align:center;margin:0;">
+    You're receiving this from your real estate agent.<br/>
+    <a href="https://listingwhisperer.com" style="color:#aaa;">listingwhisperer.com</a>
+  </p>
+
 </div>`
 }
 
@@ -50,6 +67,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Maximum 50 recipients per blast' }, { status: 400 })
     }
 
+    // Fetch agent brand voice once for all emails
+    let agentName = 'Your Agent'
+    let brokerage = ''
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('brand_voice')
+      .eq('id', userId)
+      .single()
+
+    if (profile?.brand_voice) {
+      try {
+        const bv = typeof profile.brand_voice === 'string'
+          ? JSON.parse(profile.brand_voice)
+          : profile.brand_voice
+        if (bv.agentName) agentName = bv.agentName
+        if (bv.brokerage) brokerage = bv.brokerage
+      } catch {}
+    }
+
+    const fromHeader = `${agentName} via Listing Whisperer <notifications@listingwhisperer.com>`
+
     // Fetch only leads that belong to this user
     const { data: leads, error } = await supabase
       .from('leads')
@@ -72,7 +110,7 @@ export async function POST(request: Request) {
     for (const lead of leads) {
       if (!lead.email) continue
 
-      const personalized = message.replace(/\{\{name\}\}/gi, lead.name || 'there')
+      const personalizedMessage = message.replace(/\{\{name\}\}/gi, lead.name || 'there')
 
       try {
         const res = await fetch('https://api.resend.com/emails', {
@@ -82,10 +120,10 @@ export async function POST(request: Request) {
             'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
           },
           body: JSON.stringify({
-            from: 'Listing Whisperer <notifications@listingwhisperer.com>',
+            from: fromHeader,
             to: lead.email,
             subject,
-            html: buildHtml(personalized),
+            html: buildHtml(personalizedMessage, agentName, brokerage),
           }),
         })
 
