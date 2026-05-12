@@ -29,6 +29,12 @@ export default function LeadsPage() {
   const [editingLead, setEditingLead] = useState<any>(null)
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState('All')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [showCompose, setShowCompose] = useState(false)
+  const [composeSubject, setComposeSubject] = useState('')
+  const [composeMessage, setComposeMessage] = useState('')
+  const [sending, setSending] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   const emptyForm = {
     name: '', phone: '', email: '', address: '',
@@ -99,6 +105,44 @@ export default function LeadsPage() {
   }
 
   const filteredLeads = filterStatus === 'All' ? leads : leads.filter(l => l.status === filterStatus)
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const showToast = (msg: string) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 3500)
+  }
+
+  const sendBulkMessage = async () => {
+    if (!composeSubject.trim() || !composeMessage.trim()) return
+    const ids = Array.from(selectedIds)
+    if (ids.length > 50) return
+    setSending(true)
+    try {
+      const res = await fetch('/api/leads/bulk-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadIds: ids, subject: composeSubject, message: composeMessage, userId })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Unknown error')
+      setShowCompose(false)
+      setSelectedIds(new Set())
+      setComposeSubject('')
+      setComposeMessage('')
+      showToast(`Message sent to ${data.sent} lead${data.sent === 1 ? '' : 's'}`)
+    } catch {
+      showToast('Something went wrong. Please try again.')
+    }
+    setSending(false)
+  }
 
   const inputStyle = {
     width: '100%', padding: '11px 14px', background: 'var(--lw-input)',
@@ -213,12 +257,35 @@ export default function LeadsPage() {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {filteredLeads.map(lead => (
-              <div key={lead.id} style={{ ...cardStyle, padding: '1.25rem', transition: 'border-color 0.15s, box-shadow 0.15s' }}
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', padding: '0 4px' }}>
+              <input
+                type="checkbox"
+                checked={filteredLeads.length > 0 && filteredLeads.every(l => selectedIds.has(l.id))}
+                onChange={() => {
+                  const allSel = filteredLeads.every(l => selectedIds.has(l.id))
+                  if (allSel) setSelectedIds(new Set())
+                  else setSelectedIds(new Set(filteredLeads.map(l => l.id)))
+                }}
+                style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--lw-accent)' }}
+              />
+              <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', fontWeight: '600' }}>
+                {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {filteredLeads.map(lead => (
+              <div key={lead.id} style={{ ...cardStyle, padding: '1.25rem', transition: 'border-color 0.15s, box-shadow 0.15s', display: 'flex', alignItems: 'flex-start', gap: '12px', border: selectedIds.has(lead.id) ? '1px solid rgba(29,158,117,0.4)' : '1px solid var(--lw-border)' }}
                 onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(29,158,117,0.35)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(29,158,117,0.08)' }}
-                onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--lw-border)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                onMouseOut={e => { e.currentTarget.style.borderColor = selectedIds.has(lead.id) ? 'rgba(29,158,117,0.4)' : 'var(--lw-border)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.05)' }}>
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(lead.id)}
+                  onChange={() => toggleSelect(lead.id)}
+                  onClick={e => e.stopPropagation()}
+                  style={{ width: '16px', height: '16px', marginTop: '3px', cursor: 'pointer', accentColor: 'var(--lw-accent)', flexShrink: 0 }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flex: 1 }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', flexWrap: 'wrap' }}>
                       <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--lw-text)', margin: 0 }}>{lead.name}</h3>
@@ -266,8 +333,95 @@ export default function LeadsPage() {
               </div>
             ))}
           </div>
+          </>
         )}
       </div>
+
+      {/* TOAST */}
+      {toast && (
+        <div style={{ position: 'fixed', bottom: selectedIds.size > 0 ? '72px' : '24px', left: '50%', transform: 'translateX(-50%)', background: '#111318', color: '#fff', padding: '12px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: '600', zIndex: 500, boxShadow: '0 4px 20px rgba(0,0,0,0.3)', whiteSpace: 'nowrap', transition: 'bottom 0.2s' }}>
+          {toast}
+        </div>
+      )}
+
+      {/* BULK ACTION BAR */}
+      {selectedIds.size > 0 && (
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 400, background: 'var(--lw-card)', borderTop: '1px solid var(--lw-border)', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 -4px 20px rgba(0,0,0,0.1)', flexWrap: 'wrap', gap: '10px' }}>
+          <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--lw-text)' }}>
+            {selectedIds.size} lead{selectedIds.size === 1 ? '' : 's'} selected
+          </span>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={() => setShowCompose(true)}
+              style={{ padding: '10px 20px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 4px 12px rgba(29,158,117,0.3)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+              ✉️ Send Message
+            </button>
+            <button onClick={() => setSelectedIds(new Set())}
+              style={{ padding: '10px 16px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* COMPOSE MODAL */}
+      {showCompose && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: 'var(--lw-card)', borderRadius: '20px', border: '1px solid var(--lw-border)', padding: '2rem', maxWidth: '520px', width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)', position: 'relative' }}>
+            <button onClick={() => setShowCompose(false)}
+              style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', color: 'var(--lw-text-muted)', width: '32px', height: '32px', borderRadius: '50%', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>✕</button>
+
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--lw-text)', margin: '0 0 4px', letterSpacing: '-0.02em' }}>✉️ Send Message</h2>
+            <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '0 0 1.25rem' }}>
+              Sending to {selectedIds.size} lead{selectedIds.size === 1 ? '' : 's'}
+            </p>
+
+            {selectedIds.size > 50 && (
+              <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', padding: '10px 14px', marginBottom: '1rem' }}>
+                <p style={{ fontSize: '13px', color: '#ef4444', margin: 0, fontWeight: '600' }}>
+                  ⚠️ Maximum 50 recipients per blast. Please deselect some leads.
+                </p>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '1.25rem' }}>
+              <div>
+                <label style={labelStyle}>Subject</label>
+                <input
+                  placeholder="Just checking in..."
+                  value={composeSubject}
+                  onChange={e => setComposeSubject(e.target.value)}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Message</label>
+                <textarea
+                  placeholder="Hi {{name}}, I wanted to reach out..."
+                  value={composeMessage}
+                  onChange={e => setComposeMessage(e.target.value)}
+                  style={{ ...inputStyle, minHeight: '140px', resize: 'vertical' as const }}
+                />
+                <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '6px 0 0', fontWeight: '500' }}>
+                  Use <code style={{ background: 'var(--lw-input)', padding: '1px 5px', borderRadius: '4px', fontSize: '11px' }}>{'{{name}}'}</code> to personalize each message
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={sendBulkMessage}
+                disabled={sending || selectedIds.size > 50 || !composeSubject.trim() || !composeMessage.trim()}
+                style={{ flex: 1, padding: '13px', background: (sending || selectedIds.size > 50 || !composeSubject.trim() || !composeMessage.trim()) ? 'var(--lw-input)' : 'linear-gradient(135deg,#1D9E75,#085041)', color: (sending || selectedIds.size > 50 || !composeSubject.trim() || !composeMessage.trim()) ? 'var(--lw-text-muted)' : '#fff', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: (sending || selectedIds.size > 50 || !composeSubject.trim() || !composeMessage.trim()) ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+                {sending ? 'Sending...' : `Send to ${selectedIds.size} lead${selectedIds.size === 1 ? '' : 's'}`}
+              </button>
+              <button onClick={() => setShowCompose(false)}
+                style={{ padding: '13px 20px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ADD/EDIT MODAL */}
       {showForm && (
