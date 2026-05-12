@@ -28,7 +28,14 @@ function buildHtml(body: string, agentName: string, brokerage: string): string {
     ? `<p style="margin:4px 0 0;font-size:13px;color:#666;">${escapeHtml(brokerage)}</p>`
     : ''
 
-  return `<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#222;">
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+</head>
+<body style="margin:0;padding:0;background:#ffffff;">
+<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#222;">
 
   ${paragraphs}
 
@@ -44,7 +51,9 @@ function buildHtml(body: string, agentName: string, brokerage: string): string {
     <a href="https://listingwhisperer.com" style="color:#aaa;">listingwhisperer.com</a>
   </p>
 
-</div>`
+</div>
+</body>
+</html>`
 }
 
 export async function POST(request: Request) {
@@ -67,14 +76,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Maximum 50 recipients per blast' }, { status: 400 })
     }
 
-    // Fetch agent brand voice once for all emails
+    // Fetch agent brand voice and email once for all sends
     let agentName = 'Your Agent'
     let brokerage = ''
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('brand_voice')
-      .eq('id', userId)
-      .single()
+    let agentEmail: string | undefined
+
+    const [{ data: profile }, { data: authData }] = await Promise.all([
+      supabase.from('profiles').select('brand_voice').eq('id', userId).single(),
+      supabase.auth.admin.getUserById(userId),
+    ])
 
     if (profile?.brand_voice) {
       try {
@@ -84,6 +94,10 @@ export async function POST(request: Request) {
         if (bv.agentName) agentName = bv.agentName
         if (bv.brokerage) brokerage = bv.brokerage
       } catch {}
+    }
+
+    if (authData?.user?.email) {
+      agentEmail = authData.user.email
     }
 
     const fromHeader = `${agentName} via Listing Whisperer <notifications@listingwhisperer.com>`
@@ -110,7 +124,9 @@ export async function POST(request: Request) {
     for (const lead of leads) {
       if (!lead.email) continue
 
-      const personalizedMessage = message.replace(/\{\{name\}\}/gi, lead.name || 'there')
+      const personalizedMessage = (message || '')
+        .replace(/\{\{name\}\}/gi, lead.name || 'there')
+        .replace(/{{name}}/gi, lead.name || 'there')
 
       try {
         const res = await fetch('https://api.resend.com/emails', {
@@ -122,6 +138,7 @@ export async function POST(request: Request) {
           body: JSON.stringify({
             from: fromHeader,
             to: lead.email,
+            ...(agentEmail ? { reply_to: agentEmail } : {}),
             subject,
             html: buildHtml(personalizedMessage, agentName, brokerage),
           }),
