@@ -1,462 +1,209 @@
-import Link from "next/link";
+'use client'
+import { useState } from 'react'
 
-export const metadata = {
-  title: "Terms of Service — Listing Whisperer",
-  description:
-    "Terms of Service for Listing Whisperer. Read our usage terms, subscription policies, and legal agreements.",
-};
+export default function TermsOfService() {
+  const [activeSection, setActiveSection] = useState('acceptance')
 
-const sections = [
-  {
-    id: "acceptance",
-    title: "1. Acceptance of Terms",
-    content: `By accessing or using Listing Whisperer ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.
+  const sections = [
+    { id: 'acceptance', title: '1. Acceptance of Terms' },
+    { id: 'description', title: '2. Description of Service' },
+    { id: 'accounts', title: '3. Accounts & Registration' },
+    { id: 'trial', title: '4. Free Trial' },
+    { id: 'billing', title: '5. Subscriptions & Billing' },
+    { id: 'use', title: '6. Acceptable Use' },
+    { id: 'ip', title: '7. Intellectual Property' },
+    { id: 'ai', title: '8. AI-Generated Content' },
+    { id: 'privacy', title: '9. Privacy' },
+    { id: 'disclaimer', title: '10. Disclaimers' },
+    { id: 'liability', title: '11. Limitation of Liability' },
+    { id: 'termination', title: '12. Termination' },
+    { id: 'contact', title: '13. Contact' },
+  ]
 
-These Terms apply to all users of the Service, including visitors, free trial users, and paid subscribers. We reserve the right to update these Terms at any time. Continued use of the Service after changes constitutes acceptance of the updated Terms.`,
-  },
-  {
-    id: "description",
-    title: "2. Description of Service",
-    content: `Listing Whisperer is an AI-powered assistant built for real estate agents. The Service generates marketing copy, listing descriptions, seller meeting prep materials, and related content based on information you provide.
+  const styles = {
+    page: { minHeight: '100vh', background: '#0d1117', fontFamily: "var(--font-plus-jakarta), sans-serif", color: '#f0f0f0' },
+    card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' },
+  }
 
-The Service is intended for professional use by licensed real estate agents, brokers, and related real estate professionals. You are responsible for ensuring that any content generated through the Service complies with your local MLS rules, brokerage policies, and applicable laws.`,
-  },
-  {
-    id: "accounts",
-    title: "3. Accounts & Registration",
-    content: `To access the full features of the Service, you must create an account. You agree to:
-
-• Provide accurate, current, and complete information during registration
-• Maintain and promptly update your account information
-• Keep your password secure and confidential
-• Accept responsibility for all activity that occurs under your account
-• Notify us immediately of any unauthorized use of your account
-
-You must be at least 18 years old to use the Service. We reserve the right to suspend or terminate accounts that violate these Terms.`,
-  },
-  {
-    id: "trial",
-    title: "4. Free Trial",
-    content: `We offer a 24-hour free trial that includes full Pro access and up to 2 listings at no charge. No credit card is required to start your trial.
-
-The free trial is available once per person and once per household. Creating multiple accounts to obtain additional free trials is prohibited and may result in account termination.
-
-After your trial expires, continued use of Pro features requires a paid subscription.`,
-  },
-  {
-    id: "billing",
-    title: "5. Subscriptions & Billing",
-    content: `Pro subscriptions are billed at $20 per month. Subscriptions automatically renew each month unless cancelled prior to the renewal date.
-
-Payment is processed securely through Stripe. By subscribing, you authorize us to charge your payment method on a recurring monthly basis.
-
-You may cancel your subscription at any time from your account settings. Cancellation takes effect at the end of the current billing period — you will retain access through the period you have paid for. We do not issue refunds for partial months.
-
-Prices are subject to change with 30 days' notice.`,
-  },
-  {
-    id: "content",
-    title: "6. Your Content & Data",
-    content: `You retain ownership of the property information, notes, and other inputs you provide to the Service ("Your Content"). By using the Service, you grant Listing Whisperer a limited license to process Your Content solely to provide the Service to you.
-
-You are solely responsible for the accuracy and legality of Your Content. Do not input confidential client information, personally identifiable information about third parties, or any information you are not authorized to share.
-
-AI-generated outputs are provided for your use. We do not claim ownership of content generated on your behalf, but we make no guarantees about its originality, accuracy, or fitness for any particular purpose.`,
-  },
-  {
-    id: "acceptable-use",
-    title: "7. Acceptable Use",
-    content: `You agree not to use the Service to:
-
-• Violate any applicable law, regulation, or MLS rule
-• Generate false, misleading, or deceptive property descriptions
-• Infringe on the intellectual property rights of others
-• Transmit spam, malware, or harmful code
-• Attempt to reverse-engineer, scrape, or extract data from the Service
-• Share your account credentials with others
-• Resell or sublicense access to the Service
-• Use the Service in any way that could harm Listing Whisperer or other users
-
-We reserve the right to suspend or terminate accounts that violate this policy.`,
-  },
-  {
-    id: "ip",
-    title: "8. Intellectual Property",
-    content: `The Listing Whisperer name, logo, product design, and underlying technology are owned by Listing Whisperer and protected by intellectual property laws. You may not use our brand assets, copy our product design, or create derivative works without written permission.
-
-AI-generated content produced for you through the Service may be used by you for your real estate business. We do not claim copyright over individual outputs generated for you.`,
-  },
-  {
-    id: "disclaimer",
-    title: "9. Disclaimers",
-    content: `The Service is provided "as is" and "as available" without warranties of any kind, express or implied. We do not warrant that:
-
-• The Service will be uninterrupted or error-free
-• AI-generated content will be accurate, complete, or suitable for any specific purpose
-• The Service will meet your specific business requirements
-
-AI-generated content should always be reviewed and verified by you before use. You are responsible for compliance with your MLS, brokerage, and any applicable real estate regulations.`,
-  },
-  {
-    id: "liability",
-    title: "10. Limitation of Liability",
-    content: `To the maximum extent permitted by applicable law, Listing Whisperer shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Service.
-
-Our total liability to you for any claims arising from these Terms or the Service shall not exceed the amount you paid us in the 3 months preceding the claim.
-
-Some jurisdictions do not allow limitations on liability, so these limitations may not apply to you.`,
-  },
-  {
-    id: "termination",
-    title: "11. Termination",
-    content: `You may cancel your account at any time from your account settings or by contacting us. We may suspend or terminate your account if you violate these Terms, with or without notice.
-
-Upon termination, your right to use the Service ceases immediately. We may retain certain data as required by law or for legitimate business purposes.`,
-  },
-  {
-    id: "governing-law",
-    title: "12. Governing Law",
-    content: `These Terms are governed by the laws of the State of California, without regard to its conflict of law provisions. Any disputes shall be resolved in the state or federal courts located in Orange County, California.
-
-If any provision of these Terms is found to be unenforceable, the remaining provisions will remain in full force and effect.`,
-  },
-  {
-    id: "contact",
-    title: "13. Contact Us",
-    content: `If you have questions about these Terms, please contact us:
-
-Email: support@listingwhisperer.com
-
-We aim to respond to all inquiries within 2 business days.`,
-  },
-];
-
-export default function TermsPage() {
   return (
-    <div
-      style={{ backgroundColor: "#0d1117", minHeight: "100vh", color: "#e6edf3" }}
-    >
-      {/* Nav */}
-      <nav
-        style={{
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          padding: "0 24px",
-          height: "60px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "sticky",
-          top: 0,
-          backgroundColor: "rgba(13,17,23,0.95)",
-          backdropFilter: "blur(12px)",
-          zIndex: 50,
-        }}
-      >
-        <Link
-          href="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            textDecoration: "none",
-          }}
-        >
-          <span
-            style={{
-              fontWeight: 700,
-              fontSize: "17px",
-              color: "#e6edf3",
-              letterSpacing: "-0.3px",
-            }}
-          >
-            Listing<span style={{ color: "#1D9E75" }}>Whisperer</span>
-          </span>
-        </Link>
-        <Link
-          href="/"
-          style={{
-            fontSize: "13px",
-            color: "#8b949e",
-            textDecoration: "none",
-            transition: "color 0.2s",
-          }}
-          onMouseEnter={(e) =>
-            ((e.target as HTMLElement).style.color = "#e6edf3")
-          }
-          onMouseLeave={(e) =>
-            ((e.target as HTMLElement).style.color = "#8b949e")
-          }
-        >
-          ← Back to Home
-        </Link>
-      </nav>
-
-      {/* Hero */}
-      <div
-        style={{
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          padding: "64px 24px 48px",
-          textAlign: "center",
-        }}
-      >
-        <div
-          style={{
-            display: "inline-block",
-            backgroundColor: "rgba(29,158,117,0.1)",
-            border: "1px solid rgba(29,158,117,0.25)",
-            borderRadius: "20px",
-            padding: "4px 14px",
-            fontSize: "12px",
-            color: "#1D9E75",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            fontWeight: 600,
-            marginBottom: "20px",
-          }}
-        >
-          Legal
-        </div>
-        <h1
-          style={{
-            fontSize: "clamp(28px, 5vw, 42px)",
-            fontWeight: 700,
-            letterSpacing: "-0.5px",
-            margin: "0 0 12px",
-            color: "#e6edf3",
-          }}
-        >
-          Terms of Service
-        </h1>
-        <p style={{ color: "#8b949e", fontSize: "15px", margin: 0 }}>
-          Last updated: June 1, 2026
-        </p>
+    <div style={styles.page}>
+      {/* HEADER */}
+      <div style={{background:'rgba(10,13,20,0.98)',borderBottom:'1px solid rgba(255,255,255,0.05)',padding:'0.875rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
+        <a href="/" style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0',textDecoration:'none'}}>
+          Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
+        </a>
+        <a href="/dashboard" style={{fontSize:'13px',color:'#5a5f72',textDecoration:'none'}}>Dashboard →</a>
       </div>
 
-      {/* Main layout */}
-      <div
-        style={{
-          maxWidth: "1100px",
-          margin: "0 auto",
-          padding: "48px 24px 96px",
-          display: "grid",
-          gridTemplateColumns: "220px 1fr",
-          gap: "48px",
-          alignItems: "start",
-        }}
-      >
-        {/* Sidebar TOC */}
-        <aside
-          style={{
-            position: "sticky",
-            top: "80px",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "11px",
-              fontWeight: 700,
-              color: "#8b949e",
-              textTransform: "uppercase",
-              letterSpacing: "0.1em",
-              marginBottom: "12px",
-            }}
-          >
-            On this page
-          </p>
-          <nav style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            {sections.map((s) => (
-              <a
-                key={s.id}
-                href={`#${s.id}`}
-                style={{
-                  fontSize: "13px",
-                  color: "#8b949e",
-                  textDecoration: "none",
-                  padding: "5px 10px",
-                  borderRadius: "6px",
-                  transition: "background 0.15s, color 0.15s",
-                  lineHeight: 1.4,
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor =
-                    "rgba(29,158,117,0.08)";
-                  (e.currentTarget as HTMLElement).style.color = "#1D9E75";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor =
-                    "transparent";
-                  (e.currentTarget as HTMLElement).style.color = "#8b949e";
-                }}
-              >
+      <div style={{maxWidth:'900px',margin:'0 auto',padding:'3rem 1.5rem',display:'flex',gap:'2rem',alignItems:'flex-start'}}>
+
+        {/* SIDEBAR */}
+        <div style={{width:'220px',flexShrink:0,position:'sticky',top:'80px'}}>
+          <div style={{...styles.card,padding:'1rem'}}>
+            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 12px'}}>CONTENTS</p>
+            {sections.map(s => (
+              <a key={s.id} href={`#${s.id}`}
+                onClick={() => setActiveSection(s.id)}
+                style={{display:'block',padding:'6px 8px',borderRadius:'6px',fontSize:'12px',textDecoration:'none',marginBottom:'2px',
+                  background: activeSection === s.id ? 'rgba(29,158,117,0.1)' : 'transparent',
+                  color: activeSection === s.id ? '#1D9E75' : '#5a5f72',
+                  borderLeft: activeSection === s.id ? '2px solid #1D9E75' : '2px solid transparent'}}>
                 {s.title}
               </a>
             ))}
-          </nav>
-        </aside>
+          </div>
+        </div>
 
-        {/* Content */}
-        <main style={{ minWidth: 0 }}>
-          {/* Intro card */}
-          <div
-            style={{
-              backgroundColor: "#1a1d2e",
-              border: "1px solid rgba(29,158,117,0.2)",
-              borderRadius: "12px",
-              padding: "24px 28px",
-              marginBottom: "40px",
-              borderLeft: "3px solid #1D9E75",
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontSize: "15px",
-                color: "#c9d1d9",
-                lineHeight: 1.7,
-              }}
-            >
-              Please read these Terms of Service carefully before using Listing
-              Whisperer. These Terms govern your access to and use of our
-              service. By creating an account or using our platform, you agree
-              to these Terms.
-            </p>
+        {/* CONTENT */}
+        <div style={{flex:1}}>
+          <div style={{marginBottom:'2rem'}}>
+            <h1 style={{fontSize:'2rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 8px',letterSpacing:'-0.3px'}}>Terms of Service</h1>
+            <p style={{fontSize:'13px',color:'#5a5f72',margin:'0'}}>Last updated: April 26, 2026</p>
           </div>
 
-          {/* Sections */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-            {sections.map((section, i) => (
-              <section
-                key={section.id}
-                id={section.id}
-                style={{
-                  borderTop:
-                    i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)",
-                  paddingTop: i === 0 ? 0 : "36px",
-                  marginTop: i === 0 ? 0 : "36px",
-                }}
-              >
-                <h2
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: 600,
-                    color: "#e6edf3",
-                    marginBottom: "16px",
-                    marginTop: 0,
-                    letterSpacing: "-0.2px",
-                  }}
-                >
-                  {section.title}
-                </h2>
-                <div
-                  style={{
-                    fontSize: "15px",
-                    color: "#8b949e",
-                    lineHeight: 1.8,
-                    whiteSpace: "pre-line",
-                  }}
-                >
-                  {section.content}
-                </div>
-              </section>
-            ))}
-          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:'2rem'}}>
 
-          {/* Footer CTA */}
-          <div
-            style={{
-              marginTop: "64px",
-              backgroundColor: "#1a1d2e",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "12px",
-              padding: "32px",
-              textAlign: "center",
-            }}
-          >
-            <p
-              style={{
-                color: "#8b949e",
-                fontSize: "14px",
-                margin: "0 0 16px",
-              }}
-            >
-              Have questions about our Terms?
-            </p>
-            <a
-              href="mailto:support@listingwhisperer.com"
-              style={{
-                display: "inline-block",
-                backgroundColor: "#1D9E75",
-                color: "#fff",
-                padding: "10px 24px",
-                borderRadius: "8px",
-                textDecoration: "none",
-                fontSize: "14px",
-                fontWeight: 600,
-              }}
-            >
-              Contact Us
-            </a>
-            <div
-              style={{
-                marginTop: "24px",
-                paddingTop: "24px",
-                borderTop: "1px solid rgba(255,255,255,0.06)",
-                display: "flex",
-                gap: "20px",
-                justifyContent: "center",
-                flexWrap: "wrap",
-              }}
-            >
-              <Link
-                href="/privacy"
-                style={{
-                  fontSize: "13px",
-                  color: "#8b949e",
-                  textDecoration: "none",
-                }}
-              >
-                Privacy Policy →
-              </Link>
-              <Link
-                href="/signup"
-                style={{
-                  fontSize: "13px",
-                  color: "#1D9E75",
-                  textDecoration: "none",
-                }}
-              >
-                Get Started Free →
-              </Link>
+            <div id="acceptance" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>1. Acceptance of Terms</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                By accessing or using Listing Whisperer ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service. These Terms apply to all users of the Service, including visitors, free trial users, and paid subscribers. We reserve the right to update these Terms at any time. Continued use of the Service after changes constitutes acceptance of the new Terms.
+              </p>
             </div>
+
+            <div id="description" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>2. Description of Service</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                Listing Whisperer is an AI-powered assistant built for real estate agents. The Service generates marketing copy, listing descriptions, seller meeting prep materials, pricing strategies, and other real estate workflow tools. The Service is intended for professional use by licensed real estate agents, brokers, and related real estate professionals. You are responsible for ensuring that any content generated through the Service complies with applicable real estate laws, MLS rules, and professional standards in your jurisdiction.
+              </p>
+            </div>
+
+            <div id="accounts" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>3. Accounts & Registration</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0 0 12px'}}>
+                To access the full features of the Service, you must create an account. You agree to:
+              </p>
+              <ul style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'2',paddingLeft:'1.5rem',margin:'0'}}>
+                <li>Provide accurate, current, and complete information during registration</li>
+                <li>Maintain and promptly update your account information</li>
+                <li>Keep your password secure and confidential</li>
+                <li>Accept responsibility for all activity that occurs under your account</li>
+                <li>Notify us immediately of any unauthorized use of your account</li>
+              </ul>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'12px 0 0'}}>
+                You must be at least 18 years old to use the Service. We reserve the right to suspend or terminate accounts that violate these Terms.
+              </p>
+            </div>
+
+            <div id="trial" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>4. Free Trial</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                We offer a 24-hour free trial that includes full Pro access and up to 2 listings at no charge. No credit card is required to start your trial. The free trial is available once per person and once per household. Creating multiple accounts to obtain additional free trials is prohibited and may result in account termination. After your trial expires, continued use of Pro features requires a paid subscription.
+              </p>
+            </div>
+
+            <div id="billing" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>5. Subscriptions & Billing</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0 0 12px'}}>
+                Pro subscriptions are billed at $20 per month. Subscriptions automatically renew each month unless cancelled prior to the renewal date. By subscribing, you authorize us to charge your payment method on a recurring monthly basis.
+              </p>
+              <ul style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'2',paddingLeft:'1.5rem',margin:'0'}}>
+                <li>You may cancel your subscription at any time from your account settings</li>
+                <li>Cancellation takes effect at the end of the current billing period</li>
+                <li>No refunds are provided for partial months</li>
+                <li>We reserve the right to change pricing with 30 days notice</li>
+              </ul>
+            </div>
+
+            <div id="use" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>6. Acceptable Use</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0 0 12px'}}>You agree not to use the Service to:</p>
+              <ul style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'2',paddingLeft:'1.5rem',margin:'0'}}>
+                <li>Violate any applicable laws or regulations</li>
+                <li>Generate false, misleading, or fraudulent real estate listings</li>
+                <li>Infringe upon the intellectual property rights of others</li>
+                <li>Attempt to reverse engineer or extract the underlying AI models</li>
+                <li>Resell or redistribute the Service without written permission</li>
+                <li>Use automated scripts to access the Service in an abusive manner</li>
+                <li>Harass, abuse, or harm other users</li>
+              </ul>
+            </div>
+
+            <div id="ip" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>7. Intellectual Property</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                The Listing Whisperer platform, including its design, code, branding, and non-AI-generated content, is owned by Listing Whisperer and protected by copyright and trademark laws. You retain ownership of the property information and content you input into the Service. AI-generated outputs produced through your use of the Service may be used by you for your professional real estate activities. You may not claim ownership of the underlying AI model or the Service platform itself.
+              </p>
+            </div>
+
+            <div id="ai" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>8. AI-Generated Content</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                The Service uses AI to generate marketing copy, pricing guidance, and other real estate content. You acknowledge that: AI-generated content may contain errors, inaccuracies, or omissions; all content should be reviewed and verified before professional use; pricing suggestions are not certified appraisals and should not be relied upon as such; the Service does not replace the judgment of a licensed real estate professional. Listing Whisperer is not responsible for any decisions made based on AI-generated content.
+              </p>
+            </div>
+
+            <div id="privacy" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>9. Privacy</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                Your use of the Service is also governed by our <a href="/privacy" style={{color:'#1D9E75'}}>Privacy Policy</a>, which is incorporated into these Terms by reference. By using the Service, you consent to the collection and use of your information as described in our Privacy Policy.
+              </p>
+            </div>
+
+            <div id="disclaimer" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>10. Disclaimers</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. LISTING WHISPERER DOES NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR FREE OF HARMFUL COMPONENTS. WE DO NOT WARRANT THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY AI-GENERATED CONTENT. YOUR USE OF THE SERVICE IS AT YOUR SOLE RISK.
+              </p>
+            </div>
+
+            <div id="liability" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>11. Limitation of Liability</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                TO THE MAXIMUM EXTENT PERMITTED BY LAW, LISTING WHISPERER SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE SERVICE. OUR TOTAL LIABILITY TO YOU FOR ANY CLAIMS ARISING FROM THESE TERMS OR YOUR USE OF THE SERVICE SHALL NOT EXCEED THE AMOUNT YOU PAID US IN THE 12 MONTHS PRECEDING THE CLAIM.
+              </p>
+            </div>
+
+            <div id="termination" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>12. Termination</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                We reserve the right to suspend or terminate your account at any time for violation of these Terms, fraudulent activity, or any other reason at our sole discretion. You may terminate your account at any time by contacting us. Upon termination, your right to use the Service ceases immediately. Provisions of these Terms that by their nature should survive termination shall survive, including intellectual property provisions, disclaimers, and limitations of liability.
+              </p>
+            </div>
+
+            <div id="governing" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>13. Governing Law</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                These Terms shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be resolved exclusively in the state or federal courts located in Orange County, California. You consent to the personal jurisdiction of such courts.
+              </p>
+            </div>
+
+            <div id="contact" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 14px'}}>14. Contact</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                If you have any questions about these Terms, please contact us at:<br/><br/>
+                <strong style={{color:'#f0f0f0'}}>Listing Whisperer</strong><br/>
+                <a href="mailto:support@listingwhisperer.com" style={{color:'#1D9E75'}}>support@listingwhisperer.com</a><br/>
+                <a href="/contact" style={{color:'#1D9E75'}}>listingwhisperer.com/contact</a>
+              </p>
+            </div>
+
           </div>
-        </main>
+
+          <div style={{marginTop:'2rem',padding:'1.5rem',background:'rgba(29,158,117,0.06)',borderRadius:'12px',border:'1px solid rgba(29,158,117,0.15)',textAlign:'center'}}>
+            <p style={{fontSize:'13px',color:'#5a5f72',margin:'0 0 12px'}}>Ready to get started?</p>
+            <a href="/signup" style={{display:'inline-block',padding:'10px 24px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'8px',textDecoration:'none',fontSize:'13px',fontWeight:'600'}}>
+              Start Free Trial →
+            </a>
+          </div>
+        </div>
       </div>
 
-      {/* Footer */}
-      <footer
-        style={{
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-          padding: "24px",
-          textAlign: "center",
-        }}
-      >
-        <p style={{ color: "#8b949e", fontSize: "13px", margin: 0 }}>
-          © 2026 Listing Whisperer ·{" "}
-          <Link
-            href="/terms"
-            style={{ color: "#1D9E75", textDecoration: "none" }}
-          >
-            Terms
-          </Link>{" "}
-          ·{" "}
-          <Link
-            href="/privacy"
-            style={{ color: "#8b949e", textDecoration: "none" }}
-          >
-            Privacy
-          </Link>
+      {/* FOOTER */}
+      <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid rgba(255,255,255,0.05)',marginTop:'2rem'}}>
+        <p style={{fontSize:'13px',color:'#444'}}>
+          © 2026 Listing Whisperer · <a href="/terms" style={{color:'#444'}}>Terms</a> · <a href="/privacy" style={{color:'#444'}}>Privacy</a> · <a href="/contact" style={{color:'#444'}}>Contact</a>
         </p>
       </footer>
     </div>
-  );
+  )
 }

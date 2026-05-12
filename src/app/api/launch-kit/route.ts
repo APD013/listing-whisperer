@@ -17,6 +17,7 @@ export async function POST(request: Request) {
     const prompt = `You are a real estate marketing expert. Create a complete 7-day listing launch marketing plan for this property. Respond ONLY with valid JSON, no markdown, no backticks.
 
 Property: ${property.type}, ${property.beds}, ${property.sqft} sq ft, ${property.neighborhood}${property.price ? ', ' + property.price : ''}
+Location: ${property.city ? property.city + ', ' : ''}${property.state || 'not specified'}
 Features: ${property.features}
 Notes: ${property.notes || 'none'}
 

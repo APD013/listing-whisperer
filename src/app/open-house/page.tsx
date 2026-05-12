@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,6 +15,8 @@ export default function OpenHouseKit() {
   const [userId, setUserId] = useState<string | null>(null)
   const [form, setForm] = useState({
     address: '',
+    city: '',
+    state: '',
     date: '',
     time: '',
     beds: '',
@@ -26,6 +29,7 @@ export default function OpenHouseKit() {
   })
 
   useEffect(() => {
+    trackEvent('tool_page_view', { tool: 'open_house' })
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) setUserId(user.id)
@@ -33,13 +37,10 @@ export default function OpenHouseKit() {
     getUser()
   }, [])
 
-  const styles = {
-    page: { minHeight: '100vh', background: '#0d1117', fontFamily: "'Inter', sans-serif", color: '#f0f0f0' },
-    card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' },
-    input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
-    select: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
-    label: { fontSize: '11px', color: '#6b7280', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
-  }
+  const inputStyle = { width: '100%', padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '13px', color: 'var(--lw-text)', boxSizing: 'border-box' as const, outline: 'none' }
+  const labelStyle = { fontSize: '11px', color: 'var(--lw-text-muted)', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const }
+  const cardStyle = { background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', marginBottom: '1rem' }
+  const sectionHeadStyle = { fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)', letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px' }
 
   const handleCopy = (key: string, text: string) => {
     navigator.clipboard.writeText(text)
@@ -65,93 +66,165 @@ export default function OpenHouseKit() {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={{background:'rgba(10,13,20,0.98)',borderBottom:'1px solid rgba(255,255,255,0.05)',padding:'0.875rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
-        <a href="/dashboard" style={{fontSize:'13px',color:'#5a5f72',textDecoration:'none'}}>← Dashboard</a>
-        <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
-        <div style={{width:'80px'}}/>
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif', color: 'var(--lw-text)' }}>
+
+      <div style={{ position: 'fixed', top: '8%', right: '8%', width: '480px', height: '480px', background: 'radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'fixed', bottom: '15%', left: '5%', width: '360px', height: '360px', background: 'radial-gradient(circle, rgba(5,150,105,0.05) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+
+      {/* NAV */}
+      <div style={{ background: 'var(--lw-card)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--lw-border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
+        <a href="/dashboard" style={{ fontSize: '13px', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Dashboard</a>
+        <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--lw-text)' }}>Listing<span style={{ color: '#1D9E75' }}>Whisperer</span></div>
       </div>
 
-      <div style={{maxWidth:'760px',margin:'0 auto',padding:'2.5rem 1.5rem'}}>
-        <div style={{marginBottom:'2rem'}}>
-          <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'8px'}}>
-            <div style={{width:'44px',height:'44px',borderRadius:'12px',background:'rgba(16,185,129,0.12)',border:'1px solid rgba(16,185,129,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px'}}>🏡</div>
+      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1.5rem', position: 'relative', zIndex: 1 }}>
+
+        {/* HERO */}
+        <div style={{ background: 'linear-gradient(135deg,#10b981,#059669)', borderRadius: '20px', padding: '2.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 60px rgba(16,185,129,0.25)', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', borderRadius: '20px', padding: '4px 14px', fontSize: '11px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '1px', marginBottom: '14px' }}>
+            OPEN HOUSE KIT
+          </div>
+          <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>
+            🏡 Everything you need for a successful open house.
+          </h1>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: '1.7', maxWidth: '500px', margin: '0 auto 18px' }}>
+            Enter your listing details — get a complete open house kit with flyer, posts, and follow-up emails.
+          </p>
+          <button
+            onClick={() => document.getElementById('open-house-form')?.scrollIntoView({ behavior: 'smooth' })}
+            style={{ background: 'rgba(255,255,255,0.2)', border: '1.5px solid rgba(255,255,255,0.5)', color: '#fff', borderRadius: '10px', padding: '11px 28px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', backdropFilter: 'blur(4px)' }}
+          >
+            🏡 Build My Open House Kit
+          </button>
+        </div>
+
+        {/* HOW IT WORKS */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>How It Works</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            {[
+              { s: '1', icon: '🏠', title: 'Enter property details', desc: 'Address, beds, baths, price, and key highlights' },
+              { s: '2', icon: '📅', title: 'Set your open house date and time', desc: 'Date, time, and optional agent contact info' },
+              { s: '3', icon: '🎉', title: 'Get your complete open house kit', desc: 'Flyer, posts, email invite, follow-up, and checklist' },
+            ].map(({ s, icon, title, desc }) => (
+              <div key={s} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '14px', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span style={{ width: '22px', height: '22px', background: 'linear-gradient(135deg,#10b981,#059669)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '800', color: '#fff', flexShrink: 0 }}>{s}</span>
+                  <span style={{ fontSize: '1rem' }}>{icon}</span>
+                </div>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', lineHeight: '1.4' }}>{title}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FORM */}
+        <div id="open-house-form" style={{ ...cardStyle, border: '1px solid rgba(16,185,129,0.18)', boxShadow: '0 4px 32px rgba(16,185,129,0.08)' }}>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: '#10b981', letterSpacing: '1px', margin: '0 0 16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>OPEN HOUSE DETAILS</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={labelStyle}>Property Address</label>
+              <input placeholder="123 Oak Street, Newport Beach, CA" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} style={inputStyle} />
+            </div>
             <div>
-              <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',margin:'0',letterSpacing:'-0.3px'}}>Open House Kit</h1>
-              <p style={{fontSize:'13px',color:'#5a5f72',margin:'0'}}>Flyer copy, social posts, reminder texts, and follow-up emails</p>
+              <label style={labelStyle}>City</label>
+              <input placeholder="e.g. Newport Beach" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>State</label>
+              <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} style={inputStyle}>
+                <option value="">Select State</option>
+                {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Open House Date</label>
+              <input placeholder="Saturday, May 3rd" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Time</label>
+              <input placeholder="1:00 PM – 4:00 PM" value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Beds</label>
+              <input placeholder="4" value={form.beds} onChange={e => setForm({ ...form, beds: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Baths</label>
+              <input placeholder="3" value={form.baths} onChange={e => setForm({ ...form, baths: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Sq Ft</label>
+              <input placeholder="2,200" value={form.sqft} onChange={e => setForm({ ...form, sqft: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>List Price</label>
+              <input placeholder="$1,295,000" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} style={inputStyle} />
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px solid var(--lw-border)', paddingTop: '16px', marginBottom: '16px' }}>
+            <label style={labelStyle}>Key highlights / features</label>
+            <input placeholder="Ocean views, chef's kitchen, spa bath, 3-car garage..." value={form.highlights} onChange={e => setForm({ ...form, highlights: e.target.value })} style={inputStyle} />
+          </div>
+
+          <div style={{ borderTop: '1px solid var(--lw-border)', paddingTop: '16px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#10b981', letterSpacing: '1px', margin: '0 0 12px' }}>AGENT INFO (OPTIONAL)</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <label style={labelStyle}>Agent Name</label>
+                <input placeholder="Jane Smith" value={form.agentName} onChange={e => setForm({ ...form, agentName: e.target.value })} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Phone</label>
+                <input placeholder="(949) 555-0123" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={inputStyle} />
+              </div>
             </div>
           </div>
         </div>
 
-        <div style={{...styles.card, marginBottom:'1.5rem'}}>
-          <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 16px',paddingBottom:'12px',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>OPEN HOUSE DETAILS</p>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))',gap:'12px',marginBottom:'16px'}}>
-            <div style={{gridColumn:'1 / -1'}}>
-              <label style={styles.label}>Property Address</label>
-              <input placeholder="123 Oak Street, Newport Beach, CA" value={form.address} onChange={e => setForm({...form, address: e.target.value})} style={styles.input}/>
-            </div>
-            <div>
-              <label style={styles.label}>Open House Date</label>
-              <input placeholder="Saturday, May 3rd" value={form.date} onChange={e => setForm({...form, date: e.target.value})} style={styles.input}/>
-            </div>
-            <div>
-              <label style={styles.label}>Time</label>
-              <input placeholder="1:00 PM – 4:00 PM" value={form.time} onChange={e => setForm({...form, time: e.target.value})} style={styles.input}/>
-            </div>
-            <div>
-              <label style={styles.label}>Beds</label>
-              <input placeholder="4" value={form.beds} onChange={e => setForm({...form, beds: e.target.value})} style={styles.input}/>
-            </div>
-            <div>
-              <label style={styles.label}>Baths</label>
-              <input placeholder="3" value={form.baths} onChange={e => setForm({...form, baths: e.target.value})} style={styles.input}/>
-            </div>
-            <div>
-              <label style={styles.label}>Sq Ft</label>
-              <input placeholder="2,200" value={form.sqft} onChange={e => setForm({...form, sqft: e.target.value})} style={styles.input}/>
-            </div>
-            <div>
-              <label style={styles.label}>List Price</label>
-              <input placeholder="$1,295,000" value={form.price} onChange={e => setForm({...form, price: e.target.value})} style={styles.input}/>
-            </div>
-          </div>
-
-          <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'16px',marginBottom:'16px'}}>
-            <label style={styles.label}>Key highlights / features</label>
-            <input placeholder="Ocean views, chef's kitchen, spa bath, 3-car garage..." value={form.highlights} onChange={e => setForm({...form, highlights: e.target.value})} style={{...styles.input, marginBottom:'12px'}}/>
-          </div>
-
-          <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'16px'}}>
-            <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 12px'}}>AGENT INFO (OPTIONAL)</p>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'16px'}}>
-              <div>
-                <label style={styles.label}>Agent Name</label>
-                <input placeholder="Jane Smith" value={form.agentName} onChange={e => setForm({...form, agentName: e.target.value})} style={styles.input}/>
+        {/* WHAT YOU'LL GET */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <p style={sectionHeadStyle}>What You'll Get</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' }}>
+            {[
+              { icon: '📄', label: 'Open house flyer copy', desc: 'Print-ready flyer text with all key property details' },
+              { icon: '📱', label: 'Social media posts', desc: 'Instagram and Facebook announcements ready to post' },
+              { icon: '📧', label: 'Email invitation', desc: 'Email blast to send to your buyer and agent list' },
+              { icon: '✅', label: 'Day-of checklist', desc: 'Everything to prep and run a smooth open house' },
+              { icon: '🤝', label: 'Follow-up email sequence', desc: 'Post-open house emails to nurture every attendee' },
+              { icon: '📋', label: 'Sign-in sheet link', desc: 'Customizable sign-in sheet for collecting buyer info' },
+            ].map(({ icon, label, desc }) => (
+              <div key={label} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)' }}>{label}</span>
+                <span style={{ fontSize: '12px', color: 'var(--lw-text-muted)', lineHeight: '1.5' }}>{desc}</span>
               </div>
-              <div>
-                <label style={styles.label}>Phone</label>
-                <input placeholder="(949) 555-0123" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} style={styles.input}/>
-              </div>
-            </div>
-            <button onClick={generate} disabled={loading}
-              style={{width:'100%',padding:'15px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 30px rgba(29,158,117,0.3)',transition:'all 0.2s'}}>
-              {loading ? '⏳ Generating...' : '🏡 Generate Open House Kit'}
-            </button>
+            ))}
           </div>
         </div>
 
+        {/* CTA */}
+        <button onClick={generate} disabled={loading}
+          style={{ width: '100%', padding: '15px', background: loading ? '#059669' : 'linear-gradient(135deg,#10b981,#059669)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 0 28px rgba(16,185,129,0.35)', transition: 'all 0.2s', marginBottom: '1.5rem' }}>
+          {loading ? '⏳ Generating...' : '🏡 Generate Open House Kit'}
+        </button>
+
+        {/* LOADING */}
         {loading && (
-          <div style={{...styles.card, padding:'1.25rem 1.5rem', display:'flex', alignItems:'center', gap:'12px'}}>
+          <div style={{ ...cardStyle, padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <style>{`@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }`}</style>
-            <div style={{display:'flex',gap:'4px'}}>
-              {[0,1,2].map(i => <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#10b981',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>)}
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {[0, 1, 2].map(i => <div key={i} style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', animation: `pulse-dot 1.2s ${i * 0.2}s infinite` }} />)}
             </div>
-            <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>Building your open house kit...</p>
+            <p style={{ color: 'var(--lw-text)', fontWeight: '600', fontSize: '13px', margin: '0', flex: 1 }}>Building your open house kit...</p>
           </div>
         )}
 
+        {/* RESULTS */}
         {result && !loading && (
-          <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {[
               { key: 'flyerCopy', label: 'Flyer Copy', icon: '📄', color: '#10b981', desc: 'Print-ready open house flyer' },
               { key: 'socialPost', label: 'Social Media Post', icon: '📱', color: '#e1306c', desc: 'Instagram & Facebook announcement' },
@@ -159,33 +232,33 @@ export default function OpenHouseKit() {
               { key: 'emailInvite', label: 'Email Invite', icon: '📧', color: '#1D9E75', desc: 'Email blast to your list' },
               { key: 'followUpEmail', label: 'Follow-Up Email', icon: '🤝', color: '#f59e0b', desc: 'Send to attendees after the open house' },
             ].map(card => result[card.key] && (
-              <div key={card.key} style={{...styles.card}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'12px'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                    <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}15`,border:`1px solid ${card.color}25`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px'}}>{card.icon}</div>
+              <div key={card.key} style={cardStyle}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '9px', background: `${card.color}15`, border: `1px solid ${card.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>{card.icon}</div>
                     <div>
-                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>{card.label}</p>
-                      <p style={{fontSize:'11px',color:'#5a5f72',margin:'0'}}>{card.desc}</p>
+                      <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)', margin: '0' }}>{card.label}</p>
+                      <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '0' }}>{card.desc}</p>
                     </div>
                   </div>
                   <button onClick={() => handleCopy(card.key, result[card.key])}
-                    style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                    style={{ padding: '5px 14px', borderRadius: '6px', border: '1px solid', fontSize: '11px', cursor: 'pointer', fontWeight: '500', background: copied === card.key ? card.color : 'var(--lw-input)', color: copied === card.key ? '#fff' : 'var(--lw-text-muted)', borderColor: copied === card.key ? card.color : 'var(--lw-border)' }}>
                     {copied === card.key ? '✓ Copied!' : '📋 Copy'}
                   </button>
                 </div>
-                <p style={{fontSize:'13px',lineHeight:'1.85',color:'#c0c0c0',margin:'0',whiteSpace:'pre-wrap'}}>{result[card.key]}</p>
+                <p style={{ fontSize: '13px', lineHeight: '1.85', color: 'var(--lw-text)', margin: '0', whiteSpace: 'pre-wrap' }}>{result[card.key]}</p>
               </div>
             ))}
-            <div style={{display:'flex',gap:'10px',flexWrap:'wrap',paddingTop:'8px'}}>
-              <a href="/dashboard" style={{padding:'10px 20px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'13px',fontWeight:'600'}}>← Back to Dashboard</a>
-              <button onClick={() => { setResult(null); window.scrollTo({top:0,behavior:'smooth'}) }}
-                style={{padding:'10px 20px',background:'rgba(0,0,0,0.2)',color:'#8b8fa8',borderRadius:'10px',border:'1px solid rgba(255,255,255,0.08)',fontSize:'13px',cursor:'pointer'}}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '8px' }}>
+              <a href="/dashboard" style={{ padding: '10px 20px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}>← Back to Dashboard</a>
+              <button onClick={() => { setResult(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                style={{ padding: '10px 20px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', borderRadius: '10px', border: '1px solid var(--lw-border)', fontSize: '13px', cursor: 'pointer' }}>
                 ↺ New Open House
               </button>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }

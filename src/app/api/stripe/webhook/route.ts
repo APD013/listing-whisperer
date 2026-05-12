@@ -53,6 +53,21 @@ export async function POST(request: Request) {
             .from('profiles')
             .update({ plan: 'pro', stripe_customer_id: session.customer as string })
             .eq('id', profileId)
+
+          // Apply referral coupon if user was referred
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('referred_by')
+            .eq('id', profileId)
+            .single()
+
+          if (profile?.referred_by) {
+            await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/apply-referral-coupon`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ referralCode: profile.referred_by })
+            })
+          }
         } else if (mode === 'payment') {
           // Add 1 listing credit
           const { data: profile } = await supabase

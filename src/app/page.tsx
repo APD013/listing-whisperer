@@ -4,9 +4,31 @@ import { trackCTAClick, trackEvent, preserveUTMs } from './lib/analytics'
 
 export default function Home() {
   const [activeOutput, setActiveOutput] = useState('mls')
+  const [showExitPopup, setShowExitPopup] = useState(false)
+
   useEffect(() => {
     preserveUTMs()
     trackEvent('landing_page_view')
+
+    // Check if modal was dismissed within last 7 days
+    const lastDismissed = localStorage.getItem('exit_popup_dismissed')
+    const sevenDays = 7 * 24 * 60 * 60 * 1000
+    const alreadyShown = sessionStorage.getItem('exit_popup_shown')
+
+    if (lastDismissed && Date.now() - parseInt(lastDismissed) < sevenDays) return
+    if (alreadyShown) return
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      const alreadyShown = sessionStorage.getItem('exit_popup_shown')
+      const dismissed = localStorage.getItem('exit_popup_dismissed')
+      if (e.clientY <= 0 && !alreadyShown && !dismissed) {
+        setShowExitPopup(true)
+        sessionStorage.setItem('exit_popup_shown', 'true')
+        trackEvent('exit_intent_shown')
+      }
+    }
+    document.addEventListener('mouseleave', handleMouseLeave)
+    return () => document.removeEventListener('mouseleave', handleMouseLeave)
   }, [])
 
   const sampleOutputs: Record<string, string> = {
@@ -16,16 +38,56 @@ export default function Home() {
   }
 
   return (
-    <main style={{fontFamily:"'Inter', sans-serif",color:'#111'}}>
+    <main style={{fontFamily:"var(--font-plus-jakarta), sans-serif",color:'#111'}}>
+
+      {/* EXIT INTENT POPUP */}
+      {showExitPopup && (
+        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.75)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
+          <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)',padding:'2.5rem',maxWidth:'480px',width:'100%',boxShadow:'0 0 60px rgba(29,158,117,0.15)',textAlign:'center',position:'relative'}}>
+            <button onClick={() => { setShowExitPopup(false); localStorage.setItem('exit_popup_dismissed', Date.now().toString()) }}
+              style={{position:'absolute',top:'1rem',right:'1rem',background:'rgba(255,255,255,0.1)',border:'none',color:'#fff',width:'32px',height:'32px',borderRadius:'50%',fontSize:'16px',cursor:'pointer'}}>✕</button>
+            <div style={{fontSize:'3rem',marginBottom:'1rem'}}>🎁</div>
+            <h2 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Wait — don't leave empty handed!</h2>
+            <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'1.5rem',lineHeight:'1.7'}}>
+              Get <strong style={{color:'#1D9E75'}}>24 hours of full Pro access free</strong> — no credit card required. Generate your first listing in 60 seconds.
+            </p>
+            <div style={{background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.2)',borderRadius:'10px',padding:'1rem',marginBottom:'1.5rem'}}>
+              <p style={{fontSize:'13px',color:'#1D9E75',margin:'0',lineHeight:'1.8'}}>
+                ✓ Unlimited listings for 24 hours<br/>
+                ✓ 11 copy formats per listing<br/>
+                ✓ Seller meeting prep<br/>
+                ✓ No credit card needed
+              </p>
+            </div>
+            <a href="/signup" onClick={() => { trackEvent('exit_intent_cta_click'); setShowExitPopup(false); localStorage.setItem('exit_popup_dismissed', Date.now().toString()) }}
+              style={{display:'block',padding:'14px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'15px',fontWeight:'700',boxShadow:'0 0 24px rgba(29,158,117,0.3)',marginBottom:'12px'}}>
+              Start Free Trial →
+            </a>
+            <p style={{fontSize:'12px',color:'#444',margin:'0'}}>Use code <strong style={{color:'#1D9E75'}}>WELCOME50</strong> for 50% off Pro after trial</p>
+            <button onClick={() => { setShowExitPopup(false); localStorage.setItem('exit_popup_dismissed', Date.now().toString()) }}
+              style={{background:'none',border:'none',color:'#444',fontSize:'12px',cursor:'pointer',marginTop:'10px'}}>
+              No thanks, I'll pass
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STICKY TOP BAR */}
+      <div style={{background:'linear-gradient(135deg,#1D9E75,#085041)',padding:'10px 1.5rem',textAlign:'center',position:'sticky',top:0,zIndex:101}}>
+        <p style={{margin:'0',fontSize:'13px',color:'#fff',fontWeight:'600'}}>
+          🎉 Limited offer — Use code <strong style={{color:'#d4af37'}}>WELCOME50</strong> for 50% off Pro · 
+          <a href="/signup" style={{color:'#fff',textDecoration:'underline',marginLeft:'8px',fontWeight:'700'}}>Start free trial →</a>
+        </p>
+      </div>
 
       {/* NAV */}
-      <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:0,zIndex:100}}>
+      <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:'41px',zIndex:100}}>
         <div style={{fontSize:'18px',fontWeight:'700'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
           <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
           <a href="#pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
           <a href="/login" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Sign In</a>
-          <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 16px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',whiteSpace:'nowrap',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>Try Free →</a>
+          <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 16px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',whiteSpace:'nowrap',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>Start Free — No Credit Card</a>
         </div>
       </nav>
 
@@ -36,12 +98,17 @@ export default function Home() {
           BUILT FOR REAL ESTATE AGENTS
         </div>
         <h1 style={{fontSize:'clamp(2rem, 5vw, 3.25rem)',fontWeight:'800',lineHeight:'1.15',maxWidth:'740px',margin:'0 auto 1.25rem',letterSpacing:'-0.5px'}}>
-          The AI assistant built for<br/>
-          <span style={{color:'#1D9E75'}}>real estate agents.</span>
+          Everything you need to win listings,<br/>
+          build marketing, and grow your business —<br/>
+          <span style={{color:'#1D9E75'}}>powered by AI.</span>
         </h1>
         <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'560px',margin:'0 auto 1rem',lineHeight:'1.75'}}>
           From seller meeting prep to on-site photo drafts to full marketing launch — Listing Whisperer is your AI field assistant before, during, and after every listing.
         </p>
+        <div style={{display:'inline-flex',alignItems:'center',gap:'8px',background:'#0d1117',borderRadius:'30px',padding:'8px 18px',marginBottom:'0.5rem',border:'1px solid rgba(29,158,117,0.3)'}}>
+          <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',boxShadow:'0 0 8px rgba(29,158,117,0.8)',animation:'pulse 2s infinite'}}/>
+          <span style={{fontSize:'13px',color:'#1D9E75',fontWeight:'600'}}>AI Chat Assistant — ask anything, navigate, add leads, set reminders</span>
+        </div>
         <p style={{fontSize:'14px',color:'#1D9E75',fontWeight:'600',maxWidth:'480px',margin:'0 auto 2rem'}}>
           Used by agents across the country to save hours per listing.
         </p>
@@ -55,7 +122,7 @@ export default function Home() {
             See Real Output
           </a>
         </div>
-        <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · 2 listings included · Cancel anytime</p>
+        <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · Unlimited listings · Cancel anytime</p>
       </section>
 
       {/* STATS STRIP */}
@@ -77,8 +144,15 @@ export default function Home() {
       {/* PROOF BAR */}
       <section style={{background:'#1D9E75',padding:'1rem 2rem'}}>
         <div style={{maxWidth:'800px',margin:'0 auto',display:'flex',justifyContent:'center',gap:'2rem',flexWrap:'wrap'}}>
-          {['11 copy formats','Seller meeting prep','Pricing assistant','On-site photo drafts','7-day launch kit'].map(item => (
-            <span key={item} style={{color:'#fff',fontSize:'13px',fontWeight:'600'}}>✓ {item}</span>
+          {[
+            { label: 'Win the listing', items: 'Seller prep · Pricing strategy · Buyer consultation · Scripts' },
+            { label: 'Build the marketing', items: '11 copy formats · Snap & Start · 7-day launch kit · Social planner' },
+            { label: 'Follow up and grow', items: 'Follow-up tools · Reminders · CRM · Referral request · Career highlights' },
+          ].map(({ label, items }) => (
+            <div key={label} style={{textAlign:'center'}}>
+              <span style={{color:'#fff',fontSize:'14px',fontWeight:'800',display:'block'}}>✓ {label}</span>
+              <span style={{color:'rgba(255,255,255,0.75)',fontSize:'11px',fontWeight:'500',display:'block',marginTop:'2px'}}>{items}</span>
+            </div>
           ))}
         </div>
       </section>
@@ -90,9 +164,9 @@ export default function Home() {
           <p style={{color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>From seller appointment to launch day — Listing Whisperer handles it all.</p>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'2rem'}}>
             {[
-              {step:'1',title:'Before the appointment',desc:'Generate a complete seller meeting prep kit — talking points, questions to ask, and a follow-up email — before you walk in the door.',color:'#1D9E75'},
-              {step:'2',title:'On-site with Snap & Start',desc:'Upload property photos from your phone. Our AI detects features and generates your first draft while you\'re still at the property.',color:'#085041'},
-              {step:'3',title:'Full marketing launch',desc:'Generate all 11 copy formats, download PDF flyers, and get a 7-day launch plan — everything ready before you leave your desk.',color:'#1D9E75'},
+              {step:'1',title:'Win the listing',desc:'Generate a complete seller meeting prep kit, pricing strategy, and consultation guide — walk into every appointment ready to close.',color:'#1D9E75'},
+              {step:'2',title:'Build the marketing',desc:'Upload photos on-site, generate 11 copy formats, and get a full 7-day launch plan — your complete marketing kit, ready before you leave your desk.',color:'#085041'},
+              {step:'3',title:'Follow up and grow',desc:'AI-powered follow-up scripts, referral requests, and a CRM to track every lead — turn every closing into your next listing.',color:'#1D9E75'},
             ].map(({step,title,desc,color}) => (
               <div key={step} style={{textAlign:'center',padding:'1.5rem',background:'#fff',borderRadius:'16px',border:'1px solid #eee',boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
                 <div style={{width:'52px',height:'52px',background:color,color:'#fff',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',fontWeight:'800',margin:'0 auto 1.25rem',boxShadow:`0 4px 12px ${color}40`}}>{step}</div>
@@ -107,8 +181,14 @@ export default function Home() {
       {/* FEATURES GRID */}
       <section id="features" style={{padding:'5rem 2rem',background:'#fff'}}>
         <div style={{maxWidth:'920px',margin:'0 auto'}}>
+          <p style={{textAlign:'center',fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'10px'}}>ONE PLATFORM. EVERY TOOL AN AGENT NEEDS.</p>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>One assistant. The entire listing workflow.</h2>
-          <p style={{textAlign:'center',color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>Not a generic AI tool — a purpose-built assistant for every stage of the listing process.</p>
+          <p style={{textAlign:'center',color:'#777',marginBottom:'2rem',fontSize:'15px'}}>Not a generic AI tool — a purpose-built assistant for every stage of the listing process.</p>
+          <div style={{maxWidth:'640px',margin:'0 auto 3.5rem',background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 20px',textAlign:'center'}}>
+            <p style={{fontSize:'13px',color:'#6b7280',margin:'0',lineHeight:'1.7'}}>
+              💡 <strong style={{color:'#1D9E75'}}>Works with your existing tools.</strong> Copy, export, and use content across your MLS, CRM, email platform, and social channels. Direct integrations coming soon.
+            </p>
+          </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))',gap:'1.5rem'}}>
             {[
               {icon:'📋',title:'Seller Meeting Prep',desc:'Meeting outlines, talking points, seller questions, and follow-up emails — before every appointment.'},
@@ -117,6 +197,19 @@ export default function Home() {
               {icon:'🚀',title:'7-Day Launch Kit',desc:'A complete day-by-day marketing plan with social posts, email sequences, and pro tips.'},
               {icon:'✨',title:'Listing Rewriter',desc:'Paste any boring MLS description and get a polished, buyer-ready rewrite instantly.'},
               {icon:'🎙️',title:'Brand Voice Memory',desc:'Save your tone, style, and CTA preferences so every listing sounds like you.'},
+              {icon:'🛡️',title:'Objection Handler',desc:'Turn any seller or buyer objection into a confident, professional response — instantly.'},
+              {icon:'📅',title:'Social Content Planner',desc:'Generate a full 7-day social media calendar for any listing — Instagram, Facebook, LinkedIn, Twitter and SMS.'},
+              {icon:'💰',title:'Seller Net Sheet',desc:'Estimate your seller\'s take-home proceeds before closing. Fast, clear, and easy to share.'},
+              {icon:'🏆',title:'Agent Portfolio',desc:'A shareable public portfolio page with all your past listings. Send it to any potential client. Pro only.'},
+              {icon:'👥',title:'Leads & CRM',desc:'Track your pipeline, manage contacts, and stay on top of every client relationship.'},
+              {icon:'✦',title:'AI Chat Assistant',desc:'Ask anything about real estate or your listings. Your always-on AI assistant built for agents.'},
+              {icon:'📞',title:'Scripts Library',desc:'Cold call, door knock, FSBO, and expired listing scripts — ready to use and AI-customized for your market.'},
+              {icon:'🎙️',title:'Call Capture',desc:'Answer your phone, close more deals. Record client calls, auto-transcribe, and instantly log lead details to your CRM. Pro only.',},
+              {icon:'⭐',title:'Career Highlights',desc:'Capture your favorite closing moments with photos and memories. Market the listing today — remember the moment tomorrow.'},
+              {icon:'📬',title:'Postcard Copy',desc:'Generate Just Listed & Just Sold postcard copy in seconds — ready to send to the neighborhood.'},
+              {icon:'🤝',title:'Referral Request',desc:'Turn every closing into your next listing. Email, text, phone and LinkedIn referral scripts — personalized for every client.'},
+              {icon:'🎬',title:'Video Studio',desc:'Turn one listing into a complete short-form video ad kit — script, caption, hashtags, motion prompt, and more.'},
+              {icon:'🚨',title:'Listing Rescue',desc:'Diagnose exactly why your listing is sitting — and get a complete AI-powered rescue plan to reposition, remarket, and sell it.'},
             ].map(({icon,title,desc}) => (
               <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
                 onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}
@@ -126,6 +219,134 @@ export default function Home() {
                 <p style={{fontSize:'13px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AI CHAT FEATURE HIGHLIGHT */}
+      <section style={{padding:'5rem 2rem',background:'linear-gradient(135deg,#0d1117 0%,#1a1d2e 100%)'}}>
+        <div style={{maxWidth:'860px',margin:'0 auto',textAlign:'center'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(29,158,117,0.15)',color:'#1D9E75',fontSize:'12px',fontWeight:'700',padding:'5px 14px',borderRadius:'20px',marginBottom:'1.5rem',letterSpacing:'0.5px',border:'1px solid rgba(29,158,117,0.3)'}}>
+            <span style={{width:'6px',height:'6px',borderRadius:'50%',background:'#1D9E75',display:'inline-block'}}/>
+            PRO FEATURE
+          </div>
+          <h2 style={{fontSize:'clamp(1.75rem, 4vw, 2.5rem)',fontWeight:'800',color:'#f0f0f0',marginBottom:'1rem',letterSpacing:'-0.3px'}}>
+            Your always-on AI assistant.<br/>
+            <span style={{color:'#1D9E75'}}>Built for real estate agents.</span>
+          </h2>
+          <p style={{fontSize:'15px',color:'#8b8fa8',maxWidth:'560px',margin:'0 auto 3rem',lineHeight:'1.8'}}>
+            Ask real estate questions, navigate your tools, add leads, set reminders — all from one smart chat widget available on every page.
+          </p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'1.25rem',marginBottom:'3rem'}}>
+            {[
+              {icon:'💬',title:'Ask anything',desc:'"What\'s the average days on market in Newport Beach right now?"'},
+              {icon:'🧭',title:'Navigate instantly',desc:'"Take me to Seller Prep" — and it takes you there.'},
+              {icon:'👥',title:'Add leads by voice',desc:'"Add John Smith, john@email.com as a lead" — done.'},
+              {icon:'⏰',title:'Set reminders',desc:'"Remind me to call Sarah on Friday at 10AM" — saved.'},
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{background:'rgba(255,255,255,0.04)',borderRadius:'14px',padding:'1.5rem',border:'1px solid rgba(255,255,255,0.08)',textAlign:'left'}}>
+                <div style={{fontSize:'1.75rem',marginBottom:'10px'}}>{icon}</div>
+                <h3 style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#5a5f72',lineHeight:'1.7',margin:'0',fontStyle:'italic'}}>{desc}</p>
+              </div>
+            ))}
+          </div>
+          <a href="/signup" onClick={() => trackCTAClick('chat_feature_cta', 'homepage')}
+            style={{display:'inline-block',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',padding:'14px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'15px',boxShadow:'0 4px 24px rgba(29,158,117,0.4)'}}>
+            Try the AI Assistant Free →
+          </a>
+        </div>
+      </section>
+
+      {/* CALL CAPTURE SECTION */}
+      <section style={{padding:'5rem 2rem',background:'#fff'}}>
+        <div style={{maxWidth:'860px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',marginBottom:'1.5rem'}}>
+            <div style={{width:'52px',height:'52px',background:'linear-gradient(135deg,#ef4444,#b91c1c)',borderRadius:'16px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',boxShadow:'0 4px 16px rgba(239,68,68,0.3)'}}>📞</div>
+            <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'rgba(239,68,68,0.08)',color:'#ef4444',fontSize:'12px',fontWeight:'700',padding:'5px 14px',borderRadius:'20px',letterSpacing:'0.5px',border:'1px solid rgba(239,68,68,0.2)'}}>
+              PRO EXCLUSIVE FEATURE
+            </div>
+          </div>
+          <h2 style={{textAlign:'center',fontSize:'clamp(1.75rem, 4vw, 2.5rem)',fontWeight:'800',marginBottom:'1rem',letterSpacing:'-0.3px'}}>
+            Answer your phone.<br/>
+            <span style={{color:'#ef4444'}}>Close more deals.</span>
+          </h2>
+          <p style={{textAlign:'center',fontSize:'15px',color:'#777',maxWidth:'560px',margin:'0 auto 3rem',lineHeight:'1.8'}}>
+            Call Capture records your client calls, automatically transcribes them, extracts the lead details, and logs everything directly into your CRM — while you're still on the call.
+          </p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'1.5rem',marginBottom:'3rem'}}>
+            {[
+              {icon:'🔴',title:'One tap to record',desc:'Hit record when you answer. Place your phone on speaker. Call Capture listens to both sides of the conversation.'},
+              {icon:'🤖',title:'AI transcribes instantly',desc:'When the call ends, Whisper AI transcribes every word with near-perfect accuracy — even with background noise.'},
+              {icon:'👤',title:'Lead auto-extracted',desc:'Our AI pulls out the caller\'s name, phone, property address, price range, timeline, and motivation automatically.'},
+              {icon:'📋',title:'Saved to your CRM',desc:'The lead is instantly added to Leads & Clients with full notes from the call. Ready to follow up in one click.'},
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
+                onMouseOver={e => {e.currentTarget.style.borderColor='#ef4444';e.currentTarget.style.boxShadow='0 4px 20px rgba(239,68,68,0.08)'}}
+                onMouseOut={e => {e.currentTarget.style.borderColor='#eee';e.currentTarget.style.boxShadow='none'}}>
+                <div style={{fontSize:'2rem',marginBottom:'12px'}}>{icon}</div>
+                <h3 style={{fontSize:'15px',fontWeight:'700',marginBottom:'8px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{background:'linear-gradient(135deg,#fff5f5,#fff8f8)',border:'1px solid rgba(239,68,68,0.15)',borderRadius:'16px',padding:'2rem',marginBottom:'2rem'}}>
+            <p style={{fontSize:'13px',fontWeight:'700',color:'#ef4444',margin:'0 0 12px',letterSpacing:'0.5px'}}>⚖️ BUILT FOR COMPLIANCE</p>
+            <p style={{fontSize:'14px',color:'#555',lineHeight:'1.8',margin:'0'}}>
+              Call Capture automatically detects your state's recording laws. In two-party consent states like California, Illinois, and Washington, it provides ready-to-use consent scripts you can read to your client before recording starts — keeping you fully compliant.
+            </p>
+          </div>
+          <div style={{textAlign:'center'}}>
+            <a href="/signup"
+              style={{display:'inline-block',background:'linear-gradient(135deg,#ef4444,#b91c1c)',color:'#fff',padding:'14px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'15px',boxShadow:'0 4px 24px rgba(239,68,68,0.3)',marginBottom:'12px'}}>
+              Try Call Capture Free →
+            </a>
+            <p style={{fontSize:'12px',color:'#aaa',margin:'0'}}>Available on Pro plan · 24 hour free trial · No credit card</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CAREER HIGHLIGHTS SECTION */}
+      <section style={{padding:'5rem 2rem',background:'#f9fafb'}}>
+        <div style={{maxWidth:'860px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',marginBottom:'1.5rem'}}>
+            <div style={{width:'52px',height:'52px',background:'linear-gradient(135deg,#f59e0b,#d97706)',borderRadius:'16px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',boxShadow:'0 4px 16px rgba(245,158,11,0.3)'}}>⭐</div>
+          </div>
+          <h2 style={{textAlign:'center',fontSize:'clamp(1.75rem, 4vw, 2.5rem)',fontWeight:'800',marginBottom:'1rem',letterSpacing:'-0.3px'}}>
+            Market the listing today.<br/>
+            <span style={{color:'#f59e0b'}}>Remember the moment tomorrow.</span>
+          </h2>
+          <p style={{textAlign:'center',fontSize:'15px',color:'#777',maxWidth:'560px',margin:'0 auto 3rem',lineHeight:'1.8'}}>
+            Every closing has a story. Career Highlights lets you capture your favorite moments — the first-time buyers who cried at the table, the record sale, the client who became a friend — with a photo and a memory, saved forever.
+          </p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))',gap:'1.5rem',marginBottom:'3rem'}}>
+            {[
+              {icon:'📸',title:'Add a photo',desc:'Upload a photo from any closing — the property, the clients, the moment. Your highlight reel, your way.'},
+              {icon:'✍️',title:'Write your memory',desc:'Capture the story behind the sale. First-time buyers, record prices, referrals — the moments that made your career.'},
+              {icon:'🏆',title:'Your highlight reel',desc:'All your best closings in one beautiful place. A private gallery of everything you\'ve built.'},
+              {icon:'🔗',title:'Share on your portfolio',desc:'Your Career Highlights appear on your public Agent Portfolio — showing clients the human behind the agent.'},
+            ].map(({icon,title,desc}) => (
+              <div key={title} style={{background:'#fff',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
+                onMouseOver={e => {e.currentTarget.style.borderColor='#f59e0b';e.currentTarget.style.boxShadow='0 4px 20px rgba(245,158,11,0.1)'}}
+                onMouseOut={e => {e.currentTarget.style.borderColor='#eee';e.currentTarget.style.boxShadow='none'}}>
+                <div style={{fontSize:'2rem',marginBottom:'12px'}}>{icon}</div>
+                <h3 style={{fontSize:'15px',fontWeight:'700',marginBottom:'8px'}}>{title}</h3>
+                <p style={{fontSize:'13px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{background:'linear-gradient(135deg,#fffbeb,#fef3c7)',border:'1px solid rgba(245,158,11,0.2)',borderRadius:'16px',padding:'2rem',marginBottom:'2rem',textAlign:'center'}}>
+            <p style={{fontSize:'1.25rem',fontStyle:'italic',color:'#92400e',lineHeight:'1.8',margin:'0 0 12px'}}>
+              "First-time buyers — they cried at the closing table. One of my favorite moments in 10 years of real estate."
+            </p>
+            <p style={{fontSize:'13px',color:'#a16207',margin:'0',fontWeight:'600'}}>— The kind of moment Career Highlights was built to capture</p>
+          </div>
+          <div style={{textAlign:'center'}}>
+            <a href="/signup"
+              style={{display:'inline-block',background:'linear-gradient(135deg,#f59e0b,#d97706)',color:'#fff',padding:'14px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'15px',boxShadow:'0 4px 24px rgba(245,158,11,0.3)',marginBottom:'12px'}}>
+              Start Capturing Your Moments →
+            </a>
+            <p style={{fontSize:'12px',color:'#aaa',margin:'0'}}>Free to start · No credit card required</p>
           </div>
         </div>
       </section>
@@ -281,7 +502,13 @@ export default function Home() {
                 <li>Tone & buyer targeting</li>
                 <li>Saved listing history</li>
                 <li>Pricing assistant</li>
+                <li>Objection handler</li>
+                <li>Social content planner</li>
+                <li>Seller net sheet</li>
+                <li>Agent portfolio page</li>
+                <li>AI chat assistant</li>
                 <li>Follow-up tools</li>
+                <li>Call Capture — auto-log calls</li>
               </ul>
             </div>
           </div>
@@ -301,7 +528,7 @@ export default function Home() {
             <p style={{fontSize:'12px',color:'#bbb',marginBottom:'1.5rem'}}>24 hours of full Pro access</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
               <li>✅ 24 hours of Pro access</li>
-              <li>✅ 2 listings included</li>
+              <li>✅ Unlimited listings during trial</li>
               <li>✅ All 11 copy formats</li>
               <li>✅ All AI assistant tools</li>
               <li>✅ No credit card needed</li>
@@ -328,7 +555,17 @@ export default function Home() {
               <li>✅ Snap & start on-site</li>
               <li>✅ 7-day launch kit</li>
               <li>✅ Pricing assistant</li>
+              <li>✅ Objection handler</li>
+              <li>✅ Social content planner</li>
+              <li>✅ Seller net sheet</li>
+              <li>✅ Agent portfolio page</li>
+              <li>✅ AI chat assistant</li>
               <li>✅ Brand voice memory</li>
+              <li>✅ Buyer consultation kit</li>
+              <li>✅ Postcard copy generator</li>
+              <li>✅ Referral request scripts</li>
+              <li>✅ Career highlights page</li>
+              <li>✅ Call Capture — auto-log calls to CRM</li>
               <li>✅ Priority support</li>
             </ul>
             <a href="/signup" onClick={() => trackCTAClick('pricing_pro_cta', 'homepage')}
@@ -345,13 +582,17 @@ export default function Home() {
         <div style={{maxWidth:'620px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'3.5rem',letterSpacing:'-0.3px'}}>Frequently asked questions</h2>
           {[
-            {q:'Is this really free to start?',a:'Yes. You get 24 hours of full Pro access and 2 listings completely free — no credit card required. After your trial, Pro is $20/month with unlimited listings and all features.'},
+            {q:'Is this really free to start?',a:'Yes. You get 24 hours of full Pro access — unlimited listings completely free — no credit card required. After your trial, Pro is $20/month with unlimited listings and all features.'},
             {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, SMS, Flyer, Price Drop, and SEO copy — all from one set of notes.'},
             {q:'What is Seller Meeting Prep?',a:'Before your listing appointment, Listing Whisperer generates a complete meeting outline, talking points, questions to ask the seller, and a follow-up email — so you walk in fully prepared.'},
             {q:'What is Snap & Start?',a:'On your phone or tablet, upload property photos on-site. Our AI detects visible features, you confirm the details, and generate your first draft before you leave the property.'},
             {q:'How is this different from ChatGPT?',a:'Listing Whisperer is built specifically for real estate agents. It covers the entire listing workflow — seller prep, on-site photo drafts, full marketing launch, and pricing strategy — not just copy generation. No prompt writing required.'},
             {q:'Can I cancel anytime?',a:'Yes. No contracts, no commitments. Cancel your Pro subscription anytime from your account settings.'},
             {q:'How good is the copy quality?',a:'Our AI is trained specifically for real estate marketing and produces MLS-ready, professional copy that sounds like it was written by an experienced agent.'},
+            {q:'What is the Objection Handler?',a:'Type in any objection you\'re hearing from a seller or buyer — like "your commission is too high" or "Zillow says it\'s worth more" — and get a confident, professional response instantly.'},
+            {q:'What is the Seller Net Sheet?',a:'A fast proceeds estimator. Enter the sale price, mortgage balance, commission, and closing costs — and instantly see how much your seller will walk away with. Easy to print and share.'},
+            {q:'What is the Agent Portfolio?',a:'A shareable public page at listingwhisperer.com/portfolio/yourname that shows all your past listings and brand info. Send it to any potential client to showcase your work. Pro only.'},
+            {q:'Does it have an AI chat assistant?',a:'Yes. The AI chat widget is available on your dashboard. Ask it anything about real estate, your listings, or how to use any tool in the app.'},
           ].map(({q,a}) => (
             <div key={q} style={{borderBottom:'1px solid #e5e7eb',paddingBottom:'1.5rem',marginBottom:'1.5rem'}}>
               <p style={{fontWeight:'700',fontSize:'15px',marginBottom:'8px',color:'#111'}}>{q}</p>
@@ -364,19 +605,22 @@ export default function Home() {
       {/* BOTTOM CTA */}
       <section style={{padding:'5rem 2rem',background:'linear-gradient(135deg,#f0fdf8,#e8f9f2)',textAlign:'center',borderTop:'1px solid #bbf0d9'}}>
         <h2 style={{fontSize:'2rem',fontWeight:'800',marginBottom:'0.75rem',letterSpacing:'-0.3px'}}>Your AI listing assistant is ready.</h2>
-        <p style={{fontSize:'15px',color:'#555',marginBottom:'2rem',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 24 hours of full Pro access, 2 listings included. No credit card needed.</p>
+        <p style={{fontSize:'16px',color:'#085041',fontWeight:'600',maxWidth:'560px',margin:'0 auto 1.25rem',lineHeight:'1.7',fontStyle:'italic'}}>
+          "From listing appointment to closing — Listing Whisperer handles the marketing, so you can focus on the clients."
+        </p>
+        <p style={{fontSize:'15px',color:'#555',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 24 hours of full Pro access, unlimited listings. No credit card needed.</p>
         <a href="/signup" onClick={() => trackCTAClick('bottom_cta', 'homepage')}
           style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'16px 40px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 24px rgba(29,158,117,0.35)'}}>
-          Get Started Free →
+          Start Free — No Credit Card
         </a>
-        <p style={{fontSize:'13px',color:'#aaa',marginTop:'1rem'}}>No credit card · 2 listings included · Cancel anytime</p>
+        <p style={{fontSize:'13px',color:'#aaa',marginTop:'1rem'}}>No credit card · Unlimited listings · Cancel anytime</p>
       </section>
 
       {/* FOOTER */}
       <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid #eee',background:'#fff'}}>
         <div style={{fontSize:'16px',fontWeight:'700',marginBottom:'8px'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <p style={{fontSize:'13px',color:'#aaa',marginBottom:'8px'}}>The AI assistant for real estate agents. Before the appointment, on-site, and at launch.</p>
-        <p style={{fontSize:'13px',color:'#aaa'}}>© 2026 Listing Whisperer · <a href="/login" style={{color:'#aaa'}}>Sign In</a> · <a href="/signup" style={{color:'#aaa'}}>Get Started Free</a> · <a href="#pricing" style={{color:'#aaa'}}>Pricing</a> · <a href="/contact" style={{color:'#aaa'}}>Contact Us</a></p>
+        <p style={{fontSize:'13px',color:'#aaa'}}>© 2026 Listing Whisperer · <a href="/login" style={{color:'#aaa'}}>Sign In</a> · <a href="/signup" style={{color:'#aaa'}}>Start Free — No Credit Card</a> · <a href="#pricing" style={{color:'#aaa'}}>Pricing</a> · <a href="/contact" style={{color:'#aaa'}}>Contact Us</a> · <a href="/terms" style={{color:'#aaa'}}>Terms</a> · <a href="/privacy" style={{color:'#aaa'}}>Privacy</a></p>
       </footer>
 
     </main>

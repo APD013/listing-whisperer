@@ -2,8 +2,11 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { useTheme } from '../lib/theme'
 import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
 import jsPDF from 'jspdf'
+import OnboardingModal from '../components/OnboardingModal'
+import DashboardChecklist from '../components/DashboardChecklist'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,8 +15,10 @@ const supabase = createClient(
 
 export default function Dashboard() {
   const router = useRouter()
+  const { theme, toggleTheme } = useTheme()
   const [userId, setUserId] = useState<string | null>(null)
   const [listingsUsed, setListingsUsed] = useState(0)
+  const [trialEndsAt, setTrialEndsAt] = useState('')
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
   const [listingCredits, setListingCredits] = useState(0)
@@ -29,17 +34,26 @@ export default function Dashboard() {
   const [featuredKey, setFeaturedKey] = useState('mls_standard')
   const [userName, setUserName] = useState('')
   const [referralCode, setReferralCode] = useState('')
+  const [brandVoice, setBrandVoice] = useState<any>({})
   const [referralCopied, setReferralCopied] = useState(false)
   const [showReferralBanner, setShowReferralBanner] = useState(false)
   const [dueReminders, setDueReminders] = useState<any[]>([])
   const [showReminderPopup, setShowReminderPopup] = useState(false)
   const [showChat, setShowChat] = useState(false)
+  const [currentListingId, setCurrentListingId] = useState<string | null>(null)
+  const [listingNameInput, setListingNameInput] = useState('')
   const [chatMessages, setChatMessages] = useState<{role:string,content:string}[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<Record<string,boolean>>({'win':true,'build':true,'launch':true,'manage':true})
+  const [leads, setLeads] = useState<any[]>([])
+  const [workspaceListing, setWorkspaceListing] = useState<any>(null)
+  const [workspaceLeads, setWorkspaceLeads] = useState<number>(0)
+  const [workspaceReminders, setWorkspaceReminders] = useState<number>(0)
+  const [recentActivity, setRecentActivity] = useState<{type:string;text:string;created_at:string}[]>([])
 
   const [form, setForm] = useState({
-    type: 'Single family', beds: '', sqft: '', price: '',
+    type: 'Single family', beds: '', baths: '', sqft: '', price: '',
     neighborhood: '', features: '', tone: 'Professional', buyer: 'Move-up families',
     notes: '', name: ''
   })
@@ -57,17 +71,27 @@ export default function Dashboard() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const upgraded = params.get('upgraded')
+    const generateFromLead = params.get('generate')
+    const leadNeighborhood = params.get('neighborhood')
+    const leadPrice = params.get('price')
+    const leadName = params.get('name')
+    if (generateFromLead) {
+      setForm(prev => ({...prev, neighborhood: decodeURIComponent(leadNeighborhood || ''), price: decodeURIComponent(leadPrice || ''), name: decodeURIComponent(leadName || '')}))
+      setActivePage('generate')
+      window.scrollTo({top:0,behavior:'smooth'})
+    }
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
       const { data: profile } = await supabase
         .from('profiles')
-        .select('listings_used, plan, listing_credits, brand_voice, full_name, referral_code')
+        .select('listings_used, plan, listing_credits, brand_voice, full_name, referral_code, trial_ends_at')
         .eq('id', user.id)
         .single()
       if (profile) {
         setListingsUsed(profile.listings_used || 0)
+        setTrialEndsAt(profile.trial_ends_at || '')
         setPlan(profile.plan || 'starter')
         setListingCredits(profile.listing_credits || 0)
         setUserName(profile.full_name || '')
@@ -78,6 +102,7 @@ export default function Dashboard() {
           try {
             const bv = JSON.parse(profile.brand_voice)
             if (bv.preferredTone) setForm(prev => ({ ...prev, tone: bv.preferredTone }))
+            setBrandVoice(bv)
           } catch(e) {}
         }
       } else { setPlanLoaded(true) }
@@ -85,6 +110,29 @@ export default function Dashboard() {
         .from('listings').select('*').eq('user_id', user.id)
         .order('created_at', { ascending: false }).limit(10)
       if (listings) setPastListings(listings)
+      const { data: leadsData } = await supabase
+        .from('leads').select('id, name, status, created_at').eq('user_id', user.id)
+        .order('created_at', { ascending: false }).limit(5)
+      if (leadsData) setLeads(leadsData)
+
+      const { data: wsListing } = await supabase.from('listings').select('id, name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1)
+      if (wsListing && wsListing[0]) setWorkspaceListing(wsListing[0])
+      const { data: wsLeadsAll } = await supabase.from('leads').select('id').eq('user_id', user.id)
+      setWorkspaceLeads(wsLeadsAll ? wsLeadsAll.length : 0)
+      const { data: wsRemindersData } = await supabase.from('reminders').select('id').eq('user_id', user.id).eq('sent', false).lte('remind_at', new Date().toISOString())
+      setWorkspaceReminders(wsRemindersData ? wsRemindersData.length : 0)
+      const [{ data: actListings }, { data: actLeads }, { data: actVideoKits }] = await Promise.all([
+        supabase.from('listings').select('name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
+        supabase.from('leads').select('name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
+        supabase.from('video_kits').select('video_goal, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(2),
+      ])
+      const allActivity = [
+        ...(actListings || []).map((l: any) => ({ type: 'listing', text: `Generated listing: ${l.name || 'Untitled'}`, created_at: l.created_at })),
+        ...(actLeads || []).map((l: any) => ({ type: 'lead', text: `Added lead: ${l.name}`, created_at: l.created_at })),
+        ...(actVideoKits || []).map((v: any) => ({ type: 'video', text: `Created video kit: ${v.video_goal || 'Video Kit'}`, created_at: v.created_at })),
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 5)
+      setRecentActivity(allActivity)
+
       if (upgraded) setPlan('pro')
 
       const checkReminders = async () => {
@@ -95,8 +143,12 @@ export default function Dashboard() {
           .eq('sent', false)
           .lte('remind_at', new Date().toISOString())
         if (reminders && reminders.length > 0) {
-          setDueReminders(reminders)
-          setShowReminderPopup(true)
+          const dismissed = JSON.parse(sessionStorage.getItem('lw_dismissed_reminders') || '[]')
+          const undismissed = reminders.filter((r: any) => !dismissed.includes(r.id))
+          if (undismissed.length > 0) {
+            setDueReminders(undismissed)
+            setShowReminderPopup(true)
+          }
         }
       }
       checkReminders()
@@ -114,14 +166,14 @@ export default function Dashboard() {
 
   const generate = async () => {
     if (!form.features && !form.neighborhood) { alert('Please fill in at least the neighborhood and features!'); return }
-    if (plan === 'starter' && listingsUsed >= 2 && listingCredits <= 0) { setShowUpgradeModal(true); return }
+    if (plan === 'starter' && listingCredits <= 0 && new Date() > new Date((trialEndsAt || ''))) { setShowUpgradeModal(true); return }
     setLoading(true)
     setOutputs(null)
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property: form, userId })
+        body: JSON.stringify({ property: {...form, beds: `${form.beds} bed${form.baths ? ' / ' + form.baths + ' bath' : ''}`}, userId })
       })
       const data = await res.json()
       if (data.error === 'LIMIT_REACHED') { setShowUpgradeModal(true); setLoading(false); return }
@@ -134,7 +186,10 @@ export default function Dashboard() {
         const { data: listings } = await supabase
           .from('listings').select('*').eq('user_id', userId)
           .order('created_at', { ascending: false }).limit(10)
-        if (listings) setPastListings(listings)
+        if (listings) {
+          setPastListings(listings)
+          if (listings[0]) setCurrentListingId(listings[0].id)
+        }
       }
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
@@ -186,49 +241,226 @@ export default function Dashboard() {
     try {
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const pageWidth = doc.internal.pageSize.getWidth()
-      const margin = 20
+      const pageHeight = doc.internal.pageSize.getHeight()
+      const margin = 18
       const contentWidth = pageWidth - margin * 2
-      let y = 20
-      const addText = (text: string, x: number, yPos: number, options: any = {}) => { doc.text(text, x, yPos, options) }
-      const addWrappedText = (text: string, x: number, yPos: number, maxWidth: number, lineHeight: number = 6) => {
+      let y = 0
+
+      // Brand colors
+      const green = [29, 158, 117] as [number, number, number]
+      const darkGreen = [8, 80, 65] as [number, number, number]
+      const dark = [13, 17, 23] as [number, number, number]
+      const white = [255, 255, 255] as [number, number, number]
+      const lightGray = [245, 247, 250] as [number, number, number]
+      const textDark = [30, 30, 40] as [number, number, number]
+      const textMid = [80, 85, 100] as [number, number, number]
+      const textLight = [140, 145, 160] as [number, number, number]
+
+      const addWrappedText = (text: string, x: number, yPos: number, maxWidth: number, lineHeight: number = 5.5) => {
         const lines = doc.splitTextToSize(text, maxWidth)
         doc.text(lines, x, yPos)
         return yPos + (lines.length * lineHeight)
       }
-      const addSectionTitle = (title: string, yPos: number) => {
-        doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(29, 158, 117)
-        addText(title.toUpperCase(), margin, yPos)
-        doc.setDrawColor(29, 158, 117); doc.line(margin, yPos + 2, pageWidth - margin, yPos + 2)
-        return yPos + 8
-      }
+
       const checkPageBreak = (yPos: number, needed: number = 30) => {
-        if (yPos > 270 - needed) { doc.addPage(); return 20 }
+        if (yPos > pageHeight - needed) {
+          doc.addPage()
+          // Add header on new page
+          doc.setFillColor(...dark)
+          doc.rect(0, 0, pageWidth, 14, 'F')
+          doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
+          doc.text('ListingWhisperer', margin, 9)
+          doc.setTextColor(...textLight); doc.setFont('helvetica', 'normal')
+          doc.text(form.neighborhood || form.name || '', pageWidth - margin, 9, { align: 'right' })
+          return 22
+        }
         return yPos
       }
+
+      const addSectionTitle = (title: string, yPos: number) => {
+        doc.setFillColor(...lightGray)
+        doc.roundedRect(margin, yPos - 4, contentWidth, 10, 1, 1, 'F')
+        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
+        doc.text(title.toUpperCase(), margin + 4, yPos + 2.5)
+        return yPos + 12
+      }
+
       if (type === 'mls') {
-        doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor(29, 158, 117)
-        addText('ListingWhisperer', margin, y)
-        doc.setFontSize(18); doc.setTextColor(17, 17, 17); doc.setFont('helvetica', 'bold')
-        addText(form.price || '', pageWidth - margin, y, { align: 'right' })
-        y += 8; doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 100, 100)
-        addText(form.neighborhood || '', pageWidth - margin, y, { align: 'right' })
-        doc.setDrawColor(29, 158, 117); doc.setLineWidth(0.8); doc.line(margin, y + 4, pageWidth - margin, y + 4)
-        y += 14; y = addSectionTitle('MLS Description', y)
-        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50)
+        // DARK HEADER BANNER
+        doc.setFillColor(...dark)
+        doc.rect(0, 0, pageWidth, 36, 'F')
+        doc.setFillColor(...green)
+        doc.rect(0, 36, pageWidth, 2, 'F')
+
+        // Brand name
+        doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
+        doc.text('Listing', margin, 18)
+        const listingWidth = doc.getTextWidth('Listing')
+        doc.setTextColor(...white)
+        doc.text('Whisperer', margin + listingWidth, 18)
+
+        // Price — big and bold
+        doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
+        doc.text(form.price || '', pageWidth - margin, 16, { align: 'right' })
+
+        // Address/neighborhood
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(...green)
+        doc.text(form.neighborhood || form.name || '', margin, 28)
+
+        // Property details strip
+        const details = [form.type, form.beds, form.sqft ? form.sqft + ' sq ft' : ''].filter(Boolean).join('  ·  ')
+        doc.setTextColor(180, 180, 180); doc.setFontSize(8)
+        doc.text(details, pageWidth - margin, 28, { align: 'right' })
+
+        y = 46
+
+        // Agent info if available
+        const bv = brandVoice
+        if (bv.agentName || bv.phone) {
+          doc.setFillColor(240, 253, 248)
+          doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'F')
+          doc.setDrawColor(...green); doc.setLineWidth(0.3)
+          doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'S')
+          doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textDark)
+          doc.text(bv.agentName || '', margin + 4, y + 6)
+          if (bv.brokerage) {
+            doc.setFont('helvetica', 'normal'); doc.setTextColor(...textMid)
+            doc.text(bv.brokerage, margin + 4, y + 11)
+          }
+          if (bv.phone) {
+            doc.setTextColor(...green); doc.setFont('helvetica', 'bold')
+            doc.text(bv.phone, pageWidth - margin - 4, y + 6, { align: 'right' })
+          }
+          if (bv.website) {
+            doc.setFont('helvetica', 'normal'); doc.setTextColor(...textMid)
+            doc.text(bv.website, pageWidth - margin - 4, y + 11, { align: 'right' })
+          }
+          y += 20
+        }
+
+        // MLS DESCRIPTION
+        y = addSectionTitle('MLS Description', y)
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
         y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
-        y += 10; y = checkPageBreak(y); y = addSectionTitle('Luxury MLS', y)
+
+        y += 8; y = checkPageBreak(y)
+        y = addSectionTitle('Luxury MLS Version', y)
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
         y = addWrappedText(outputs.mls_luxury || '', margin, y, contentWidth)
-        y += 10; y = checkPageBreak(y); y = addSectionTitle('Email Blast', y)
+
+        y += 8; y = checkPageBreak(y)
+        y = addSectionTitle('Email Blast', y)
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
         y = addWrappedText(outputs.email || '', margin, y, contentWidth)
-        doc.setFontSize(9); doc.setTextColor(150, 150, 150)
-        addText('Generated by ListingWhisperer.com', pageWidth / 2, 285, { align: 'center' })
-        doc.save(`MLS-Sheet-${form.neighborhood || 'listing'}.pdf`)
+
+        // FOOTER
+        doc.setFillColor(...dark)
+        doc.rect(0, pageHeight - 12, pageWidth, 12, 'F')
+        doc.setFontSize(7); doc.setTextColor(...textLight); doc.setFont('helvetica', 'normal')
+        doc.text('Generated by ListingWhisperer.com — AI Assistant for Real Estate Agents', pageWidth / 2, pageHeight - 5, { align: 'center' })
+
+        doc.save(`MLS-Sheet-${form.neighborhood || form.name || 'listing'}.pdf`)
+
       } else if (type === 'flyer') {
-        doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(29, 158, 117)
-        addText(form.price || '', pageWidth / 2, y + 10, { align: 'center' })
-        doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(17, 17, 17)
-        addText(form.neighborhood || '', pageWidth / 2, y + 20, { align: 'center' })
-        doc.setDrawColor(29, 158, 117); doc.setLineWidth(0.8); doc.line(margin, y + 32, pageWidth - margin, y + 32)
+        // DARK HEADER BANNER
+        doc.setFillColor(...dark)
+        doc.rect(0, 0, pageWidth, 50, 'F')
+        doc.setFillColor(...green)
+        doc.rect(0, 50, pageWidth, 3, 'F')
+
+        // Brand
+        doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
+        doc.text('Listing', margin, 12)
+        const lw = doc.getTextWidth('Listing')
+        doc.setTextColor(...white)
+        doc.text('Whisperer', margin + lw, 12)
+
+        // JUST LISTED badge
+        doc.setFillColor(...green)
+        doc.roundedRect(pageWidth - margin - 28, 6, 28, 8, 2, 2, 'F')
+        doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
+        doc.text('JUST LISTED', pageWidth - margin - 14, 11.5, { align: 'center' })
+
+        // Price — huge
+        doc.setFontSize(28); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
+        doc.text(form.price || 'Price Upon Request', pageWidth / 2, 32, { align: 'center' })
+
+        // Address
+        doc.setFontSize(12); doc.setFont('helvetica', 'normal'); doc.setTextColor(180, 220, 200)
+        doc.text(form.neighborhood || form.name || '', pageWidth / 2, 42, { align: 'center' })
+
+        y = 62
+
+        // Property specs bar
+        const specs = [
+          form.type,
+          form.beds,
+          form.sqft ? form.sqft + ' sq ft' : ''
+        ].filter(Boolean)
+
+        if (specs.length > 0) {
+          const specWidth = contentWidth / specs.length
+          specs.forEach((spec, i) => {
+            const x = margin + (i * specWidth) + (specWidth / 2)
+            doc.setFillColor(...lightGray)
+            doc.roundedRect(margin + (i * specWidth) + 2, y - 4, specWidth - 4, 16, 2, 2, 'F')
+            doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textDark)
+            doc.text(spec, x, y + 5, { align: 'center' })
+          })
+          y += 22
+        }
+
+        // Description
+        y = addSectionTitle('About This Home', y)
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
+        y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
+
+        // Features
+        if (form.features) {
+          y += 8; y = checkPageBreak(y)
+          y = addSectionTitle('Key Features', y)
+          const features = form.features.split(',').map((f: string) => f.trim()).filter(Boolean)
+          doc.setFontSize(10); doc.setTextColor(...textDark)
+          features.forEach((feature: string) => {
+            y = checkPageBreak(y, 10)
+            doc.setFillColor(...green)
+            doc.circle(margin + 2, y - 1, 1, 'F')
+            doc.text(feature, margin + 6, y)
+            y += 6
+          })
+        }
+
+        // Agent card
+        const bv = brandVoice
+        if (bv.agentName || bv.phone) {
+          y += 10; y = checkPageBreak(y, 30)
+          doc.setFillColor(...dark)
+          doc.roundedRect(margin, y, contentWidth, 28, 3, 3, 'F')
+          doc.setFillColor(...green)
+          doc.roundedRect(margin, y, 4, 28, 2, 2, 'F')
+
+          doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
+          doc.text(bv.agentName || '', margin + 10, y + 10)
+          doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(...green)
+          doc.text(bv.brokerage || '', margin + 10, y + 17)
+          if (bv.phone) {
+            doc.setTextColor(...white); doc.setFont('helvetica', 'bold'); doc.setFontSize(11)
+            doc.text(bv.phone, pageWidth - margin - 4, y + 10, { align: 'right' })
+          }
+          if (bv.website) {
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...green)
+            doc.text(bv.website, pageWidth - margin - 4, y + 17, { align: 'right' })
+          }
+          y += 34
+        }
+
+        // FOOTER
+        doc.setFillColor(...dark)
+        doc.rect(0, pageHeight - 12, pageWidth, 12, 'F')
+        doc.setFontSize(7); doc.setTextColor(...textLight); doc.setFont('helvetica', 'normal')
+        doc.text('Generated by ListingWhisperer.com — AI Assistant for Real Estate Agents', pageWidth / 2, pageHeight - 5, { align: 'center' })
+
+        doc.save(`Flyer-${form.neighborhood || form.name || 'listing'}.pdf`)
         y += 42; y = addSectionTitle('About This Home', y)
         doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50)
         y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
@@ -259,36 +491,53 @@ export default function Dashboard() {
     { key: 'history', icon: '🕐', label: 'History' },
   ]
 
+  const isDark = theme === 'dark'
   const styles = {
-    page: { minHeight: '100vh', background: '#0d1117', fontFamily: "'Inter', sans-serif", display: 'flex' as const },
-    sidebar: { width: '210px', background: '#0a0d14', borderRight: '1px solid rgba(255,255,255,0.04)', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-210px)' },
+    page: { minHeight: '100vh', background: isDark ? '#111318' : '#f4f5f7', fontFamily: "var(--font-plus-jakarta), sans-serif", display: 'flex' as const, color: isDark ? '#f0f0f0' : '#111318' },
+    sidebar: { width: '210px', background: isDark ? '#0d1018' : '#ffffff', borderRight: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.08)', display: 'flex' as const, flexDirection: 'column' as const, position: 'fixed' as const, top: 0, left: 0, height: '100vh', zIndex: 200, transition: 'transform 0.3s ease' as const, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-210px)' },
     main: { flex: 1, minHeight: '100vh', display: 'flex' as const, flexDirection: 'column' as const },
-    card: { background: 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' },
-    input: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0', boxSizing: 'border-box' as const, outline: 'none' },
-    select: { width: '100%', padding: '11px 14px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', fontSize: '13px', color: '#f0f0f0' },
-    label: { fontSize: '11px', color: '#6b7280', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
+    card: { background: isDark ? 'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)' : '#ffffff', borderRadius: '16px', border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.08)', padding: '1.5rem', boxShadow: isDark ? '0 4px 24px rgba(0,0,0,0.3)' : '0 2px 12px rgba(0,0,0,0.08)' },
+    input: { width: '100%', padding: '11px 14px', background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.04)', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)', borderRadius: '8px', fontSize: '13px', color: isDark ? '#f0f0f0' : '#111318', boxSizing: 'border-box' as const, outline: 'none' },
+    select: { width: '100%', padding: '11px 14px', background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.04)', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)', borderRadius: '8px', fontSize: '13px', color: isDark ? '#f0f0f0' : '#111318' },
+    label: { fontSize: '11px', color: isDark ? '#6b7280' : '#5a6172', display: 'block' as const, marginBottom: '5px', fontWeight: '600' as const, letterSpacing: '0.3px', textTransform: 'uppercase' as const },
   }
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = userName ? userName.split(' ')[0] : ''
 
+  const getRelativeTime = (dateStr: string) => {
+    const diffMs = Date.now() - new Date(dateStr).getTime()
+    const diffHours = Math.floor(diffMs / 3600000)
+    if (diffHours < 1) return 'Just now'
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+    const diffDays = Math.floor(diffHours / 24)
+    if (diffDays === 1) return 'Yesterday'
+    if (diffDays < 7) return `${diffDays} days ago`
+    return new Date(dateStr).toLocaleDateString()
+  }
+
   const buckets = [
     {
       label: 'WIN THE LISTING',
       color: '#8b5cf6',
       cards: [
-        { icon: '📋', title: 'Seller Prep', desc: 'Prepare for your listing appointment', color: '#8b5cf6', href: '/seller-prep' },
+        { icon: '📋', title: 'Seller Prep', desc: 'Prepare for your listing appointment', color: '#8b5cf6', href: '/seller-prep', priority: true },
+        { icon: '🏠', title: 'Buyer Consultation', desc: 'Prepare for your buyer appointments', color: '#6366f1', href: '/buyer-consultation' },
         { icon: '💲', title: 'Pricing Assistant', desc: 'Get a data-backed price range and strategy', color: '#d4af37', href: '/pricing-assistant' },
+        { icon: '📊', title: 'Market Snapshot', desc: 'Instant market analysis for any neighborhood', color: '#1D9E75', href: '/market-snapshot' },
         { icon: '🎯', title: 'Listing Presentation', desc: 'Build your full seller appointment deck', color: '#a78bfa', href: '/listing-presentation' },
+        { icon: '🏆', title: 'Agent Portfolio', desc: 'Your shareable listing portfolio page', color: '#d4af37', href: '/agent-portfolio' },
+        { icon: '⭐', title: 'Career Highlights', desc: 'Capture your favorite closing moments forever', color: '#f59e0b', href: '/career-highlights' },
+        { icon: '🚨', title: 'Listing Rescue', desc: 'Diagnose why your listing is sitting and get a complete rescue plan', color: '#ef4444', href: '/listing-rescue' },
       ]
     },
     {
       label: 'BUILD THE LISTING',
       color: '#1D9E75',
       cards: [
-        { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => setActivePage('generate') },
-        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing' },
+        { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) } },
+        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing', popular: true, startHere: true, tooltip: 'Upload 1 photo → generate full listing marketing', priority: true },
         { icon: '📸', title: 'Snap & Start', desc: 'On-site? Start from photos instantly', color: '#e1306c', href: '/snap-start' },
         { icon: '✍️', title: 'Rewrite Listing', desc: 'Polish and improve existing copy', color: '#6366f1', href: '/rewrite' },
         { icon: '🖼️', title: 'Photo Library', desc: 'Manage your saved property photos', color: '#f97316', href: '/photos' },
@@ -299,22 +548,89 @@ export default function Dashboard() {
       color: '#f59e0b',
       cards: [
         { icon: '🚀', title: 'Launch Plan', desc: '7-day marketing rollout strategy', color: '#f59e0b', href: '/launch-kit' },
+        { icon: '📅', title: 'Social Planner', desc: '7-day social media content calendar', color: '#e1306c', href: '/social-planner' },
         { icon: '🏡', title: 'Open House Kit', desc: 'Flyer, posts, and follow-up emails', color: '#10b981', href: '/open-house' },
+        { icon: '📋', title: 'Open House Sign-In', desc: 'Tablet-friendly visitor sign-in sheet', color: '#1D9E75', href: '/open-house-signin' },
         { icon: '💰', title: 'Price Drop Kit', desc: 'Price improvement announcement suite', color: '#ef4444', href: '/price-drop' },
+        { icon: '📬', title: 'Postcard Copy', desc: 'Just Listed & Just Sold postcard copy generator', color: '#6366f1', href: '/postcard-copy' },
+        { icon: '🎬', title: 'Video Studio', desc: 'Turn one listing photo into a complete video ad kit', color: '#e1306c', href: '/video-studio', pro: true },
+        { icon: '🤝', title: 'Referral Request', desc: 'Turn every closing into your next listing', color: '#10b981', href: '/referral-request' },
       ]
     },
     {
       label: 'MANAGE THE RELATIONSHIP',
       color: '#10b981',
       cards: [
+        { icon: '✅', title: 'Transaction Checklist', desc: 'Track every step from listing to closing', color: '#1D9E75', href: '/transaction-checklist' },
+        { icon: '⏰', title: 'Reminders', desc: 'Never miss a follow-up or deadline', color: '#f59e0b', href: '/reminders' },
         { icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline and contacts', color: '#10b981', href: '/leads' },
-        { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up' },
+        { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up', priority: true },
+        { icon: '💰', title: 'Seller Net Sheet', desc: 'Estimate seller proceeds before closing', color: '#1D9E75', href: '/seller-net-sheet' },
+        { icon: '🧮', title: 'Commission Calculator', desc: 'Calculate your real take-home after splits and fees', color: '#d4af37', href: '/commission-calculator' },
+        { icon: '🛡️', title: 'Objection Handler', desc: 'Turn any objection into a confident response', color: '#8b5cf6', href: '/objection-handler' },
+        { icon: '🏘️', title: 'Neighborhood Bio', desc: 'Generate compelling neighborhood descriptions instantly', color: '#1D9E75', href: '/neighborhood-bio' },
+        { icon: '🔄', title: 'Follow-Up Sequence', desc: 'Generate a complete follow-up sequence for any lead', color: '#6366f1', href: '/follow-up-sequence', priority: true },
+      ]
+    },
+  ]
+
+  const sidebarSections: Array<{key:string;label:string;color:string;items:Array<{icon:string;label:string;href?:string;action?:()=>void}>}> = [
+    {
+      key: 'win', label: 'Win the Listing', color: '#8b5cf6',
+      items: [
+        { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
+        { href: '/buyer-consultation', icon: '🏠', label: 'Buyer Consultation' },
+        { href: '/pricing-assistant', icon: '💲', label: 'Pricing Assistant' },
+        { href: '/market-snapshot', icon: '📊', label: 'Market Snapshot' },
+        { href: '/listing-presentation', icon: '🎯', label: 'Listing Presentation' },
+        { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
+        { href: '/career-highlights', icon: '⭐', label: 'Career Highlights' },
+        { href: '/listing-rescue', icon: '🚨', label: 'Listing Rescue' },
+      ]
+    },
+    {
+      key: 'build', label: 'Build the Listing', color: '#1D9E75',
+      items: [
+        { action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}); setSidebarOpen(false) }, icon: '✨', label: 'New Listing' },
+        { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
+        { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
+        { href: '/rewrite', icon: '✍️', label: 'Rewrite' },
+        { href: '/photos', icon: '🖼️', label: 'Photo Library' },
+      ]
+    },
+    {
+      key: 'launch', label: 'Launch the Listing', color: '#f59e0b',
+      items: [
+        { href: '/launch-kit', icon: '🚀', label: 'Launch Plan' },
+        { href: '/social-planner', icon: '📅', label: 'Social Planner' },
+        { href: '/open-house', icon: '🏡', label: 'Open House Kit' },
+        { href: '/open-house-signin', icon: '📋', label: 'Open House Sign-In' },
+        { href: '/price-drop', icon: '💰', label: 'Price Drop Kit' },
+        { href: '/postcard-copy', icon: '📬', label: 'Postcard Copy' },
+        { href: '/video-studio', icon: '🎬', label: 'Video Studio' },
+        { href: '/referral-request', icon: '🤝', label: 'Referral Request' },
+      ]
+    },
+    {
+      key: 'manage', label: 'Manage the Relationship', color: '#10b981',
+      items: [
+        { href: '/transaction-checklist', icon: '✅', label: 'Transaction Checklist' },
+        { href: '/reminders', icon: '⏰', label: 'Reminders' },
+        { href: '/leads', icon: '👥', label: 'Leads & Clients' },
+        { href: '/follow-up', icon: '📩', label: 'Follow-Up Assistant' },
+        { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
+        { href: '/commission-calculator', icon: '🧮', label: 'Commission Calculator' },
+        { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
+        { href: '/neighborhood-bio', icon: '🏘️', label: 'Neighborhood Bio' },
+        { href: '/follow-up-sequence', icon: '🔄', label: 'Follow-Up Sequence' },
       ]
     },
   ]
 
   return (
     <div style={styles.page}>
+
+      <OnboardingModal />
 
       {sidebarOpen && (
         <div onClick={() => setSidebarOpen(false)}
@@ -363,26 +679,48 @@ export default function Dashboard() {
             </button>
           ))}
 
-          <div style={{margin:'0.75rem 1.25rem',borderTop:'1px solid rgba(255,255,255,0.04)'}}/>
-          <p style={{fontSize:'9px',fontWeight:'700',color:'#2a2a2a',letterSpacing:'1.2px',margin:'0 0 4px',padding:'0 1.25rem'}}>TOOLS</p>
-          {[
-            { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
-            { href: '/pricing-assistant', icon: '💲', label: 'Pricing Assistant' },
-            { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
-            { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
-            { href: '/rewrite', icon: '✍️', label: 'Rewrite' },
-            { href: '/launch-kit', icon: '🚀', label: 'Launch Plan' },
-            { href: '/leads', icon: '👥', label: 'Leads & Clients' },
-            { href: '/photos', icon: '🖼️', label: 'Photo Library' },
-            { href: '/settings', icon: '⚙️', label: 'Settings' },
-          ].map(item => (
-            <a key={item.href} href={item.href}
-              style={{width:'100%',padding:'7px 1.25rem',display:'flex',alignItems:'center',gap:'9px',color:'#3a3f52',fontSize:'12px',textDecoration:'none',borderLeft:'2px solid transparent',transition:'color 0.15s'}}
-              onMouseOver={e => e.currentTarget.style.color='#6b7280'}
-              onMouseOut={e => e.currentTarget.style.color='#3a3f52'}>
-              <span style={{fontSize:'12px'}}>{item.icon}</span> {item.label}
-            </a>
+          <div style={{margin:'0.75rem 1.25rem',borderTop:'1px solid rgba(0,0,0,0.06)'}}/>
+
+          {sidebarSections.map(section => (
+            <div key={section.key}>
+              <button
+                onClick={() => setSidebarCollapsed(prev => ({...prev, [section.key]: !prev[section.key]}))}
+                style={{width:'100%',padding:'8px 1.25rem',display:'flex',alignItems:'center',justifyContent:'space-between',background:'none',border:'none',cursor:'pointer',textAlign:'left' as const}}>
+                <span style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                  <span style={{width:'7px',height:'7px',borderRadius:'50%',background:section.color,display:'inline-block',flexShrink:0}}/>
+                  <span style={{fontSize:'10px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'0.8px'}}>{section.label.toUpperCase()}</span>
+                </span>
+                <span style={{fontSize:'11px',color:'var(--lw-text-muted)',transform:sidebarCollapsed[section.key] ? 'rotate(-90deg)' : 'rotate(0deg)',transition:'transform 0.2s',display:'inline-block',lineHeight:1}}>▾</span>
+              </button>
+              <div style={{maxHeight:sidebarCollapsed[section.key] ? '0' : '600px',overflow:'hidden',transition:'max-height 0.3s ease'}}>
+                {section.items.map((item, idx) => (
+                  item.action ? (
+                    <button key={idx} onClick={item.action}
+                      style={{width:'100%',padding:'6px 1.25rem 6px 2.5rem',display:'flex',alignItems:'center',gap:'8px',color:'var(--lw-text-muted)',fontSize:'12px',background:'none',border:'none',borderLeft:'2px solid transparent',cursor:'pointer',textAlign:'left' as const,transition:'color 0.15s',fontFamily:'var(--font-plus-jakarta),sans-serif'}}
+                      onMouseOver={e => {e.currentTarget.style.color='var(--lw-text)';e.currentTarget.style.borderLeftColor=section.color}}
+                      onMouseOut={e => {e.currentTarget.style.color='var(--lw-text-muted)';e.currentTarget.style.borderLeftColor='transparent'}}>
+                      <span style={{fontSize:'12px'}}>{item.icon}</span> {item.label}
+                    </button>
+                  ) : (
+                    <a key={idx} href={item.href}
+                      style={{width:'100%',padding:'6px 1.25rem 6px 2.5rem',display:'flex',alignItems:'center',gap:'8px',color:'var(--lw-text-muted)',fontSize:'12px',textDecoration:'none',borderLeft:'2px solid transparent',transition:'color 0.15s'}}
+                      onMouseOver={e => {e.currentTarget.style.color='var(--lw-text)';e.currentTarget.style.borderLeftColor=section.color}}
+                      onMouseOut={e => {e.currentTarget.style.color='var(--lw-text-muted)';e.currentTarget.style.borderLeftColor='transparent'}}>
+                      <span style={{fontSize:'12px'}}>{item.icon}</span> {item.label}
+                    </a>
+                  )
+                ))}
+              </div>
+            </div>
           ))}
+
+          <div style={{margin:'0.5rem 1.25rem',borderTop:'1px solid rgba(0,0,0,0.06)'}}/>
+          <a href="/settings"
+            style={{width:'100%',padding:'8px 1.25rem',display:'flex',alignItems:'center',gap:'9px',color:'var(--lw-text-muted)',fontSize:'12px',textDecoration:'none',borderLeft:'2px solid transparent',transition:'color 0.15s'}}
+            onMouseOver={e => {e.currentTarget.style.color='var(--lw-text)'}}
+            onMouseOut={e => {e.currentTarget.style.color='var(--lw-text-muted)'}}>
+            <span style={{fontSize:'12px'}}>⚙️</span> Settings
+          </a>
         </div>
 
         <div style={{padding:'1rem 1.25rem',borderTop:'1px solid rgba(255,255,255,0.04)'}}>
@@ -396,7 +734,7 @@ export default function Dashboard() {
           )}
           {plan === 'starter' && (
             <div style={{fontSize:'10px',color:'#2a2a2a',textAlign:'center',marginBottom:'8px'}}>
-              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : listingsUsed < 2 ? 'Try free — 24 hours of Pro on us' : '⚠️ Trial ended — upgrade to continue'}
+              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : '✅ 24 hours of Pro — unlimited listings'}
             </div>
           )}
           <div style={{display:'flex',justifyContent:'center',gap:'10px'}}>
@@ -410,20 +748,27 @@ export default function Dashboard() {
 
       {/* MAIN */}
       <div style={styles.main}>
-        <div style={{background:'rgba(10,13,20,0.98)',borderBottom:'1px solid rgba(255,255,255,0.04)',padding:'0.75rem 1.25rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
+        <div style={{background: isDark ? 'rgba(10,13,20,0.98)' : 'rgba(255,255,255,0.98)',borderBottom: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.08)',padding:'0.75rem 1.25rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
           <button onClick={() => setSidebarOpen(true)}
             style={{background:'none',border:'1px solid rgba(255,255,255,0.07)',color:'#5a5f72',fontSize:'15px',cursor:'pointer',padding:'5px 10px',borderRadius:'7px'}}>
             ☰
           </button>
-          <div style={{fontSize:'14px',fontWeight:'700',color:'#f0f0f0'}}>
+          <div style={{fontSize:'14px',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318'}}>
             Listing<span style={{color:'#1D9E75'}}>Whisperer</span>
             {planLoaded && plan === 'pro' && (
-              <span style={{marginLeft:'5px',fontSize:'10px',fontWeight:'700',color:'#d4af37',verticalAlign:'middle'}}>Pro</span>
+              <span style={{marginLeft:'6px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',verticalAlign:'middle',boxShadow:'0 0 10px rgba(29,158,117,0.4)'}}>PRO</span>
             )}
           </div>
-          <a href="/pricing" style={{fontSize:'11px',color: plan === 'pro' ? '#d4af37' : '#444',textDecoration:'none',fontWeight:'600'}}>
-            {plan === 'pro' ? '✦ Pro' : 'Upgrade'}
-          </a>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <button onClick={toggleTheme}
+              style={{background:'none',border:'1px solid rgba(255,255,255,0.07)',color:'#6b7280',fontSize:'14px',cursor:'pointer',padding:'5px 10px',borderRadius:'7px',transition:'all 0.2s'}}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+              {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+            </button>
+            <a href="/pricing" style={{fontSize:'11px',color: plan === 'pro' ? '#d4af37' : '#444',textDecoration:'none',fontWeight:'600'}}>
+              {plan === 'pro' ? '✦ Pro' : 'Upgrade'}
+            </a>
+          </div>
         </div>
 
         <div style={{padding:'2.5rem 1.5rem 3rem',flex:1,maxWidth:'860px',width:'100%',margin:'0 auto'}}>
@@ -431,13 +776,14 @@ export default function Dashboard() {
           {/* HOME PAGE */}
           {activePage === 'home' && (
             <div>
+              <DashboardChecklist />
               <div style={{marginBottom:'3rem'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'16px',marginBottom:'8px'}}>
                   <div>
-                    <h1 style={{fontSize:'2rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 8px',letterSpacing:'-0.5px'}}>
+                    <h1 style={{fontSize:'2rem',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318',margin:'0 0 8px',letterSpacing:'-0.5px'}}>
                       {greeting}{firstName ? `, ${firstName}` : ''} 👋
                     </h1>
-                    <p style={{fontSize:'15px',color:'#3a3f52',margin:'0',fontWeight:'400'}}>
+                    <p style={{fontSize:'15px',color: isDark ? '#8b8fa8' : '#5a6172',margin:'0',fontWeight:'400'}}>
                       What would you like to do today?
                     </p>
                   </div>
@@ -462,7 +808,7 @@ export default function Dashboard() {
                       onMouseOut={e => e.currentTarget.style.borderColor='rgba(255,255,255,0.06)'}>
                       <div>
                         <div style={{fontSize:'11px',fontWeight:'600',color:'#d0d0d0'}}>
-                          {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} left` : listingsUsed < 2 ? '24 hours of Pro — on us' : '⚠️ Trial ended'}
+                          {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} left` : '✅ 24 hours unlimited'}
                         </div>
                         <div style={{fontSize:'10px',color:'#1D9E75',marginTop:'2px',fontWeight:'500'}}>Upgrade to Pro →</div>
                       </div>
@@ -471,33 +817,190 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div style={{display:'flex',flexDirection:'column',gap:'2.5rem',marginBottom:'3rem'}}>
+              {/* ACTION-FIRST SECTION */}
+              <div style={{marginBottom:'3rem'}}>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 16px'}}>WHAT DO YOU NEED TO DO RIGHT NOW?</p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'14px'}}>
+                  {[
+                    { icon:'🏠', label:'Start a Listing', desc:'Create a full listing from photos and notes in seconds', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
+                    { icon:'📋', label:'Prep a Meeting', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep', tooltip:'Use this before your next listing appointment' },
+                    { icon:'✦', label:'Ask AI', desc:'Get instant answers to any real estate question', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() }, tooltip:'Ask about pricing, strategy, follow-ups, or anything real estate' },
+                    { icon:'👥', label:'Follow Up a Lead', desc:'Turn conversations into signed clients', color:'#f59e0b', href:'/leads' },
+                  ].map((item, i) => (
+                    item.href ? (
+                      <a key={i} href={item.href}
+                        title={(item as any).tooltip || undefined}
+                        style={{display:'block',background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem',textDecoration:'none',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:'pointer'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 8px 32px ${item.color}22`;e.currentTarget.style.transform='translateY(-2px)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';e.currentTarget.style.transform='translateY(0)'}}>
+                        <div style={{width:'46px',height:'46px',borderRadius:'13px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',marginBottom:'14px'}}>{item.icon}</div>
+                        <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 7px'}}>{item.label}</p>
+                        <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',lineHeight:'1.6',fontWeight:'400'}}>{item.desc}</p>
+                      </a>
+                    ) : (
+                      <div key={i}
+                        onClick={item.action}
+                        title={(item as any).tooltip || undefined}
+                        style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:'pointer'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 8px 32px ${item.color}22`;e.currentTarget.style.transform='translateY(-2px)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';e.currentTarget.style.transform='translateY(0)'}}>
+                        <div style={{width:'46px',height:'46px',borderRadius:'13px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',marginBottom:'14px'}}>{item.icon}</div>
+                        <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 7px'}}>{item.label}</p>
+                        <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',lineHeight:'1.6',fontWeight:'400'}}>{item.desc}</p>
+                      </div>
+                    )
+                  ))}
+                </div>
+
+                <div style={{marginTop:'14px',display:'flex',flexWrap:'wrap',gap:'8px',alignItems:'center'}}>
+                  <span style={{fontSize:'11px',color:'var(--lw-text-muted)',fontWeight:'600',flexShrink:0}}>Try asking:</span>
+                  {[
+                    'How should I price this listing?',
+                    'What do I say to a hesitant seller?',
+                    'Create a follow-up text after a showing',
+                    'What should I do next with this lead?',
+                  ].map(prompt => (
+                    <button key={prompt}
+                      onClick={() => window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: prompt }))}
+                      style={{padding:'5px 13px',borderRadius:'20px',border:'1px solid var(--lw-border)',background:'var(--lw-input)',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif',transition:'all 0.15s'}}
+                      onMouseOver={e => {e.currentTarget.style.borderColor='#6366f1';e.currentTarget.style.color='#6366f1';e.currentTarget.style.background='rgba(99,102,241,0.06)'}}
+                      onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.color='var(--lw-text-muted)';e.currentTarget.style.background='var(--lw-input)'}}>
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{textAlign:'center',marginTop:'22px'}}>
+                  <button onClick={() => document.getElementById('all-tools')?.scrollIntoView({behavior:'smooth'})}
+                    style={{padding:'10px 24px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'20px',color:'var(--lw-text-muted)',fontSize:'13px',fontWeight:'600',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                    Browse All Tools ↓
+                  </button>
+                </div>
+              </div>
+
+              {/* TODAY'S WORKSPACE */}
+              <div style={{marginBottom:'2.5rem',background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem'}}>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 16px',display:'flex',alignItems:'center',gap:'6px'}}>
+                  <span>📋</span> TODAY'S WORKSPACE
+                </p>
+                {(workspaceListing || workspaceLeads > 0 || workspaceReminders > 0) ? (
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'12px'}}>
+                    <div style={{background:'var(--lw-input)',borderRadius:'12px',border:'1px solid var(--lw-border)',padding:'1rem'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'10px',marginBottom:'10px'}}>
+                        <span style={{fontSize:'18px',flexShrink:0}}>🏠</span>
+                        <p style={{margin:'0',fontSize:'13px',color:'var(--lw-text)',fontWeight:'600',lineHeight:'1.5'}}>
+                          {workspaceListing ? `Continue: ${workspaceListing.name || 'Untitled Listing'}` : 'Start your first listing'}
+                        </p>
+                      </div>
+                      {workspaceListing ? (
+                        <button onClick={() => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) }}
+                          style={{padding:'5px 12px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'#1D9E75',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                          → Open
+                        </button>
+                      ) : (
+                        <a href="/quick-listing" style={{display:'inline-block',padding:'5px 12px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'#1D9E75',textDecoration:'none'}}>
+                          → Quick Listing
+                        </a>
+                      )}
+                    </div>
+                    <div style={{background:'var(--lw-input)',borderRadius:'12px',border:'1px solid var(--lw-border)',padding:'1rem'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'10px',marginBottom:'10px'}}>
+                        <span style={{fontSize:'18px',flexShrink:0}}>👥</span>
+                        <p style={{margin:'0',fontSize:'13px',color:'var(--lw-text)',fontWeight:'600',lineHeight:'1.5'}}>
+                          {workspaceLeads > 0 ? `You have ${workspaceLeads} lead${workspaceLeads > 1 ? 's' : ''} — follow up today` : 'No leads yet — add your first client'}
+                        </p>
+                      </div>
+                      <a href="/leads" style={{display:'inline-block',padding:'5px 12px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'#1D9E75',textDecoration:'none'}}>
+                        {workspaceLeads > 0 ? '→ View Leads' : '→ Add Lead'}
+                      </a>
+                    </div>
+                    <div style={{background:'var(--lw-input)',borderRadius:'12px',border:'1px solid var(--lw-border)',padding:'1rem'}}>
+                      <div style={{display:'flex',alignItems:'flex-start',gap:'10px',marginBottom:'10px'}}>
+                        <span style={{fontSize:'18px',flexShrink:0}}>⏰</span>
+                        <p style={{margin:'0',fontSize:'13px',color:'var(--lw-text)',fontWeight:'600',lineHeight:'1.5'}}>
+                          {workspaceReminders > 0 ? `${workspaceReminders} reminder${workspaceReminders > 1 ? 's' : ''} due today` : 'No reminders due'}
+                        </p>
+                      </div>
+                      <a href="/reminders" style={{display:'inline-block',padding:'5px 12px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'#1D9E75',textDecoration:'none'}}>
+                        {workspaceReminders > 0 ? '→ View' : '→ Set Reminder'}
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{textAlign:'center',padding:'0.5rem 0 0.25rem'}}>
+                    <p style={{fontSize:'14px',color:'var(--lw-text-muted)',margin:'0 0 16px',lineHeight:'1.6'}}>Your workspace is ready. Start a listing, ask AI, or add your first lead.</p>
+                    <div style={{display:'flex',gap:'8px',justifyContent:'center',flexWrap:'wrap'}}>
+                      <button onClick={() => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) }}
+                        style={{padding:'7px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'var(--lw-text)',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                        Start Listing
+                      </button>
+                      <button onClick={() => window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: '' }))}
+                        style={{padding:'7px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'var(--lw-text)',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                        Ask AI
+                      </button>
+                      <a href="/leads" style={{display:'inline-block',padding:'7px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',fontWeight:'600',color:'var(--lw-text)',textDecoration:'none'}}>
+                        Add Lead
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RECENT ACTIVITY */}
+              <div style={{marginBottom:'2.5rem'}}>
+                <p style={{fontSize:'10px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 12px'}}>RECENT ACTIVITY</p>
+                {recentActivity.length > 0 ? (
+                  <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                    {recentActivity.map((item, i) => (
+                      <div key={i} style={{display:'flex',alignItems:'center',gap:'10px',padding:'8px 12px',borderRadius:'8px',background:'var(--lw-input)',border:'1px solid var(--lw-border)'}}>
+                        <span style={{fontSize:'15px',flexShrink:0}}>{item.type === 'listing' ? '🏠' : item.type === 'lead' ? '👥' : '🎬'}</span>
+                        <span style={{fontSize:'13px',color:'var(--lw-text)',flex:1,fontWeight:'400'}}>{item.text}</span>
+                        <span style={{fontSize:'11px',color:'var(--lw-text-muted)',flexShrink:0,whiteSpace:'nowrap' as const}}>{getRelativeTime(item.created_at)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',fontStyle:'italic'}}>No recent activity yet. Your work will appear here as you use Listing Whisperer.</p>
+                )}
+              </div>
+
+              <div id="all-tools" style={{display:'flex',flexDirection:'column',gap:'3rem',marginBottom:'3rem'}}>
                 {buckets.map((bucket, bi) => (
                   <div key={bi}>
-                    <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'14px'}}>
-                      <span style={{width:'3px',height:'14px',background:bucket.color,borderRadius:'2px',display:'inline-block',boxShadow:`0 0 8px ${bucket.color}60`}}/>
-                      <p style={{fontSize:'10px',fontWeight:'700',color:bucket.color,letterSpacing:'1.5px',margin:'0',opacity:0.8}}>{bucket.label}</p>
-                      <span style={{flex:1,height:'1px',background:`${bucket.color}12`,display:'inline-block'}}/>
+                    <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'18px'}}>
+                      <span style={{width:'4px',height:'20px',background:bucket.color,borderRadius:'2px',display:'inline-block',boxShadow:`0 0 10px ${bucket.color}50`}}/>
+                      <p style={{fontSize:'11px',fontWeight:'800',color:bucket.color,letterSpacing:'1.2px',margin:'0'}}>{bucket.label}</p>
+                      <span style={{flex:1,height:'1px',background:`${bucket.color}18`,display:'inline-block'}}/>
                     </div>
-                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(190px, 1fr))',gap:'10px'}}>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px'}}>
                       {bucket.cards.map((card: any, ci: number) => (
                         card.href ? (
                           <a key={ci} href={card.href}
-                            style={{background:'linear-gradient(135deg,#111420,#13161f)',borderRadius:'13px',border:'1px solid rgba(255,255,255,0.05)',padding:'1.125rem',textDecoration:'none',display:'block',transition:'all 0.2s'}}
-                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}30`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
-                            onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.05)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
-                            <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color:'#e0e0e0',marginBottom:'3px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color:'#3a3f52',lineHeight:'1.5'}}>{card.desc}</div>
+                            title={card.tooltip || undefined}
+                            style={{background: card.priority ? 'rgba(29,158,117,0.03)' : (card.popular ? `linear-gradient(135deg,${card.color}0d,${card.color}04)` : (isDark ? 'linear-gradient(135deg,#111420,#13161f)' : '#ffffff')),borderRadius:'13px',border: card.popular ? `1.5px solid ${card.color}35` : (isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'),borderLeft: card.priority ? '3px solid #1D9E75' : undefined,padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.2s',boxShadow: card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'),position:'relative' as const}}
+                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 10px 32px ${card.color}22`}}
+                            onMouseOut={e => {e.currentTarget.style.borderColor=card.popular ? `${card.color}35` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)');if(card.priority){e.currentTarget.style.borderLeftColor='#1D9E75';e.currentTarget.style.borderLeftWidth='3px'}e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)')}}>
+                            {card.popular && (
+                              <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>MOST POPULAR</div>
+                            )}
+                            {card.pro && !card.popular && (
+                              <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#d4af37,#a07c20)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(212,175,55,0.35)'}}>PRO</div>
+                            )}
+                            <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{card.icon}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px',display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}}>
+                              {card.title}
+                              {card.startHere && <span style={{fontSize:'9px',fontWeight:'700',color:'#fff',background:'#1D9E75',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',flexShrink:0}}>START HERE</span>}
+                            </div>
+                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.55'}}>{card.desc}</div>
                           </a>
                         ) : (
                           <div key={ci} onClick={card.action}
-                            style={{background:`linear-gradient(135deg,${card.color}0e,${card.color}05)`,borderRadius:'13px',border:`1px solid ${card.color}20`,padding:'1.125rem',cursor:'pointer',transition:'all 0.2s'}}
-                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}45`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px rgba(0,0,0,0.4)`}}
-                            onMouseOut={e => {e.currentTarget.style.borderColor=`${card.color}20`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
-                            <div style={{width:'36px',height:'36px',borderRadius:'9px',background:`${card.color}15`,border:`1px solid ${card.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',marginBottom:'10px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color:'#e0e0e0',marginBottom:'3px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color:'#3a3f52',lineHeight:'1.5'}}>{card.desc}</div>
+                            style={{background:`linear-gradient(135deg,${card.color}0e,${card.color}05)`,borderRadius:'13px',border:`1px solid ${card.color}22`,padding:'1.25rem',cursor:'pointer',transition:'all 0.2s'}}
+                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 10px 32px ${card.color}22`}}
+                            onMouseOut={e => {e.currentTarget.style.borderColor=`${card.color}22`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
+                            <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${card.color}15`,border:`1px solid ${card.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{card.icon}</div>
+                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px'}}>{card.title}</div>
+                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.55'}}>{card.desc}</div>
                             <div style={{marginTop:'8px',fontSize:'11px',fontWeight:'600',color:card.color}}>Start now →</div>
                           </div>
                         )
@@ -510,19 +1013,19 @@ export default function Dashboard() {
               {pastListings.length > 0 && (
                 <div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
-                    <p style={{fontSize:'10px',fontWeight:'700',color:'#2a2a2a',letterSpacing:'1px',margin:'0'}}>RECENT WORK</p>
+                    <p style={{fontSize:'10px',fontWeight:'700',color:'#6b7280',letterSpacing:'1px',margin:'0'}}>RECENT WORK</p>
                     <button onClick={() => setActivePage('history')} style={{background:'none',border:'none',color:'#333',fontSize:'11px',cursor:'pointer',padding:'0'}}>View all →</button>
                   </div>
                   <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
                     {pastListings.slice(0, 3).map(listing => (
                       <div key={listing.id}
-                        onClick={() => { setOutputs(listing.outputs); setActivePage('results') }}
-                        style={{background:'rgba(255,255,255,0.015)',borderRadius:'9px',border:'1px solid rgba(255,255,255,0.04)',padding:'0.8rem 1rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all 0.15s'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.2)';e.currentTarget.style.background='rgba(29,158,117,0.03)'}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.04)';e.currentTarget.style.background='rgba(255,255,255,0.015)'}}>
+                        onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setForm(prev => ({...prev, name: listing.name || '', neighborhood: listing.neighborhood || '', price: listing.price || '', beds: listing.beds_baths || '', sqft: listing.sqft || ''})); setListingNameInput(listing.name || listing.neighborhood || ''); setActivePage('results'); window.scrollTo({top:0,behavior:'smooth'}) }}
+                        style={{background:'var(--lw-input)',borderRadius:'9px',border:'1px solid var(--lw-border)',padding:'0.8rem 1rem',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',transition:'all 0.15s'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.3)';e.currentTarget.style.background='rgba(29,158,117,0.04)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.background='var(--lw-input)'}}>
                         <div>
-                          <p style={{margin:'0',fontSize:'12px',fontWeight:'600',color:'#c0c0c0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
-                          <p style={{margin:'2px 0 0',fontSize:'10px',color:'#2a2a2a'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
+                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'var(--lw-text)'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
+                          <p style={{margin:'2px 0 0',fontSize:'11px',color:'var(--lw-text-muted)'}}>{listing.price} · {new Date(listing.created_at).toLocaleDateString()}</p>
                         </div>
                         <span style={{fontSize:'11px',color:'#1D9E75',fontWeight:'500'}}>View →</span>
                       </div>
@@ -530,6 +1033,40 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
+
+              {/* LEADS & CLIENTS SECTION */}
+              <div style={{marginTop:'2.5rem',paddingBottom:'1rem'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                    <span style={{width:'4px',height:'18px',background:'#10b981',borderRadius:'2px',display:'inline-block',boxShadow:'0 0 10px rgba(16,185,129,0.5)'}}/>
+                    <p style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>Leads & Clients</p>
+                  </div>
+                  <a href="/leads" style={{fontSize:'11px',color:'#10b981',fontWeight:'600',textDecoration:'none'}}>View all →</a>
+                </div>
+                {leads.length === 0 ? (
+                  <div style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'2.75rem',textAlign:'center',boxShadow:'0 2px 10px rgba(0,0,0,0.04)'}}>
+                    <div style={{fontSize:'2.75rem',marginBottom:'12px'}}>👥</div>
+                    <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 8px'}}>Your first lead starts here.</p>
+                    <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0 0 20px',lineHeight:'1.65',maxWidth:'320px',marginLeft:'auto',marginRight:'auto'}}>Add a buyer, seller, or past client — then let AI handle the follow-up.</p>
+                    <a href="/leads" style={{display:'inline-block',padding:'11px 24px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'13px',fontWeight:'700',boxShadow:'0 0 20px rgba(29,158,117,0.25)'}}>Add Lead</a>
+                  </div>
+                ) : (
+                  <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                    {leads.slice(0,3).map((lead: any) => (
+                      <a key={lead.id} href="/leads"
+                        style={{background:'var(--lw-input)',borderRadius:'10px',border:'1px solid var(--lw-border)',padding:'0.875rem 1rem',display:'flex',justifyContent:'space-between',alignItems:'center',textDecoration:'none',transition:'all 0.15s'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(16,185,129,0.3)';e.currentTarget.style.background='rgba(16,185,129,0.04)'}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.background='var(--lw-input)'}}>
+                        <div>
+                          <p style={{margin:'0',fontSize:'13px',fontWeight:'600',color:'var(--lw-text)'}}>{lead.name}</p>
+                          <p style={{margin:'2px 0 0',fontSize:'11px',color:'var(--lw-text-muted)'}}>{lead.status || 'Lead'}</p>
+                        </div>
+                        <span style={{fontSize:'11px',color:'#10b981',fontWeight:'500'}}>View →</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -538,7 +1075,7 @@ export default function Dashboard() {
             <div style={{maxWidth:'680px'}}>
               <div style={{marginBottom:'1.5rem',display:'flex',alignItems:'center',gap:'12px'}}>
                 <button onClick={() => setActivePage('home')} style={{background:'none',border:'none',color:'#444',fontSize:'13px',cursor:'pointer',padding:'0'}}>← Home</button>
-                <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>New Listing</h1>
+                <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>New Listing</h1>
                 <span style={{background:'rgba(29,158,117,0.15)',color:'#1D9E75',fontSize:'11px',fontWeight:'600',padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)'}}>11 formats</span>
               </div>
 
@@ -547,7 +1084,8 @@ export default function Dashboard() {
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))',gap:'12px',marginBottom:'12px'}}>
                   <div><label style={styles.label}>Listing name</label><input placeholder="123 Oak Street" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Type</label><select value={form.type} onChange={e => setForm({...form, type: e.target.value})} style={styles.select}><option>Single family</option><option>Condo</option><option>Townhome</option><option>Luxury estate</option><option>Multi-family</option></select></div>
-                  <div><label style={styles.label}>Beds / Baths</label><input placeholder="3 bed / 2 bath" value={form.beds} onChange={e => setForm({...form, beds: e.target.value})} style={styles.input}/></div>
+                  <div><label style={styles.label}>Beds</label><input placeholder="3" value={form.beds} onChange={e => setForm({...form, beds: e.target.value})} style={styles.input}/></div>
+                  <div><label style={styles.label}>Baths</label><input placeholder="2" value={form.baths} onChange={e => setForm({...form, baths: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Sq Ft</label><input placeholder="1,850" value={form.sqft} onChange={e => setForm({...form, sqft: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Price</label><input placeholder="$899,000" value={form.price} onChange={e => setForm({...form, price: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Neighborhood</label><input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({...form, neighborhood: e.target.value})} style={styles.input}/></div>
@@ -626,8 +1164,8 @@ export default function Dashboard() {
                   <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                     <span style={{fontSize:'1.5rem'}}>🎁</span>
                     <div>
-                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share with a fellow agent — you both get a free listing!</p>
-                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get a free trial · You get 1 listing credit</p>
+                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share Listing Whisperer — you both get a reward!</p>
+                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 24 hours of Pro free · You get 25% off your next month</p>
                     </div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
@@ -646,15 +1184,44 @@ export default function Dashboard() {
                   <div>
                     <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'6px'}}>
                       <span style={{fontSize:'1.75rem'}}>🎉</span>
-                      <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Marketing Suite Ready</h1>
+                      <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>Marketing Suite Ready</h1>
                       <span style={{background:'rgba(29,158,117,0.2)',color:'#1D9E75',fontSize:'11px',fontWeight:'700',padding:'4px 12px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.4)'}}>✓ 11 FORMATS</span>
                     </div>
-                    <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>{form.neighborhood || form.name || 'Your listing'}{form.price ? ` · ${form.price}` : ''} · {form.beds || ''} · {form.sqft ? `${form.sqft} sq ft` : ''}</p>
+                    <div style={{display:'flex',alignItems:'center',gap:'8px',marginTop:'8px',flexWrap:'wrap'}}>
+                      <input
+                        key={currentListingId || 'new'}
+                        placeholder="Name this listing..."
+                        value={listingNameInput}
+                        onChange={e => setListingNameInput(e.target.value)}
+                        style={{background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',color:'var(--lw-text)',fontSize:'13px',fontWeight:'600',outline:'none',width:'220px',padding:'6px 10px',fontFamily:'var(--font-plus-jakarta),sans-serif'}}
+                      />
+                      <button onClick={async () => {
+                        const newName = listingNameInput.trim()
+                        if (!newName) { alert('Please enter a name first!'); return }
+                        if (userId && currentListingId) {
+                          const { error } = await supabase.from('listings').update({ name: newName }).eq('id', currentListingId)
+                          if (!error) {
+                            setForm(prev => ({...prev, name: newName}))
+                            setPastListings(prev => prev.map(l => l.id === currentListingId ? {...l, name: newName} : l))
+                            alert('✅ Name saved!')
+                          } else {
+                            alert('Error saving: ' + error.message)
+                          }
+                        } else {
+                          alert('Error: no listing ID found. Try generating a new listing.')
+                        }
+                      }}
+                        style={{padding:'6px 14px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'8px',fontSize:'12px',fontWeight:'700',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
+                        Save Name
+                      </button>
+                      {form.price && <span style={{fontSize:'13px',color:'var(--lw-text-muted)'}}>· {form.price}</span>}
+                    </div>
                   </div>
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+                    <button onClick={() => setActivePage('history')} style={{padding:'8px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontWeight:'600',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>← All Listings</button>
                     <button onClick={() => handleDownloadPdf('mls')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
                     <button onClick={() => handleDownloadPdf('flyer')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>🏠 Flyer PDF</button>
-                    <button onClick={() => { setActivePage('generate'); setOutputs(null) }} style={{padding:'8px 16px',background:'rgba(29,158,117,0.15)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'8px',color:'#1D9E75',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>+ New Listing</button>
+                    <button onClick={() => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) }} style={{padding:'8px 16px',background:'rgba(29,158,117,0.15)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'8px',color:'#1D9E75',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>+ New Listing</button>
                   </div>
                 </div>
               </div>
@@ -671,10 +1238,18 @@ export default function Dashboard() {
                       <span style={{fontSize:'11px',color:'#6b7280'}}>Primary listing copy — MLS ready</span>
                     </div>
                   </div>
-                  <button onClick={() => handleCopy(featuredKey, outputs[featuredKey] || '')}
-                    style={{padding:'8px 20px',borderRadius:'8px',border:'1px solid',fontSize:'13px',cursor:'pointer',fontWeight:'600',background: copied === featuredKey ? '#d4af37' : 'rgba(212,175,55,0.1)',color: copied === featuredKey ? '#000' : '#d4af37',borderColor: copied === featuredKey ? '#d4af37' : 'rgba(212,175,55,0.3)'}}>
-                    {copied === featuredKey ? '✓ Copied!' : '📋 Copy'}
-                  </button>
+                  <div style={{display:'flex',gap:'8px'}}>
+                    {featuredKey !== 'mls_standard' && (
+                      <button onClick={() => setFeaturedKey('mls_standard')}
+                        style={{padding:'8px 16px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.1)',fontSize:'12px',cursor:'pointer',fontWeight:'500',background:'rgba(255,255,255,0.05)',color:'#6b7280'}}>
+                        ↩ Reset
+                      </button>
+                    )}
+                    <button onClick={() => handleCopy(featuredKey, outputs[featuredKey] || '')}
+                      style={{padding:'8px 20px',borderRadius:'8px',border:'1px solid',fontSize:'13px',cursor:'pointer',fontWeight:'600',background: copied === featuredKey ? '#d4af37' : 'rgba(212,175,55,0.1)',color: copied === featuredKey ? '#000' : '#d4af37',borderColor: copied === featuredKey ? '#d4af37' : 'rgba(212,175,55,0.3)'}}>
+                      {copied === featuredKey ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                  </div>
                 </div>
                 <p style={{fontSize:'15px',lineHeight:'1.9',color:'#e8e8e8',margin:'0',borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'1rem',whiteSpace:'pre-wrap'}}>{outputs[featuredKey] || ''}</p>
               </div>
@@ -741,8 +1316,11 @@ export default function Dashboard() {
           {activePage === 'history' && (
             <div style={{maxWidth:'760px'}}>
               <div style={{marginBottom:'1.5rem'}}>
-                <h1 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'6px'}}>Listing History</h1>
-                <p style={{fontSize:'14px',color:'#8b8fa8'}}>{pastListings.length} most recent listings</p>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'6px'}}>
+                  <h1 style={{fontSize:'1.5rem',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318',margin:'0'}}>Listing History</h1>
+                  <button onClick={() => setActivePage('home')} style={{padding:'8px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontWeight:'600',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>← Back to Dashboard</button>
+                </div>
+                <p style={{fontSize:'14px',color:'#8b8fa8',margin:'0'}}>{pastListings.length} most recent listings</p>
               </div>
               {pastListings.length === 0 ? (
                 <div style={{...styles.card,textAlign:'center',padding:'3rem'}}>
@@ -755,9 +1333,9 @@ export default function Dashboard() {
                     <div key={listing.id} style={{...styles.card}}
                       onMouseOver={e => (e.currentTarget.style.borderColor = '#1D9E75')}
                       onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}} onClick={() => { setOutputs(listing.outputs); setActivePage('results') }}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',cursor:'pointer'}} onClick={() => { setOutputs(listing.outputs); setCurrentListingId(listing.id); setForm(prev => ({...prev, name: listing.name || '', neighborhood: listing.neighborhood || '', price: listing.price || '', beds: listing.beds_baths || '', sqft: listing.sqft || ''})); setListingNameInput(listing.name || listing.neighborhood || ''); setActivePage('results'); window.scrollTo({top:0,behavior:'smooth'}) }}>
                         <div>
-                          <p style={{margin:'0',fontSize:'14px',fontWeight:'600',color:'#f0f0f0'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
+                          <p style={{margin:'0',fontSize:'14px',fontWeight:'600',color: isDark ? '#f0f0f0' : '#111318'}}>{listing.name || `${listing.property_type} — ${listing.neighborhood}`}</p>
                           <p style={{margin:'4px 0 0',fontSize:'12px',color:'#8b8fa8'}}>{listing.beds_baths} · {listing.sqft} sq ft · {listing.price}</p>
                         </div>
                         <div style={{textAlign:'right'}}>
@@ -768,7 +1346,7 @@ export default function Dashboard() {
                       <textarea placeholder="Agent notes..." defaultValue={listing.agent_notes || ''}
                         onBlur={async (e) => { await supabase.from('listings').update({agent_notes: e.target.value}).eq('id', listing.id) }}
                         onClick={e => e.stopPropagation()}
-                        style={{width:'100%',padding:'8px',background:'rgba(0,0,0,0.2)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'8px',fontSize:'12px',color:'#8b8fa8',minHeight:'60px',resize:'vertical',boxSizing:'border-box'}}/>
+                        style={{width:'100%',padding:'8px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',fontSize:'12px',color:'var(--lw-text-muted)',minHeight:'60px',resize:'vertical',boxSizing:'border-box',fontFamily:'var(--font-plus-jakarta),sans-serif'}}/>
                     </div>
                   ))}
                 </div>
@@ -802,14 +1380,14 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowReminderPopup(false)} style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,#d4af37,#a08040)',color:'#000',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>Dismiss All & Continue</button>
+            <button onClick={() => { const ids = dueReminders.map(r => r.id); const existing = JSON.parse(sessionStorage.getItem('lw_dismissed_reminders') || '[]'); sessionStorage.setItem('lw_dismissed_reminders', JSON.stringify([...existing, ...ids])); setShowReminderPopup(false) }} style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,#d4af37,#a08040)',color:'#000',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>Dismiss All & Continue</button>
             <p style={{fontSize:'11px',color:'#444',textAlign:'center',margin:'10px 0 0'}}>Dismissed reminders are marked as done and won't show again</p>
           </div>
         </div>
       )}
 
-      {/* CHAT WIDGET */}
-      <div style={{position:'fixed',bottom:'24px',right:'24px',zIndex:1500}}>
+      {/* CHAT WIDGET MOVED TO GLOBAL LAYOUT */}
+      <div style={{display:'none'}}>
         {showChat && (
           <div style={{position:'absolute',bottom:'70px',right:'0',width:'360px',height:'500px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden'}}>
             <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>

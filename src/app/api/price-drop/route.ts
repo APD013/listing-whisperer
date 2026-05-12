@@ -10,6 +10,7 @@ export async function POST(request: Request) {
 
 Listing Details:
 - Address: ${form.address}
+- Location: ${form.city ? form.city + ', ' : ''}${form.state || 'not specified'}
 - Original Price: ${form.originalPrice}
 - New Price: ${form.newPrice}
 - Beds: ${form.beds} | Baths: ${form.baths} | Sqft: ${form.sqft}

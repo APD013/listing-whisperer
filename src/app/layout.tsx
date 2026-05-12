@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 
-const inter = Inter({
-  variable: "--font-inter",
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 import "./globals.css";
+import GlobalChat from "./components/GlobalChat";
 import Script from "next/script";
+import { ThemeProvider } from "./lib/theme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,9 +41,22 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} h-full antialiased`}
     >
       <head>
+        <script dangerouslySetInnerHTML={{__html: `
+          (function() {
+            try {
+              var theme = localStorage.getItem('lw_theme') || 'light';
+              document.documentElement.setAttribute('data-theme', theme);
+              if (theme === 'light') {
+                document.documentElement.style.background = '#f4f5f7';
+              } else {
+                document.documentElement.style.background = '#111318';
+              }
+            } catch(e) {}
+          })();
+        `}}/>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-50NE5KHLE3"
           strategy="afterInteractive"
@@ -65,8 +80,11 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="min-h-full flex flex-col" style={{fontFamily: 'var(--font-inter), sans-serif'}}>
-        {children}
+      <body className="min-h-full flex flex-col" style={{fontFamily: 'var(--font-plus-jakarta), sans-serif'}}>
+        <ThemeProvider>
+          {children}
+          <GlobalChat />
+        </ThemeProvider>
       </body>
     </html>
   );
