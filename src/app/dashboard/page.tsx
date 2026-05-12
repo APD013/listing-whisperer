@@ -1376,6 +1376,20 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+
+        {/* LEARNING CENTER BANNER */}
+        <div style={{padding:'0 1.5rem 2rem'}}>
+          <a href="/learn" style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px',padding:'14px 18px',background:'var(--lw-card)',border:'1px solid var(--lw-border)',borderRadius:'12px',textDecoration:'none',flexWrap:'wrap'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+              <span style={{fontSize:'18px',lineHeight:1}}>📚</span>
+              <div>
+                <p style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 2px'}}>Free Agent Guides</p>
+                <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0'}}>Tips on listings, follow-up, branding, AI and more →</p>
+              </div>
+            </div>
+            <span style={{fontSize:'12px',color:'var(--lw-text-muted)',fontWeight:'500',whiteSpace:'nowrap'}}>View all guides →</span>
+          </a>
+        </div>
       </div>
 
       {/* REMINDER POPUP */}

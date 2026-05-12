@@ -86,6 +86,7 @@ export default function Home() {
         <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
           <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
           <a href="#pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
+          <a href="/learn" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Free Guides</a>
           <a href="/login" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Sign In</a>
           <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 16px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',whiteSpace:'nowrap',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>Start Free — No Credit Card</a>
         </div>
