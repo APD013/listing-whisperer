@@ -43,6 +43,36 @@ const QUICK_CHIPS = [
   { label: '🏠 Listing Strategy', prompt: 'Help me create a marketing strategy for my listing' },
 ]
 
+const AVATAR_STYLES = [
+  { name: 'Professional Assistant', color: '#8b5cf6' },
+  { name: 'Luxury Listing Advisor', color: '#d4af37' },
+  { name: 'Friendly Marketing Coach', color: '#1D9E75' },
+  { name: 'Broker Mentor', color: '#4a6fa5' },
+  { name: 'Minimal AI Assistant', color: '#6b7280' },
+]
+
+const AVATAR_STATE_TEXT: Record<string, string> = {
+  idle: 'Ready to help',
+  listening: 'Listening...',
+  thinking: 'Thinking...',
+  completed: 'Done!',
+}
+
+function AvatarSVG({ size = 64, color = '#8b5cf6' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="30" fill={color + '1a'} stroke={color} strokeWidth="1.5"/>
+      <path d="M18 52 L27 42 L30 46 L32 44 L34 46 L37 42 L46 52 Q32 58 18 52Z" fill={color + 'bb'}/>
+      <ellipse cx="32" cy="26" rx="13" ry="15" fill={color + 'ee'}/>
+      <circle cx="27.5" cy="23" r="2" fill="white" fillOpacity="0.9"/>
+      <circle cx="36.5" cy="23" r="2" fill="white" fillOpacity="0.9"/>
+      <circle cx="28" cy="23.5" r="0.9" fill={color}/>
+      <circle cx="37" cy="23.5" r="0.9" fill={color}/>
+      <path d="M27.5 30 Q32 34 36.5 30" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" strokeOpacity="0.85"/>
+    </svg>
+  )
+}
+
 function pickRandom<T>(arr: T[], count: number): T[] {
   return [...arr].sort(() => Math.random() - 0.5).slice(0, count)
 }
@@ -72,9 +102,13 @@ export default function GlobalChat() {
   const [isListening, setIsListening] = useState(false)
   const [voiceEnabled, setVoiceEnabled] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>(() => pickRandom(SUGGESTIONS_POOL, 4))
+  const [avatarState, setAvatarState] = useState<'idle'|'listening'|'thinking'|'completed'>('idle')
+  const [avatarStyle, setAvatarStyle] = useState('Professional Assistant')
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
   const prevShowChatRef = useRef(false)
+  const hadLoadingRef = useRef(false)
 
   // Call Capture state
   const [isRecording, setIsRecording] = useState(false)
@@ -146,10 +180,10 @@ export default function GlobalChat() {
     return () => clearInterval(timerRef.current)
   }, [isRecording])
 
-  // Rotate suggestions and inject page-aware greeting when chat opens
   useEffect(() => {
     if (showChat && !prevShowChatRef.current) {
       setSuggestions(pickRandom(SUGGESTIONS_POOL, 4))
+      setAvatarState('idle')
       setMessages(current => {
         if (current.length === 0) {
           return [{ role: 'assistant', content: getPageMessage(pathname) }]
@@ -159,6 +193,30 @@ export default function GlobalChat() {
     }
     prevShowChatRef.current = showChat
   }, [showChat, pathname])
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('lw_avatar_style')
+      if (saved && AVATAR_STYLES.some(s => s.name === saved)) setAvatarStyle(saved)
+    } catch(e) {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lw_avatar_style', avatarStyle)
+    } catch(e) {}
+  }, [avatarStyle])
+
+  useEffect(() => {
+    if (loading) {
+      hadLoadingRef.current = true
+      setAvatarState('thinking')
+    } else if (hadLoadingRef.current) {
+      setAvatarState('completed')
+      const t = setTimeout(() => setAvatarState('idle'), 2000)
+      return () => clearTimeout(t)
+    }
+  }, [loading])
 
   if (HIDDEN_PATHS.includes(pathname)) return null
   if (HIDDEN_PATH_PREFIXES.some(prefix => pathname.startsWith(prefix))) return null
@@ -170,6 +228,8 @@ export default function GlobalChat() {
   }
 
   const isTwoPartyState = TWO_PARTY_STATES.includes(userState)
+  const currentStyleColor = AVATAR_STYLES.find(s => s.name === avatarStyle)?.color || '#8b5cf6'
+  const statusDotActive = avatarState === 'idle' || avatarState === 'completed'
 
   const startRecording = async () => {
     try {
@@ -177,11 +237,9 @@ export default function GlobalChat() {
       const mediaRecorder = new MediaRecorder(stream)
       mediaRecorderRef.current = mediaRecorder
       audioChunksRef.current = []
-
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) audioChunksRef.current.push(e.data)
       }
-
       mediaRecorder.start(1000)
       setIsRecording(true)
     } catch(e) {
@@ -193,17 +251,13 @@ export default function GlobalChat() {
     if (!mediaRecorderRef.current) return
     setIsRecording(false)
     setCallProcessing(true)
-
     mediaRecorderRef.current.stop()
     mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop())
-
     await new Promise(resolve => setTimeout(resolve, 500))
-
     const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
     const formData = new FormData()
     formData.append('audio', audioBlob, 'call.webm')
     formData.append('userId', userId || '')
-
     try {
       const res = await fetch('/api/call-capture', { method: 'POST', body: formData })
       const data = await res.json()
@@ -262,6 +316,7 @@ export default function GlobalChat() {
     setMessages(updatedMessages)
     setInput('')
     setLoading(true)
+    setAvatarState('thinking')
 
     try {
       const res = await fetch('/api/chat', {
@@ -400,7 +455,6 @@ export default function GlobalChat() {
                 <p style={{fontSize:'12px',color:'#8b8fa8',margin:'0 0 16px',lineHeight:'1.6',textAlign:'center'}}>
                   {isRecording ? 'Recording in progress — place your phone on speaker' : 'Tap Record when you answer the call. Place phone on speaker so both sides are captured.'}
                 </p>
-
                 {isRecording && (
                   <div style={{textAlign:'center',marginBottom:'16px'}}>
                     <div style={{fontSize:'2rem',marginBottom:'4px'}}>🔴</div>
@@ -408,18 +462,15 @@ export default function GlobalChat() {
                     <p style={{fontSize:'11px',color:'#6b7280',margin:'4px 0 0'}}>Recording...</p>
                   </div>
                 )}
-
                 <button onClick={isRecording ? stopRecording : startRecording}
                   style={{width:'100%',padding:'14px',background: isRecording ? 'linear-gradient(135deg,#ef4444,#b91c1c)' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'12px',fontSize:'14px',fontWeight:'700',cursor:'pointer',boxShadow: isRecording ? '0 4px 20px rgba(239,68,68,0.4)' : '0 4px 20px rgba(29,158,117,0.3)'}}>
                   {isRecording ? '⏹ Stop & Analyze Call' : '🔴 Start Recording'}
                 </button>
-
                 <p style={{fontSize:'10px',color:'#444',textAlign:'center',margin:'8px 0 0',lineHeight:'1.5'}}>
                   By recording you agree to comply with your local recording laws.
                 </p>
               </>
             )}
-
             {callProcessing && (
               <div style={{textAlign:'center',padding:'1rem 0'}}>
                 <div style={{fontSize:'2rem',marginBottom:'12px'}}>🤖</div>
@@ -427,7 +478,6 @@ export default function GlobalChat() {
                 <p style={{fontSize:'11px',color:'#6b7280',margin:'0'}}>Transcribing and extracting lead details</p>
               </div>
             )}
-
             {callResult && (
               <div>
                 <div style={{background:'rgba(29,158,117,0.08)',border:'1px solid rgba(29,158,117,0.2)',borderRadius:'12px',padding:'1rem',marginBottom:'12px'}}>
@@ -455,15 +505,27 @@ export default function GlobalChat() {
 
       {/* CHAT WINDOW */}
       {showChat && (
-        <div style={{position:'fixed',bottom:'100px',left:'50%',transform:'translateX(-50%)',width:'min(360px, calc(100vw - 48px))',height:'520px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 32px 80px rgba(0,0,0,0.6)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500,animation:'chat-appear 0.2s ease-out'}}>
+        <div style={{position:'fixed',bottom:'100px',left:'50%',transform:'translateX(-50%)',width:'min(360px, calc(100vw - 48px))',height:'580px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 32px 80px rgba(0,0,0,0.6)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500,animation:'chat-appear 0.2s ease-out'}}>
 
           {/* HEADER */}
-          <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.1)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.25)'}}>
+          <div style={{padding:'0.875rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.1)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.25)',flexShrink:0}}>
             <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-              <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>✦</div>
+              <div style={{position:'relative',width:'32px',height:'32px',borderRadius:'50%',flexShrink:0}}>
+                <AvatarSVG size={32} color={currentStyleColor}/>
+              </div>
               <div>
-                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Listing Whisperer AI</p>
-                <p style={{fontSize:'10px',color:'#1D9E75',margin:'0'}}>Your real estate assistant</p>
+                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Listing Assistant</p>
+                <div style={{display:'flex',alignItems:'center',gap:'4px',marginTop:'1px'}}>
+                  <div style={{
+                    width:'6px',height:'6px',borderRadius:'50%',flexShrink:0,
+                    background: statusDotActive ? '#1D9E75' : '#8b5cf6',
+                    animation: avatarState === 'thinking' ? 'avatar-glow-dot 1s ease-in-out infinite' : 'none',
+                    transition:'background 0.3s ease',
+                  }}/>
+                  <p style={{fontSize:'10px',color:'#8b8fa8',margin:'0',transition:'all 0.3s ease'}}>
+                    {AVATAR_STATE_TEXT[avatarState]}
+                  </p>
+                </div>
               </div>
             </div>
             <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
@@ -481,6 +543,67 @@ export default function GlobalChat() {
             </div>
           </div>
 
+          {/* AVATAR SHOWCASE */}
+          <div style={{
+            padding:'10px 16px 8px',
+            borderBottom:'1px solid rgba(255,255,255,0.06)',
+            display:'flex',
+            flexDirection:'column',
+            alignItems:'center',
+            gap:'5px',
+            background:'rgba(0,0,0,0.12)',
+            flexShrink:0,
+          }}>
+            <div style={{
+              position:'relative',
+              borderRadius:'50%',
+              transition:'all 0.3s ease',
+              animation: avatarState === 'idle' ? 'avatar-float 3s ease-in-out infinite' :
+                         avatarState === 'listening' ? 'avatar-glow 1.5s ease-in-out infinite' :
+                         avatarState === 'completed' ? 'avatar-complete 0.5s ease-out' : 'none',
+            }}>
+              {avatarState === 'thinking' && (
+                <div style={{
+                  position:'absolute',
+                  top:'-5px',left:'-5px',right:'-5px',bottom:'-5px',
+                  borderRadius:'50%',
+                  border:`2px solid ${currentStyleColor}`,
+                  borderTopColor:'transparent',
+                  animation:'avatar-think 1s linear infinite',
+                  pointerEvents:'none',
+                  zIndex:1,
+                }}/>
+              )}
+              <div className="lw-avatar-main">
+                <AvatarSVG size={56} color={currentStyleColor}/>
+              </div>
+            </div>
+            <p style={{fontSize:'10px',color:'#6b7280',margin:'0',letterSpacing:'0.3px',transition:'all 0.3s ease'}}>
+              {AVATAR_STATE_TEXT[avatarState]}
+            </p>
+            <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
+              {AVATAR_STYLES.map(style => (
+                <button
+                  key={style.name}
+                  title={style.name}
+                  onClick={() => setAvatarStyle(style.name)}
+                  style={{
+                    width:'18px',height:'18px',borderRadius:'50%',
+                    background: style.color,
+                    cursor:'pointer',
+                    border: avatarStyle === style.name ? '3px solid white' : `2px solid ${style.color}44`,
+                    outline: avatarStyle === style.name ? `2px solid ${style.color}` : 'none',
+                    outlineOffset:'1px',
+                    padding:0,
+                    flexShrink:0,
+                    transition:'all 0.2s ease',
+                    boxSizing:'border-box',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
           {/* MESSAGES */}
           <div style={{flex:1,overflowY:'auto',padding:'1rem',display:'flex',flexDirection:'column',gap:'10px'}}>
             {messages.length === 0 && (
@@ -494,6 +617,7 @@ export default function GlobalChat() {
                     <p style={{fontSize:'11px',color:'#8b8fa8',margin:'0'}}>Tap to record & auto-log your next call</p>
                   </div>
                 )}
+                <p style={{fontSize:'10px',color:'#4a4f62',margin:'0 0 6px',letterSpacing:'0.5px',textTransform:'uppercase',fontWeight:'600'}}>Suggestions from your assistant:</p>
                 <div style={{display:'flex',flexDirection:'column',gap:'6px',width:'100%'}}>
                   {suggestions.map(q => (
                     <button key={q} onClick={() => setInput(q)}
@@ -533,10 +657,11 @@ export default function GlobalChat() {
           </div>
 
           {/* INPUT */}
-          <div style={{padding:'0.875rem',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',gap:'8px'}}>
+          <div style={{padding:'0.875rem',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',gap:'8px',flexShrink:0}}>
             <input
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={e => { setInput(e.target.value); if (e.target.value) setAvatarState('listening') }}
+              onBlur={e => { if (!e.target.value) setAvatarState('idle') }}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
               placeholder={isListening ? '🎤 Listening...' : 'Ask anything or give a command...'}
               style={{flex:1,padding:'10px 14px',background: isListening ? 'rgba(29,158,117,0.1)' : 'rgba(0,0,0,0.3)',border: isListening ? '1px solid rgba(29,158,117,0.4)' : '1px solid rgba(255,255,255,0.08)',borderRadius:'10px',fontSize:'13px',color:'#f0f0f0',outline:'none',transition:'all 0.2s'}}
@@ -553,7 +678,7 @@ export default function GlobalChat() {
         </div>
       )}
 
-      {/* QUICK ACTION CHIPS — appear on hover over toggle button */}
+      {/* QUICK ACTION CHIPS */}
       {!showChat && pathname === '/dashboard' && (
         <div className="lw-quick-chips" style={{position:'fixed',bottom:'104px',left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',gap:'8px',alignItems:'center',zIndex:1499,opacity:0,transition:'opacity 0.2s ease',pointerEvents:'none'}}
           id="lw-quick-chips">
@@ -593,6 +718,30 @@ export default function GlobalChat() {
         @keyframes chat-appear {
           from { opacity: 0; transform: translateX(-50%) scale(0.96); }
           to { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+        @keyframes avatar-float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes avatar-glow {
+          0%, 100% { box-shadow: 0 0 8px rgba(139,92,246,0.4); }
+          50% { box-shadow: 0 0 20px rgba(139,92,246,0.8); }
+        }
+        @keyframes avatar-think {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes avatar-complete {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.15); filter: brightness(1.3); }
+          100% { transform: scale(1); filter: brightness(1); }
+        }
+        @keyframes avatar-glow-dot {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+        @media (max-width: 480px) {
+          .lw-avatar-main svg { width: 44px !important; height: 44px !important; }
         }
         @media (max-width: 768px) {
           .lw-quick-chips { display: none !important; }
