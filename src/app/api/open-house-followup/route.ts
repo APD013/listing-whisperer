@@ -21,6 +21,7 @@ export async function GET(request: Request) {
     .from('leads')
     .select('id, name, email, notes, user_id, followup_sent, created_at')
     .eq('source', 'open_house')
+    .neq('user_id', 'c8c428ac-eca7-487f-af9d-576544dc8e12')
     .or('followup_sent.is.null,followup_sent.eq.false')
     .neq('email', '')
     .not('email', 'is', null)

@@ -11,7 +11,9 @@
       "Bash(node_modules/.bin/tsc --noEmit)",
       "Bash(Select-String -Path \"D:\\\\listing-whisperer\\\\listing-whisperer\\\\src\\\\app\\\\dashboard\\\\page.tsx\" -Pattern \"activePage === 'home'\")",
       "Bash(Select-Object LineNumber, Line)",
-      "Bash(Format-Table -AutoSize)"
+      "Bash(Format-Table -AutoSize)",
+      "Bash(grep -r \"resend\\\\|Resend\\\\|nodemailer\\\\|sendgrid\" --include=\"*.ts\" --include=\"*.tsx\" -l)",
+      "Bash(ls src/app/api/)"
     ]
   }
 }
