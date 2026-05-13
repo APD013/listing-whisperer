@@ -11,7 +11,7 @@ export const maxDuration = 30
 export async function POST(request: Request) {
   try {
     const {
-      address, city, state, propertyType, beds, baths, listPrice, daysOnMarket,
+      address, city, state, propertyType, beds, baths, sqft, listPrice, daysOnMarket,
       originalListPrice, triedSoFar, sellerSituation,
       imageBase64, imageType, brandVoice, userId,
     } = await request.json()
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 Agent: ${agentName}
 Property: ${address}${city ? ', ' + city : ''}${state ? ', ' + state : ''}
 Location: ${city ? city + ', ' : ''}${state || 'not specified'}
-Type: ${propertyType}${beds ? ` · ${beds} bed` : ''}${baths ? ` / ${baths} bath` : ''}
+Type: ${propertyType}${beds ? ` · ${beds} bed` : ''}${baths ? ` / ${baths} bath` : ''}${sqft ? ` · ${sqft} sqft` : ''}
 ${priceChange}
 Days on Market: ${daysOnMarket}
 What's been tried: ${triedSoFar || 'Not specified'}

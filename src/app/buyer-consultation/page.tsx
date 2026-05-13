@@ -24,7 +24,7 @@ export default function BuyerConsultationPage() {
 
   const [form, setForm] = useState({
     buyerName: '', budget: '', neighborhood: '', type: 'Single family',
-    beds: '', baths: '', timeline: '', preApproval: 'Yes',
+    beds: '', baths: '', sqft: '', timeline: '', preApproval: 'Yes',
     mustHaves: '', dealBreakers: '', notes: '', agentName: '',
   })
 
@@ -188,6 +188,10 @@ export default function BuyerConsultationPage() {
             <div>
               <label style={labelStyle}>Baths Needed</label>
               <input placeholder="2+" value={form.baths} onChange={e => setForm({ ...form, baths: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Sq Ft</label>
+              <input placeholder="1,850" value={form.sqft} onChange={e => setForm({ ...form, sqft: e.target.value })} style={inputStyle} />
             </div>
             <div>
               <label style={labelStyle}>Timeline to Buy</label>

@@ -4,13 +4,15 @@ export const maxDuration = 30
 
 export async function POST(request: Request) {
   try {
-    const { neighborhood, state, propertyType, bedrooms, priceMin, priceMax, notes } = await request.json()
+    const { neighborhood, state, propertyType, bedrooms, bathrooms, sqft, priceMin, priceMax, notes } = await request.json()
 
     const userPrompt = `Generate a real estate market snapshot for the following:
 
 - Neighborhood / City: ${neighborhood}${state ? ', ' + state : ''}
 - Property Type: ${propertyType}
 - Bedrooms: ${bedrooms || 'Not specified'}
+- Bathrooms: ${bathrooms || 'Not specified'}
+- Sq Ft: ${sqft || 'Not specified'}
 - Price Range: ${priceMin && priceMax ? `${priceMin} – ${priceMax}` : priceMin || priceMax || 'Not specified'}
 - Additional Notes: ${notes || 'None'}
 

@@ -40,6 +40,7 @@ export default function ListingRescuePage() {
     propertyType: 'Single Family',
     beds: '',
     baths: '',
+    sqft: '',
     listPrice: '',
     daysOnMarket: '',
     originalListPrice: '',
@@ -123,6 +124,7 @@ export default function ListingRescuePage() {
           propertyType: form.propertyType,
           beds: form.beds,
           baths: form.baths,
+          sqft: form.sqft,
           listPrice: form.listPrice,
           daysOnMarket: form.daysOnMarket,
           originalListPrice: form.originalListPrice,
@@ -398,7 +400,7 @@ export default function ListingRescuePage() {
             </select>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '14px' }}>
             <div>
               <label style={labelStyle}>Beds</label>
               <input type="text" placeholder="e.g. 3" value={form.beds} onChange={e => setForm({ ...form, beds: e.target.value })} style={inputStyle} />
@@ -406,6 +408,10 @@ export default function ListingRescuePage() {
             <div>
               <label style={labelStyle}>Baths</label>
               <input type="text" placeholder="e.g. 2" value={form.baths} onChange={e => setForm({ ...form, baths: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Sq Ft</label>
+              <input type="text" placeholder="e.g. 1,850" value={form.sqft} onChange={e => setForm({ ...form, sqft: e.target.value })} style={inputStyle} />
             </div>
           </div>
 

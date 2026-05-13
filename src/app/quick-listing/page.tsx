@@ -36,6 +36,7 @@ export default function QuickListingPage() {
     state: '',
     beds: '',
     baths: '',
+    sqft: '',
   })
 
   const loadHistory = async (uid: string) => {
@@ -124,7 +125,7 @@ export default function QuickListingPage() {
       const property = {
         type: aiAnalysis?.property_type || 'Single family',
         beds: `${answers.beds}${answers.baths ? ' bed / ' + answers.baths + ' bath' : ''}`,
-        sqft: aiAnalysis?.sqft || '',
+        sqft: answers.sqft || aiAnalysis?.sqft || '',
         price: answers.price,
         neighborhood: `${answers.neighborhood}${answers.city ? ', ' + answers.city : ''}${answers.state ? ', ' + answers.state : ''}`,
         features: aiAnalysis?.features || '',
@@ -432,10 +433,11 @@ export default function QuickListingPage() {
             </div>
 
             <div style={{ ...cardStyle, marginBottom: '1.5rem' }}>
-              <label style={{ fontSize: '13px', fontWeight: '700', color: '#1D9E75', display: 'block', marginBottom: '10px' }}>3️⃣ Beds & Baths?</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <label style={{ fontSize: '13px', fontWeight: '700', color: '#1D9E75', display: 'block', marginBottom: '10px' }}>3️⃣ Beds, Baths & Sq Ft?</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
                 <input placeholder="Beds: 3" value={answers.beds} onChange={e => setAnswers({ ...answers, beds: e.target.value })} style={inputStyle} />
                 <input placeholder="Baths: 2" value={answers.baths} onChange={e => setAnswers({ ...answers, baths: e.target.value })} style={inputStyle} />
+                <input placeholder="Sq Ft: 1,850" value={answers.sqft} onChange={e => setAnswers({ ...answers, sqft: e.target.value })} style={inputStyle} />
               </div>
             </div>
 

@@ -20,6 +20,7 @@ Desired Neighborhood: ${form.neighborhood || 'unknown'}
 Property Type: ${form.type}
 Beds Needed: ${form.beds || 'unknown'}
 Baths Needed: ${form.baths || 'unknown'}
+Sq Ft Needed: ${form.sqft || 'not specified'}
 Timeline to Buy: ${form.timeline || 'unknown'}
 Pre-Approval Status: ${form.preApproval}
 Must-Have Features: ${form.mustHaves || 'none specified'}

@@ -36,6 +36,7 @@ export default function MarketSnapshotPage() {
     propertyType: 'Single Family',
     bedrooms: '',
     bathrooms: '',
+    sqft: '',
     priceMin: '',
     priceMax: '',
     notes: '',
@@ -280,6 +281,10 @@ export default function MarketSnapshotPage() {
             <div>
               <label style={s.label}>Bathrooms</label>
               <input value={form.bathrooms} onChange={set('bathrooms')} placeholder="e.g. 2" style={s.input} />
+            </div>
+            <div>
+              <label style={s.label}>Sq Ft</label>
+              <input value={form.sqft} onChange={set('sqft')} placeholder="e.g. 1,850" style={s.input} />
             </div>
           </div>
 
