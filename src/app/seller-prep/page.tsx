@@ -21,11 +21,17 @@ export default function SellerPrepPage() {
   const [outputs, setOutputs] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('meeting_outline')
   const [copied, setCopied] = useState(false)
+  const [showComps, setShowComps] = useState(false)
 
   const [form, setForm] = useState({
     address: '', city: '', state: '', neighborhood: '', type: 'Single family', beds: '', baths: '',
     sqft: '', estimatedPrice: '', sellerGoals: '', timeframe: '',
     propertyCondition: 'Good', notes: '', agentName: '',
+    comps: [
+      { address: '', salePrice: '', bedsBaths: '', sqft: '', dom: '' },
+      { address: '', salePrice: '', bedsBaths: '', sqft: '', dom: '' },
+      { address: '', salePrice: '', bedsBaths: '', sqft: '', dom: '' },
+    ],
   })
 
   useEffect(() => {
@@ -76,6 +82,14 @@ export default function SellerPrepPage() {
     setLoading(false)
   }
 
+  const updateComp = (index: number, field: string, value: string) => {
+    setForm(prev => {
+      const comps = [...prev.comps]
+      comps[index] = { ...comps[index], [field]: value }
+      return { ...prev, comps }
+    })
+  }
+
   const tabs = [
     { key: 'meeting_outline', label: 'Meeting Outline', icon: '📋' },
     { key: 'talking_points', label: 'Talking Points', icon: '🎤' },
@@ -84,6 +98,8 @@ export default function SellerPrepPage() {
     { key: 'selling_angles', label: 'Selling Angles', icon: '🎯' },
     { key: 'followup_email', label: 'Follow-Up Email', icon: '📧' },
     { key: 'presentation_intro', label: 'Presentation Intro', icon: '📊' },
+    { key: 'cma_analysis', label: 'CMA & Pricing', icon: '📈' },
+    { key: 'objection_responses', label: 'Objection Responses', icon: '🛡️' },
   ]
 
   const inputStyle = { width: '100%', padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '13px', color: 'var(--lw-text)', boxSizing: 'border-box' as const, outline: 'none' }
@@ -124,7 +140,7 @@ export default function SellerPrepPage() {
             📋 Prepare My Listing Kit
           </button>
           <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.65)', margin: '0', letterSpacing: '0.2px' }}>
-            7 sections generated · Takes about 20–30 seconds
+            9 sections generated · Takes about 20–30 seconds
           </p>
         </div>
 
@@ -223,6 +239,47 @@ export default function SellerPrepPage() {
           </div>
         </div>
 
+        {/* COMPARABLE SALES */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <button
+            onClick={() => setShowComps(!showComps)}
+            style={{
+              width: '100%', padding: '13px 16px',
+              background: 'var(--lw-card)', border: '1px solid var(--lw-border)',
+              borderRadius: '12px', fontSize: '13px', fontWeight: '600',
+              color: 'var(--lw-text-muted)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '8px',
+              fontFamily: 'var(--font-plus-jakarta), sans-serif',
+            }}
+          >
+            <span>{showComps ? '▾' : '▸'}</span>
+            <span>{showComps ? '− Hide Comparable Sales' : '+ Add Comparable Sales'}</span>
+            <span style={{ fontSize: '11px', color: 'var(--lw-text-muted)', fontWeight: '400', marginLeft: 'auto', opacity: 0.7 }}>Optional · Improves CMA analysis</span>
+          </button>
+          {showComps && (
+            <div style={{ ...cardStyle, marginTop: '8px', marginBottom: '0', border: '1px solid rgba(139,92,246,0.18)' }}>
+              <p style={{ fontSize: '11px', fontWeight: '700', color: '#8b5cf6', letterSpacing: '1px', margin: '0 0 4px' }}>COMPARABLE SALES</p>
+              <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: '0 0 16px', lineHeight: '1.5' }}>
+                Add recent sold comps to get a pricing narrative and objection responses
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {form.comps.map((comp, i) => (
+                  <div key={i}>
+                    <p style={{ ...labelStyle, marginBottom: '7px' }}>Comp {i + 1}</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px' }}>
+                      <input placeholder="Address" value={comp.address} onChange={e => updateComp(i, 'address', e.target.value)} style={inputStyle} />
+                      <input placeholder="Sale Price" value={comp.salePrice} onChange={e => updateComp(i, 'salePrice', e.target.value)} style={inputStyle} />
+                      <input placeholder="Beds/Baths" value={comp.bedsBaths} onChange={e => updateComp(i, 'bedsBaths', e.target.value)} style={inputStyle} />
+                      <input placeholder="Sqft" value={comp.sqft} onChange={e => updateComp(i, 'sqft', e.target.value)} style={inputStyle} />
+                      <input placeholder="Days on Market" value={comp.dom} onChange={e => updateComp(i, 'dom', e.target.value)} style={inputStyle} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* WHAT YOU'LL GET */}
         <div style={{ marginBottom: '1.5rem' }}>
           <p style={sectionHeadStyle}>What You'll Get</p>
@@ -275,7 +332,7 @@ export default function SellerPrepPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>
               <div>
                 <p style={{ fontSize: '11px', fontWeight: '700', color: '#1D9E75', letterSpacing: '1px', margin: '0 0 4px' }}>MEETING PREP KIT READY</p>
-                <h2 style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--lw-text)', margin: '0' }}>7 sections generated</h2>
+                <h2 style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--lw-text)', margin: '0' }}>{tabs.length} sections generated</h2>
               </div>
             </div>
 

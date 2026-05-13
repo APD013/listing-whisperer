@@ -13,6 +13,9 @@ export async function POST(request: Request) {
     const { allowed } = checkRateLimit(`sellerprep_${userId}`, 10, 60000)
     if (!allowed) return rateLimitResponse()
 
+    const hasComps = form.comps && form.comps.some((c: any) => c.address)
+    const validComps = hasComps ? form.comps.filter((c: any) => c.address) : []
+
     const prompt = `You are an expert real estate agent coach. Create a complete seller meeting preparation kit for this listing appointment. Respond ONLY with valid JSON, no markdown, no backticks.
 
 Property: ${form.type}, ${form.beds}, ${form.sqft ? form.sqft + ' sq ft,' : ''} ${form.address}
@@ -23,6 +26,23 @@ Seller Goals: ${form.sellerGoals || 'unknown'}
 Timeframe: ${form.timeframe || 'unknown'}
 Agent Name: ${form.agentName || 'Agent'}
 Notes: ${form.notes || 'none'}
+${hasComps ? `Comparable Sales: ${JSON.stringify(validComps)}` : 'Comparable Sales: None provided.'}
+
+For "cma_analysis":${hasComps ? `
+The seller provided comparable sales. Include all of the following:
+1. COMPARABLE SALES SUMMARY: A narrative paragraph analyzing the comps and what they suggest about the subject property's value.
+   Comps: ${JSON.stringify(validComps)}
+   Subject: ${form.address}, ${form.estimatedPrice}, ${form.beds} bed/${form.baths} bath, ${form.sqft} sqft, condition: ${form.propertyCondition}
+2. RECOMMENDED LIST PRICE: Based on the comps, a recommended price range with clear reasoning.
+3. PRICE PER SQFT ANALYSIS: Calculate and compare price per sqft across the comps and subject property.
+4. SELLER OBJECTION RESPONSES (data-backed using comp data): Confident responses to "My neighbor got more for their home" / "Zillow says my home is worth more" / "Let's start high and reduce if needed" / "I need to net a specific amount"` : `
+Generate general pricing strategy talking points based on the estimated price range of ${form.estimatedPrice || 'unknown'} and current market conditions. No comps were provided so keep it strategic and general.`}
+
+For "objection_responses": Always write confident, conversational responses in the agent's voice to ALL 4 of these common seller objections, using the property details and estimated price. Format each with the objection as a header followed by the response.
+1. "My neighbor got more for their home"
+2. "Zillow says my home is worth more"
+3. "Let's start high and reduce if needed"
+4. "I need to net a specific amount"
 
 Return exactly this JSON:
 {
@@ -32,7 +52,9 @@ Return exactly this JSON:
 "marketing_preview": "A preview of the marketing plan the agent can present to the seller",
 "selling_angles": "3-5 strongest likely selling angles for this property based on what we know",
 "followup_email": "Complete follow-up email to send after the meeting with subject line",
-"presentation_intro": "A strong 2-3 paragraph opening statement for the listing presentation"
+"presentation_intro": "A strong 2-3 paragraph opening statement for the listing presentation",
+"cma_analysis": "Detailed CMA analysis and pricing narrative as described above",
+"objection_responses": "Confident responses to all 4 seller objections, each with the objection as a header followed by the agent's response"
 }`
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -44,7 +66,7 @@ Return exactly this JSON:
       },
       body: JSON.stringify({
         model: 'claude-opus-4-5',
-        max_tokens: 3000,
+        max_tokens: 5000,
         messages: [{ role: 'user', content: prompt }]
       })
     })
