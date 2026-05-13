@@ -47,7 +47,27 @@ export async function POST(request: Request) {
 
         if (!profileId) break
 
-        if (mode === 'subscription') {
+        if (session.metadata?.type === 'staging_credits') {
+          // Add virtual staging credits based on price
+          const creditsByPrice: Record<string, number> = {
+            'price_1TWi1AKzAxeqVLKnDPUHAsKO': 5,
+            'price_1TWi39KzAxeqVLKnsI7zCtL4': 15,
+            'price_1TWi3TKzAxeqVLKnZBT2TJP1': 30,
+          }
+          const priceId = session.metadata?.priceId
+          const creditsToAdd = creditsByPrice[priceId] ?? 0
+          if (creditsToAdd > 0) {
+            const { data: existingProfile } = await supabase
+              .from('profiles')
+              .select('staging_credits')
+              .eq('id', profileId)
+              .single()
+            await supabase
+              .from('profiles')
+              .update({ staging_credits: (existingProfile?.staging_credits || 0) + creditsToAdd })
+              .eq('id', profileId)
+          }
+        } else if (mode === 'subscription') {
           // Upgrade user to Pro
           await supabase
             .from('profiles')

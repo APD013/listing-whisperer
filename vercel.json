@@ -19,6 +19,10 @@
     {
       "path": "/api/demo/reset",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/staging-credits/reset",
+      "schedule": "0 0 1 * *"
     }
   ],
   "version": 2

@@ -19,6 +19,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Fetch profile credits
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('staging_credits, staging_credits_reset_at')
+      .eq('id', userId)
+      .single()
+
+    const today = new Date()
+    const todayStr = today.toISOString().split('T')[0]
+    let currentCredits = profile?.staging_credits ?? 0
+
+    // Reset credits if staging_credits_reset_at is from a previous month
+    if (profile?.staging_credits_reset_at) {
+      const resetAt = new Date(profile.staging_credits_reset_at)
+      const isPreviousMonth =
+        resetAt.getFullYear() < today.getFullYear() ||
+        (resetAt.getFullYear() === today.getFullYear() && resetAt.getMonth() < today.getMonth())
+      if (isPreviousMonth) {
+        currentCredits = 3
+        await supabase
+          .from('profiles')
+          .update({ staging_credits: 3, staging_credits_reset_at: todayStr })
+          .eq('id', userId)
+      }
+    }
+
+    if (currentCredits <= 0) {
+      return NextResponse.json({ error: 'NO_CREDITS' }, { status: 403 })
+    }
+
     console.log('DECOR8_API_KEY present:', !!process.env.DECOR8_API_KEY)
 
     const response = await fetch('https://api.decor8.ai/generate_designs_for_room', {
@@ -47,7 +77,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No images returned from Decor8 AI' }, { status: 500 })
     }
 
-    return NextResponse.json({ images })
+    // Decrement credits
+    const newCredits = currentCredits - 1
+    await supabase
+      .from('profiles')
+      .update({
+        staging_credits: newCredits,
+        staging_credits_reset_at: profile?.staging_credits_reset_at || todayStr,
+      })
+      .eq('id', userId)
+
+    return NextResponse.json({ images, creditsRemaining: newCredits })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }

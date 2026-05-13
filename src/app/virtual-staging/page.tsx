@@ -31,6 +31,12 @@ const DESIGN_STYLES = [
   { label: 'Mid-Century', value: 'midcentury' },
 ]
 
+const CREDIT_PACKS = [
+  { label: '5 Stagings', price: '$9', priceId: 'price_1TWi1AKzAxeqVLKnDPUHAsKO' },
+  { label: '15 Stagings', price: '$24', priceId: 'price_1TWi39KzAxeqVLKnsI7zCtL4' },
+  { label: '30 Stagings', price: '$44', priceId: 'price_1TWi3TKzAxeqVLKnZBT2TJP1' },
+]
+
 export default function VirtualStagingPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
@@ -43,14 +49,34 @@ export default function VirtualStagingPage() {
   const [designStyle, setDesignStyle] = useState('modern')
   const [results, setResults] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [credits, setCredits] = useState<number | null>(null)
+  const [showUpsell, setShowUpsell] = useState(false)
+  const [buyingCredits, setBuyingCredits] = useState<string | null>(null)
+  const [creditsAddedBanner, setCreditsAddedBanner] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('staging_credits')
+        .eq('id', user.id)
+        .single()
+      setCredits(profile?.staging_credits ?? 0)
     }
     getUser()
+
+    // Check for ?credits=added param
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('credits') === 'added') {
+        setCreditsAddedBanner(true)
+        window.history.replaceState({}, '', '/virtual-staging')
+      }
+    }
   }, [])
 
   const processFile = async (file: File) => {
@@ -92,15 +118,36 @@ export default function VirtualStagingPage() {
         body: JSON.stringify({ imageUrl, roomType, designStyle, userId })
       })
       const data = await res.json()
-      if (data.error) {
+      if (data.error === 'NO_CREDITS') {
+        setShowUpsell(true)
+      } else if (data.error) {
         setError(data.error)
       } else {
         setResults(data.images)
+        setCredits(data.creditsRemaining)
       }
     } catch (e: any) {
       setError(e.message || 'Something went wrong')
     }
     setLoading(false)
+  }
+
+  const handleBuyCredits = async (priceId: string) => {
+    if (!userId) return
+    setBuyingCredits(priceId)
+    try {
+      const res = await fetch('/api/staging-credits/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId, userId })
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+      else alert('Error: ' + (data.error || 'Could not create checkout session'))
+    } catch (e: any) {
+      alert('Error: ' + e.message)
+    }
+    setBuyingCredits(null)
   }
 
   const handleDownload = async (url: string, index: number) => {
@@ -137,6 +184,21 @@ export default function VirtualStagingPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
       <Navbar />
+
+      {/* Credits added banner */}
+      {creditsAddedBanner && (
+        <div style={{
+          background: '#1D9E75', color: '#fff', padding: '12px 1.5rem',
+          textAlign: 'center', fontSize: '14px', fontWeight: '600',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+        }}>
+          ✅ Credits added! You're ready to stage more listings.
+          <button
+            onClick={() => setCreditsAddedBanner(false)}
+            style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '16px', lineHeight: 1, padding: '0 0 0 8px' }}
+          >✕</button>
+        </div>
+      )}
 
       <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem 1.25rem 4rem' }}>
 
@@ -182,7 +244,7 @@ export default function VirtualStagingPage() {
         </div>
 
         {/* Form card */}
-        <div style={{ background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.75rem 2rem', marginBottom: '2rem' }}>
+        <div style={{ background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.75rem 2rem', marginBottom: credits !== null && credits <= 1 ? '0.75rem' : '2rem' }}>
           <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-text-muted)', letterSpacing: '1.2px', margin: '0 0 1.25rem' }}>UPLOAD & CONFIGURE</p>
 
           {/* Image upload */}
@@ -267,6 +329,21 @@ export default function VirtualStagingPage() {
           >
             {loading ? 'Staging your room…' : 'Stage This Room →'}
           </button>
+
+          {/* Credits remaining */}
+          {credits !== null && (
+            <div style={{ marginTop: '12px', textAlign: 'center', fontSize: '13px', fontWeight: '600', color: '#8b5cf6' }}>
+              ✦ {credits} staging{credits === 1 ? '' : 's'} remaining this month
+              {credits === 0 && (
+                <button
+                  onClick={() => setShowUpsell(true)}
+                  style={{ marginLeft: '10px', fontSize: '12px', color: '#8b5cf6', background: 'none', border: '1px solid #8b5cf660', borderRadius: '20px', padding: '2px 10px', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}
+                >
+                  Buy more
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Loading state */}
@@ -351,6 +428,70 @@ export default function VirtualStagingPage() {
           </div>
         )}
       </div>
+
+      {/* Upsell modal */}
+      {showUpsell && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+            zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '1.5rem',
+          }}
+          onClick={e => { if (e.target === e.currentTarget) setShowUpsell(false) }}
+        >
+          <div style={{
+            background: 'var(--lw-card)', borderRadius: '20px', border: '1px solid var(--lw-border)',
+            padding: '2rem', maxWidth: '440px', width: '100%', textAlign: 'center',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+          }}>
+            <div style={{ fontSize: '40px', marginBottom: '14px' }}>🛋️</div>
+            <h2 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--lw-text)', margin: '0 0 10px', letterSpacing: '-0.3px' }}>
+              You've used all your stagings this month
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', lineHeight: '1.6', margin: '0 0 1.75rem' }}>
+              Buy more credits to keep staging listings. Credits reset on the 1st of each month.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.25rem' }}>
+              {CREDIT_PACKS.map(pack => (
+                <button
+                  key={pack.priceId}
+                  onClick={() => handleBuyCredits(pack.priceId)}
+                  disabled={buyingCredits === pack.priceId}
+                  style={{
+                    padding: '14px 20px',
+                    background: buyingCredits === pack.priceId ? '#6b7280' : 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '15px',
+                    fontWeight: '700',
+                    cursor: buyingCredits === pack.priceId ? 'not-allowed' : 'pointer',
+                    fontFamily: 'var(--font-plus-jakarta), sans-serif',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span>{pack.label}</span>
+                  <span style={{ opacity: 0.85, fontWeight: '600' }}>{pack.price}</span>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowUpsell(false)}
+              style={{
+                padding: '10px 24px', background: 'none', border: '1px solid var(--lw-border)',
+                borderRadius: '20px', color: 'var(--lw-text-muted)', fontSize: '13px', fontWeight: '600',
+                cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif',
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
