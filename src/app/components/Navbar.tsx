@@ -36,6 +36,11 @@ export default function Navbar() {
     router.push('/dashboard')
   }
 
+  const handleDashboardClick = () => {
+    sessionStorage.setItem('lw_dashboard_scroll', String(window.scrollY))
+    router.push('/dashboard')
+  }
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push('/')
@@ -57,19 +62,23 @@ export default function Navbar() {
       boxSizing: 'border-box' as const,
     }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <a
-          href="/dashboard"
-          onClick={() => sessionStorage.setItem('lw_scroll_position', String(window.scrollY))}
+        <button
+          onClick={handleDashboardClick}
           style={{
             fontSize: '13px',
             color: 'var(--lw-text-muted)',
             textDecoration: 'none',
             fontWeight: '500',
             marginRight: '16px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: 'var(--font-plus-jakarta), sans-serif',
+            padding: 0,
           }}
         >
           ← Dashboard
-        </a>
+        </button>
         <button
           onClick={handleLogoClick}
           style={{

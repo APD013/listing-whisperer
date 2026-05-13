@@ -149,6 +149,14 @@ export default function Dashboard() {
 
       if (upgraded) setPlan('pro')
 
+      const savedScroll = sessionStorage.getItem('lw_dashboard_scroll')
+      if (savedScroll) {
+        setTimeout(() => {
+          window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' })
+          sessionStorage.removeItem('lw_dashboard_scroll')
+        }, 100)
+      }
+
       const checkReminders = async () => {
         const { data: reminders } = await supabase
           .from('reminders')
