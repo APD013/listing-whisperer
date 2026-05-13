@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -8,6 +8,10 @@ const supabase = createClient(
 )
 
 export default function DemoPage() {
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'light')
+  }, [])
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
