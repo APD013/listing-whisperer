@@ -633,9 +633,9 @@ export default function GlobalChat() {
       <button
         data-chat-toggle="true"
         onClick={() => setShowChat(!showChat)}
-        style={{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'18px',fontWeight:'800',letterSpacing:'-0.5px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500}}
-        onMouseOver={e => { e.currentTarget.style.transform='translateX(-50%) scale(1.1)'; e.currentTarget.style.boxShadow='0 4px 32px rgba(29,158,117,0.9)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='1'; chips.style.pointerEvents='all' } }}
-        onMouseOut={e => { e.currentTarget.style.transform='translateX(-50%) scale(1)'; e.currentTarget.style.boxShadow='0 4px 24px rgba(29,158,117,0.6)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='0'; chips.style.pointerEvents='none' } }}>
+        style={{position:'fixed',bottom:'24px',right:'24px',width:'48px',height:'48px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'16px',fontWeight:'800',letterSpacing:'-0.5px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1000}}
+        onMouseOver={e => { e.currentTarget.style.transform='scale(1.1)'; e.currentTarget.style.boxShadow='0 4px 32px rgba(29,158,117,0.9)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='1'; chips.style.pointerEvents='all' } }}
+        onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.boxShadow='0 4px 24px rgba(29,158,117,0.6)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='0'; chips.style.pointerEvents='none' } }}>
         {showChat ? '✕' : 'LW'}
       </button>
 
