@@ -149,13 +149,7 @@ export default function Dashboard() {
 
       if (upgraded) setPlan('pro')
 
-      const savedScroll = sessionStorage.getItem('lw_dashboard_scroll')
-      if (savedScroll) {
-        setTimeout(() => {
-          window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' })
-          sessionStorage.removeItem('lw_dashboard_scroll')
-        }, 800)
-      }
+      // scroll restore handled by separate useEffect
 
       const checkReminders = async () => {
         const { data: reminders } = await supabase
@@ -648,6 +642,19 @@ export default function Dashboard() {
       ]
     },
   ]
+
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem('lw_dashboard_scroll')
+    if (savedScroll) {
+      const scrollTo = parseInt(savedScroll)
+      sessionStorage.removeItem('lw_dashboard_scroll')
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: scrollTo, behavior: 'instant' })
+        })
+      })
+    }
+  }, [pastListings])
 
   return (
     <div style={styles.page}>
