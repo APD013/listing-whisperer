@@ -16,6 +16,36 @@ export default function PhotosPage() {
   const [photos, setPhotos] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const loadPhotos = async (uid: string) => {
+    const { data: files } = await supabase.storage
+      .from('listing-photos')
+      .list(uid, { sortBy: { column: 'created_at', order: 'desc' } })
+    if (files) {
+      const photoUrls = files.map(file => {
+        const { data: { publicUrl } } = supabase.storage
+          .from('listing-photos')
+          .getPublicUrl(`${uid}/${file.name}`)
+        return { name: file.name, url: publicUrl, created_at: file.created_at }
+      })
+      setPhotos(photoUrls)
+    }
+    setLoading(false)
+  }
+
+  const uploadPhoto = async (file: File) => {
+    if (!userId) return
+    setUploading(true)
+    const fileName = `${userId}/${Date.now()}-${file.name}`
+    const { error } = await supabase.storage
+      .from('listing-photos')
+      .upload(fileName, file, { cacheControl: '3600', upsert: false })
+    if (error) { alert('Upload error: ' + error.message); setUploading(false); return }
+    await loadPhotos(userId)
+    setUploading(false)
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -26,21 +56,7 @@ export default function PhotosPage() {
         .from('profiles').select('plan').eq('id', user.id).single()
       if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
       else { setPlanLoaded(true) }
-
-      const { data: files } = await supabase.storage
-        .from('listing-photos')
-        .list(user.id, { sortBy: { column: 'created_at', order: 'desc' } })
-
-      if (files) {
-        const photoUrls = files.map(file => {
-          const { data: { publicUrl } } = supabase.storage
-            .from('listing-photos')
-            .getPublicUrl(`${user.id}/${file.name}`)
-          return { name: file.name, url: publicUrl, created_at: file.created_at }
-        })
-        setPhotos(photoUrls)
-      }
-      setLoading(false)
+      loadPhotos(user.id)
     }
     getUser()
   }, [])
@@ -128,6 +144,23 @@ export default function PhotosPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* UPLOAD ZONE */}
+        <div
+          style={{ border: isDragging ? '2px dashed var(--lw-accent)' : '2px dashed var(--lw-border)', borderRadius: '14px', padding: '1.5rem', textAlign: 'center', background: isDragging ? 'rgba(29,158,117,0.04)' : 'var(--lw-card)', cursor: 'pointer', marginBottom: '1.5rem', transition: 'border-color 0.2s' }}
+          onClick={() => document.getElementById('photos-upload-input')?.click()}
+          onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={e => { e.preventDefault(); setIsDragging(false); const file = e.dataTransfer.files[0]; if (file) uploadPhoto(file) }}
+        >
+          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📸</div>
+          <p style={{ fontSize: '14px', fontWeight: '600', color: 'var(--lw-text)', margin: '0 0 4px' }}>
+            {uploading ? 'Uploading…' : 'Drag & drop or click to upload'}
+          </p>
+          <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: 0 }}>JPG, PNG, WEBP accepted</p>
+          <input id="photos-upload-input" type="file" accept="image/*" style={{ display: 'none' }}
+            onChange={e => { const file = e.target.files?.[0]; if (file) uploadPhoto(file) }} />
         </div>
 
         {/* LOADING */}

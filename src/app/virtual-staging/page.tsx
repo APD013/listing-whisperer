@@ -24,6 +24,7 @@ export default function VirtualStagingPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [roomType, setRoomType] = useState('Living Room')
@@ -40,9 +41,8 @@ export default function VirtualStagingPage() {
     getUser()
   }, [])
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !userId) return
+  const processFile = async (file: File) => {
+    if (!userId) return
     setUploading(true)
     setError(null)
     const ext = file.name.split('.').pop()
@@ -61,6 +61,11 @@ export default function VirtualStagingPage() {
     setImageUrl(urlData.publicUrl)
     setImagePreview(urlData.publicUrl)
     setUploading(false)
+  }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) processFile(file)
   }
 
   const handleGenerate = async () => {
@@ -171,23 +176,28 @@ export default function VirtualStagingPage() {
           {/* Image upload */}
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={labelStyle}>ROOM PHOTO</label>
-            <label style={{
-              display: 'block',
-              border: '2px dashed var(--lw-border)',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              textAlign: 'center',
-              cursor: 'pointer',
-              transition: 'border-color 0.2s',
-              background: imagePreview ? 'transparent' : 'var(--lw-input)',
-            }}>
+            <label
+              style={{
+                display: 'block',
+                border: isDragging ? '2px dashed var(--lw-accent)' : '2px dashed var(--lw-border)',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'border-color 0.2s',
+                background: isDragging ? 'var(--lw-accent)10' : imagePreview ? 'transparent' : 'var(--lw-input)',
+              }}
+              onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={e => { e.preventDefault(); setIsDragging(false); const file = e.dataTransfer.files[0]; if (file) processFile(file) }}
+            >
               {imagePreview ? (
                 <img src={imagePreview} alt="Room preview" style={{ maxHeight: '220px', borderRadius: '8px', objectFit: 'cover', maxWidth: '100%' }} />
               ) : (
                 <div>
                   <div style={{ fontSize: '32px', marginBottom: '8px' }}>📷</div>
                   <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--lw-text)', marginBottom: '4px' }}>
-                    {uploading ? 'Uploading…' : 'Click to upload room photo'}
+                    {uploading ? 'Uploading…' : 'Drag & drop or click to upload'}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--lw-text-muted)' }}>JPG or PNG accepted</div>
                 </div>

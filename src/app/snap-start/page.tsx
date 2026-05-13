@@ -19,6 +19,7 @@ export default function SnapStartPage() {
   const [step, setStep] = useState<'upload' | 'confirm' | 'results'>('upload')
   const [photos, setPhotos] = useState<string[]>([])
   const [analyzing, setAnalyzing] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [locationLoading, setLocationLoading] = useState(false)
   const [suggestedFeatures, setSuggestedFeatures] = useState<string[]>([])
@@ -48,8 +49,7 @@ export default function SnapStartPage() {
     getUser()
   }, [])
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
+  const processPhotoFiles = async (files: File[]) => {
     if (files.length === 0) return
     setAnalyzing(true)
     try {
@@ -89,6 +89,10 @@ export default function SnapStartPage() {
       setStep('confirm')
     } catch(e: any) { alert('Error analyzing photos: ' + e.message) }
     setAnalyzing(false)
+  }
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    processPhotoFiles(Array.from(e.target.files || []))
   }
 
   const handleGetLocation = () => {
@@ -213,11 +217,16 @@ export default function SnapStartPage() {
             {/* UPLOAD FORM */}
             <div id="snap-form">
               <p style={sectionHeadStyle}>Upload Property Photos</p>
-              <div style={{ ...cardStyle, textAlign: 'center', cursor: 'pointer', border: analyzing ? '2px solid #e1306c' : '2px dashed rgba(225,48,108,0.3)' }}
-                onClick={() => fileInputRef.current?.click()}>
+              <div
+                style={{ ...cardStyle, textAlign: 'center', cursor: 'pointer', border: analyzing ? '2px solid #e1306c' : isDragging ? '2px dashed var(--lw-accent)' : '2px dashed rgba(225,48,108,0.3)', background: isDragging ? 'rgba(29,158,117,0.05)' : undefined, transition: 'border-color 0.2s' }}
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={e => { e.preventDefault(); setIsDragging(false); const file = e.dataTransfer.files[0]; if (file) processPhotoFiles([file]) }}
+              >
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📸</div>
                 <p style={{ fontSize: '16px', fontWeight: '600', color: 'var(--lw-text)', marginBottom: '8px' }}>Upload Property Photos</p>
-                <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', marginBottom: '16px' }}>Upload 1–10 photos — AI will suggest visible features</p>
+                <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', marginBottom: '16px' }}>Drag & drop or click to upload — AI will suggest visible features</p>
                 <button style={{ background: 'linear-gradient(135deg,#e1306c,#833ab4)', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', boxShadow: '0 0 16px rgba(225,48,108,0.3)' }}>
                   {analyzing ? '🔍 Analyzing photos...' : 'Choose Photos'}
                 </button>

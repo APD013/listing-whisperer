@@ -19,6 +19,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    console.log('DECOR8_API_KEY present:', !!process.env.DECOR8_API_KEY)
+
     const response = await fetch('https://api.decor8.ai/generate_designs_for_room', {
       method: 'POST',
       headers: {

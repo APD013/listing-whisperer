@@ -20,6 +20,7 @@ export default function CareerHighlightsPage() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const [form, setForm] = useState({
     address: '', price: '', closing_date: '', quote: '', notes: '', photo_url: ''
   })
@@ -183,14 +184,19 @@ export default function CareerHighlightsPage() {
             {/* PHOTO UPLOAD */}
             <div style={{ marginBottom: '14px' }}>
               <label style={labelStyle}>Photo</label>
-              <div style={{ border: '2px dashed var(--lw-border)', borderRadius: '12px', padding: '1.5rem', textAlign: 'center', background: 'var(--lw-input)', cursor: 'pointer', position: 'relative' }}
-                onClick={() => document.getElementById('photo-upload')?.click()}>
+              <div
+                style={{ border: isDragging ? '2px dashed var(--lw-accent)' : '2px dashed var(--lw-border)', borderRadius: '12px', padding: '1.5rem', textAlign: 'center', background: isDragging ? 'var(--lw-accent)10' : 'var(--lw-input)', cursor: 'pointer', position: 'relative', transition: 'border-color 0.2s' }}
+                onClick={() => document.getElementById('photo-upload')?.click()}
+                onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={e => { e.preventDefault(); setIsDragging(false); const file = e.dataTransfer.files[0]; if (file) uploadPhoto(file) }}
+              >
                 {form.photo_url ? (
                   <img src={form.photo_url} alt="Highlight" style={{ maxHeight: '200px', borderRadius: '8px', objectFit: 'cover', width: '100%' }} />
                 ) : (
                   <>
                     <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📸</div>
-                    <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: 0 }}>{uploading ? 'Uploading...' : 'Click to upload a photo'}</p>
+                    <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: 0 }}>{uploading ? 'Uploading...' : 'Drag & drop or click to upload'}</p>
                   </>
                 )}
                 <input id="photo-upload" type="file" accept="image/*" style={{ display: 'none' }}

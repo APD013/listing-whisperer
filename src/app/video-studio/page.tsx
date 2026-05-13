@@ -48,10 +48,9 @@ export default function VideoStudioPage() {
   const [imageBase64, setImageBase64] = useState<string | null>(null)
   const [imageType, setImageType] = useState<string | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const processImageFile = (file: File) => {
     const reader = new FileReader()
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string
@@ -61,6 +60,11 @@ export default function VideoStudioPage() {
       setImageType(file.type)
     }
     reader.readAsDataURL(file)
+  }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) processImageFile(file)
   }
 
   useEffect(() => {
@@ -274,9 +278,14 @@ export default function VideoStudioPage() {
                   </div>
                 </div>
               ) : (
-                <div style={{ padding: '22px', border: '1.5px dashed var(--lw-border)', borderRadius: '10px', textAlign: 'center', background: 'var(--lw-input)' }}>
+                <div
+                  style={{ padding: '22px', border: isDragging ? '1.5px dashed var(--lw-accent)' : '1.5px dashed var(--lw-border)', borderRadius: '10px', textAlign: 'center', background: isDragging ? 'var(--lw-accent)10' : 'var(--lw-input)', transition: 'border-color 0.2s' }}
+                  onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={e => { e.preventDefault(); setIsDragging(false); const file = e.dataTransfer.files[0]; if (file) processImageFile(file) }}
+                >
                   <div style={{ fontSize: '1.6rem', marginBottom: '6px' }}>📷</div>
-                  <p style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)', margin: '0 0 3px' }}>Click to upload a listing photo</p>
+                  <p style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)', margin: '0 0 3px' }}>Drag & drop or click to upload</p>
                   <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '0', opacity: 0.7 }}>JPG, PNG or WEBP — AI will analyze visual details</p>
                 </div>
               )}
