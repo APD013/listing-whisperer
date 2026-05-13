@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
@@ -53,6 +53,7 @@ export default function Dashboard() {
   const [recentActivity, setRecentActivity] = useState<{type:string;text:string;created_at:string}[]>([])
   const [nudgeDismissed, setNudgeDismissed] = useState(false)
   const [totalReminders, setTotalReminders] = useState<number | null>(null)
+  const [showMoreTools, setShowMoreTools] = useState(false)
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', baths: '', sqft: '', price: '',
@@ -986,51 +987,118 @@ export default function Dashboard() {
                 )}
               </div>
 
-              <div id="all-tools" style={{display:'flex',flexDirection:'column',gap:'3rem',marginBottom:'3rem'}}>
-                {buckets.map((bucket, bi) => (
-                  <div key={bi}>
-                    <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'18px'}}>
-                      <span style={{width:'4px',height:'20px',background:bucket.color,borderRadius:'2px',display:'inline-block',boxShadow:`0 0 10px ${bucket.color}50`}}/>
-                      <p style={{fontSize:'11px',fontWeight:'800',color:bucket.color,letterSpacing:'1.2px',margin:'0'}}>{bucket.label}</p>
-                      <span style={{flex:1,height:'1px',background:`${bucket.color}18`,display:'inline-block'}}/>
-                    </div>
-                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px'}}>
-                      {bucket.cards.map((card: any, ci: number) => (
-                        card.href ? (
-                          <a key={ci} href={card.href}
-                            title={card.tooltip || undefined}
-                            style={{background: card.priority ? 'rgba(29,158,117,0.03)' : (card.popular ? `linear-gradient(135deg,${card.color}0d,${card.color}04)` : (isDark ? 'linear-gradient(135deg,#111420,#13161f)' : '#ffffff')),borderRadius:'13px',border: card.popular ? `1.5px solid ${card.color}35` : (isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'),borderLeft: card.priority ? '3px solid #1D9E75' : undefined,padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.2s',boxShadow: card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'),position:'relative' as const}}
-                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 10px 32px ${card.color}22`}}
-                            onMouseOut={e => {e.currentTarget.style.borderColor=card.popular ? `${card.color}35` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)');if(card.priority){e.currentTarget.style.borderLeftColor='#1D9E75';e.currentTarget.style.borderLeftWidth='3px'}e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=card.popular ? `0 4px 18px ${card.color}18` : (isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)')}}>
-                            {card.popular && (
-                              <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>MOST POPULAR</div>
-                            )}
-                            {card.pro && !card.popular && (
-                              <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#d4af37,#a07c20)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px',boxShadow:'0 2px 8px rgba(212,175,55,0.35)'}}>PRO</div>
-                            )}
-                            <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${card.color}12`,border:`1px solid ${card.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px',display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}}>
-                              {card.title}
-                              {card.startHere && <span style={{fontSize:'9px',fontWeight:'700',color:'#fff',background:'#1D9E75',padding:'2px 7px',borderRadius:'20px',letterSpacing:'0.5px',flexShrink:0}}>START HERE</span>}
-                            </div>
-                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.55'}}>{card.desc}</div>
-                          </a>
-                        ) : (
-                          <div key={ci} onClick={card.action}
-                            style={{background:`linear-gradient(135deg,${card.color}0e,${card.color}05)`,borderRadius:'13px',border:`1px solid ${card.color}22`,padding:'1.25rem',cursor:'pointer',transition:'all 0.2s'}}
-                            onMouseOver={e => {e.currentTarget.style.borderColor=`${card.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 10px 32px ${card.color}22`}}
-                            onMouseOut={e => {e.currentTarget.style.borderColor=`${card.color}22`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
-                            <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${card.color}15`,border:`1px solid ${card.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{card.icon}</div>
-                            <div style={{fontSize:'13px',fontWeight:'700',color: isDark ? '#e0e0e0' : '#111318',marginBottom:'4px'}}>{card.title}</div>
-                            <div style={{fontSize:'11px',color: isDark ? '#6b7280' : '#5a6172',lineHeight:'1.55'}}>{card.desc}</div>
-                            <div style={{marginTop:'8px',fontSize:'11px',fontWeight:'600',color:card.color}}>Start now →</div>
-                          </div>
-                        )
-                      ))}
-                    </div>
+              {/* TOOL TIERS */}
+              <div id="all-tools" style={{marginBottom:'3rem'}}>
+
+                {/* TIER 1 — HERO TOOLS */}
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))',gap:'14px',marginBottom:'2.5rem'}}>
+                  {[
+                    { icon:'⚡', title:'Quick Listing', desc:'Generate a full listing from a few details in seconds', color:'#1D9E75', href:'/quick-listing', badge:'START HERE' },
+                    { icon:'📋', title:'Seller Prep', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep' },
+                    { icon:'👥', title:'Leads & Clients', desc:'Track your pipeline and manage client relationships', color:'#10b981', href:'/leads' },
+                    { icon:'📩', title:'Follow-Up Assistant', desc:'Turn showings and meetings into follow-up emails', color:'#6366f1', href:'/follow-up' },
+                  ].map((item, i) => (
+                    <a key={i} href={item.href}
+                      style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',borderLeft:`3px solid ${item.color}`,padding:'1.75rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',position:'relative' as const}}
+                      onMouseOver={e => {e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow=`0 12px 36px ${item.color}25`}}
+                      onMouseOut={e => {e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)'}}>
+                      {item.badge && (
+                        <div style={{position:'absolute',top:'14px',right:'14px',background:'#1D9E75',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px'}}>
+                          {item.badge}
+                        </div>
+                      )}
+                      <div style={{width:'48px',height:'48px',borderRadius:'14px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',marginBottom:'16px'}}>
+                        {item.icon}
+                      </div>
+                      <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 8px'}}>{item.title}</p>
+                      <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',lineHeight:'1.6'}}>{item.desc}</p>
+                    </a>
+                  ))}
+                </div>
+
+                {/* TIER 2 — CORE TOOLS */}
+                <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 14px'}}>CORE TOOLS</p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px',marginBottom:'1.75rem'}}>
+                  {([
+                    { icon:'✨', title:'New Listing', desc:'Create a full listing from scratch', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
+                    { icon:'🎯', title:'Listing Presentation', desc:'Build a winning listing presentation', color:'#8b5cf6', href:'/listing-presentation' },
+                    { icon:'🚀', title:'Launch Plan', desc:'7-day marketing rollout strategy', color:'#f59e0b', href:'/launch-kit' },
+                    { icon:'📅', title:'Social Planner', desc:'7-day social media content calendar', color:'#e1306c', href:'/social-planner' },
+                    { icon:'🏡', title:'Open House Kit', desc:'Flyer, posts, and follow-up emails', color:'#10b981', href:'/open-house' },
+                    { icon:'⏰', title:'Reminders', desc:'Never miss a follow-up or deadline', color:'#f59e0b', href:'/reminders' },
+                    { icon:'💲', title:'Pricing Assistant', desc:'Sharpen your pricing strategy', color:'#8b5cf6', href:'/pricing-assistant' },
+                    { icon:'📊', title:'Market Snapshot', desc:'Generate instant market reports', color:'#6366f1', href:'/market-snapshot' },
+                    { icon:'🎬', title:'Video Studio', desc:'Turn one listing photo into a complete video ad kit', color:'#e1306c', href:'/video-studio', pro:true },
+                  ] as any[]).map((item, i) => (
+                    item.href ? (
+                      <a key={i} href={item.href}
+                        style={{background:'var(--lw-card)',borderRadius:'13px',border:'1px solid var(--lw-border)',padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:isDark?'none':'0 2px 8px rgba(0,0,0,0.06)',position:'relative' as const}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=`${item.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px ${item.color}20`}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=isDark?'none':'0 2px 8px rgba(0,0,0,0.06)'}}>
+                        {item.pro && <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#d4af37,#a07c20)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px'}}>PRO</div>}
+                        <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${item.color}12`,border:`1px solid ${item.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{item.icon}</div>
+                        <div style={{fontSize:'13px',fontWeight:'700',color:isDark?'#e0e0e0':'#111318',marginBottom:'4px'}}>{item.title}</div>
+                        <div style={{fontSize:'11px',color:isDark?'#6b7280':'#5a6172',lineHeight:'1.55'}}>{item.desc}</div>
+                      </a>
+                    ) : (
+                      <div key={i} onClick={item.action}
+                        style={{background:`linear-gradient(135deg,${item.color}0e,${item.color}05)`,borderRadius:'13px',border:`1px solid ${item.color}22`,padding:'1.25rem',cursor:'pointer',transition:'all 0.18s'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=`${item.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px ${item.color}20`}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor=`${item.color}22`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
+                        <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${item.color}15`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{item.icon}</div>
+                        <div style={{fontSize:'13px',fontWeight:'700',color:isDark?'#e0e0e0':'#111318',marginBottom:'4px'}}>{item.title}</div>
+                        <div style={{fontSize:'11px',color:isDark?'#6b7280':'#5a6172',lineHeight:'1.55'}}>{item.desc}</div>
+                        <div style={{marginTop:'8px',fontSize:'11px',fontWeight:'600',color:item.color}}>Start now →</div>
+                      </div>
+                    )
+                  ))}
+                </div>
+
+                {/* TIER 3 — MORE TOOLS (collapsed) */}
+                {showMoreTools && (
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px',marginBottom:'1.25rem'}}>
+                    {[
+                      { icon:'🏠', title:'Buyer Consultation', desc:'Prepare for any buyer meeting', color:'#8b5cf6', href:'/buyer-consultation' },
+                      { icon:'🏆', title:'Agent Portfolio', desc:'Showcase your track record and wins', color:'#d4af37', href:'/agent-portfolio' },
+                      { icon:'⭐', title:'Career Highlights', desc:'Your stats and success story', color:'#f59e0b', href:'/career-highlights' },
+                      { icon:'🚨', title:'Listing Rescue', desc:'Revive a stale listing with fresh copy', color:'#ef4444', href:'/listing-rescue' },
+                      { icon:'📸', title:'Snap & Start', desc:'Start a listing from a photo', color:'#1D9E75', href:'/snap-start' },
+                      { icon:'✍️', title:'Rewrite Listing', desc:'Polish and improve existing copy', color:'#6366f1', href:'/rewrite' },
+                      { icon:'🖼️', title:'Photo Library', desc:'Organize your listing photos', color:'#10b981', href:'/photos' },
+                      { icon:'💰', title:'Price Drop Kit', desc:'Price improvement announcement suite', color:'#ef4444', href:'/price-drop' },
+                      { icon:'📬', title:'Postcard Copy', desc:'Just Listed & Just Sold postcards', color:'#6366f1', href:'/postcard-copy' },
+                      { icon:'🤝', title:'Referral Request', desc:'Turn every closing into your next listing', color:'#10b981', href:'/referral-request' },
+                      { icon:'📋', title:'Open House Sign-In', desc:'Tablet-friendly visitor sign-in sheet', color:'#1D9E75', href:'/open-house-signin' },
+                      { icon:'✅', title:'Transaction Checklist', desc:'Track every step from listing to closing', color:'#1D9E75', href:'/transaction-checklist' },
+                      { icon:'💰', title:'Seller Net Sheet', desc:'Estimate seller proceeds before closing', color:'#1D9E75', href:'/seller-net-sheet' },
+                      { icon:'🧮', title:'Commission Calculator', desc:'Calculate your real take-home', color:'#d4af37', href:'/commission-calculator' },
+                      { icon:'🛡️', title:'Objection Handler', desc:'Turn any objection into a confident response', color:'#8b5cf6', href:'/objection-handler' },
+                      { icon:'🏘️', title:'Neighborhood Bio', desc:'Compelling neighborhood descriptions', color:'#1D9E75', href:'/neighborhood-bio' },
+                      { icon:'🔄', title:'Follow-Up Sequence', desc:'Complete follow-up sequence for any lead', color:'#6366f1', href:'/follow-up-sequence' },
+                    ].map((item, i) => (
+                      <a key={i} href={item.href}
+                        style={{background:'var(--lw-card)',borderRadius:'13px',border:'1px solid var(--lw-border)',padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:isDark?'none':'0 2px 8px rgba(0,0,0,0.06)'}}
+                        onMouseOver={e => {e.currentTarget.style.borderColor=`${item.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px ${item.color}20`}}
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=isDark?'none':'0 2px 8px rgba(0,0,0,0.06)'}}>
+                        <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${item.color}12`,border:`1px solid ${item.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{item.icon}</div>
+                        <div style={{fontSize:'13px',fontWeight:'700',color:isDark?'#e0e0e0':'#111318',marginBottom:'4px'}}>{item.title}</div>
+                        <div style={{fontSize:'11px',color:isDark?'#6b7280':'#5a6172',lineHeight:'1.55'}}>{item.desc}</div>
+                      </a>
+                    ))}
                   </div>
-                ))}
+                )}
+                <div style={{textAlign:'center',marginBottom:'1rem'}}>
+                  <button onClick={() => setShowMoreTools(v => !v)}
+                    style={{padding:'9px 22px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'20px',color:'var(--lw-text-muted)',fontSize:'13px',fontWeight:'600',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif',transition:'all 0.15s'}}
+                    onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.color='#1D9E75'}}
+                    onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.color='var(--lw-text-muted)'}}>
+                    {showMoreTools ? 'Show less ↑' : 'Show more tools ↓'}
+                  </button>
+                </div>
+
               </div>
+
+              
 
               {pastListings.length > 0 && (
                 <div>
