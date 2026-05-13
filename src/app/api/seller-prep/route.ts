@@ -31,7 +31,7 @@ ${hasComps ? `Comparable Sales: ${JSON.stringify(validComps)}` : 'Comparable Sal
 For "cma_analysis":${hasComps ? `
 The seller provided comparable sales. Include all of the following:
 1. COMPARABLE SALES SUMMARY: A narrative paragraph analyzing the comps and what they suggest about the subject property's value.
-   Comps: ${JSON.stringify(validComps)}
+   Comps: ${validComps.map((c: any) => `${c.address} — $${c.salePrice}, ${c.beds} bed / ${c.baths} bath, ${c.sqft} sqft, ${c.dom} DOM`).join('; ')}
    Subject: ${form.address}, ${form.estimatedPrice}, ${form.beds} bed/${form.baths} bath, ${form.sqft} sqft, condition: ${form.propertyCondition}
 2. RECOMMENDED LIST PRICE: Based on the comps, a recommended price range with clear reasoning.
 3. PRICE PER SQFT ANALYSIS: Calculate and compare price per sqft across the comps and subject property.

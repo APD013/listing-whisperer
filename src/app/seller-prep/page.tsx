@@ -28,9 +28,9 @@ export default function SellerPrepPage() {
     sqft: '', estimatedPrice: '', sellerGoals: '', timeframe: '',
     propertyCondition: 'Good', notes: '', agentName: '',
     comps: [
-      { address: '', salePrice: '', bedsBaths: '', sqft: '', dom: '' },
-      { address: '', salePrice: '', bedsBaths: '', sqft: '', dom: '' },
-      { address: '', salePrice: '', bedsBaths: '', sqft: '', dom: '' },
+      { address: '', salePrice: '', beds: '', baths: '', sqft: '', dom: '' },
+      { address: '', salePrice: '', beds: '', baths: '', sqft: '', dom: '' },
+      { address: '', salePrice: '', beds: '', baths: '', sqft: '', dom: '' },
     ],
   })
 
@@ -269,7 +269,8 @@ export default function SellerPrepPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px' }}>
                       <input placeholder="Address" value={comp.address} onChange={e => updateComp(i, 'address', e.target.value)} style={inputStyle} />
                       <input placeholder="Sale Price" value={comp.salePrice} onChange={e => updateComp(i, 'salePrice', e.target.value)} style={inputStyle} />
-                      <input placeholder="Beds/Baths" value={comp.bedsBaths} onChange={e => updateComp(i, 'bedsBaths', e.target.value)} style={inputStyle} />
+                      <input placeholder="3" value={comp.beds} onChange={e => updateComp(i, 'beds', e.target.value)} style={inputStyle} />
+                      <input placeholder="2" value={comp.baths} onChange={e => updateComp(i, 'baths', e.target.value)} style={inputStyle} />
                       <input placeholder="Sqft" value={comp.sqft} onChange={e => updateComp(i, 'sqft', e.target.value)} style={inputStyle} />
                       <input placeholder="Days on Market" value={comp.dom} onChange={e => updateComp(i, 'dom', e.target.value)} style={inputStyle} />
                     </div>
