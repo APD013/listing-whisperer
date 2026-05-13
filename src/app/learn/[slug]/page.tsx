@@ -109,7 +109,38 @@ export default async function GuidePage({
 
         {/* ARTICLE CONTENT */}
         <article style={{ marginBottom: '3rem' }}>
-          {guide.sections.map((section) => (
+          {guide.sections.slice(0, Math.floor(guide.sections.length / 2)).map((section) => (
+            <section
+              key={section.id}
+              id={section.id}
+              style={{ marginBottom: '3rem', scrollMarginTop: '80px' }}
+            >
+              <h2 style={{
+                fontSize: '1.375rem',
+                fontWeight: '800',
+                color: 'var(--lw-text)',
+                letterSpacing: '-0.025em',
+                lineHeight: '1.3',
+                margin: '0 0 1.125rem',
+                paddingBottom: '0.75rem',
+                borderBottom: '2px solid rgba(29,158,117,0.15)',
+              }}>
+                {section.heading}
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {section.paragraphs.map((para, i) => (
+                  <p key={i} style={{ fontSize: '15px', color: 'var(--lw-text)', lineHeight: '1.8', margin: 0 }}>
+                    {para}
+                  </p>
+                ))}
+              </div>
+            </section>
+          ))}
+          <p style={{ margin: '0 0 2.5rem', padding: '10px 16px', background: 'rgba(29,158,117,0.06)', border: '1px solid rgba(29,158,117,0.15)', borderRadius: '8px', fontSize: '13px', color: 'var(--lw-text-muted)', lineHeight: '1.6' }}>
+            Want to do this faster? Listing Whisperer handles it in one click.{' '}
+            <a href="/signup" style={{ color: 'var(--lw-accent)', fontWeight: '700', textDecoration: 'none' }}>Try it free →</a>
+          </p>
+          {guide.sections.slice(Math.floor(guide.sections.length / 2)).map((section) => (
             <section
               key={section.id}
               id={section.id}
@@ -139,22 +170,27 @@ export default async function GuidePage({
         </article>
 
         {/* CTA CARD */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(29,158,117,0.08), rgba(8,80,65,0.05))', borderRadius: '20px', border: '1px solid rgba(29,158,117,0.25)', padding: '2.5rem', marginBottom: '3rem', textAlign: 'center' }}>
-          <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-accent)', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 0.75rem' }}>
-            Ready to put this into practice?
-          </p>
-          <h3 style={{ fontSize: '1.375rem', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.025em', margin: '0 0 0.75rem' }}>
-            Try this in Listing Whisperer
+        <div style={{ background: 'rgba(29,158,117,0.08)', borderRadius: '20px', border: '1px solid rgba(29,158,117,0.25)', padding: '2.5rem', marginBottom: '3rem', textAlign: 'center' }}>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--lw-text)', letterSpacing: '-0.025em', margin: '0 0 0.875rem' }}>
+            Put this into practice in 60 seconds
           </h3>
-          <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', lineHeight: '1.7', margin: '0 0 1.75rem', maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto' }}>
-            Stop writing from scratch. Use AI to generate professional copy, presentations, and follow-up messages in seconds.
+          <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', lineHeight: '1.7', margin: '0 0 1.75rem', maxWidth: '460px', marginLeft: 'auto', marginRight: 'auto' }}>
+            Listing Whisperer gives you AI tools built specifically for real estate agents. No prompts to write. No setup required.
           </p>
-          <a
-            href={guide.ctaLink}
-            style={{ display: 'inline-block', padding: '13px 30px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700', boxShadow: '0 4px 20px rgba(29,158,117,0.35)' }}
-          >
-            {guide.ctaLabel} →
-          </a>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a
+              href="/signup"
+              style={{ display: 'inline-block', padding: '13px 28px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700', boxShadow: '0 4px 20px rgba(29,158,117,0.35)' }}
+            >
+              Try It Free — No Credit Card
+            </a>
+            <a
+              href="/dashboard"
+              style={{ display: 'inline-block', padding: '13px 24px', color: 'var(--lw-accent)', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '600', border: '1px solid rgba(29,158,117,0.3)' }}
+            >
+              See all tools →
+            </a>
+          </div>
         </div>
 
         {/* RELATED GUIDES */}
