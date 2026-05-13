@@ -67,6 +67,11 @@ export async function POST(request: Request) {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ referralCode: profile.referred_by })
             })
+            await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/referral/convert`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: profileId })
+            })
           }
         } else if (mode === 'payment') {
           // Add 1 listing credit

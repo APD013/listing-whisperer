@@ -21,7 +21,10 @@ export default function SignupPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const ref = params.get('ref')
-    if (ref) setRefCode(ref)
+    if (ref) {
+      setRefCode(ref)
+      localStorage.setItem('lw_referral_code', ref)
+    }
   }, [])
 
   const handleSignup = async () => {
@@ -40,6 +43,11 @@ export default function SignupPage() {
       if (refCode && data.user) {
         try {
           await supabase.rpc('handle_referral', { referral_code_used: refCode, new_user_id: data.user.id })
+          await fetch('/api/referral/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ referralCode: refCode, newUserId: data.user.id })
+          })
         } catch(refErr) {}
       }
 
