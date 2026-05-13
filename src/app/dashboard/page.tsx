@@ -154,7 +154,7 @@ export default function Dashboard() {
         setTimeout(() => {
           window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' })
           sessionStorage.removeItem('lw_dashboard_scroll')
-        }, 100)
+        }, 800)
       }
 
       const checkReminders = async () => {
