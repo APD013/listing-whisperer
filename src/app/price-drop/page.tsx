@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
 
+import Navbar from '../components/Navbar'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -78,11 +80,7 @@ export default function PriceDropKit() {
       <div style={{position:'fixed',top:'10%',left:'5%',width:'350px',height:'350px',background:'radial-gradient(circle, rgba(239,68,68,0.07) 0%, transparent 70%)',pointerEvents:'none'}}/>
       <div style={{position:'fixed',bottom:'20%',right:'5%',width:'300px',height:'300px',background:'radial-gradient(circle, rgba(220,38,38,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
-      {/* NAV */}
-      <div style={{background:'var(--lw-card)',borderBottom:'1px solid var(--lw-border)',padding:'0.875rem 1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)'}}>
-        <a href="/dashboard" style={{fontSize:'13px',fontWeight:'600',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Dashboard</a>
-        <div style={{fontSize:'15px',fontWeight:'800',color:'var(--lw-text)',letterSpacing:'-0.02em'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
-      </div>
+      <Navbar />
 
       <div style={{maxWidth:'760px',margin:'0 auto',padding:'2rem 1.5rem'}}>
 

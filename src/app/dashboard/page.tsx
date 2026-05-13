@@ -72,6 +72,14 @@ export default function Dashboard() {
   ]
 
   useEffect(() => {
+    const savedPos = sessionStorage.getItem('lw_scroll_position')
+    if (savedPos) {
+      window.scrollTo({ top: parseInt(savedPos, 10), behavior: 'instant' })
+      sessionStorage.removeItem('lw_scroll_position')
+    }
+  }, [])
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const upgraded = params.get('upgraded')
     const generateFromLead = params.get('generate')
