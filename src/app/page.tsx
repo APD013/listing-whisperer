@@ -115,7 +115,7 @@ export default function Home() {
           </a>
         </div>
         <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · Unlimited listings · Cancel anytime</p>
-        <a href="/demo" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none',display:'block',textAlign:'center',marginTop:'12px'}}>
+        <a href="/demo" style={{fontSize:'15px',color:'var(--lw-accent)',textDecoration:'none',display:'block',textAlign:'center',marginTop:'16px',fontWeight:'600'}}>
           See a live demo →
         </a>
       </section>
