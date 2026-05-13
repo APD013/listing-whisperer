@@ -72,16 +72,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* STICKY TOP BAR */}
-      <div style={{background:'linear-gradient(135deg,#1D9E75,#085041)',padding:'10px 1.5rem',textAlign:'center',position:'sticky',top:0,zIndex:101}}>
-        <p style={{margin:'0',fontSize:'13px',color:'#fff',fontWeight:'600'}}>
-          🎉 Limited offer — Use code <strong style={{color:'#d4af37'}}>WELCOME50</strong> for 50% off Pro · 
-          <a href="/signup" style={{color:'#fff',textDecoration:'underline',marginLeft:'8px',fontWeight:'700'}}>Start free trial →</a>
-        </p>
-      </div>
-
       {/* NAV */}
-      <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:'41px',zIndex:100}}>
+      <nav style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 1.5rem',borderBottom:'1px solid #eee',background:'#fff',position:'sticky',top:0,zIndex:100}}>
         <div style={{fontSize:'18px',fontWeight:'700'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
           <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
@@ -99,10 +91,10 @@ export default function Home() {
           BUILT FOR REAL ESTATE AGENTS
         </div>
         <h1 style={{fontSize:'clamp(2rem, 5vw, 3.25rem)',fontWeight:'800',lineHeight:'1.15',maxWidth:'740px',margin:'0 auto 1.25rem',letterSpacing:'-0.5px'}}>
-          The AI Assistant Built for Real Estate Agents
+          From one listing photo to a full marketing campaign.
         </h1>
         <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'560px',margin:'0 auto 1rem',lineHeight:'1.75'}}>
-          From one listing photo to a full marketing campaign — descriptions, captions, emails, follow-ups, open house content, and more in seconds.
+          Descriptions, captions, emails, follow-ups, open house content, and more — in seconds. Built for real estate agents.
         </p>
         <div style={{display:'inline-flex',alignItems:'center',gap:'8px',background:'#0d1117',borderRadius:'30px',padding:'8px 18px',marginBottom:'0.5rem',border:'1px solid rgba(29,158,117,0.3)'}}>
           <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',boxShadow:'0 0 8px rgba(29,158,117,0.8)',animation:'pulse 2s infinite'}}/>
@@ -220,40 +212,21 @@ export default function Home() {
         <div style={{maxWidth:'920px',margin:'0 auto'}}>
           <p style={{textAlign:'center',fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',marginBottom:'10px'}}>ONE PLATFORM. EVERY TOOL AN AGENT NEEDS.</p>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>One assistant. The entire listing workflow.</h2>
-          <p style={{textAlign:'center',color:'#777',marginBottom:'2rem',fontSize:'15px'}}>Not a generic AI tool — a purpose-built assistant for every stage of the listing process.</p>
-          <div style={{maxWidth:'640px',margin:'0 auto 3.5rem',background:'rgba(29,158,117,0.06)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'10px',padding:'12px 20px',textAlign:'center'}}>
-            <p style={{fontSize:'13px',color:'#6b7280',margin:'0',lineHeight:'1.7'}}>
-              💡 <strong style={{color:'#1D9E75'}}>Works with your existing tools.</strong> Copy, export, and use content across your MLS, CRM, email platform, and social channels. Direct integrations coming soon.
-            </p>
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))',gap:'1.5rem'}}>
+          <p style={{textAlign:'center',color:'#777',marginBottom:'3.5rem',fontSize:'15px'}}>Purpose-built for every stage of the listing process — from first call to closing.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(260px, 1fr))',gap:'1.5rem'}}>
             {[
-              {icon:'📋',title:'Seller Meeting Prep',desc:'Meeting outlines, talking points, seller questions, and follow-up emails — before every appointment.'},
-              {icon:'📸',title:'Snap & Start',desc:'Upload photos on-site, confirm details, and generate your first draft before you leave the property.'},
-              {icon:'🏠',title:'11 Copy Formats',desc:'MLS, Luxury MLS, Instagram, Facebook, Email, Open House, Video Script, SMS, Flyer, Price Drop, SEO — and more formats coming.'},
-              {icon:'🚀',title:'7-Day Launch Kit',desc:'A complete day-by-day marketing plan with social posts, email sequences, and pro tips.'},
-              {icon:'✨',title:'Listing Rewriter',desc:'Paste any boring MLS description and get a polished, buyer-ready rewrite instantly.'},
-              {icon:'🎙️',title:'Brand Voice Memory',desc:'Save your tone, style, and CTA preferences so every listing sounds like you.'},
-              {icon:'🛡️',title:'Objection Handler',desc:'Turn any seller or buyer objection into a confident, professional response — instantly.'},
-              {icon:'📅',title:'Social Content Planner',desc:'Generate a full 7-day social media calendar for any listing — Instagram, Facebook, LinkedIn, Twitter and SMS.'},
-              {icon:'💰',title:'Seller Net Sheet',desc:'Estimate your seller\'s take-home proceeds before closing. Fast, clear, and easy to share.'},
-              {icon:'🏆',title:'Agent Portfolio',desc:'A shareable public portfolio page with all your past listings. Send it to any potential client. Pro only.'},
-              {icon:'👥',title:'Leads & CRM',desc:'Track your pipeline, manage contacts, and stay on top of every client relationship.'},
-              {icon:'✦',title:'AI Chat Assistant',desc:'Ask anything about real estate or your listings. Your always-on AI assistant built for agents.'},
-              {icon:'📞',title:'Scripts Library',desc:'Cold call, door knock, FSBO, and expired listing scripts — ready to use and AI-customized for your market.'},
-              {icon:'🎙️',title:'Call Capture',desc:'Answer your phone, close more deals. Record client calls, auto-transcribe, and instantly log lead details to your CRM. Pro only.',},
-              {icon:'⭐',title:'Career Highlights',desc:'Capture your favorite closing moments with photos and memories. Market the listing today — remember the moment tomorrow.'},
-              {icon:'📬',title:'Postcard Copy',desc:'Generate Just Listed & Just Sold postcard copy in seconds — ready to send to the neighborhood.'},
-              {icon:'🤝',title:'Referral Request',desc:'Turn every closing into your next listing. Email, text, phone and LinkedIn referral scripts — personalized for every client.'},
-              {icon:'🎬',title:'Video Studio',desc:'Turn one listing into a complete short-form video ad kit — script, caption, hashtags, motion prompt, and more.'},
-              {icon:'🚨',title:'Listing Rescue',desc:'Diagnose exactly why your listing is sitting — and get a complete AI-powered rescue plan to reposition, remarket, and sell it.'},
+              {icon:'🏡',title:'Listing Descriptions',desc:'MLS copy, luxury, price drop, and rewrite tools — 11 formats from one set of notes.'},
+              {icon:'📱',title:'Social & Email Content',desc:'Instagram, Facebook, email blasts, video scripts, postcard copy, and a full 7-day social calendar.'},
+              {icon:'🎤',title:'Seller Prep & Presentation',desc:'Meeting outlines, pricing strategy, objection handling, and a shareable agent portfolio.'},
+              {icon:'📋',title:'Follow-Up & Lead Management',desc:'CRM, follow-up scripts, referral requests, reminders, and open house tools.'},
+              {icon:'📞',title:'Call Capture',desc:'Record client calls, auto-transcribe, extract lead details, and log directly to your CRM. Pro only.'},
             ].map(({icon,title,desc}) => (
-              <div key={title} style={{background:'#f8fafc',borderRadius:'14px',padding:'1.5rem',border:'1px solid #eee',transition:'all 0.2s'}}
+              <div key={title} style={{background:'#f8fafc',borderRadius:'16px',padding:'1.75rem',border:'1px solid #eee',transition:'all 0.2s'}}
                 onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}
                 onMouseOut={e => {e.currentTarget.style.borderColor='#eee';e.currentTarget.style.boxShadow='none'}}>
-                <div style={{fontSize:'2rem',marginBottom:'12px'}}>{icon}</div>
-                <h3 style={{fontSize:'15px',fontWeight:'700',marginBottom:'8px'}}>{title}</h3>
-                <p style={{fontSize:'13px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
+                <div style={{fontSize:'2.25rem',marginBottom:'14px'}}>{icon}</div>
+                <h3 style={{fontSize:'16px',fontWeight:'700',marginBottom:'8px'}}>{title}</h3>
+                <p style={{fontSize:'14px',color:'#777',lineHeight:'1.75',margin:'0'}}>{desc}</p>
               </div>
             ))}
           </div>

@@ -43,34 +43,11 @@ const QUICK_CHIPS = [
   { label: '🏠 Listing Strategy', prompt: 'Help me create a marketing strategy for my listing' },
 ]
 
-const AVATAR_STYLES = [
-  { name: 'Professional Assistant', color: '#8b5cf6' },
-  { name: 'Luxury Listing Advisor', color: '#d4af37' },
-  { name: 'Friendly Marketing Coach', color: '#1D9E75' },
-  { name: 'Broker Mentor', color: '#4a6fa5' },
-  { name: 'Minimal AI Assistant', color: '#6b7280' },
-]
-
 const AVATAR_STATE_TEXT: Record<string, string> = {
   idle: 'Ready to help',
   listening: 'Listening...',
   thinking: 'Thinking...',
   completed: 'Done!',
-}
-
-function AvatarSVG({ size = 64, color = '#8b5cf6' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="32" cy="32" r="30" fill={color + '1a'} stroke={color} strokeWidth="1.5"/>
-      <path d="M18 52 L27 42 L30 46 L32 44 L34 46 L37 42 L46 52 Q32 58 18 52Z" fill={color + 'bb'}/>
-      <ellipse cx="32" cy="26" rx="13" ry="15" fill={color + 'ee'}/>
-      <circle cx="27.5" cy="23" r="2" fill="white" fillOpacity="0.9"/>
-      <circle cx="36.5" cy="23" r="2" fill="white" fillOpacity="0.9"/>
-      <circle cx="28" cy="23.5" r="0.9" fill={color}/>
-      <circle cx="37" cy="23.5" r="0.9" fill={color}/>
-      <path d="M27.5 30 Q32 34 36.5 30" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" strokeOpacity="0.85"/>
-    </svg>
-  )
 }
 
 function pickRandom<T>(arr: T[], count: number): T[] {
@@ -103,8 +80,6 @@ export default function GlobalChat() {
   const [voiceEnabled, setVoiceEnabled] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>(() => pickRandom(SUGGESTIONS_POOL, 4))
   const [avatarState, setAvatarState] = useState<'idle'|'listening'|'thinking'|'completed'>('idle')
-  const [avatarStyle, setAvatarStyle] = useState('Professional Assistant')
-
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
   const prevShowChatRef = useRef(false)
@@ -195,19 +170,6 @@ export default function GlobalChat() {
   }, [showChat, pathname])
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('lw_avatar_style')
-      if (saved && AVATAR_STYLES.some(s => s.name === saved)) setAvatarStyle(saved)
-    } catch(e) {}
-  }, [])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('lw_avatar_style', avatarStyle)
-    } catch(e) {}
-  }, [avatarStyle])
-
-  useEffect(() => {
     if (loading) {
       hadLoadingRef.current = true
       setAvatarState('thinking')
@@ -228,7 +190,6 @@ export default function GlobalChat() {
   }
 
   const isTwoPartyState = TWO_PARTY_STATES.includes(userState)
-  const currentStyleColor = AVATAR_STYLES.find(s => s.name === avatarStyle)?.color || '#8b5cf6'
   const statusDotActive = avatarState === 'idle' || avatarState === 'completed'
 
   const startRecording = async () => {
@@ -510,9 +471,7 @@ export default function GlobalChat() {
           {/* HEADER */}
           <div style={{padding:'0.875rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.1)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.25)',flexShrink:0}}>
             <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-              <div style={{position:'relative',width:'32px',height:'32px',borderRadius:'50%',flexShrink:0}}>
-                <AvatarSVG size={32} color={currentStyleColor}/>
-              </div>
+              <div style={{width:'32px',height:'32px',borderRadius:'50%',background:'#1D9E75',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:'12px',fontWeight:'800',letterSpacing:'-0.5px',flexShrink:0}}>LW</div>
               <div>
                 <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Listing Assistant</p>
                 <div style={{display:'flex',alignItems:'center',gap:'4px',marginTop:'1px'}}>
@@ -554,57 +513,29 @@ export default function GlobalChat() {
             background:'rgba(0,0,0,0.12)',
             flexShrink:0,
           }}>
-            <div style={{
-              position:'relative',
-              borderRadius:'50%',
-              transition:'all 0.3s ease',
-              animation: avatarState === 'idle' ? 'avatar-float 3s ease-in-out infinite' :
-                         avatarState === 'listening' ? 'avatar-glow 1.5s ease-in-out infinite' :
-                         avatarState === 'completed' ? 'avatar-complete 0.5s ease-out' : 'none',
-              boxShadow: avatarState === 'listening' ? `0 0 20px ${currentStyleColor}88` :
-                         avatarState === 'completed' ? `0 0 16px ${currentStyleColor}66` : 'none',
-              transform: avatarState === 'listening' ? 'scale(1.05)' : 'scale(1)',
-            }}>
+            <div style={{position:'relative'}}>
               {avatarState === 'thinking' && (
                 <div style={{
                   position:'absolute',
                   top:'-5px',left:'-5px',right:'-5px',bottom:'-5px',
                   borderRadius:'50%',
-                  border:`2px solid ${currentStyleColor}`,
+                  border:'2px solid #1D9E75',
                   borderTopColor:'transparent',
                   animation:'avatar-think 1s linear infinite',
                   pointerEvents:'none',
                   zIndex:1,
                 }}/>
               )}
-              <div className="lw-avatar-main">
-                <AvatarSVG size={56} color={currentStyleColor}/>
-              </div>
+              <div style={{
+                width:'48px',height:'48px',borderRadius:'50%',
+                background:'#1D9E75',
+                display:'flex',alignItems:'center',justifyContent:'center',
+                color:'#fff',fontSize:'17px',fontWeight:'800',letterSpacing:'-0.5px',
+              }}>LW</div>
             </div>
             <p style={{fontSize:'10px',color:'#6b7280',margin:'0',letterSpacing:'0.3px',transition:'all 0.3s ease'}}>
               {AVATAR_STATE_TEXT[avatarState]}
             </p>
-            <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
-              {AVATAR_STYLES.map(style => (
-                <button
-                  key={style.name}
-                  title={style.name}
-                  onClick={() => setAvatarStyle(style.name)}
-                  style={{
-                    width:'18px',height:'18px',borderRadius:'50%',
-                    background: style.color,
-                    cursor:'pointer',
-                    border: avatarStyle === style.name ? '3px solid white' : `2px solid ${style.color}44`,
-                    outline: avatarStyle === style.name ? `2px solid ${style.color}` : 'none',
-                    outlineOffset:'1px',
-                    padding:0,
-                    flexShrink:0,
-                    transition:'all 0.2s ease',
-                    boxSizing:'border-box',
-                  }}
-                />
-              ))}
-            </div>
           </div>
 
           {/* MESSAGES */}
@@ -702,10 +633,10 @@ export default function GlobalChat() {
       <button
         data-chat-toggle="true"
         onClick={() => setShowChat(!showChat)}
-        style={{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'26px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500,animation: showChat ? 'none' : 'pulse-ring 2s infinite'}}
-        onMouseOver={e => { e.currentTarget.style.transform='scale(1.12)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='1'; chips.style.pointerEvents='all' } }}
-        onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='0'; chips.style.pointerEvents='none' } }}>
-        {showChat ? '✕' : '✦'}
+        style={{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',width:'64px',height:'64px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'18px',fontWeight:'800',letterSpacing:'-0.5px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1500}}
+        onMouseOver={e => { e.currentTarget.style.transform='translateX(-50%) scale(1.1)'; e.currentTarget.style.boxShadow='0 4px 32px rgba(29,158,117,0.9)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='1'; chips.style.pointerEvents='all' } }}
+        onMouseOut={e => { e.currentTarget.style.transform='translateX(-50%) scale(1)'; e.currentTarget.style.boxShadow='0 4px 24px rgba(29,158,117,0.6)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='0'; chips.style.pointerEvents='none' } }}>
+        {showChat ? '✕' : 'LW'}
       </button>
 
       <style>{`
@@ -713,38 +644,17 @@ export default function GlobalChat() {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.5; transform: scale(0.8); }
         }
-        @keyframes pulse-ring {
-          0% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 0 rgba(29,158,117,0.4); }
-          70% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 14px rgba(29,158,117,0); }
-          100% { box-shadow: 0 4px 24px rgba(29,158,117,0.6), 0 0 0 0 rgba(29,158,117,0); }
-        }
         @keyframes chat-appear {
           from { opacity: 0; transform: translateX(-50%) scale(0.96); }
           to { opacity: 1; transform: translateX(-50%) scale(1); }
-        }
-        @keyframes avatar-float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-4px); }
-        }
-        @keyframes avatar-glow {
-          0%, 100% { box-shadow: 0 0 8px rgba(139,92,246,0.4); }
-          50% { box-shadow: 0 0 20px rgba(139,92,246,0.8); }
         }
         @keyframes avatar-think {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes avatar-complete {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.15); filter: brightness(1.3); }
-          100% { transform: scale(1); filter: brightness(1); }
-        }
         @keyframes avatar-glow-dot {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.3; }
-        }
-        @media (max-width: 480px) {
-          .lw-avatar-main svg { width: 44px !important; height: 44px !important; }
         }
         @media (max-width: 768px) {
           .lw-quick-chips { display: none !important; }
