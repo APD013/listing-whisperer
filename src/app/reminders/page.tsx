@@ -18,7 +18,7 @@ export default function RemindersPage() {
   const [reminders, setReminders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ content: '', remind_at: '' })
+  const [form, setForm] = useState({ content: '', notes: '', remind_at: '' })
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('upcoming')
   const [googleConnected, setGoogleConnected] = useState(false)
@@ -87,11 +87,12 @@ export default function RemindersPage() {
     const { error } = await supabase.from('reminders').insert({
       user_id: userId,
       content: form.content,
+      notes: form.notes || null,
       remind_at: new Date(form.remind_at).toISOString(),
       sent: false,
     })
     if (!error) {
-      setForm({ content: '', remind_at: '' })
+      setForm({ content: '', notes: '', remind_at: '' })
       setShowForm(false)
       await loadReminders(userId!)
     }
@@ -268,6 +269,16 @@ export default function RemindersPage() {
                 style={inputStyle}
               />
             </div>
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)', display: 'block', marginBottom: '6px' }}>Notes (optional)</label>
+              <textarea
+                placeholder="Additional details, context, or instructions..."
+                value={form.notes}
+                onChange={e => setForm({ ...form, notes: e.target.value })}
+                rows={3}
+                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' }}
+              />
+            </div>
             <div style={{ marginBottom: '18px' }}>
               <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)', display: 'block', marginBottom: '6px' }}>When?</label>
               <input
@@ -339,9 +350,14 @@ export default function RemindersPage() {
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: reminder.sent ? 'var(--lw-text-muted)' : 'var(--lw-text)', margin: '0 0 6px', textDecoration: reminder.sent ? 'line-through' : 'none', lineHeight: '1.5' }}>
+                      <p style={{ fontSize: '14px', fontWeight: '600', color: reminder.sent ? 'var(--lw-text-muted)' : 'var(--lw-text)', margin: '0 0 4px', textDecoration: reminder.sent ? 'line-through' : 'none', lineHeight: '1.5' }}>
                         {reminder.content}
                       </p>
+                      {reminder.notes && (
+                        <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: '0 0 6px', lineHeight: '1.5' }}>
+                          {reminder.notes}
+                        </p>
+                      )}
                       <p style={{ fontSize: '12px', color: isOverdue ? '#ef4444' : 'var(--lw-text-muted)', margin: '0', fontWeight: isOverdue ? '600' : '500' }}>
                         {isOverdue ? '🔴 Overdue · ' : '📅 '}
                         {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
