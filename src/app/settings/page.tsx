@@ -364,54 +364,6 @@ function SettingsContent() {
           )}
         </div>
 
-        {/* REFERRAL PROGRAM */}
-        {referralCode && (
-          <div style={cardStyle}>
-            <p style={sectionLabel}>🎁 REFER AN AGENT</p>
-            <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '4px 0 16px', lineHeight: '1.6' }}>
-              Share your link. When an agent you refer upgrades to Pro, you earn a referral credit.
-            </p>
-
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ flex: 1, padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', color: 'var(--lw-text)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {typeof window !== 'undefined' ? `${window.location.origin}/signup?ref=${referralCode}` : `/signup?ref=${referralCode}`}
-              </div>
-              <button
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    navigator.clipboard.writeText(`${window.location.origin}/signup?ref=${referralCode}`)
-                  }
-                  setReferralCopied(true)
-                  setTimeout(() => setReferralCopied(false), 2000)
-                }}
-                style={{ padding: '11px 18px', background: referralCopied ? '#1D9E75' : 'var(--lw-input)', color: referralCopied ? '#fff' : 'var(--lw-text)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
-                {referralCopied ? '✓ Copied!' : 'Copy'}
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-              <a
-                href={`mailto:?subject=Try Listing Whisperer&body=Hey! I've been using Listing Whisperer to write AI-powered listing copy. Check it out: ${typeof window !== 'undefined' ? window.location.origin : ''}/signup?ref=${referralCode}`}
-                style={{ flex: 1, padding: '10px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)', textDecoration: 'none', textAlign: 'center' as const }}>
-                ✉️ Email
-              </a>
-              <a
-                href={`sms:?body=Hey! I've been using Listing Whisperer for AI listing copy. Try it here: ${typeof window !== 'undefined' ? window.location.origin : ''}/signup?ref=${referralCode}`}
-                style={{ flex: 1, padding: '10px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)', textDecoration: 'none', textAlign: 'center' as const }}>
-                💬 SMS
-              </a>
-            </div>
-
-            <div style={{ background: 'rgba(29,158,117,0.06)', border: '1px solid rgba(29,158,117,0.15)', borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ fontSize: '2rem', fontWeight: '800', color: '#1D9E75', lineHeight: 1 }}>{referralCredits}</div>
-              <div>
-                <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--lw-text)', margin: '0 0 2px' }}>Referral Credits Earned</p>
-                <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: 0 }}>Each credit = 1 month free Pro for you when a referral upgrades.</p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* UNSAVED CHANGES REMINDER */}
         {!saved && (
           <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '10px', padding: '10px 14px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -429,6 +381,49 @@ function SettingsContent() {
         <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
           <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Back to Dashboard</a>
         </div>
+
+        {/* REFER AN AGENT */}
+        {referralCode && (
+          <div style={{ ...cardStyle, marginBottom: '2rem' }}>
+            <p style={sectionLabel}>🎁 REFER AN AGENT</p>
+            <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '4px 0 16px', lineHeight: '1.6' }}>
+              Share your link. When a friend upgrades to Pro, you get one free month.
+            </p>
+
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+              <div style={{ flex: 1, padding: '11px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', color: 'var(--lw-text)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                {`https://listingwhisperer.com/signup?ref=${referralCode}`}
+              </div>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`https://listingwhisperer.com/signup?ref=${referralCode}`)
+                  setReferralCopied(true)
+                  setTimeout(() => setReferralCopied(false), 2000)
+                }}
+                style={{ padding: '11px 18px', background: referralCopied ? 'var(--lw-accent)' : 'var(--lw-input)', color: referralCopied ? '#fff' : 'var(--lw-text)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+                {referralCopied ? '✓ Copied!' : 'Copy'}
+              </button>
+            </div>
+
+            <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '0 0 14px' }}>
+              You have <strong style={{ color: 'var(--lw-accent)' }}>{referralCredits}</strong> referral credit{referralCredits !== 1 ? 's' : ''} earned
+            </p>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <a
+                href={`mailto:?subject=Try Listing Whisperer&body=I've been using Listing Whisperer to generate listing marketing in seconds. Try it free: https://listingwhisperer.com/signup?ref=${referralCode}`}
+                style={{ flex: 1, padding: '11px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)', textDecoration: 'none', textAlign: 'center' as const }}>
+                📧 Share via Email
+              </a>
+              <a
+                href={`sms:?body=Try Listing Whisperer free: https://listingwhisperer.com/signup?ref=${referralCode}`}
+                style={{ flex: 1, padding: '11px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)', textDecoration: 'none', textAlign: 'center' as const }}>
+                💬 Share via SMS
+              </a>
+            </div>
+          </div>
+        )}
+
       </div>
     </main>
   )
