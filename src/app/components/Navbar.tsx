@@ -56,24 +56,39 @@ export default function Navbar() {
       width: '100%',
       boxSizing: 'border-box' as const,
     }}>
-      <button
-        onClick={handleLogoClick}
-        style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          padding: 0,
-          fontSize: '16px',
-          fontWeight: '700',
-          color: 'var(--lw-text)',
-          fontFamily: 'var(--font-plus-jakarta), sans-serif',
-        }}
-      >
-        Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
-        {planLoaded && plan === 'pro' && (
-          <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle', boxShadow: '0 0 10px rgba(29,158,117,0.4)' }}>PRO</span>
-        )}
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <a
+          href="/dashboard"
+          onClick={() => sessionStorage.setItem('lw_scroll_position', String(window.scrollY))}
+          style={{
+            fontSize: '13px',
+            color: 'var(--lw-text-muted)',
+            textDecoration: 'none',
+            fontWeight: '500',
+            marginRight: '16px',
+          }}
+        >
+          ← Dashboard
+        </a>
+        <button
+          onClick={handleLogoClick}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            fontSize: '16px',
+            fontWeight: '700',
+            color: 'var(--lw-text)',
+            fontFamily: 'var(--font-plus-jakarta), sans-serif',
+          }}
+        >
+          Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
+          {planLoaded && plan === 'pro' && (
+            <span style={{ marginLeft: '6px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', fontSize: '9px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.5px', verticalAlign: 'middle', boxShadow: '0 0 10px rgba(29,158,117,0.4)' }}>PRO</span>
+          )}
+        </button>
+      </div>
       <button
         onClick={handleSignOut}
         onMouseEnter={() => setHoverSignOut(true)}
