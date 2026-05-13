@@ -37,6 +37,15 @@ const CREDIT_PACKS = [
   { label: '30 Stagings', price: '$44', priceId: 'price_1TWi3TKzAxeqVLKnZBT2TJP1' },
 ]
 
+type StagingRecord = {
+  id: string
+  created_at: string
+  original_image_url: string
+  staged_image_urls: string[]
+  room_type: string
+  design_style: string
+}
+
 export default function VirtualStagingPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
@@ -53,12 +62,24 @@ export default function VirtualStagingPage() {
   const [showUpsell, setShowUpsell] = useState(false)
   const [buyingCredits, setBuyingCredits] = useState<string | null>(null)
   const [creditsAddedBanner, setCreditsAddedBanner] = useState(false)
+  const [history, setHistory] = useState<StagingRecord[]>([])
+
+  const loadHistory = async (uid: string) => {
+    const { data } = await supabase
+      .from('virtual_stagings')
+      .select('*')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(20)
+    if (data) setHistory(data)
+  }
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      loadHistory(user.id)
 
       const { data: profile } = await supabase
         .from('profiles')
@@ -125,6 +146,7 @@ export default function VirtualStagingPage() {
       } else {
         setResults(data.images)
         setCredits(data.creditsRemaining)
+        if (userId) loadHistory(userId)
       }
     } catch (e: any) {
       setError(e.message || 'Something went wrong')
@@ -158,6 +180,15 @@ export default function VirtualStagingPage() {
     a.download = `virtually-staged-${index + 1}.jpg`
     a.click()
   }
+
+  const handleStageAgain = (record: StagingRecord) => {
+    setRoomType(record.room_type)
+    setDesignStyle(record.design_style)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const getRoomLabel = (val: string) => ROOM_TYPES.find(r => r.value === val)?.label ?? val
+  const getStyleLabel = (val: string) => DESIGN_STYLES.find(s => s.value === val)?.label ?? val
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -423,10 +454,71 @@ export default function VirtualStagingPage() {
           <div style={{
             background: '#f59e0b10', borderRadius: '12px', border: '1px solid #f59e0b30',
             padding: '1rem 1.25rem', fontSize: '13px', color: 'var(--lw-text-muted)', lineHeight: '1.6',
+            marginBottom: '2rem',
           }}>
             ⚠️ <strong style={{ color: 'var(--lw-text)' }}>Disclosure required:</strong> Virtually staged images must be labeled when used in MLS listings. Always disclose to buyers.
           </div>
         )}
+
+        {/* Staging History */}
+        <div style={{ marginTop: results.length > 0 ? '0' : '2rem' }}>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-text-muted)', letterSpacing: '1.2px', margin: '0 0 1rem' }}>YOUR STAGING HISTORY</p>
+          {history.length === 0 ? (
+            <div style={{ background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '2.5rem', textAlign: 'center' }}>
+              <div style={{ fontSize: '32px', marginBottom: '10px' }}>🛋️</div>
+              <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', margin: 0 }}>Your staging history will appear here after your first generation.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+              {history.map(record => (
+                <div key={record.id} style={{ background: 'var(--lw-card)', borderRadius: '14px', border: '1px solid var(--lw-border)', overflow: 'hidden' }}>
+                  {record.staged_image_urls?.[0] && (
+                    <img src={record.staged_image_urls[0]} alt="Staged result" style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }} />
+                  )}
+                  <div style={{ padding: '0.875rem' }}>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '12px', background: '#8b5cf620', color: '#8b5cf6' }}>
+                        {getRoomLabel(record.room_type)}
+                      </span>
+                      <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 8px', borderRadius: '12px', background: '#1D9E7520', color: '#1D9E75' }}>
+                        {getStyleLabel(record.design_style)}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '0 0 10px' }}>
+                      {new Date(record.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '8px' }}>
+                      {record.staged_image_urls?.map((url, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleDownload(url, i)}
+                          style={{
+                            padding: '8px', background: '#8b5cf620', border: '1px solid #8b5cf640',
+                            borderRadius: '8px', color: '#8b5cf6', fontSize: '12px', fontWeight: '700',
+                            cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif',
+                          }}
+                        >
+                          ⬇ Download {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => handleStageAgain(record)}
+                      style={{
+                        width: '100%', padding: '8px', background: 'var(--lw-input)',
+                        border: '1px solid var(--lw-border)', borderRadius: '8px',
+                        color: 'var(--lw-text-muted)', fontSize: '12px', fontWeight: '600',
+                        cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif',
+                      }}
+                    >
+                      Stage Again ↺
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Upsell modal */}

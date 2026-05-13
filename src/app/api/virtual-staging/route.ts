@@ -87,6 +87,14 @@ export async function POST(request: Request) {
       })
       .eq('id', userId)
 
+    await supabase.from('virtual_stagings').insert({
+      user_id: userId,
+      original_image_url: imageUrl,
+      staged_image_urls: images,
+      room_type: roomType,
+      design_style: designStyle,
+    })
+
     return NextResponse.json({ images, creditsRemaining: newCredits })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
