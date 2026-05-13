@@ -612,6 +612,7 @@ export default function Dashboard() {
         { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
         { href: '/rewrite', icon: '✍️', label: 'Rewrite' },
         { href: '/photos', icon: '🖼️', label: 'Photo Library' },
+        { href: '/virtual-staging', icon: '🛋️', label: 'Virtual Staging' },
       ]
     },
     {

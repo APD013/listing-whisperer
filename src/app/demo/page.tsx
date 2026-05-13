@@ -70,6 +70,7 @@ export default function DemoPage() {
             { icon: '🏠', title: '3 Active Listings', desc: 'See full AI-generated marketing suites' },
             { icon: '👥', title: '5 Sample Leads', desc: 'Explore the CRM and follow-up tools' },
             { icon: '⏰', title: 'Live Reminders', desc: 'See how agents stay organized' },
+            { icon: '🛋️', title: 'Virtual Staging', desc: 'See AI-staged room examples instantly' },
           ].map((item) => (
             <div key={item.title} style={{ background: '#fff', borderRadius: '14px', border: '1px solid #e5e7eb', padding: '1.375rem', boxShadow: '0 2px 10px rgba(0,0,0,0.04)' }}>
               <div style={{ fontSize: '1.875rem', marginBottom: '10px' }}>{item.icon}</div>
