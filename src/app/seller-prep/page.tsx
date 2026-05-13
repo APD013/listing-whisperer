@@ -301,6 +301,10 @@ export default function SellerPrepPage() {
               <input placeholder="2" value={form.baths || ''} onChange={e => setForm({ ...form, baths: e.target.value })} style={inputStyle} />
             </div>
             <div>
+              <label style={labelStyle}>Sq Ft</label>
+              <input placeholder="1,850" value={form.sqft} onChange={e => setForm({ ...form, sqft: e.target.value })} style={inputStyle} />
+            </div>
+            <div>
               <label style={labelStyle}>Est. Price Range</label>
               <input placeholder="$800k - $900k" value={form.estimatedPrice} onChange={e => setForm({ ...form, estimatedPrice: e.target.value })} style={inputStyle} />
             </div>
