@@ -18,7 +18,7 @@ export default function RemindersPage() {
   const [reminders, setReminders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ content: '', notes: '', remind_at: '' })
+  const [form, setForm] = useState({ content: '', remind_at: '' })
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('upcoming')
   const [googleConnected, setGoogleConnected] = useState(false)
@@ -87,12 +87,11 @@ export default function RemindersPage() {
     const { error } = await supabase.from('reminders').insert({
       user_id: userId,
       content: form.content,
-      notes: form.notes || null,
       remind_at: new Date(form.remind_at).toISOString(),
       sent: false,
     })
     if (!error) {
-      setForm({ content: '', notes: '', remind_at: '' })
+      setForm({ content: '', remind_at: '' })
       setShowForm(false)
       await loadReminders(userId!)
     }
@@ -261,20 +260,11 @@ export default function RemindersPage() {
           <div style={{ ...cardStyle, border: '1px solid rgba(245,158,11,0.25)', boxShadow: '0 4px 20px rgba(245,158,11,0.08)', marginBottom: '1.25rem' }}>
             <p style={{ fontSize: '11px', fontWeight: '700', color: '#f59e0b', letterSpacing: '1px', margin: '0 0 16px 0' }}>NEW REMINDER</p>
             <div style={{ marginBottom: '14px' }}>
-              <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)', display: 'block', marginBottom: '6px' }}>What do you need to do?</label>
-              <input
-                placeholder="e.g. Call John Smith to follow up on listing"
-                value={form.content}
-                onChange={e => setForm({ ...form, content: e.target.value })}
-                style={inputStyle}
-              />
-            </div>
-            <div style={{ marginBottom: '14px' }}>
               <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)', display: 'block', marginBottom: '6px' }}>Notes (optional)</label>
               <textarea
-                placeholder="Additional details, context, or instructions..."
-                value={form.notes}
-                onChange={e => setForm({ ...form, notes: e.target.value })}
+                placeholder="e.g. Call John Smith to follow up on listing — additional details, context, or instructions..."
+                value={form.content}
+                onChange={e => setForm({ ...form, content: e.target.value })}
                 rows={3}
                 style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' }}
               />
@@ -353,11 +343,6 @@ export default function RemindersPage() {
                       <p style={{ fontSize: '14px', fontWeight: '600', color: reminder.sent ? 'var(--lw-text-muted)' : 'var(--lw-text)', margin: '0 0 4px', textDecoration: reminder.sent ? 'line-through' : 'none', lineHeight: '1.5' }}>
                         {reminder.content}
                       </p>
-                      {reminder.notes && (
-                        <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: '0 0 6px', lineHeight: '1.5' }}>
-                          {reminder.notes}
-                        </p>
-                      )}
                       <p style={{ fontSize: '12px', color: isOverdue ? '#ef4444' : 'var(--lw-text-muted)', margin: '0', fontWeight: isOverdue ? '600' : '500' }}>
                         {isOverdue ? '🔴 Overdue · ' : '📅 '}
                         {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
