@@ -5,6 +5,7 @@ import { trackCTAClick, trackEvent, preserveUTMs } from './lib/analytics'
 export default function Home() {
   const [activeOutput, setActiveOutput] = useState('mls')
   const [showExitPopup, setShowExitPopup] = useState(false)
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
 
   useEffect(() => {
     preserveUTMs()
@@ -114,9 +115,9 @@ export default function Home() {
           </a>
         </div>
         <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · Unlimited listings · Cancel anytime</p>
-        <p style={{fontSize:'13px',marginTop:'10px'}}>
-          <a href="/demo" style={{color:'#9ca3af',textDecoration:'none',fontWeight:'500'}}>See a live demo →</a>
-        </p>
+        <a href="/demo" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none',display:'block',textAlign:'center',marginTop:'12px'}}>
+          See a live demo →
+        </a>
       </section>
 
       {/* OUTPUT DEMO */}
@@ -176,21 +177,32 @@ export default function Home() {
       </section>
 
       {/* SCREENSHOT SHOWCASE */}
+      {lightboxSrc && (
+        <div onClick={() => setLightboxSrc(null)} style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.85)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',cursor:'zoom-out'}}>
+          <button onClick={e => { e.stopPropagation(); setLightboxSrc(null) }}
+            style={{position:'fixed',top:'1.25rem',right:'1.25rem',background:'rgba(255,255,255,0.15)',border:'none',color:'#fff',width:'40px',height:'40px',borderRadius:'50%',fontSize:'20px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>
+            ✕
+          </button>
+          <img src={lightboxSrc} alt="Screenshot" style={{maxWidth:'90vw',maxHeight:'90vh',objectFit:'contain',borderRadius:'12px',boxShadow:'0 24px 80px rgba(0,0,0,0.6)'}} onClick={e => e.stopPropagation()}/>
+        </div>
+      )}
       <section style={{padding:'3rem 1.5rem 0',background:'linear-gradient(180deg,#f0fdf8 0%,#fff 100%)',position:'relative',overflow:'hidden'}}>
         <div style={{maxWidth:'980px',margin:'0 auto',paddingBottom:'80px'}}>
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))',gap:'1.5rem'}}>
-            <div style={{borderRadius:'16px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',border:'1px solid #eee'}}>
-              <img src="/screenshots/screenshot-dashboard.png" alt="Your Daily Workspace" style={{width:'100%',display:'block',objectFit:'cover'}}/>
-              <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>Your Daily Workspace</div>
-            </div>
-            <div style={{borderRadius:'16px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',border:'1px solid #eee'}}>
-              <img src="/screenshots/screenshot-tool.png" alt="AI-Powered Listing Tools" style={{width:'100%',display:'block',objectFit:'cover'}}/>
-              <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>AI-Powered Listing Tools</div>
-            </div>
-            <div style={{borderRadius:'16px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',border:'1px solid #eee'}}>
-              <img src="/screenshots/screenshot-results.png" alt="Career Highlights & Portfolio" style={{width:'100%',display:'block',objectFit:'cover'}}/>
-              <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>Career Highlights & Portfolio</div>
-            </div>
+            {[
+              {src:'/screenshots/screenshot-dashboard.png', label:'Your Daily Workspace'},
+              {src:'/screenshots/screenshot-tool.png', label:'AI-Powered Listing Tools'},
+              {src:'/screenshots/screenshot-results.png', label:'Career Highlights & Portfolio'},
+            ].map(({src, label}) => (
+              <div key={src}
+                onClick={() => setLightboxSrc(src)}
+                style={{borderRadius:'16px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',border:'1px solid #eee',cursor:'zoom-in',transition:'transform 0.2s ease, box-shadow 0.2s ease'}}
+                onMouseOver={e => { e.currentTarget.style.transform='scale(1.02)'; e.currentTarget.style.boxShadow='0 16px 48px rgba(0,0,0,0.18)' }}
+                onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.boxShadow='0 8px 32px rgba(0,0,0,0.1)' }}>
+                <img src={src} alt={label} style={{width:'100%',display:'block',objectFit:'cover'}}/>
+                <div style={{padding:'10px 14px',background:'var(--lw-card,#fff)',fontSize:'13px',fontWeight:'600',color:'var(--lw-text,#111)',textAlign:'center'}}>{label}</div>
+              </div>
+            ))}
           </div>
         </div>
         <div style={{position:'absolute',bottom:0,left:0,right:0,height:'80px',background:'linear-gradient(180deg,transparent,#fff)',pointerEvents:'none'}}/>
