@@ -18,7 +18,7 @@ export default function RemindersPage() {
   const [reminders, setReminders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ content: '', remind_at: '' })
+  const [form, setForm] = useState({ contact_name: '', content: '', remind_at: '' })
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('upcoming')
   const [googleConnected, setGoogleConnected] = useState(false)
@@ -82,16 +82,17 @@ export default function RemindersPage() {
   }
 
   const addReminder = async () => {
-    if (!form.content || !form.remind_at) { alert('Please fill in both fields'); return }
+    if (!form.contact_name || !form.remind_at) { alert('Please fill in the task and date fields'); return }
     setSaving(true)
     const { error } = await supabase.from('reminders').insert({
       user_id: userId,
-      content: form.content,
+      contact_name: form.contact_name,
+      content: form.content || null,
       remind_at: new Date(form.remind_at).toISOString(),
       sent: false,
     })
     if (!error) {
-      setForm({ content: '', remind_at: '' })
+      setForm({ contact_name: '', content: '', remind_at: '' })
       setShowForm(false)
       await loadReminders(userId!)
     }
@@ -260,9 +261,18 @@ export default function RemindersPage() {
           <div style={{ ...cardStyle, border: '1px solid rgba(245,158,11,0.25)', boxShadow: '0 4px 20px rgba(245,158,11,0.08)', marginBottom: '1.25rem' }}>
             <p style={{ fontSize: '11px', fontWeight: '700', color: '#f59e0b', letterSpacing: '1px', margin: '0 0 16px 0' }}>NEW REMINDER</p>
             <div style={{ marginBottom: '14px' }}>
+              <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)', display: 'block', marginBottom: '6px' }}>What do you need to do?</label>
+              <input
+                placeholder="e.g. Call John Smith to follow up on listing"
+                value={form.contact_name}
+                onChange={e => setForm({ ...form, contact_name: e.target.value })}
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ marginBottom: '14px' }}>
               <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--lw-text-muted)', display: 'block', marginBottom: '6px' }}>Notes (optional)</label>
               <textarea
-                placeholder="e.g. Call John Smith to follow up on listing — additional details, context, or instructions..."
+                placeholder="Additional details, context, or instructions..."
                 value={form.content}
                 onChange={e => setForm({ ...form, content: e.target.value })}
                 rows={3}
@@ -341,8 +351,13 @@ export default function RemindersPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
                     <div style={{ flex: 1 }}>
                       <p style={{ fontSize: '14px', fontWeight: '600', color: reminder.sent ? 'var(--lw-text-muted)' : 'var(--lw-text)', margin: '0 0 4px', textDecoration: reminder.sent ? 'line-through' : 'none', lineHeight: '1.5' }}>
-                        {reminder.content}
+                        {reminder.contact_name || reminder.content}
                       </p>
+                      {reminder.contact_name && reminder.content && (
+                        <p style={{ fontSize: '12px', color: 'var(--lw-text-muted)', margin: '0 0 4px', lineHeight: '1.5' }}>
+                          {reminder.content}
+                        </p>
+                      )}
                       <p style={{ fontSize: '12px', color: isOverdue ? '#ef4444' : 'var(--lw-text-muted)', margin: '0', fontWeight: isOverdue ? '600' : '500' }}>
                         {isOverdue ? '🔴 Overdue · ' : '📅 '}
                         {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
