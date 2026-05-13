@@ -115,7 +115,11 @@ export default function Home() {
           </a>
         </div>
         <p style={{fontSize:'13px',color:'#aaa'}}>No credit card · Unlimited listings · Cancel anytime</p>
-        <a href="/demo" style={{fontSize:'15px',color:'var(--lw-accent)',textDecoration:'none',display:'block',textAlign:'center',marginTop:'16px',fontWeight:'600'}}>
+        <style>{`@keyframes demo-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
+        <a href="/demo"
+          style={{fontSize:'15px',color:'var(--lw-accent)',textDecoration:'none',display:'block',textAlign:'center',marginTop:'16px',fontWeight:'600'}}
+          onMouseOver={e => { e.currentTarget.style.animation = 'demo-pulse 0.8s ease-in-out infinite' }}
+          onMouseOut={e => { e.currentTarget.style.animation = 'none' }}>
           See a live demo →
         </a>
       </section>
