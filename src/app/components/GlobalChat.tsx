@@ -466,7 +466,7 @@ export default function GlobalChat() {
 
       {/* CHAT WINDOW */}
       {showChat && (
-        <div style={{position:'fixed',bottom:'100px',left:'50%',transform:'translateX(-50%)',width:'min(360px, calc(100vw - 48px))',height:'580px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 32px 80px rgba(0,0,0,0.6)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1500,animation:'chat-appear 0.2s ease-out'}}>
+        <div style={{position:'fixed',bottom:'88px',right:'24px',width:'360px',height:'580px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 32px 80px rgba(0,0,0,0.6)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1000,animation:'chat-appear 0.2s ease-out'}}>
 
           {/* HEADER */}
           <div style={{padding:'0.875rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.1)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.25)',flexShrink:0}}>
@@ -645,8 +645,8 @@ export default function GlobalChat() {
           50% { opacity: 0.5; transform: scale(0.8); }
         }
         @keyframes chat-appear {
-          from { opacity: 0; transform: translateX(-50%) scale(0.96); }
-          to { opacity: 1; transform: translateX(-50%) scale(1); }
+          from { opacity: 0; transform: scale(0.96); transform-origin: bottom right; }
+          to { opacity: 1; transform: scale(1); transform-origin: bottom right; }
         }
         @keyframes avatar-think {
           from { transform: rotate(0deg); }
