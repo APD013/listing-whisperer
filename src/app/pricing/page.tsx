@@ -111,6 +111,11 @@ export default function PricingPage() {
               <li>✅ Price drop kit</li>
               <li>✅ Follow-up assistant</li>
               <li>✅ Brand voice memory</li>
+              <li>✅ 3 virtual stagings/month included</li>
+              <li>✅ Call Capture (Pro only)</li>
+              <li>✅ Leads & CRM</li>
+              <li>✅ Listing performance tracker</li>
+              <li>✅ Referral program</li>
               <li>✅ Priority support</li>
             </ul>
             <button
@@ -136,11 +141,14 @@ export default function PricingPage() {
         <div style={{textAlign:'left',maxWidth:'600px',margin:'0 auto'}}>
           <h2 style={{fontSize:'1.25rem',fontWeight:'700',marginBottom:'1.5rem',textAlign:'center',color:'#f0f0f0'}}>Pricing FAQ</h2>
           {[
-            {q:'Is the free trial really free?',a:'Yes. You get 24 hours of full Pro access and 2 listings included — no credit card required. After your trial expires, Pro is $20/month.'},
-            {q:'What\'s included in Pro?',a:'Everything — unlimited listings, unlimited rewrites, all 11 copy formats, seller meeting prep, snap & start, pricing assistant, open house kit, price drop kit, follow-up assistant, launch kit, and brand voice memory.'},
+            {q:'Is the free trial really free?',a:'Yes. You get 24 hours of full Pro access with unlimited listings — no credit card required. After your trial expires, Pro is $20/month.'},
+            {q:'What\'s included in Pro?',a:'Everything — unlimited listings, all AI tools, virtual staging (3/month), seller prep, pricing assistant, open house kit, follow-up assistant, launch kit, brand voice memory, leads CRM, listing performance tracker, and more.'},
+            {q:'What is Virtual Staging?',a:'Virtual Staging lets you upload a photo of an empty room and get back a fully furnished, professionally staged version in seconds. Pro includes 3 stagings per month. Additional credits are available as add-ons.'},
             {q:'Can I use the discount code WELCOME50?',a:'Yes! Enter code WELCOME50 at checkout for 50% off your first Pro month.'},
             {q:'Can I cancel Pro anytime?',a:'Yes. No contracts. Cancel anytime from your account settings. You keep Pro access until the end of your billing period.'},
             {q:'What happens after my free trial?',a:'After 24 hours, you can upgrade to Pro for $20/month. Your listing history and settings are always saved.'},
+            {q:'Is my data private?',a:"Yes. We never sell your data. Property details you enter are used only to generate your content. See our Privacy Policy for full details."},
+            {q:'Do you offer refunds?',a:"We don't offer refunds for partial months, but you can cancel anytime. Virtual Staging credits are non-refundable once used."},
           ].map(({q,a}) => (
             <div key={q} style={{borderBottom:'1px solid rgba(255,255,255,0.06)',paddingBottom:'1.25rem',marginBottom:'1.25rem'}}>
               <p style={{fontWeight:'600',fontSize:'14px',marginBottom:'6px',color:'#f0f0f0'}}>{q}</p>
@@ -155,8 +163,31 @@ export default function PricingPage() {
           <p style={{fontSize:'13px',color:'#6b7280',margin:'0'}}>Use code <strong style={{color:'#d4af37'}}>WELCOME50</strong> at checkout for 50% off your first Pro month.</p>
         </div>
 
+        {/* VIRTUAL STAGING CREDITS */}
+        <div style={{marginTop:'3rem',textAlign:'center'}}>
+          <h2 style={{fontSize:'1.25rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Need more Virtual Stagings?</h2>
+          <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'2rem'}}>Pro includes 3 per month. Buy more anytime — credits never expire.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))',gap:'1rem',textAlign:'center'}}>
+            {[
+              {credits:'5 credits',price:'$9',perUnit:'$1.80 per staging'},
+              {credits:'15 credits',price:'$24',perUnit:'$1.60 per staging'},
+              {credits:'30 credits',price:'$44',perUnit:'$1.47 per staging'},
+            ].map(pack => (
+              <a key={pack.credits} href="/virtual-staging" style={{textDecoration:'none'}}>
+                <div style={{background:'linear-gradient(135deg, #1a1d2e 0%, #1e2235 100%)',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.25)',padding:'1.5rem',transition:'all 0.2s',cursor:'pointer'}}
+                  onMouseOver={e => {(e.currentTarget as HTMLDivElement).style.borderColor='#1D9E75';(e.currentTarget as HTMLDivElement).style.boxShadow='0 4px 20px rgba(29,158,117,0.15)'}}
+                  onMouseOut={e => {(e.currentTarget as HTMLDivElement).style.borderColor='rgba(29,158,117,0.25)';(e.currentTarget as HTMLDivElement).style.boxShadow='none'}}>
+                  <p style={{fontSize:'20px',fontWeight:'800',color:'#f0f0f0',margin:'0 0 4px'}}>{pack.price}</p>
+                  <p style={{fontSize:'14px',fontWeight:'700',color:'#1D9E75',margin:'0 0 6px'}}>{pack.credits}</p>
+                  <p style={{fontSize:'12px',color:'#5a5f72',margin:'0'}}>{pack.perUnit}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
         <p style={{fontSize:'12px',color:'#333',marginTop:'2rem'}}>
-          <a href="/terms" style={{color:'#333'}}>Terms of Service</a> · <a href="/privacy" style={{color:'#333'}}>Privacy Policy</a>
+          <a href="/terms" style={{color:'#333'}}>Terms of Service</a> · <a href="/privacy" style={{color:'#333'}}>Privacy Policy</a> · <a href="/faq" style={{color:'#333'}}>FAQ</a>
         </p>
       </div>
     </main>

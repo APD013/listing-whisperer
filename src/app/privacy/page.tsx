@@ -56,7 +56,7 @@ export default function PrivacyPolicy() {
         <div style={{flex:1}}>
           <div style={{marginBottom:'2rem'}}>
             <h1 style={{fontSize:'2rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 8px',letterSpacing:'-0.3px'}}>Privacy Policy</h1>
-            <p style={{fontSize:'13px',color:'#5a5f72',margin:'0'}}>Last updated: April 26, 2026</p>
+            <p style={{fontSize:'13px',color:'#5a5f72',margin:'0'}}>Last updated: May 13, 2026</p>
           </div>
 
           <div style={{display:'flex',flexDirection:'column',gap:'2rem'}}>
@@ -117,6 +117,8 @@ export default function PrivacyPolicy() {
                 <li><strong style={{color:'#d0d0d0'}}>Stripe</strong> — for payment processing</li>
                 <li><strong style={{color:'#d0d0d0'}}>Supabase</strong> — for secure database storage</li>
                 <li><strong style={{color:'#d0d0d0'}}>Anthropic</strong> — your property inputs are sent to generate AI content</li>
+                <li><strong style={{color:'#d0d0d0'}}>Decor8 AI</strong> — when you use the Virtual Staging feature, photos you upload are sent to Decor8 AI for processing. Decor8 AI's privacy policy governs how they handle your images.</li>
+                <li><strong style={{color:'#d0d0d0'}}>OpenAI</strong> — audio recordings from Call Capture are sent to OpenAI's Whisper API for transcription.</li>
                 <li><strong style={{color:'#d0d0d0'}}>Resend</strong> — for transactional email delivery</li>
                 <li><strong style={{color:'#d0d0d0'}}>Vercel</strong> — for platform hosting and analytics</li>
                 <li><strong style={{color:'#d0d0d0'}}>Law enforcement</strong> — when required by law</li>
@@ -141,6 +143,14 @@ export default function PrivacyPolicy() {
               <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>7. AI & Your Data</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 When you generate content using Listing Whisperer, your property details and inputs are sent to Anthropic's API to generate AI responses. Anthropic's privacy policy governs how they handle this data. We do not use your listing data to train our own AI models. Generated content is stored in your account history for your convenience and can be deleted at any time from your account settings.
+              </p>
+              <p style={{fontSize:'13px',fontWeight:'700',color:'#d0d0d0',margin:'12px 0 6px'}}>Virtual Staging</p>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0 0 12px'}}>
+                When you use Virtual Staging, the photos you upload are transmitted to Decor8 AI's servers for processing. We do not store your uploaded photos beyond what is needed to generate the staged image. Generated staged images are stored in your account for download. We recommend you do not upload photos containing identifiable personal information.
+              </p>
+              <p style={{fontSize:'13px',fontWeight:'700',color:'#d0d0d0',margin:'0 0 6px'}}>Call Capture</p>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                Audio recordings are sent to OpenAI's Whisper API for transcription. Recordings are not stored on our servers after transcription is complete.
               </p>
             </div>
 
@@ -198,7 +208,7 @@ export default function PrivacyPolicy() {
       {/* FOOTER */}
       <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid rgba(255,255,255,0.05)',marginTop:'2rem'}}>
         <p style={{fontSize:'13px',color:'#444'}}>
-          © 2026 Listing Whisperer · <a href="/terms" style={{color:'#444'}}>Terms</a> · <a href="/privacy" style={{color:'#444'}}>Privacy</a> · <a href="/contact" style={{color:'#444'}}>Contact</a>
+          © 2026 Listing Whisperer · <a href="/terms" style={{color:'#444'}}>Terms</a> · <a href="/privacy" style={{color:'#444'}}>Privacy</a> · <a href="/faq" style={{color:'#444'}}>FAQ</a> · <a href="/contact" style={{color:'#444'}}>Contact</a>
         </p>
       </footer>
     </div>

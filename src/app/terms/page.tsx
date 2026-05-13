@@ -12,12 +12,14 @@ export default function TermsOfService() {
     { id: 'billing', title: '5. Subscriptions & Billing' },
     { id: 'use', title: '6. Acceptable Use' },
     { id: 'ip', title: '7. Intellectual Property' },
-    { id: 'ai', title: '8. AI-Generated Content' },
-    { id: 'privacy', title: '9. Privacy' },
-    { id: 'disclaimer', title: '10. Disclaimers' },
-    { id: 'liability', title: '11. Limitation of Liability' },
-    { id: 'termination', title: '12. Termination' },
-    { id: 'contact', title: '13. Contact' },
+    { id: 'virtual-staging-terms', title: '8. Virtual Staging & AI Images' },
+    { id: 'ai', title: '9. AI-Generated Content' },
+    { id: 'privacy', title: '10. Privacy' },
+    { id: 'disclaimer', title: '11. Disclaimers' },
+    { id: 'liability', title: '12. Limitation of Liability' },
+    { id: 'termination', title: '13. Termination' },
+    { id: 'governing', title: '14. Governing Law' },
+    { id: 'contact', title: '15. Contact' },
   ]
 
   const styles = {
@@ -58,7 +60,7 @@ export default function TermsOfService() {
         <div style={{flex:1}}>
           <div style={{marginBottom:'2rem'}}>
             <h1 style={{fontSize:'2rem',fontWeight:'700',color:'#f0f0f0',margin:'0 0 8px',letterSpacing:'-0.3px'}}>Terms of Service</h1>
-            <p style={{fontSize:'13px',color:'#5a5f72',margin:'0'}}>Last updated: April 26, 2026</p>
+            <p style={{fontSize:'13px',color:'#5a5f72',margin:'0'}}>Last updated: May 13, 2026</p>
           </div>
 
           <div style={{display:'flex',flexDirection:'column',gap:'2rem'}}>
@@ -106,12 +108,15 @@ export default function TermsOfService() {
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0 0 12px'}}>
                 Pro subscriptions are billed at $20 per month. Subscriptions automatically renew each month unless cancelled prior to the renewal date. By subscribing, you authorize us to charge your payment method on a recurring monthly basis.
               </p>
-              <ul style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'2',paddingLeft:'1.5rem',margin:'0'}}>
+              <ul style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'2',paddingLeft:'1.5rem',margin:'0 0 12px'}}>
                 <li>You may cancel your subscription at any time from your account settings</li>
                 <li>Cancellation takes effect at the end of the current billing period</li>
                 <li>No refunds are provided for partial months</li>
                 <li>We reserve the right to change pricing with 30 days notice</li>
               </ul>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
+                Virtual Staging credits are available as one-time purchase add-ons (5, 15, or 30 credits). Pro subscribers receive 3 free staging credits per month, which reset on the 1st of each month and do not roll over. Purchased credit packs do not expire and are non-refundable.
+              </p>
             </div>
 
             <div id="use" style={{...styles.card}}>
@@ -135,50 +140,64 @@ export default function TermsOfService() {
               </p>
             </div>
 
+            <div id="virtual-staging-terms" style={{...styles.card}}>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>8. Virtual Staging & AI-Generated Images</h2>
+              <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0 0 12px'}}>
+                Virtual Staging is an AI-powered feature that uses Decor8 AI's API to generate furnished room images from photos you upload. By using Virtual Staging, you agree that:
+              </p>
+              <ul style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'2',paddingLeft:'1.5rem',margin:'0'}}>
+                <li>You are responsible for ensuring all virtually staged images are properly disclosed when used in MLS listings, marketing materials, or client-facing content, in accordance with your local MLS rules, NAR guidelines, and applicable laws.</li>
+                <li>Photos you upload are processed by Decor8 AI (a third-party provider). Their privacy policy governs how they handle uploaded images.</li>
+                <li>Virtual Staging credits are non-refundable once used.</li>
+                <li>Listing Whisperer is not responsible for MLS violations or compliance issues arising from your use of virtually staged images.</li>
+                <li>You must not use virtually staged images to misrepresent a property's actual condition, remove structural defects, or deceive buyers.</li>
+              </ul>
+            </div>
+
             <div id="ai" style={{...styles.card}}>
-              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>8. AI-Generated Content</h2>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>9. AI-Generated Content</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 The Service uses AI to generate marketing copy, pricing guidance, and other real estate content. You acknowledge that: AI-generated content may contain errors, inaccuracies, or omissions; all content should be reviewed and verified before professional use; pricing suggestions are not certified appraisals and should not be relied upon as such; the Service does not replace the judgment of a licensed real estate professional. Listing Whisperer is not responsible for any decisions made based on AI-generated content.
               </p>
             </div>
 
             <div id="privacy" style={{...styles.card}}>
-              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>9. Privacy</h2>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>10. Privacy</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 Your use of the Service is also governed by our <a href="/privacy" style={{color:'#1D9E75'}}>Privacy Policy</a>, which is incorporated into these Terms by reference. By using the Service, you consent to the collection and use of your information as described in our Privacy Policy.
               </p>
             </div>
 
             <div id="disclaimer" style={{...styles.card}}>
-              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>10. Disclaimers</h2>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>11. Disclaimers</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. LISTING WHISPERER DOES NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR FREE OF HARMFUL COMPONENTS. WE DO NOT WARRANT THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY AI-GENERATED CONTENT. YOUR USE OF THE SERVICE IS AT YOUR SOLE RISK.
               </p>
             </div>
 
             <div id="liability" style={{...styles.card}}>
-              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>11. Limitation of Liability</h2>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>12. Limitation of Liability</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 TO THE MAXIMUM EXTENT PERMITTED BY LAW, LISTING WHISPERER SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE SERVICE. OUR TOTAL LIABILITY TO YOU FOR ANY CLAIMS ARISING FROM THESE TERMS OR YOUR USE OF THE SERVICE SHALL NOT EXCEED THE AMOUNT YOU PAID US IN THE 12 MONTHS PRECEDING THE CLAIM.
               </p>
             </div>
 
             <div id="termination" style={{...styles.card}}>
-              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>12. Termination</h2>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>13. Termination</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 We reserve the right to suspend or terminate your account at any time for violation of these Terms, fraudulent activity, or any other reason at our sole discretion. You may terminate your account at any time by contacting us. Upon termination, your right to use the Service ceases immediately. Provisions of these Terms that by their nature should survive termination shall survive, including intellectual property provisions, disclaimers, and limitations of liability.
               </p>
             </div>
 
             <div id="governing" style={{...styles.card}}>
-              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>13. Governing Law</h2>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>14. Governing Law</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 These Terms shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be resolved exclusively in the state or federal courts located in Orange County, California. You consent to the personal jurisdiction of such courts.
               </p>
             </div>
 
             <div id="contact" style={{...styles.card}}>
-              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 14px'}}>14. Contact</h2>
+              <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 14px'}}>15. Contact</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
                 If you have any questions about these Terms, please contact us at:<br/><br/>
                 <strong style={{color:'#f0f0f0'}}>Listing Whisperer</strong><br/>
@@ -201,7 +220,7 @@ export default function TermsOfService() {
       {/* FOOTER */}
       <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid rgba(255,255,255,0.05)',marginTop:'2rem'}}>
         <p style={{fontSize:'13px',color:'#444'}}>
-          © 2026 Listing Whisperer · <a href="/terms" style={{color:'#444'}}>Terms</a> · <a href="/privacy" style={{color:'#444'}}>Privacy</a> · <a href="/contact" style={{color:'#444'}}>Contact</a>
+          © 2026 Listing Whisperer · <a href="/terms" style={{color:'#444'}}>Terms</a> · <a href="/privacy" style={{color:'#444'}}>Privacy</a> · <a href="/faq" style={{color:'#444'}}>FAQ</a> · <a href="/contact" style={{color:'#444'}}>Contact</a>
         </p>
       </footer>
     </div>
