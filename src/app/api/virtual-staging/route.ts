@@ -41,9 +41,9 @@ export async function POST(request: Request) {
     }
 
     const result = await response.json()
-    const images: string[] = result?.info?.images ?? []
+    const images = result?.info?.images?.map((img: any) => img.url).filter(Boolean)
 
-    if (!images.length) {
+    if (!images || images.length === 0) {
       return NextResponse.json({ error: 'No images returned from Decor8 AI' }, { status: 500 })
     }
 

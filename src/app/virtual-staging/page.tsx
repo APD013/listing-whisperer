@@ -10,13 +10,25 @@ const supabase = createClient(
 )
 
 const ROOM_TYPES = [
-  'Living Room', 'Bedroom', 'Dining Room', 'Kitchen',
-  'Bathroom', 'Home Office', 'Kids Room'
+  { label: 'Living Room', value: 'livingroom' },
+  { label: 'Bedroom', value: 'bedroom' },
+  { label: 'Dining Room', value: 'diningroom' },
+  { label: 'Kitchen', value: 'kitchen' },
+  { label: 'Bathroom', value: 'bathroom' },
+  { label: 'Home Office', value: 'homeoffice' },
+  { label: 'Kids Room', value: 'kidsroom' },
 ]
 
 const DESIGN_STYLES = [
-  'Modern', 'Scandinavian', 'Industrial', 'Bohemian',
-  'Coastal', 'Farmhouse', 'Luxury', 'Minimalist', 'Mid-Century'
+  { label: 'Modern', value: 'modern' },
+  { label: 'Scandinavian', value: 'scandinavian' },
+  { label: 'Industrial', value: 'industrial' },
+  { label: 'Bohemian', value: 'bohemian' },
+  { label: 'Coastal', value: 'coastal' },
+  { label: 'Farmhouse', value: 'farmhouse' },
+  { label: 'Luxury', value: 'luxury' },
+  { label: 'Minimalist', value: 'minimalist' },
+  { label: 'Mid-Century', value: 'midcentury' },
 ]
 
 export default function VirtualStagingPage() {
@@ -27,8 +39,8 @@ export default function VirtualStagingPage() {
   const [isDragging, setIsDragging] = useState(false)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [roomType, setRoomType] = useState('Living Room')
-  const [designStyle, setDesignStyle] = useState('Modern')
+  const [roomType, setRoomType] = useState('livingroom')
+  const [designStyle, setDesignStyle] = useState('modern')
   const [results, setResults] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
 
@@ -225,13 +237,13 @@ export default function VirtualStagingPage() {
             <div>
               <label style={labelStyle}>ROOM TYPE</label>
               <select value={roomType} onChange={e => setRoomType(e.target.value)} style={inputStyle}>
-                {ROOM_TYPES.map(r => <option key={r} value={r}>{r}</option>)}
+                {ROOM_TYPES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
             </div>
             <div>
               <label style={labelStyle}>DESIGN STYLE</label>
               <select value={designStyle} onChange={e => setDesignStyle(e.target.value)} style={inputStyle}>
-                {DESIGN_STYLES.map(s => <option key={s} value={s}>{s}</option>)}
+                {DESIGN_STYLES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
           </div>
