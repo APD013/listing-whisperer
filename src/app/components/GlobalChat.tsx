@@ -18,74 +18,75 @@ const SpeechRecognition = typeof window !== 'undefined'
 const HIDDEN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/pricing', '/terms', '/privacy', '/contact']
 const HIDDEN_PATH_PREFIXES = ['/portfolio/', '/open-house-signin/']
 
-const SUGGESTIONS_POOL = [
-  'How should I price this listing?',
-  'Write a follow-up text after a showing',
-  'What do I say to a hesitant seller?',
-  'Help me prepare for a listing appointment',
-  'What should I do next with this lead?',
-  'Create social captions for my new listing',
-  'How do I respond to a low offer?',
-  'Help me win this listing',
-  "What's a good opening line for a cold follow-up?",
-  'How do I handle a seller who wants to overprice?',
-  'Write me a just-listed email to my sphere',
-  'What should I do before an open house?',
-  'Help me create a price reduction announcement',
-  'How do I follow up after no response?',
-  'What makes a listing description stand out?',
-  'Give me 3 tips to win more listings this month',
-]
-
 const QUICK_CHIPS = [
   { label: '✍️ Write Follow-Up', prompt: 'Help me write a follow-up message for a lead' },
   { label: '💲 Pricing Help', prompt: 'Help me build a pricing strategy for a listing' },
   { label: '🏠 Listing Strategy', prompt: 'Help me create a marketing strategy for my listing' },
 ]
 
-const AVATAR_STATE_TEXT: Record<string, string> = {
-  idle: 'Ready to help',
-  listening: 'Listening...',
-  thinking: 'Thinking...',
-  completed: 'Done!',
+function getPageGreeting(pathname: string): string {
+  if (pathname.includes('seller-prep')) return "Getting ready for a listing appointment? I can help you prep talking points, pricing strategy, or objection responses."
+  if (pathname.includes('quick-listing') || pathname.includes('dashboard')) return "Working on a listing? Ask me about pricing, copy angles, or what buyers in this market care about."
+  if (pathname.includes('leads')) return "Managing your pipeline? I can help with follow-up scripts, objection handling, or how to re-engage cold leads."
+  if (pathname.includes('pricing-assistant')) return "Need pricing help? Ask me about how to justify a price range to a seller or how to handle a lowball offer."
+  if (pathname.includes('open-house')) return "Preparing for an open house? I can help with scripts, follow-up emails, or how to convert visitors to clients."
+  if (pathname.includes('follow-up')) return "Need help following up? Tell me about the lead and I'll write the perfect message."
+  if (pathname.includes('market-snapshot')) return "Want market insights? Ask me about pricing trends, days on market, or how to position a listing in this neighborhood."
+  if (pathname.includes('listing-rescue')) return "Listing not moving? Tell me what's happening and I'll help you diagnose the problem."
+  if (pathname.includes('virtual-staging')) return "Using Virtual Staging? Ask me which room styles work best for your target buyer or how to present staged photos."
+  return "What would you like help with today? I know real estate inside and out."
 }
 
-function pickRandom<T>(arr: T[], count: number): T[] {
-  return [...arr].sort(() => Math.random() - 0.5).slice(0, count)
+function getPageChips(pathname: string): string[] {
+  if (pathname.includes('seller-prep')) return [
+    'How do I handle a seller who wants to overprice?',
+    'Write me a strong listing presentation opener',
+    'What questions should I ask at a listing appointment?',
+    'How do I respond to "we want to try it ourselves first"?',
+  ]
+  if (pathname.includes('leads')) return [
+    'Write a follow-up text for a cold lead',
+    'How do I re-engage a lead who went quiet?',
+    'What should I say after a showing?',
+    'How do I ask for a referral without being pushy?',
+  ]
+  if (pathname.includes('pricing') || pathname.includes('market')) return [
+    'How do I justify a price reduction to a seller?',
+    'What is a CMA and how do I explain it?',
+    "How do I respond to \"Zillow says it's worth more\"?",
+    'What factors most affect days on market?',
+  ]
+  return [
+    'How should I price this listing?',
+    'What do I say to a hesitant seller?',
+    'Create a follow-up text after a showing',
+    'What should I do next with this lead?',
+  ]
 }
 
-function getPageMessage(pathname: string): string {
-  if (pathname === '/seller-prep') return 'I can help you prep for your listing appointment. What do you need?'
-  if (pathname === '/pricing-assistant') return 'Need help building a pricing strategy? Tell me about the property.'
-  if (pathname.startsWith('/follow-up')) return 'I can write follow-up messages for any situation. Who are you following up with?'
-  if (pathname === '/leads') return 'I can help you follow up with any of your leads. Who do you want to reach out to?'
-  if (pathname === '/market-snapshot') return 'I can help you understand any market. What neighborhood are you researching?'
-  if (pathname === '/video-studio') return 'I can help with your video marketing. What are you working on?'
-  if (pathname === '/open-house') return 'Getting ready for an open house? I can help with prep, posts, or follow-ups.'
-  if (pathname === '/launch-kit') return 'Ready to launch? I can help with your marketing strategy.'
-  if (pathname === '/dashboard') return 'What would you like to work on today?'
-  return 'How can I help you today?'
+type Message = { role: string; content: string; time?: string }
+
+function nowTime(): string {
+  return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
 }
 
 export default function GlobalChat() {
   const pathname = usePathname()
   const [showChat, setShowChat] = useState(false)
-  const [messages, setMessages] = useState<{role:string,content:string}[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [userPlan, setUserPlan] = useState('starter')
   const [userState, setUserState] = useState('')
   const [isListening, setIsListening] = useState(false)
-  const [voiceEnabled, setVoiceEnabled] = useState(false)
-  const [suggestions, setSuggestions] = useState<string[]>(() => pickRandom(SUGGESTIONS_POOL, 4))
+  const [voiceEnabled] = useState(false)
   const [avatarState, setAvatarState] = useState<'idle'|'listening'|'thinking'|'completed'>('idle')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
   const prevShowChatRef = useRef(false)
   const hadLoadingRef = useRef(false)
 
-  // Call Capture state
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [showCallCapture, setShowCallCapture] = useState(false)
@@ -157,11 +158,10 @@ export default function GlobalChat() {
 
   useEffect(() => {
     if (showChat && !prevShowChatRef.current) {
-      setSuggestions(pickRandom(SUGGESTIONS_POOL, 4))
       setAvatarState('idle')
       setMessages(current => {
         if (current.length === 0) {
-          return [{ role: 'assistant', content: getPageMessage(pathname) }]
+          return [{ role: 'assistant', content: getPageGreeting(pathname), time: nowTime() }]
         }
         return current
       })
@@ -190,7 +190,8 @@ export default function GlobalChat() {
   }
 
   const isTwoPartyState = TWO_PARTY_STATES.includes(userState)
-  const statusDotActive = avatarState === 'idle' || avatarState === 'completed'
+  const chips = getPageChips(pathname)
+  const showChips = messages.length <= 1
 
   const startRecording = async () => {
     try {
@@ -272,7 +273,7 @@ export default function GlobalChat() {
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return
-    const userMessage = { role: 'user', content: input }
+    const userMessage: Message = { role: 'user', content: input, time: nowTime() }
     const updatedMessages = [...messages, userMessage]
     setMessages(updatedMessages)
     setInput('')
@@ -284,7 +285,7 @@ export default function GlobalChat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: updatedMessages,
+          messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
           currentPage: pathname,
           userId,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -293,7 +294,7 @@ export default function GlobalChat() {
       const data = await res.json()
 
       if (data.message) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+        setMessages(prev => [...prev, { role: 'assistant', content: data.message, time: nowTime() }])
         if (voiceEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
           const cleanText = data.message
             .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
@@ -317,7 +318,7 @@ export default function GlobalChat() {
           setTimeout(() => { window.location.assign(action.url) }, 1000)
         }
         if (action.type === 'lead_added' && userId) {
-          const { data: leadData, error } = await supabase.from('leads').insert({
+          const { error } = await supabase.from('leads').insert({
             user_id: userId,
             name: action.name || 'New Lead',
             email: action.email || null,
@@ -326,21 +327,23 @@ export default function GlobalChat() {
           if (!error) {
             setMessages(prev => [...prev, {
               role: 'assistant',
-              content: `✅ **${action.name || 'New Lead'}** has been added to your Leads & Clients! Taking you there now...`
+              content: `✅ **${action.name || 'New Lead'}** has been added to your Leads & Clients! Taking you there now...`,
+              time: nowTime()
             }])
             setTimeout(() => { window.location.assign('/leads') }, 1500)
           }
         }
-        if (action.type === 'reminder_created' && userId) {
+        if (action.type === 'reminder_created') {
           setMessages(prev => [...prev, {
             role: 'assistant',
-            content: `✅ Reminder set! Taking you to your reminders now...`
+            content: `✅ Reminder set! Taking you to your reminders now...`,
+            time: nowTime()
           }])
           setTimeout(() => { window.location.assign('/reminders') }, 1500)
         }
       }
     } catch(e) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.', time: nowTime() }])
     }
     setLoading(false)
   }
@@ -466,163 +469,292 @@ export default function GlobalChat() {
 
       {/* CHAT WINDOW */}
       {showChat && (
-        <div style={{position:'fixed',bottom:'88px',right:'24px',width:'360px',height:'580px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 32px 80px rgba(0,0,0,0.6)',display:'flex',flexDirection:'column',overflow:'hidden',zIndex:1000,animation:'chat-appear 0.2s ease-out'}}>
+        <div className="lw-chat-panel" style={{
+          position: 'fixed',
+          bottom: '88px',
+          right: '24px',
+          width: '420px',
+          height: '600px',
+          background: 'var(--lw-card)',
+          borderRadius: '20px',
+          border: '1px solid var(--lw-border)',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          zIndex: 1000,
+          animation: 'chat-appear 0.2s ease-out',
+          fontFamily: 'var(--font-plus-jakarta), sans-serif',
+        }}>
 
           {/* HEADER */}
-          <div style={{padding:'0.875rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.1)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.25)',flexShrink:0}}>
-            <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-              <div style={{width:'32px',height:'32px',borderRadius:'50%',background:'#1D9E75',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:'12px',fontWeight:'800',letterSpacing:'-0.5px',flexShrink:0}}>LW</div>
+          <div style={{
+            padding: '0.875rem 1.25rem',
+            borderBottom: '1px solid var(--lw-border)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: 'rgba(0,0,0,0.1)',
+            flexShrink: 0,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '10px', height: '10px', borderRadius: '50%',
+                background: '#1D9E75',
+                boxShadow: '0 0 6px rgba(29,158,117,0.6)',
+                flexShrink: 0,
+                animation: 'pulse-status 2s ease-in-out infinite',
+              }} />
               <div>
-                <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Listing Assistant</p>
-                <div style={{display:'flex',alignItems:'center',gap:'4px',marginTop:'1px'}}>
-                  <div style={{
-                    width:'6px',height:'6px',borderRadius:'50%',flexShrink:0,
-                    background: statusDotActive ? '#1D9E75' : '#8b5cf6',
-                    animation: avatarState === 'thinking' ? 'avatar-glow-dot 1s ease-in-out infinite' : 'none',
-                    transition:'background 0.3s ease',
-                  }}/>
-                  <p style={{fontSize:'10px',color:'#8b8fa8',margin:'0',transition:'all 0.3s ease'}}>
-                    {AVATAR_STATE_TEXT[avatarState]}
-                  </p>
-                </div>
+                <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--lw-text)', margin: '0', lineHeight: '1.3' }}>Listing Assistant</p>
+                <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '0' }}>Powered by AI · Real estate expert</p>
               </div>
             </div>
-            <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
               {CALL_CAPTURE_ENABLED && (
-                <button onClick={handleCallCaptureClick}
+                <button
+                  onClick={handleCallCaptureClick}
                   title="Call Capture — Record & analyze calls"
-                  style={{width:'32px',height:'32px',borderRadius:'8px',background: showCallCapture ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)',border: showCallCapture ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(255,255,255,0.08)',color: showCallCapture ? '#ef4444' : '#6b7280',fontSize:'14px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  style={{
+                    width: '30px', height: '30px', borderRadius: '8px',
+                    background: showCallCapture ? 'rgba(239,68,68,0.15)' : 'var(--lw-input)',
+                    border: showCallCapture ? '1px solid rgba(239,68,68,0.4)' : '1px solid var(--lw-border)',
+                    color: showCallCapture ? '#ef4444' : 'var(--lw-text-muted)',
+                    fontSize: '13px', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
                   📞
                 </button>
               )}
               {messages.length > 0 && (
-                <button onClick={clearHistory} style={{background:'none',border:'none',color:'#444',fontSize:'11px',cursor:'pointer',padding:'2px 6px'}}>Clear</button>
+                <button
+                  onClick={clearHistory}
+                  style={{
+                    background: 'none', border: 'none',
+                    color: 'var(--lw-text-muted)', fontSize: '11px',
+                    cursor: 'pointer', padding: '2px 6px',
+                    fontFamily: 'var(--font-plus-jakarta), sans-serif',
+                  }}>
+                  Clear
+                </button>
               )}
-              <button onClick={() => { setShowChat(false); sessionStorage.setItem('lw_chat_dismissed', '1') }} style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
+              <button
+                onClick={() => setShowChat(false)}
+                title="Minimize"
+                style={{
+                  width: '30px', height: '30px', borderRadius: '8px',
+                  background: 'var(--lw-input)', border: '1px solid var(--lw-border)',
+                  color: 'var(--lw-text-muted)', fontSize: '18px', lineHeight: '1',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'var(--font-plus-jakarta), sans-serif',
+                }}>
+                −
+              </button>
+              <button
+                onClick={() => { setShowChat(false); sessionStorage.setItem('lw_chat_dismissed', '1') }}
+                title="Close"
+                style={{
+                  width: '30px', height: '30px', borderRadius: '8px',
+                  background: 'var(--lw-input)', border: '1px solid var(--lw-border)',
+                  color: 'var(--lw-text-muted)', fontSize: '14px',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                ✕
+              </button>
             </div>
-          </div>
-
-          {/* AVATAR SHOWCASE */}
-          <div style={{
-            padding:'10px 16px 8px',
-            borderBottom:'1px solid rgba(255,255,255,0.06)',
-            display:'flex',
-            flexDirection:'column',
-            alignItems:'center',
-            gap:'5px',
-            background:'rgba(0,0,0,0.12)',
-            flexShrink:0,
-          }}>
-            <div style={{position:'relative'}}>
-              {avatarState === 'thinking' && (
-                <div style={{
-                  position:'absolute',
-                  top:'-5px',left:'-5px',right:'-5px',bottom:'-5px',
-                  borderRadius:'50%',
-                  border:'2px solid #1D9E75',
-                  borderTopColor:'transparent',
-                  animation:'avatar-think 1s linear infinite',
-                  pointerEvents:'none',
-                  zIndex:1,
-                }}/>
-              )}
-              <div style={{
-                width:'48px',height:'48px',borderRadius:'50%',
-                background:'#1D9E75',
-                display:'flex',alignItems:'center',justifyContent:'center',
-                color:'#fff',fontSize:'17px',fontWeight:'800',letterSpacing:'-0.5px',
-              }}>LW</div>
-            </div>
-            <p style={{fontSize:'10px',color:'#6b7280',margin:'0',letterSpacing:'0.3px',transition:'all 0.3s ease'}}>
-              {AVATAR_STATE_TEXT[avatarState]}
-            </p>
           </div>
 
           {/* MESSAGES */}
-          <div style={{flex:1,overflowY:'auto',padding:'1rem',display:'flex',flexDirection:'column',gap:'10px'}}>
-            {messages.length === 0 && (
-              <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'1.5rem 1rem'}}>
-                <div style={{fontSize:'2.5rem',marginBottom:'10px'}}>✦</div>
-                <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>How can I help you?</p>
-                <p style={{fontSize:'11px',color:'#5a5f72',margin:'0 0 1.25rem'}}>Ask me anything or give me a command</p>
-                {CALL_CAPTURE_ENABLED && userPlan === 'pro' && (
-                  <div style={{background:'rgba(239,68,68,0.06)',border:'1px solid rgba(239,68,68,0.15)',borderRadius:'10px',padding:'10px 12px',marginBottom:'12px',cursor:'pointer',width:'100%'}} onClick={handleCallCaptureClick}>
-                    <p style={{fontSize:'12px',color:'#ef4444',fontWeight:'600',margin:'0 0 2px'}}>📞 Call Capture</p>
-                    <p style={{fontSize:'11px',color:'#8b8fa8',margin:'0'}}>Tap to record & auto-log your next call</p>
-                  </div>
-                )}
-                <p style={{fontSize:'10px',color:'#4a4f62',margin:'0 0 6px',letterSpacing:'0.5px',textTransform:'uppercase',fontWeight:'600'}}>Suggestions from your assistant:</p>
-                <div style={{display:'flex',flexDirection:'column',gap:'6px',width:'100%'}}>
-                  {suggestions.map(q => (
-                    <button key={q} onClick={() => setInput(q)}
-                      style={{padding:'10px 14px',background:'rgba(29,158,117,0.08)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'8px',color:'#8b8fa8',fontSize:'11px',cursor:'pointer',textAlign:'left',transition:'all 0.15s'}}
-                      onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.4)';e.currentTarget.style.color='#1D9E75'}}
-                      onMouseOut={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.15)';e.currentTarget.style.color='#8b8fa8'}}>
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
+          <div style={{
+            flex: 1, overflowY: 'auto', padding: '1rem',
+            display: 'flex', flexDirection: 'column', gap: '10px',
+          }}>
             {messages.map((msg, i) => (
-              <div key={i} style={{display:'flex',justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'}}>
-                <div style={{maxWidth:'85%',padding:'10px 14px',
+              <div key={i} style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              }}>
+                <div style={{
+                  maxWidth: '85%',
+                  padding: '10px 14px',
                   borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                  background: msg.role === 'user' ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',
-                  border: msg.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.07)',
-                  borderLeft: msg.role === 'user' ? undefined : '2px solid rgba(29,158,117,0.3)',
-                  fontSize:'13px',lineHeight:'1.6',color:'#f0f0f0',whiteSpace:'pre-wrap'}}>
+                  background: msg.role === 'user' ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'var(--lw-input)',
+                  border: msg.role === 'user' ? 'none' : '1px solid var(--lw-border)',
+                  fontSize: '13px',
+                  lineHeight: '1.65',
+                  color: msg.role === 'user' ? '#fff' : 'var(--lw-text)',
+                  whiteSpace: 'pre-wrap',
+                }}>
                   {msg.content}
                 </div>
+                {msg.time && (
+                  <p style={{
+                    fontSize: '10px',
+                    color: 'var(--lw-text-muted)',
+                    margin: '3px 4px 0',
+                    opacity: 0.65,
+                  }}>
+                    {msg.time}
+                  </p>
+                )}
               </div>
             ))}
 
+            {/* PROMPT CHIPS — shown when conversation is just starting */}
+            {showChips && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                {chips.map(chip => (
+                  <button
+                    key={chip}
+                    onClick={() => setInput(chip)}
+                    style={{
+                      padding: '6px 12px',
+                      background: 'var(--lw-input)',
+                      border: '1px solid var(--lw-border)',
+                      borderRadius: '20px',
+                      fontSize: '11px',
+                      color: 'var(--lw-text-muted)',
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font-plus-jakarta), sans-serif',
+                      transition: 'all 0.15s',
+                      textAlign: 'left' as const,
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.borderColor = '#1D9E75'
+                      e.currentTarget.style.color = '#1D9E75'
+                      e.currentTarget.style.background = 'rgba(29,158,117,0.08)'
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.borderColor = 'var(--lw-border)'
+                      e.currentTarget.style.color = 'var(--lw-text-muted)'
+                      e.currentTarget.style.background = 'var(--lw-input)'
+                    }}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* TYPING INDICATOR */}
             {loading && (
-              <div style={{display:'flex',justifyContent:'flex-start'}}>
-                <div style={{padding:'10px 14px',borderRadius:'18px 18px 18px 4px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.07)',borderLeft:'2px solid rgba(29,158,117,0.3)',display:'flex',gap:'4px',alignItems:'center'}}>
-                  {[0,1,2].map(i => (
-                    <div key={i} style={{width:'6px',height:'6px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <div style={{
+                  padding: '10px 16px',
+                  borderRadius: '18px 18px 18px 4px',
+                  background: 'var(--lw-input)',
+                  border: '1px solid var(--lw-border)',
+                  display: 'flex',
+                  gap: '5px',
+                  alignItems: 'center',
+                }}>
+                  {[0, 1, 2].map(i => (
+                    <div key={i} style={{
+                      width: '7px', height: '7px', borderRadius: '50%',
+                      background: '#1D9E75',
+                      animation: `typing-dot 1.2s ${i * 0.2}s infinite`,
+                    }} />
                   ))}
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef}/>
+
+            <div ref={messagesEndRef} />
           </div>
 
           {/* INPUT */}
-          <div style={{padding:'0.875rem',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',gap:'8px',flexShrink:0}}>
+          <div style={{
+            padding: '0.875rem',
+            borderTop: '1px solid var(--lw-border)',
+            display: 'flex',
+            gap: '8px',
+            flexShrink: 0,
+            background: 'var(--lw-card)',
+          }}>
             <input
               value={input}
               onChange={e => { setInput(e.target.value); if (e.target.value) setAvatarState('listening') }}
               onBlur={e => { if (!e.target.value) setAvatarState('idle') }}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-              placeholder={isListening ? '🎤 Listening...' : 'Ask anything or give a command...'}
-              style={{flex:1,padding:'10px 14px',background: isListening ? 'rgba(29,158,117,0.1)' : 'rgba(0,0,0,0.3)',border: isListening ? '1px solid rgba(29,158,117,0.4)' : '1px solid rgba(255,255,255,0.08)',borderRadius:'10px',fontSize:'13px',color:'#f0f0f0',outline:'none',transition:'all 0.2s'}}
+              placeholder={isListening ? '🎤 Listening...' : 'Ask anything about real estate...'}
+              style={{
+                flex: 1, padding: '10px 14px',
+                background: isListening ? 'rgba(29,158,117,0.08)' : 'var(--lw-input)',
+                border: isListening ? '1px solid rgba(29,158,117,0.4)' : '1px solid var(--lw-border)',
+                borderRadius: '10px', fontSize: '13px',
+                color: 'var(--lw-text)', outline: 'none',
+                transition: 'all 0.2s',
+                fontFamily: 'var(--font-plus-jakarta), sans-serif',
+              }}
             />
-            <button onClick={isListening ? stopListening : startListening}
-              style={{width:'40px',height:'40px',borderRadius:'10px',background: isListening ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)',border: isListening ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(255,255,255,0.08)',color: isListening ? '#f87171' : '#6b7280',fontSize:'16px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all 0.2s'}}>
+            <button
+              onClick={isListening ? stopListening : startListening}
+              style={{
+                width: '40px', height: '40px', borderRadius: '10px',
+                background: isListening ? 'rgba(239,68,68,0.15)' : 'var(--lw-input)',
+                border: isListening ? '1px solid rgba(239,68,68,0.4)' : '1px solid var(--lw-border)',
+                color: isListening ? '#f87171' : 'var(--lw-text-muted)',
+                fontSize: '16px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, transition: 'all 0.2s',
+              }}>
               {isListening ? '⏹' : '🎤'}
             </button>
-            <button onClick={sendMessage} disabled={loading || !input.trim()}
-              style={{width:'40px',height:'40px',borderRadius:'10px',background: input.trim() ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',border:'none',color:'#fff',fontSize:'16px',cursor: input.trim() ? 'pointer' : 'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <button
+              onClick={sendMessage}
+              disabled={loading || !input.trim()}
+              style={{
+                width: '40px', height: '40px', borderRadius: '10px',
+                background: input.trim() ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'var(--lw-input)',
+                border: input.trim() ? 'none' : '1px solid var(--lw-border)',
+                color: input.trim() ? '#fff' : 'var(--lw-text-muted)',
+                fontSize: '16px', cursor: input.trim() ? 'pointer' : 'not-allowed',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
               ↑
             </button>
           </div>
         </div>
       )}
 
-      {/* QUICK ACTION CHIPS */}
+      {/* QUICK ACTION CHIPS — dashboard hover chips */}
       {!showChat && pathname === '/dashboard' && (
-        <div className="lw-quick-chips" style={{position:'fixed',bottom:'80px',right:'24px',display:'flex',flexDirection:'column',gap:'8px',alignItems:'flex-end',zIndex:999,opacity:0,transition:'opacity 0.2s ease',pointerEvents:'none'}}
+        <div
+          className="lw-quick-chips"
+          style={{
+            position: 'fixed', bottom: '80px', right: '24px',
+            display: 'flex', flexDirection: 'column', gap: '8px',
+            alignItems: 'flex-end', zIndex: 999,
+            opacity: 0, transition: 'opacity 0.2s ease', pointerEvents: 'none',
+          }}
           id="lw-quick-chips">
           {QUICK_CHIPS.map(chip => (
             <button
               key={chip.label}
               onClick={() => window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: chip.prompt }))}
-              style={{padding:'7px 14px',background:'rgba(20,24,40,0.85)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'20px',color:'#a0a8b8',fontSize:'12px',fontWeight:'600',cursor:'pointer',backdropFilter:'blur(8px)',whiteSpace:'nowrap',transition:'all 0.15s',boxShadow:'0 2px 12px rgba(0,0,0,0.3)',pointerEvents:'all'}}
-              onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.7)';e.currentTarget.style.color='#1D9E75';e.currentTarget.style.background='rgba(29,158,117,0.12)'}}
-              onMouseOut={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.3)';e.currentTarget.style.color='#a0a8b8';e.currentTarget.style.background='rgba(20,24,40,0.85)'}}>
+              style={{
+                padding: '7px 14px',
+                background: 'rgba(20,24,40,0.85)',
+                border: '1px solid rgba(29,158,117,0.3)',
+                borderRadius: '20px',
+                color: '#a0a8b8', fontSize: '12px', fontWeight: '600',
+                cursor: 'pointer', backdropFilter: 'blur(8px)',
+                whiteSpace: 'nowrap', transition: 'all 0.15s',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
+                pointerEvents: 'all',
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.borderColor = 'rgba(29,158,117,0.7)'
+                e.currentTarget.style.color = '#1D9E75'
+                e.currentTarget.style.background = 'rgba(29,158,117,0.12)'
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.borderColor = 'rgba(29,158,117,0.3)'
+                e.currentTarget.style.color = '#a0a8b8'
+                e.currentTarget.style.background = 'rgba(20,24,40,0.85)'
+              }}>
               {chip.label}
             </button>
           ))}
@@ -630,33 +762,77 @@ export default function GlobalChat() {
       )}
 
       {/* TOGGLE BUTTON */}
-      <button
-        data-chat-toggle="true"
-        onClick={() => setShowChat(!showChat)}
-        style={{position:'fixed',bottom:'24px',right:'24px',width:'56px',height:'56px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'3px solid rgba(255,255,255,0.2)',color:'#fff',fontSize:'16px',fontWeight:'800',letterSpacing:'-0.5px',cursor:'pointer',boxShadow:'0 4px 24px rgba(29,158,117,0.6)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',zIndex:1000}}
-        onMouseOver={e => { e.currentTarget.style.transform='scale(1.1)'; e.currentTarget.style.boxShadow='0 4px 32px rgba(29,158,117,0.9)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='1'; chips.style.pointerEvents='all' } }}
-        onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.boxShadow='0 4px 24px rgba(29,158,117,0.6)'; const chips = document.getElementById('lw-quick-chips'); if (chips) { chips.style.opacity='0'; chips.style.pointerEvents='none' } }}>
-        {showChat ? '✕' : 'LW'}
-      </button>
+      <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 1000 }}>
+        {/* Pulsing ready dot */}
+        <div style={{
+          position: 'absolute',
+          top: '0px', right: '0px',
+          width: '14px', height: '14px',
+          borderRadius: '50%',
+          background: '#1D9E75',
+          border: '2px solid var(--lw-bg, #fff)',
+          animation: 'pulse-ready 3s ease-in-out infinite',
+          zIndex: 1,
+          pointerEvents: 'none',
+        }} />
+        <button
+          data-chat-toggle="true"
+          onClick={() => setShowChat(!showChat)}
+          style={{
+            width: '64px', height: '64px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg,#1D9E75,#085041)',
+            border: '3px solid rgba(255,255,255,0.2)',
+            color: '#fff',
+            fontSize: '18px', fontWeight: '700',
+            letterSpacing: '-0.5px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 24px rgba(29,158,117,0.55)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.2s',
+            position: 'relative',
+          }}
+          onMouseOver={e => {
+            e.currentTarget.style.transform = 'scale(1.08)'
+            e.currentTarget.style.boxShadow = '0 4px 32px rgba(29,158,117,0.85)'
+            const chips = document.getElementById('lw-quick-chips')
+            if (chips) { chips.style.opacity = '1'; chips.style.pointerEvents = 'all' }
+          }}
+          onMouseOut={e => {
+            e.currentTarget.style.transform = 'scale(1)'
+            e.currentTarget.style.boxShadow = '0 4px 24px rgba(29,158,117,0.55)'
+            const chips = document.getElementById('lw-quick-chips')
+            if (chips) { chips.style.opacity = '0'; chips.style.pointerEvents = 'none' }
+          }}>
+          {showChat ? '✕' : 'LW'}
+        </button>
+      </div>
 
       <style>{`
-        @keyframes pulse-dot {
+        @keyframes typing-dot {
           0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(0.8); }
+          50% { opacity: 0.3; transform: scale(0.65); }
         }
         @keyframes chat-appear {
           from { opacity: 0; transform: scale(0.96); transform-origin: bottom right; }
           to { opacity: 1; transform: scale(1); transform-origin: bottom right; }
         }
-        @keyframes avatar-think {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes pulse-status {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.8); }
         }
-        @keyframes avatar-glow-dot {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.3; }
+        @keyframes pulse-ready {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.3); opacity: 0.65; }
         }
         @media (max-width: 768px) {
+          .lw-chat-panel {
+            width: calc(100vw - 32px) !important;
+            right: 16px !important;
+            left: 16px !important;
+            max-height: 80vh !important;
+            height: 80vh !important;
+          }
           .lw-quick-chips { display: none !important; }
         }
       `}</style>
