@@ -1052,6 +1052,7 @@ export default function Dashboard() {
                     { icon:'💲', title:'Pricing Assistant', desc:'Sharpen your pricing strategy', color:'#8b5cf6', href:'/pricing-assistant' },
                     { icon:'📊', title:'Market Snapshot', desc:'Generate instant market reports', color:'#6366f1', href:'/market-snapshot' },
                     { icon:'🎬', title:'Video Studio', desc:'Turn one listing photo into a complete video ad kit', color:'#e1306c', href:'/video-studio', pro:true },
+                    { icon:'🛋️', title:'Virtual Staging', desc:'Transform empty rooms into beautifully furnished spaces', color:'#8b5cf6', href:'/virtual-staging', pro:true },
                   ] as any[]).map((item, i) => (
                     item.href ? (
                       <a key={i} href={item.href}
