@@ -44,6 +44,11 @@ For "objection_responses": Always write confident, conversational responses in t
 3. "Let's start high and reduce if needed"
 4. "I need to net a specific amount"
 
+For "followup_email": Write a complete follow-up email with subject line. Start the greeting with exactly "Hi [Seller Name]," (use that exact bracket placeholder — do not leave it blank). Include a section titled "WHAT I HEARD FROM YOU TODAY:" with exactly these three bullet points filled in with relevant details from the conversation:
+- [Key point from discovery conversation]
+- [Their primary motivation and timeline]
+- [Their main concern or hesitation]
+
 Return exactly this JSON:
 {
 "meeting_outline": "Complete step-by-step meeting outline with timing for each section",
@@ -51,7 +56,7 @@ Return exactly this JSON:
 "seller_questions": "10 important questions the agent should ask the seller during the meeting",
 "marketing_preview": "A preview of the marketing plan the agent can present to the seller",
 "selling_angles": "3-5 strongest likely selling angles for this property based on what we know",
-"followup_email": "Complete follow-up email to send after the meeting with subject line",
+"followup_email": "Complete follow-up email as described above — greeting must use [Seller Name] placeholder, include WHAT I HEARD FROM YOU TODAY section with the three bracket placeholders",
 "presentation_intro": "A strong 2-3 paragraph opening statement for the listing presentation",
 "cma_analysis": "Detailed CMA analysis and pricing narrative as described above",
 "objection_responses": "Confident responses to all 4 seller objections, each with the objection as a header followed by the agent's response"

@@ -70,6 +70,7 @@ export function cleanPdfText(text: string): string {
     .replace(/\[([^\]]+)\]/g, '')
     .replace(/---+/g, '')
     .replace(/\*\*/g, '')
+    .replace(/[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[︀-﻿]/gu, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
