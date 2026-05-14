@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,6 +17,7 @@ export default function ListingPresentation() {
   const [userId, setUserId] = useState<string | null>(null)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
   const [form, setForm] = useState({
     agentName: '', brokerage: '', phone: '', email: '',
     sellerName: '', propertyAddress: '', city: '', state: '', propertyType: 'Single family',
@@ -76,12 +75,13 @@ export default function ListingPresentation() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
-        await supabase.from('listing_presentations').insert({
+        const { data: saved } = await supabase.from('listing_presentations').insert({
           user_id: userId,
           address: form.propertyAddress || form.neighborhood || 'Untitled',
           form_data: form,
           outputs: data.result
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
       } else {
         alert('Error: ' + (data.error || 'Something went wrong'))
@@ -91,20 +91,8 @@ export default function ListingPresentation() {
   }
 
   const downloadPDF = () => {
-    if (!result) return
-    const doc = new jsPDF()
-    const addr = form.propertyAddress || form.neighborhood || 'Untitled'
-    const y = pdfHeader(doc, 'Listing Presentation Kit', addr)
-    pdfSections(doc, [
-      { label: 'Opening Statement', content: result.openingStatement || '' },
-      { label: 'Marketing Plan', content: result.marketingPlan || '' },
-      { label: 'Why List With Me', content: result.whyListWithMe || '' },
-      { label: 'Pricing Strategy', content: result.pricingStrategy || '' },
-      { label: 'Objection Responses', content: result.objectionHandling || '' },
-      { label: 'Closing Script', content: result.closingScript || '' },
-      { label: 'Follow-Up Plan', content: result.followUpPlan || '' },
-    ], y, { agentName: form.agentName, brokerage: form.brokerage, phone: form.phone })
-    doc.save(`ListingPresentation-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/listing-presentation?id=${savedId}`, '_blank')
   }
 
   const inputStyle = {

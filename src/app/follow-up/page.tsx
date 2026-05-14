@@ -4,8 +4,6 @@ import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 
@@ -29,6 +27,7 @@ export default function FollowUpAssistant() {
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
   const [workspaceAssets, setWorkspaceAssets] = useState<any>({})
   const [sellerPrepOffer, setSellerPrepOffer] = useState<boolean | null>(null)
+  const [savedId, setSavedId] = useState<string | null>(null)
   const [form, setForm] = useState({
     contactName: '',
     contactType: 'Seller lead',
@@ -129,12 +128,13 @@ export default function FollowUpAssistant() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
-        await supabase.from('follow_ups').insert({
+        const { data: saved } = await supabase.from('follow_ups').insert({
           user_id: userId,
           contact_name: form.contactName || 'Untitled',
           form_data: form,
           outputs: data.result
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
         if (workspaceId) {
           await saveToWorkspace(workspaceId, 'follow_up', data.result.emailFollowUp || data.result)
@@ -150,18 +150,8 @@ export default function FollowUpAssistant() {
   }
 
   const downloadPDF = () => {
-    if (!result) return
-    const doc = new jsPDF()
-    const name = form.contactName || 'Untitled'
-    const y = pdfHeader(doc, 'Follow-Up Kit', name)
-    pdfSections(doc, [
-      { label: 'Follow-Up Email', content: result.emailFollowUp || '' },
-      { label: 'Follow-Up Text', content: result.textFollowUp || '' },
-      { label: 'LinkedIn Message', content: result.linkedinMessage || '' },
-      { label: 'CRM Note', content: result.reminderNote || '' },
-      { label: 'Next Step Email', content: result.nextStepEmail || '' },
-    ], y, { agentName: form.agentName, phone: form.phone })
-    doc.save(`FollowUp-${name.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/follow-up?id=${savedId}`, '_blank')
   }
 
   return (

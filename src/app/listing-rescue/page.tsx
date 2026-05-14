@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,6 +32,7 @@ export default function ListingRescuePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
   const [form, setForm] = useState({
     address: '',
     city: '',
@@ -141,12 +140,13 @@ export default function ListingRescuePage() {
       if (data.result) {
         setResult(data.result)
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
-        await supabase.from('listing_rescues_history').insert({
+        const { data: saved } = await supabase.from('listing_rescues_history').insert({
           user_id: userId,
           address: form.address || form.city || 'Untitled',
           form_data: form,
           outputs: data.result
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
       } else {
         alert('Error: ' + (data.error || 'Unknown error'))
@@ -168,16 +168,8 @@ export default function ListingRescuePage() {
   }
 
   const downloadPDF = () => {
-    if (!result) return
-    const doc = new jsPDF()
-    const addr = form.address || form.city || 'Listing Rescue'
-    const y = pdfHeader(doc, 'Listing Rescue Plan', addr)
-    pdfSections(doc,
-      outputSections.map(({ key, label }) => ({ label, content: result[key] || '' })),
-      y,
-      brandVoice?.agentName ? { agentName: brandVoice.agentName } : null
-    )
-    doc.save(`ListingRescue-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/listing-rescue?id=${savedId}`, '_blank')
   }
 
   const inputStyle = {

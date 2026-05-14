@@ -4,8 +4,6 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 
@@ -35,6 +33,7 @@ export default function LaunchKitPage() {
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
   const [workspaceAssets, setWorkspaceAssets] = useState<any>({})
   const [mlsOfferAccepted, setMlsOfferAccepted] = useState<boolean | null>(null)
+  const [savedId, setSavedId] = useState<string | null>(null)
 
   const loadHistory = async (uid: string) => {
     const { data } = await supabase
@@ -105,12 +104,13 @@ export default function LaunchKitPage() {
         setLaunchPlan(data.plan)
         setActiveTab('day1')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
-        await supabase.from('launch_kits').insert({
+        const { data: saved } = await supabase.from('launch_kits').insert({
           user_id: userId,
           address: form.neighborhood || form.city || 'Untitled',
           form_data: form,
           outputs: data.plan
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
         if (workspaceId) {
           await saveToWorkspace(workspaceId, 'launch_kit', data.plan.day1 || JSON.stringify(data.plan).slice(0, 500))
@@ -126,23 +126,8 @@ export default function LaunchKitPage() {
   }
 
   const downloadPDF = () => {
-    if (!launchPlan) return
-    const doc = new jsPDF()
-    const addr = form.neighborhood || form.city || '7-Day Launch Kit'
-    const y = pdfHeader(doc, '7-Day Launch Kit', addr)
-    pdfSections(doc, [
-      { label: 'Day 1 — Launch Day', content: launchPlan.day1 || '' },
-      { label: 'Day 2 — Follow Up', content: launchPlan.day2 || '' },
-      { label: 'Day 3 — Mid Week', content: launchPlan.day3 || '' },
-      { label: 'Day 4 — Spotlight', content: launchPlan.day4 || '' },
-      { label: 'Day 5 — Open House', content: launchPlan.day5 || '' },
-      { label: 'Day 6 — Weekend', content: launchPlan.day6 || '' },
-      { label: 'Day 7 — Final Push', content: launchPlan.day7 || '' },
-      { label: 'Email Sequence', content: launchPlan.email_sequence || '' },
-      { label: 'Social Calendar', content: launchPlan.social_calendar || '' },
-      { label: 'Pro Tips', content: launchPlan.pro_tips || '' },
-    ], y, brandVoice?.agentName ? { agentName: brandVoice.agentName } : null)
-    doc.save(`LaunchKit-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/launch-kit?id=${savedId}`, '_blank')
   }
 
   const tabs = [

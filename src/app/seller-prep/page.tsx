@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 
@@ -31,6 +29,7 @@ export default function SellerPrepPage() {
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
   const [workspaceAssets, setWorkspaceAssets] = useState<any>({})
+  const [savedId, setSavedId] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     address: '', city: '', state: '', neighborhood: '', type: 'Single family', beds: '', baths: '',
@@ -115,12 +114,13 @@ export default function SellerPrepPage() {
         setOutputs(data.outputs)
         setActiveTab('meeting_outline')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
-        await supabase.from('seller_preps').insert({
+        const { data: saved } = await supabase.from('seller_preps').insert({
           user_id: userId,
           address: form.address || form.neighborhood || 'Untitled',
           form_data: form,
           outputs: data.outputs
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
         if (workspaceId) {
           await saveToWorkspace(workspaceId, 'seller_prep', data.outputs.meeting_outline || data.outputs)
@@ -144,22 +144,8 @@ export default function SellerPrepPage() {
   }
 
   const downloadPDF = () => {
-    if (!outputs) return
-    const doc = new jsPDF()
-    const addr = form.address || form.neighborhood || 'Untitled'
-    const y = pdfHeader(doc, 'Seller Prep Package', addr)
-    pdfSections(doc, [
-      { label: 'Meeting Outline', content: outputs.meeting_outline || '' },
-      { label: 'Talking Points', content: outputs.talking_points || '' },
-      { label: 'Questions to Ask', content: outputs.seller_questions || '' },
-      { label: 'Marketing Preview', content: outputs.marketing_preview || '' },
-      { label: 'Selling Angles', content: outputs.selling_angles || '' },
-      { label: 'Follow-Up Email', content: outputs.followup_email || '' },
-      { label: 'Presentation Intro', content: outputs.presentation_intro || '' },
-      { label: 'CMA & Pricing', content: outputs.cma_analysis || '' },
-      { label: 'Objection Responses', content: outputs.objection_responses || '' },
-    ], y, { agentName: form.agentName })
-    doc.save(`SellerPrep-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/seller-prep?id=${savedId}`, '_blank')
   }
 
   const tabs = [

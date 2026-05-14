@@ -4,8 +4,6 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 
@@ -34,6 +32,7 @@ export default function QuickListingPage() {
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
   const [brandVoice, setBrandVoice] = useState<any>({})
+  const [savedId, setSavedId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [answers, setAnswers] = useState({
@@ -170,12 +169,13 @@ export default function QuickListingPage() {
       if (data.outputs) {
         setOutputs(data.outputs)
         setStep('results')
-        await supabase.from('quick_listings').insert({
+        const { data: saved } = await supabase.from('quick_listings').insert({
           user_id: userId,
           address: answers.neighborhood || answers.city || 'Untitled',
           form_data: answers,
           outputs: data.outputs
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
         if (workspaceId && data.outputs.mls_standard) {
           await saveToWorkspace(workspaceId, 'mls_description', data.outputs.mls_standard)
@@ -194,24 +194,8 @@ export default function QuickListingPage() {
   }
 
   const downloadPDF = () => {
-    if (!outputs) return
-    const doc = new jsPDF()
-    const addr = answers.neighborhood || answers.city || 'Quick Listing'
-    const y = pdfHeader(doc, 'Quick Listing Kit', addr)
-    pdfSections(doc, [
-      { label: 'MLS Standard', content: outputs.mls_standard || '' },
-      { label: 'Luxury MLS', content: outputs.mls_luxury || '' },
-      { label: 'Instagram', content: outputs.instagram || '' },
-      { label: 'Facebook', content: outputs.facebook || '' },
-      { label: 'Email', content: outputs.email || '' },
-      { label: 'Open House', content: outputs.openhouse || '' },
-      { label: 'Video Script', content: outputs.video || '' },
-      { label: 'SEO Copy', content: outputs.seo || '' },
-      { label: 'SMS', content: outputs.text_message || '' },
-      { label: 'Flyer', content: outputs.flyer || '' },
-      { label: 'Price Drop', content: outputs.price_drop || '' },
-    ], y, brandVoice?.agentName ? { agentName: brandVoice.agentName } : null)
-    doc.save(`QuickListing-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/quick-listing?id=${savedId}`, '_blank')
   }
 
   const tabs = [

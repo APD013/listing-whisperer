@@ -4,8 +4,6 @@ import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,6 +17,7 @@ export default function PricingAssistant() {
   const [userId, setUserId] = useState<string | null>(null)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
   const [form, setForm] = useState({
     address: '',
     propertyType: 'Single family',
@@ -86,12 +85,13 @@ export default function PricingAssistant() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
-        await supabase.from('pricing_reports_history').insert({
+        const { data: saved } = await supabase.from('pricing_reports_history').insert({
           user_id: userId,
           address: form.address || form.neighborhood || form.city || 'Untitled',
           form_data: form,
           outputs: data.result
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
       } else {
         alert('Error: ' + (data.error || 'Something went wrong'))
@@ -101,22 +101,8 @@ export default function PricingAssistant() {
   }
 
   const downloadPDF = () => {
-    if (!result) return
-    const doc = new jsPDF()
-    const addr = form.address || form.neighborhood || form.city || 'Untitled'
-    let y = pdfHeader(doc, 'Pricing Strategy Report', addr)
-    const priceSection = result.priceRange
-      ? `Suggested List Price: ${result.priceRange}\n${result.confidence || ''}`
-      : ''
-    pdfSections(doc, [
-      { label: 'Suggested Price Range', content: priceSection },
-      { label: 'Pricing Strategy', content: result.strategy || '' },
-      { label: 'Seller Talking Points', content: result.sellerTalkingPoints || '' },
-      { label: 'Key Pricing Factors', content: result.keyFactors || '' },
-      { label: 'Objection Responses', content: result.objectionResponses || '' },
-      { label: 'Market Positioning', content: result.marketPositioning || '' },
-    ], y)
-    doc.save(`PricingReport-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/pricing-assistant?id=${savedId}`, '_blank')
   }
 
   const scrollToForm = () => {

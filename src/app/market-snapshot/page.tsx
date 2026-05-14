@@ -4,8 +4,6 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections, pdfStatCards, cleanPdfText } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,6 +28,7 @@ export default function MarketSnapshotPage() {
   const [copied, setCopied] = useState<string | null>(null)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     neighborhood: '',
@@ -84,12 +83,13 @@ export default function MarketSnapshotPage() {
       try { data = JSON.parse(raw) } catch { setError('Raw error: ' + raw.slice(0, 200)); setLoading(false); return }
       if (data.result) {
         setResult(data.result)
-        await supabase.from('market_snapshots').insert({
+        const { data: saved } = await supabase.from('market_snapshots').insert({
           user_id: userId,
           neighborhood: form.neighborhood || form.state || 'Untitled',
           form_data: form,
           outputs: data.result
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
       } else {
         setError(data.error || 'Something went wrong. Please try again.')
@@ -107,36 +107,8 @@ export default function MarketSnapshotPage() {
   }
 
   const downloadPDF = () => {
-    if (!result) return
-    const doc = new jsPDF()
-    const area = form.neighborhood || form.state || 'Market Snapshot'
-    let y = pdfHeader(doc, 'Market Snapshot', area)
-
-    // Extract key stats from AI output
-    const combinedText = (result.market_summary || '') + ' ' + (result.price_trends || '')
-    const priceMatch = combinedText.match(/\$[\d,.]+[kKmM]?/)
-    const domMatch = combinedText.match(/\d+[-–]\d+\s*days?/i) || combinedText.match(/\d+\s*days?/i)
-    const condition = /seller['']?s\s+market/i.test(result.buyer_seller_assessment || '')
-      ? "Seller's Market"
-      : /buyer['']?s\s+market/i.test(result.buyer_seller_assessment || '')
-      ? "Buyer's Market"
-      : "Balanced Market"
-
-    y = pdfStatCards(doc, [
-      { label: 'Median Price', value: priceMatch ? priceMatch[0] : '—' },
-      { label: 'Days on Market', value: domMatch ? domMatch[0] : '—' },
-      { label: 'Market Condition', value: condition },
-    ], y)
-    y += 4
-
-    pdfSections(doc, [
-      { label: 'Market Summary', content: result.market_summary || '' },
-      { label: 'Price Trends', content: result.price_trends || '' },
-      { label: 'Inventory Analysis', content: result.inventory_analysis || '' },
-      { label: 'Buyer / Seller Assessment', content: result.buyer_seller_assessment || '' },
-      { label: 'Client Email', content: result.client_email || '' },
-    ], y)
-    doc.save(`MarketSnapshot-${area.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/market-snapshot?id=${savedId}`, '_blank')
   }
 
   const s = {

@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
-import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,6 +22,7 @@ export default function BuyerConsultationPage() {
   const [copied, setCopied] = useState(false)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     buyerName: '', budget: '', neighborhood: '', type: 'Single family',
@@ -84,12 +83,13 @@ export default function BuyerConsultationPage() {
         setOutputs(data.outputs)
         setActiveTab('consultation_outline')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
-        await supabase.from('buyer_consultations').insert({
+        const { data: saved } = await supabase.from('buyer_consultations').insert({
           user_id: userId,
           contact_name: form.buyerName || 'Untitled',
           form_data: form,
           outputs: data.outputs
-        })
+        }).select('id').single()
+        if (saved?.id) setSavedId(saved.id)
         if (userId) loadHistory(userId)
       } else {
         alert('Error: ' + JSON.stringify(data))
@@ -99,19 +99,8 @@ export default function BuyerConsultationPage() {
   }
 
   const downloadPDF = () => {
-    if (!outputs) return
-    const doc = new jsPDF()
-    const name = form.buyerName || 'Untitled'
-    const y = pdfHeader(doc, 'Buyer Consultation Kit', name)
-    pdfSections(doc, [
-      { label: 'Meeting Outline', content: outputs.consultation_outline || '' },
-      { label: 'Questions to Ask', content: outputs.questions_to_ask || '' },
-      { label: 'Needs Assessment', content: outputs.needs_assessment || '' },
-      { label: 'Financing Talk', content: outputs.financing_talking_points || '' },
-      { label: 'Search Strategy', content: outputs.property_search_strategy || '' },
-      { label: 'Follow-Up Email', content: outputs.followup_email || '' },
-    ], y, { agentName: form.agentName })
-    doc.save(`BuyerConsultation-${name.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+    if (!savedId) return
+    window.open(`/print/buyer-consultation?id=${savedId}`, '_blank')
   }
 
   const tabs = [
