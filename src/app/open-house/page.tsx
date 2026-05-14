@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
-
+import { saveToWorkspace } from '../lib/workspace'
+import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
 
 const supabase = createClient(
@@ -15,6 +16,9 @@ export default function OpenHouseKit() {
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null)
+  const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
+  const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
   const [form, setForm] = useState({
     address: '',
     city: '',
@@ -32,9 +36,18 @@ export default function OpenHouseKit() {
 
   useEffect(() => {
     trackEvent('tool_page_view', { tool: 'open_house' })
+    const params = new URLSearchParams(window.location.search)
+    const wsId = params.get('workspace')
+    if (wsId) setWorkspaceId(wsId)
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) setUserId(user.id)
+      if (user) {
+        setUserId(user.id)
+        if (wsId) {
+          const { data: ws } = await supabase.from('listing_workspaces').select('address').eq('id', wsId).single()
+          if (ws) setWorkspaceAddress(ws.address)
+        }
+      }
     }
     getUser()
   }, [])
@@ -61,8 +74,15 @@ export default function OpenHouseKit() {
         body: JSON.stringify({ form, userId })
       })
       const data = await res.json()
-      if (data.result) setResult(data.result)
-      else alert('Error: ' + (data.error || 'Something went wrong'))
+      if (data.result) {
+        setResult(data.result)
+        if (workspaceId) {
+          await saveToWorkspace(workspaceId, 'open_house_kit', data.result.flyerCopy || JSON.stringify(data.result).slice(0, 500))
+          const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
+          setWorkspaceToast(toast)
+          setTimeout(() => setWorkspaceToast(null), 3500)
+        }
+      } else alert('Error: ' + (data.error || 'Something went wrong'))
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
   }
@@ -74,6 +94,14 @@ export default function OpenHouseKit() {
       <div style={{ position: 'fixed', bottom: '15%', left: '5%', width: '360px', height: '360px', background: 'radial-gradient(circle, rgba(5,150,105,0.05) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
 
       <Navbar />
+
+      {workspaceId && (
+        <div style={{ background: 'rgba(29,158,117,0.08)', borderBottom: '1px solid rgba(29,158,117,0.2)', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--lw-text)' }}>
+          <span style={{ fontSize: '16px' }}>📁</span>
+          <span>Working in workspace: <strong>{workspaceAddress || workspaceId}</strong> — open house kit will be saved automatically.</span>
+          <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', color: '#1D9E75', fontWeight: '600', textDecoration: 'none', fontSize: '12px' }}>View Workspace →</a>
+        </div>
+      )}
 
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1.5rem', position: 'relative', zIndex: 1 }}>
 
@@ -223,6 +251,11 @@ export default function OpenHouseKit() {
         {/* RESULTS */}
         {result && !loading && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {workspaceToast && (
+              <div style={{ background: 'rgba(29,158,117,0.12)', border: '1px solid rgba(29,158,117,0.3)', borderRadius: '10px', padding: '10px 16px', fontSize: '13px', color: '#1D9E75', fontWeight: '600' }}>
+                {workspaceToast}
+              </div>
+            )}
             {[
               { key: 'flyerCopy', label: 'Flyer Copy', icon: '📄', color: '#10b981', desc: 'Print-ready open house flyer' },
               { key: 'socialPost', label: 'Social Media Post', icon: '📱', color: '#e1306c', desc: 'Instagram & Facebook announcement' },
@@ -254,6 +287,17 @@ export default function OpenHouseKit() {
                 ↺ New Open House
               </button>
             </div>
+            {!workspaceId && userId && (
+              <SaveToWorkspace
+                userId={userId}
+                assetKey="open_house_kit"
+                assetValue={result.flyerCopy || JSON.stringify(result).slice(0, 500)}
+                onSaved={(address) => {
+                  setWorkspaceToast(`✅ Saved to ${address} workspace`)
+                  setTimeout(() => setWorkspaceToast(null), 3500)
+                }}
+              />
+            )}
           </div>
         )}
       </div>

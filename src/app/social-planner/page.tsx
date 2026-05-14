@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
-
+import { saveToWorkspace } from '../lib/workspace'
+import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
 
 const supabase = createClient(
@@ -20,6 +21,9 @@ export default function SocialPlannerPage() {
   const [calendar, setCalendar] = useState<any>(null)
   const [activeDay, setActiveDay] = useState(0)
   const [copied, setCopied] = useState<string | null>(null)
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null)
+  const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
+  const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
   const [form, setForm] = useState({
     address: '',
     neighborhood: '',
@@ -32,6 +36,9 @@ export default function SocialPlannerPage() {
 
   useEffect(() => {
     trackEvent('tool_page_view', { tool: 'social_planner' })
+    const params = new URLSearchParams(window.location.search)
+    const wsId = params.get('workspace')
+    if (wsId) setWorkspaceId(wsId)
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -40,6 +47,10 @@ export default function SocialPlannerPage() {
         .from('profiles').select('plan').eq('id', user.id).single()
       if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
       else { setPlanLoaded(true) }
+      if (wsId) {
+        const { data: ws } = await supabase.from('listing_workspaces').select('address').eq('id', wsId).single()
+        if (ws) setWorkspaceAddress(ws.address)
+      }
     }
     getUser()
   }, [])
@@ -58,6 +69,12 @@ export default function SocialPlannerPage() {
         setCalendar(data.calendar)
         setActiveDay(0)
         setTimeout(() => document.getElementById('calendar')?.scrollIntoView({ behavior: 'smooth' }), 100)
+        if (workspaceId) {
+          await saveToWorkspace(workspaceId, 'social_posts', data.calendar)
+          const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
+          setWorkspaceToast(toast)
+          setTimeout(() => setWorkspaceToast(null), 3500)
+        }
       } else {
         alert('Error: ' + JSON.stringify(data))
       }
@@ -91,6 +108,14 @@ export default function SocialPlannerPage() {
       <div style={{ position: 'fixed', bottom: '15%', left: '5%', width: '360px', height: '360px', background: 'radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
 
       <Navbar />
+
+      {workspaceId && (
+        <div style={{ background: 'rgba(29,158,117,0.08)', borderBottom: '1px solid rgba(29,158,117,0.2)', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--lw-text)' }}>
+          <span style={{ fontSize: '16px' }}>📁</span>
+          <span>Working in workspace: <strong>{workspaceAddress || workspaceId}</strong> — social posts will be saved automatically.</span>
+          <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', color: '#1D9E75', fontWeight: '600', textDecoration: 'none', fontSize: '12px' }}>View Workspace →</a>
+        </div>
+      )}
 
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1.5rem', position: 'relative', zIndex: 1 }}>
 
@@ -220,6 +245,11 @@ export default function SocialPlannerPage() {
         {/* CALENDAR */}
         {calendar && (
           <div id="calendar">
+            {workspaceToast && (
+              <div style={{ background: 'rgba(29,158,117,0.12)', border: '1px solid rgba(29,158,117,0.3)', borderRadius: '10px', padding: '10px 16px', marginBottom: '12px', fontSize: '13px', color: '#1D9E75', fontWeight: '600' }}>
+                {workspaceToast}
+              </div>
+            )}
             <div style={{ ...cardStyle, border: '1px solid rgba(225,48,108,0.2)' }}>
               <p style={{ fontSize: '11px', fontWeight: '700', color: '#e1306c', letterSpacing: '1px', marginBottom: '16px' }}>📅 7-DAY CONTENT CALENDAR</p>
 
@@ -286,6 +316,17 @@ export default function SocialPlannerPage() {
                 🔄 New Calendar
               </button>
             </div>
+            {!workspaceId && userId && (
+              <SaveToWorkspace
+                userId={userId}
+                assetKey="social_posts"
+                assetValue={calendar}
+                onSaved={(address) => {
+                  setWorkspaceToast(`✅ Saved to ${address} workspace`)
+                  setTimeout(() => setWorkspaceToast(null), 3500)
+                }}
+              />
+            )}
           </div>
         )}
       </div>

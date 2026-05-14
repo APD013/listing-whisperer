@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { saveToWorkspace } from '../lib/workspace'
+import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
 
 const supabase = createClient(
@@ -63,6 +65,9 @@ export default function VirtualStagingPage() {
   const [buyingCredits, setBuyingCredits] = useState<string | null>(null)
   const [creditsAddedBanner, setCreditsAddedBanner] = useState(false)
   const [history, setHistory] = useState<StagingRecord[]>([])
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null)
+  const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
+  const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
 
   const loadHistory = async (uid: string) => {
     const { data } = await supabase
@@ -90,12 +95,19 @@ export default function VirtualStagingPage() {
     }
     getUser()
 
-    // Check for ?credits=added param
+    // Check URL params
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       if (params.get('credits') === 'added') {
         setCreditsAddedBanner(true)
         window.history.replaceState({}, '', '/virtual-staging')
+      }
+      const wsId = params.get('workspace')
+      if (wsId) {
+        setWorkspaceId(wsId)
+        supabase.from('listing_workspaces').select('address').eq('id', wsId).single().then(({ data: ws }) => {
+          if (ws) setWorkspaceAddress(ws.address)
+        })
       }
     }
   }, [])
@@ -147,6 +159,12 @@ export default function VirtualStagingPage() {
         setResults(data.images)
         setCredits(data.creditsRemaining)
         if (userId) loadHistory(userId)
+        if (workspaceId) {
+          await saveToWorkspace(workspaceId, 'virtual_staging', data.images)
+          const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
+          setWorkspaceToast(toast)
+          setTimeout(() => setWorkspaceToast(null), 3500)
+        }
       }
     } catch (e: any) {
       setError(e.message || 'Something went wrong')
@@ -215,6 +233,14 @@ export default function VirtualStagingPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
       <Navbar />
+
+      {workspaceId && (
+        <div style={{ background: 'rgba(29,158,117,0.08)', borderBottom: '1px solid rgba(29,158,117,0.2)', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--lw-text)' }}>
+          <span style={{ fontSize: '16px' }}>📁</span>
+          <span>Working in workspace: <strong>{workspaceAddress || workspaceId}</strong> — staging results will be saved automatically.</span>
+          <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', color: '#1D9E75', fontWeight: '600', textDecoration: 'none', fontSize: '12px' }}>View Workspace →</a>
+        </div>
+      )}
 
       {/* Credits added banner */}
       {creditsAddedBanner && (
@@ -403,6 +429,11 @@ export default function VirtualStagingPage() {
         {/* Results */}
         {results.length > 0 && (
           <div style={{ marginBottom: '2rem' }}>
+            {workspaceToast && (
+              <div style={{ background: 'rgba(29,158,117,0.12)', border: '1px solid rgba(29,158,117,0.3)', borderRadius: '10px', padding: '10px 16px', marginBottom: '12px', fontSize: '13px', color: '#1D9E75', fontWeight: '600' }}>
+                {workspaceToast}
+              </div>
+            )}
             <p style={{ fontSize: '11px', fontWeight: '700', color: 'var(--lw-text-muted)', letterSpacing: '1.2px', margin: '0 0 1rem' }}>YOUR RESULTS</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
               {results.map((url, i) => (
@@ -446,6 +477,19 @@ export default function VirtualStagingPage() {
                 Generate Again ↺
               </button>
             </div>
+            {!workspaceId && userId && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <SaveToWorkspace
+                  userId={userId}
+                  assetKey="virtual_staging"
+                  assetValue={results}
+                  onSaved={(address) => {
+                    setWorkspaceToast(`✅ Saved to ${address} workspace`)
+                    setTimeout(() => setWorkspaceToast(null), 3500)
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
 

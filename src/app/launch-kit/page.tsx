@@ -6,6 +6,8 @@ import { trackEvent } from '../lib/analytics'
 import Navbar from '../components/Navbar'
 import jsPDF from 'jspdf'
 import { pdfHeader, pdfSections } from '../lib/pdfStyles'
+import { saveToWorkspace } from '../lib/workspace'
+import SaveToWorkspace from '../components/SaveToWorkspace'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,6 +32,7 @@ export default function LaunchKitPage() {
   const [historyLoaded, setHistoryLoaded] = useState(false)
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
+  const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
 
   const loadHistory = async (uid: string) => {
     const { data } = await supabase
@@ -94,12 +97,11 @@ export default function LaunchKitPage() {
           outputs: data.plan
         })
         if (userId) loadHistory(userId)
-        if (workspaceId && data.plan.day1) {
-          const { data: ws } = await supabase.from('listing_workspaces').select('assets').eq('id', workspaceId).single()
-          await supabase.from('listing_workspaces').update({
-            assets: { ...(ws?.assets || {}), launch_kit: data.plan.day1 },
-            updated_at: new Date().toISOString(),
-          }).eq('id', workspaceId)
+        if (workspaceId) {
+          await saveToWorkspace(workspaceId, 'launch_kit', data.plan.day1 || JSON.stringify(data.plan).slice(0, 500))
+          const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
+          setWorkspaceToast(toast)
+          setTimeout(() => setWorkspaceToast(null), 3500)
         }
       } else {
         alert('Error: ' + JSON.stringify(data))
@@ -305,6 +307,12 @@ export default function LaunchKitPage() {
 
         {/* RESULTS */}
         {launchPlan && (
+          <>
+          {workspaceToast && (
+            <div style={{ display:'flex',alignItems:'center',gap:'8px',background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.25)',borderRadius:'8px',padding:'8px 14px',marginBottom:'12px',fontSize:'13px',fontWeight:'600',color:'#1D9E75' }}>
+              {workspaceToast}
+            </div>
+          )}
           <div id="results" style={cardStyle}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>
               <div>
@@ -360,6 +368,15 @@ export default function LaunchKitPage() {
               </button>
             </div>
           </div>
+          {!workspaceId && userId && launchPlan && (
+            <SaveToWorkspace
+              userId={userId}
+              assetKey="launch_kit"
+              assetValue={launchPlan.day1 || JSON.stringify(launchPlan).slice(0, 500)}
+              onSaved={addr => { const t = `✅ Saved to ${addr} workspace`; setWorkspaceToast(t); setTimeout(() => setWorkspaceToast(null), 3500) }}
+            />
+          )}
+          </>
         )}
 
         {/* PAST LAUNCH KITS */}

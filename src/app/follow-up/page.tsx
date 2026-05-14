@@ -6,6 +6,8 @@ import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
 import jsPDF from 'jspdf'
 import { pdfHeader, pdfSections } from '../lib/pdfStyles'
+import { saveToWorkspace } from '../lib/workspace'
+import SaveToWorkspace from '../components/SaveToWorkspace'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,6 +26,7 @@ export default function FollowUpAssistant() {
   const [historyLoaded, setHistoryLoaded] = useState(false)
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
+  const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
   const [form, setForm] = useState({
     contactName: '',
     contactType: 'Seller lead',
@@ -127,12 +130,11 @@ export default function FollowUpAssistant() {
           outputs: data.result
         })
         if (userId) loadHistory(userId)
-        if (workspaceId && data.result.emailFollowUp) {
-          const { data: ws } = await supabase.from('listing_workspaces').select('assets').eq('id', workspaceId).single()
-          await supabase.from('listing_workspaces').update({
-            assets: { ...(ws?.assets || {}), follow_up: data.result.emailFollowUp },
-            updated_at: new Date().toISOString(),
-          }).eq('id', workspaceId)
+        if (workspaceId) {
+          await saveToWorkspace(workspaceId, 'follow_up', data.result.emailFollowUp || data.result)
+          const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
+          setWorkspaceToast(toast)
+          setTimeout(() => setWorkspaceToast(null), 3500)
         }
       } else {
         alert('Error: ' + (data.error || 'Something went wrong'))
@@ -342,6 +344,11 @@ export default function FollowUpAssistant() {
         {/* RESULTS */}
         {result && !loading && (
           <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+            {workspaceToast && (
+              <div style={{ display:'flex',alignItems:'center',gap:'8px',background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.25)',borderRadius:'8px',padding:'8px 14px',fontSize:'13px',fontWeight:'600',color:'#1D9E75' }}>
+                {workspaceToast}
+              </div>
+            )}
             {[
               { key: 'emailFollowUp', label: 'Follow-Up Email', icon: '📧', color: '#6366f1', desc: 'Professional email to send within 24 hours' },
               { key: 'textFollowUp', label: 'Follow-Up Text', icon: '💬', color: '#10b981', desc: 'Casual SMS to send same day' },
@@ -383,6 +390,14 @@ export default function FollowUpAssistant() {
                 ↺ New Follow-Up
               </button>
             </div>
+            {!workspaceId && userId && result && (
+              <SaveToWorkspace
+                userId={userId}
+                assetKey="follow_up"
+                assetValue={result.emailFollowUp || result}
+                onSaved={addr => { const t = `✅ Saved to ${addr} workspace`; setWorkspaceToast(t); setTimeout(() => setWorkspaceToast(null), 3500) }}
+              />
+            )}
           </div>
         )}
 

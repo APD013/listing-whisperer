@@ -6,6 +6,8 @@ import { trackEvent } from '../lib/analytics'
 import Navbar from '../components/Navbar'
 import jsPDF from 'jspdf'
 import { pdfHeader, pdfSections } from '../lib/pdfStyles'
+import { saveToWorkspace } from '../lib/workspace'
+import SaveToWorkspace from '../components/SaveToWorkspace'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,6 +20,7 @@ export default function QuickListingPage() {
   const [plan, setPlan] = useState('starter')
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
+  const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
   const [planLoaded, setPlanLoaded] = useState(false)
   const [step, setStep] = useState<'upload' | 'questions' | 'generating' | 'results'>('upload')
   const [photos, setPhotos] = useState<string[]>([])
@@ -161,11 +164,10 @@ export default function QuickListingPage() {
         })
         if (userId) loadHistory(userId)
         if (workspaceId && data.outputs.mls_standard) {
-          const { data: ws } = await supabase.from('listing_workspaces').select('assets').eq('id', workspaceId).single()
-          await supabase.from('listing_workspaces').update({
-            assets: { ...(ws?.assets || {}), mls_description: data.outputs.mls_standard },
-            updated_at: new Date().toISOString(),
-          }).eq('id', workspaceId)
+          await saveToWorkspace(workspaceId, 'mls_description', data.outputs.mls_standard)
+          const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
+          setWorkspaceToast(toast)
+          setTimeout(() => setWorkspaceToast(null), 3500)
         }
       } else {
         alert('Error: ' + JSON.stringify(data))
@@ -478,6 +480,11 @@ export default function QuickListingPage() {
             )}
 
             <div>
+              {workspaceToast && (
+                <div style={{ display:'flex',alignItems:'center',gap:'8px',background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.25)',borderRadius:'8px',padding:'8px 14px',marginBottom:'12px',fontSize:'13px',fontWeight:'600',color:'#1D9E75' }}>
+                  {workspaceToast}
+                </div>
+              )}
               <div style={{ marginBottom: '1.25rem' }}>
                 <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--lw-text)', marginBottom: '4px', letterSpacing: '-0.02em' }}>🎉 Your listing is ready!</h2>
                 <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)' }}>11 formats generated from your photos</p>
@@ -525,6 +532,14 @@ export default function QuickListingPage() {
                   🔄 New Listing
                 </button>
               </div>
+              {!workspaceId && userId && outputs && (
+                <SaveToWorkspace
+                  userId={userId}
+                  assetKey="mls_description"
+                  assetValue={outputs.mls_standard}
+                  onSaved={addr => { const t = `✅ Saved to ${addr} workspace`; setWorkspaceToast(t); setTimeout(() => setWorkspaceToast(null), 3500) }}
+                />
+              )}
             </div>
           </div>
         )}

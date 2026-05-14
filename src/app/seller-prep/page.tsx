@@ -7,6 +7,8 @@ import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
 import jsPDF from 'jspdf'
 import { pdfHeader, pdfSections } from '../lib/pdfStyles'
+import { saveToWorkspace } from '../lib/workspace'
+import SaveToWorkspace from '../components/SaveToWorkspace'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,6 +29,7 @@ export default function SellerPrepPage() {
   const [historyLoaded, setHistoryLoaded] = useState(false)
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
+  const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     address: '', city: '', state: '', neighborhood: '', type: 'Single family', beds: '', baths: '',
@@ -105,12 +108,11 @@ export default function SellerPrepPage() {
           outputs: data.outputs
         })
         if (userId) loadHistory(userId)
-        if (workspaceId && data.outputs.meeting_outline) {
-          const { data: ws } = await supabase.from('listing_workspaces').select('assets').eq('id', workspaceId).single()
-          await supabase.from('listing_workspaces').update({
-            assets: { ...(ws?.assets || {}), seller_prep: data.outputs.meeting_outline },
-            updated_at: new Date().toISOString(),
-          }).eq('id', workspaceId)
+        if (workspaceId) {
+          await saveToWorkspace(workspaceId, 'seller_prep', data.outputs.meeting_outline || data.outputs)
+          const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
+          setWorkspaceToast(toast)
+          setTimeout(() => setWorkspaceToast(null), 3500)
         }
       } else {
         alert('Error: ' + JSON.stringify(data))
@@ -399,6 +401,12 @@ export default function SellerPrepPage() {
 
         {/* RESULTS */}
         {outputs && (
+          <>
+          {workspaceToast && (
+            <div style={{ display:'flex',alignItems:'center',gap:'8px',background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.25)',borderRadius:'8px',padding:'8px 14px',marginBottom:'12px',fontSize:'13px',fontWeight:'600',color:'#1D9E75' }}>
+              {workspaceToast}
+            </div>
+          )}
           <div id="results" style={cardStyle}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>
               <div>
@@ -448,6 +456,15 @@ export default function SellerPrepPage() {
               </button>
             </div>
           </div>
+          {!workspaceId && userId && outputs && (
+            <SaveToWorkspace
+              userId={userId}
+              assetKey="seller_prep"
+              assetValue={outputs.meeting_outline || outputs}
+              onSaved={addr => { const t = `✅ Saved to ${addr} workspace`; setWorkspaceToast(t); setTimeout(() => setWorkspaceToast(null), 3500) }}
+            />
+          )}
+          </>
         )}
 
         {/* PAST PREP KITS */}

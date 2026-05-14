@@ -198,9 +198,13 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                     gap: '6px',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '18px' }}>{asset.icon}</span>
-                    {exists && <span style={{ fontSize: '14px', color: '#1D9E75', fontWeight: '700' }}>✓</span>}
+                    {exists && (
+                      <span style={{ fontSize: '10px', fontWeight: '700', padding: '2px 7px', borderRadius: '20px', background: 'rgba(29,158,117,0.12)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', letterSpacing: '0.3px' }}>
+                        ✓ Complete
+                      </span>
+                    )}
                   </div>
                   <p style={{ margin: 0, fontSize: '12px', fontWeight: '700', color: 'var(--lw-text)' }}>{asset.label}</p>
                   {exists ? (
@@ -208,12 +212,20 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                       <p style={{ margin: 0, fontSize: '11px', color: 'var(--lw-text-muted)', lineHeight: '1.5', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
                         {String(content).slice(0, 100)}
                       </p>
-                      <button
-                        onClick={() => setViewAsset({ key: asset.key, content: String(content) })}
-                        style={{ marginTop: '4px', padding: '5px 12px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', borderRadius: '7px', fontSize: '11px', fontWeight: '600', cursor: 'pointer', alignSelf: 'flex-start' }}
-                      >
-                        View
-                      </button>
+                      <div style={{ display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
+                        <button
+                          onClick={() => setViewAsset({ key: asset.key, content: String(content) })}
+                          style={{ padding: '5px 12px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', borderRadius: '7px', fontSize: '11px', fontWeight: '600', cursor: 'pointer' }}
+                        >
+                          View
+                        </button>
+                        <a
+                          href={`${asset.href}?workspace=${id}`}
+                          style={{ padding: '5px 12px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', borderRadius: '7px', fontSize: '11px', fontWeight: '600', textDecoration: 'none' }}
+                        >
+                          Regenerate →
+                        </a>
+                      </div>
                     </>
                   ) : (
                     <a

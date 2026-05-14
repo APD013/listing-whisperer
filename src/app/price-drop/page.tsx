@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
-
+import { saveToWorkspace } from '../lib/workspace'
+import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
 
 const supabase = createClient(
@@ -15,6 +16,9 @@ export default function PriceDropKit() {
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null)
+  const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
+  const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
   const [form, setForm] = useState({
     address: '',
     city: '',
@@ -33,9 +37,18 @@ export default function PriceDropKit() {
 
   useEffect(() => {
     trackEvent('tool_page_view', { tool: 'price_drop' })
+    const params = new URLSearchParams(window.location.search)
+    const wsId = params.get('workspace')
+    if (wsId) setWorkspaceId(wsId)
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) setUserId(user.id)
+      if (user) {
+        setUserId(user.id)
+        if (wsId) {
+          const { data: ws } = await supabase.from('listing_workspaces').select('address').eq('id', wsId).single()
+          if (ws) setWorkspaceAddress(ws.address)
+        }
+      }
     }
     getUser()
   }, [])
@@ -69,8 +82,15 @@ export default function PriceDropKit() {
         body: JSON.stringify({ form, userId })
       })
       const data = await res.json()
-      if (data.result) setResult(data.result)
-      else alert('Error: ' + (data.error || 'Something went wrong'))
+      if (data.result) {
+        setResult(data.result)
+        if (workspaceId) {
+          await saveToWorkspace(workspaceId, 'price_drop_kit', data.result.mlsUpdate || JSON.stringify(data.result).slice(0, 500))
+          const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
+          setWorkspaceToast(toast)
+          setTimeout(() => setWorkspaceToast(null), 3500)
+        }
+      } else alert('Error: ' + (data.error || 'Something went wrong'))
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
   }
@@ -81,6 +101,14 @@ export default function PriceDropKit() {
       <div style={{position:'fixed',bottom:'20%',right:'5%',width:'300px',height:'300px',background:'radial-gradient(circle, rgba(220,38,38,0.05) 0%, transparent 70%)',pointerEvents:'none'}}/>
 
       <Navbar />
+
+      {workspaceId && (
+        <div style={{ background: 'rgba(29,158,117,0.08)', borderBottom: '1px solid rgba(29,158,117,0.2)', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--lw-text)' }}>
+          <span style={{ fontSize: '16px' }}>📁</span>
+          <span>Working in workspace: <strong>{workspaceAddress || workspaceId}</strong> — price drop kit will be saved automatically.</span>
+          <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', color: '#1D9E75', fontWeight: '600', textDecoration: 'none', fontSize: '12px' }}>View Workspace →</a>
+        </div>
+      )}
 
       <div style={{maxWidth:'760px',margin:'0 auto',padding:'2rem 1.5rem'}}>
 
@@ -223,6 +251,11 @@ export default function PriceDropKit() {
         {/* RESULTS */}
         {result && !loading && (
           <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+            {workspaceToast && (
+              <div style={{ background: 'rgba(29,158,117,0.12)', border: '1px solid rgba(29,158,117,0.3)', borderRadius: '10px', padding: '10px 16px', fontSize: '13px', color: '#1D9E75', fontWeight: '600' }}>
+                {workspaceToast}
+              </div>
+            )}
             {[
               { key: 'mlsUpdate', label: 'MLS Price Improvement', icon: '🏠', color: '#1D9E75', desc: 'Updated MLS description highlighting the new price' },
               { key: 'socialPost', label: 'Social Media Post', icon: '📱', color: '#e1306c', desc: 'Instagram & Facebook price improvement announcement' },
@@ -254,6 +287,17 @@ export default function PriceDropKit() {
                 ↺ New Price Drop
               </button>
             </div>
+            {!workspaceId && userId && (
+              <SaveToWorkspace
+                userId={userId}
+                assetKey="price_drop_kit"
+                assetValue={result.mlsUpdate || JSON.stringify(result).slice(0, 500)}
+                onSaved={(address) => {
+                  setWorkspaceToast(`✅ Saved to ${address} workspace`)
+                  setTimeout(() => setWorkspaceToast(null), 3500)
+                }}
+              />
+            )}
           </div>
         )}
       </div>

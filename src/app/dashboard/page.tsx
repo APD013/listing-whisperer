@@ -985,14 +985,36 @@ export default function Dashboard() {
                     {recentWorkspaces.map((ws: any) => {
                       const wsStatusColor: Record<string,string> = { Active:'#1D9E75', Pending:'#f59e0b', Sold:'#6366f1', Cancelled:'#ef4444' }
                       const sc = wsStatusColor[ws.status] || '#6b7280'
-                      const ac = ws.assets ? Object.values(ws.assets).filter((v: any) => v && String(v).trim()).length : 0
+                      const assets = ws.assets || {}
+                      const ac = Object.values(assets).filter((v: any) => v && String(v).trim()).length
+                      const nextAction = !assets.mls_description
+                        ? { label: 'Create listing copy →', href: `/quick-listing?workspace=${ws.id}` }
+                        : !assets.launch_kit
+                        ? { label: 'Build launch kit →', href: `/launch-kit?workspace=${ws.id}` }
+                        : !assets.seller_prep
+                        ? { label: 'Prep for appointment →', href: `/seller-prep?workspace=${ws.id}` }
+                        : null
                       return (
-                        <div key={ws.id} style={{display:'flex',alignItems:'center',gap:'10px',padding:'10px 14px',borderRadius:'10px',background:'var(--lw-card)',border:'1px solid var(--lw-border)'}}>
-                          <span style={{fontSize:'16px',flexShrink:0}}>📁</span>
-                          <span style={{fontSize:'13px',color:'var(--lw-text)',flex:1,fontWeight:'500'}}>{ws.address}</span>
-                          <span style={{fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',background:`${sc}15`,color:sc,border:`1px solid ${sc}30`,flexShrink:0}}>{ws.status}</span>
-                          <span style={{fontSize:'11px',color:'var(--lw-text-muted)',flexShrink:0}}>{ac}/8</span>
-                          <a href={`/workspace/${ws.id}`} style={{fontSize:'11px',color:'#1D9E75',textDecoration:'none',fontWeight:'600',flexShrink:0}}>Open →</a>
+                        <div key={ws.id} style={{padding:'10px 14px',borderRadius:'10px',background:'var(--lw-card)',border:'1px solid var(--lw-border)'}}>
+                          <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
+                            <span style={{fontSize:'15px',flexShrink:0}}>📁</span>
+                            <span style={{fontSize:'13px',color:'var(--lw-text)',flex:1,fontWeight:'500',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' as const}}>{ws.address}</span>
+                            <span style={{fontSize:'10px',fontWeight:'700',padding:'2px 7px',borderRadius:'20px',background:`${sc}15`,color:sc,border:`1px solid ${sc}30`,flexShrink:0}}>{ws.status}</span>
+                          </div>
+                          <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
+                            <div style={{flex:1,height:'4px',background:'var(--lw-border)',borderRadius:'2px',overflow:'hidden'}}>
+                              <div style={{height:'100%',width:`${(ac/8)*100}%`,background:'linear-gradient(90deg,#1D9E75,#085041)',borderRadius:'2px',transition:'width 0.3s'}}/>
+                            </div>
+                            <span style={{fontSize:'10px',color:'var(--lw-text-muted)',flexShrink:0}}>{ac}/8</span>
+                          </div>
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            {nextAction ? (
+                              <a href={nextAction.href} style={{fontSize:'11px',color:'#f59e0b',textDecoration:'none',fontWeight:'600'}}>{nextAction.label}</a>
+                            ) : (
+                              <span style={{fontSize:'11px',color:'#1D9E75',fontWeight:'600'}}>✓ All assets ready</span>
+                            )}
+                            <a href={`/workspace/${ws.id}`} style={{fontSize:'11px',color:'#1D9E75',textDecoration:'none',fontWeight:'600',flexShrink:0}}>Open →</a>
+                          </div>
                         </div>
                       )
                     })}
