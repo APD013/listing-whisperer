@@ -66,9 +66,9 @@ function PrintContent() {
   return (
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif', maxWidth: '760px', margin: '0 auto', padding: '24px 20px', color: '#1a1a2e', background: '#fff' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '2px solid #1D9E75', paddingBottom: '12px', marginBottom: '20px' }}>
-        <div>
-          <div style={{ fontSize: '16px', fontWeight: 700, whiteSpace: 'nowrap' }}>
-            <span style={{ color: '#1a1a2e' }}>Listing</span><span style={{ color: '#1D9E75' }}>Whisperer</span>
+        <div style={{ flexShrink: 0 }}>
+          <div style={{ fontSize: '16px', fontWeight: 700, whiteSpace: 'nowrap', display: 'inline-block', wordBreak: 'keep-all', overflowWrap: 'normal', hyphens: 'none', color: '#1a1a2e' }}>
+            Listing<span style={{ color: '#1D9E75' }}>Whisperer</span>
           </div>
           <div style={{ fontSize: '10px', color: '#718096', marginTop: '2px', fontFamily: 'sans-serif' }}>Market Snapshot</div>
         </div>
