@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTheme } from '../lib/theme'
 import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
 import jsPDF from 'jspdf'
-import { PDF_COLORS, pdfAgentBar, pdfSectionHeader, pdfFooter } from '../lib/pdfStyles'
+import { PDF_COLORS, pdfHeader, pdfAgentBar, pdfSectionHeader, pdfFooter, cleanPdfText } from '../lib/pdfStyles'
 import OnboardingModal from '../components/OnboardingModal'
 import DashboardChecklist from '../components/DashboardChecklist'
 
@@ -262,173 +262,98 @@ export default function Dashboard() {
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const pageWidth = doc.internal.pageSize.getWidth()
       const pageHeight = doc.internal.pageSize.getHeight()
-      const margin = 18
+      const margin = 20
       const contentWidth = pageWidth - margin * 2
-      let y = 0
 
-      // Brand colors
-      const green = [29, 158, 117] as [number, number, number]
-      const darkGreen = [8, 80, 65] as [number, number, number]
-      const dark = [13, 17, 23] as [number, number, number]
-      const white = [255, 255, 255] as [number, number, number]
-      const lightGray = [245, 247, 250] as [number, number, number]
-      const textDark = [30, 30, 40] as [number, number, number]
-      const textMid = [80, 85, 100] as [number, number, number]
-      const textLight = [140, 145, 160] as [number, number, number]
+      const sectionBg: [number, number, number] = [248, 250, 251]
+      const textDark: [number, number, number] = [26, 26, 46]
+      const textMid: [number, number, number] = [74, 85, 104]
+      const green: [number, number, number] = [29, 158, 117]
+      const borderLight: [number, number, number] = [226, 232, 240]
 
-      const addWrappedText = (text: string, x: number, yPos: number, maxWidth: number, lineHeight: number = 5.5) => {
-        const lines = doc.splitTextToSize(text, maxWidth)
+      const addWrappedText = (text: string, x: number, yPos: number, maxWidth: number, lineHeight = 5.5) => {
+        const cleaned = cleanPdfText(text)
+        const lines = doc.splitTextToSize(cleaned, maxWidth)
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
         doc.text(lines, x, yPos)
-        return yPos + (lines.length * lineHeight)
+        return yPos + lines.length * lineHeight
       }
 
-      const checkPageBreak = (yPos: number, needed: number = 30) => {
+      const checkPageBreak = (yPos: number, needed = 30) => {
         if (yPos > pageHeight - needed) {
-          pdfFooter(doc)
+          pdfFooter(doc, brandVoice)
           doc.addPage()
-          doc.setFillColor(...dark)
-          doc.rect(0, 0, pageWidth, 14, 'F')
-          doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
-          doc.text('Listing', margin, 9)
-          doc.setTextColor(...green)
-          doc.text('Whisperer', margin + doc.getTextWidth('Listing') + 1, 9)
-          doc.setTextColor(...textLight); doc.setFont('helvetica', 'normal')
-          doc.text(form.neighborhood || form.name || '', pageWidth - margin, 9, { align: 'right' })
-          return 22
+          return 20
         }
         return yPos
       }
 
-      const addSectionTitle = (title: string, yPos: number) => {
-        return pdfSectionHeader(doc, title, yPos)
-      }
-
       if (type === 'mls') {
-        // DARK HEADER BANNER
-        doc.setFillColor(...dark)
-        doc.rect(0, 0, pageWidth, 40, 'F')
-        doc.setFillColor(...green)
-        doc.rect(0, 40, pageWidth, 2, 'F')
+        let y = pdfHeader(doc, 'MLS Marketing Sheet', form.neighborhood || form.name || '')
 
-        // Brand name: "Listing" white + "Whisperer" brand green
-        doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
-        doc.text('Listing', margin, 17)
-        const listingWidth = doc.getTextWidth('Listing')
-        doc.setTextColor(...green)
-        doc.text('Whisperer', margin + listingWidth + 1.5, 17)
-
-        // Center: doc type
-        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textLight)
-        doc.text('MLS MARKETING SHEET', pageWidth / 2, 17, { align: 'center' })
-
-        // Right: address/neighborhood + price
-        doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textLight)
-        doc.text(form.neighborhood || form.name || '', pageWidth - margin, 17, { align: 'right' })
-        const dateStr2 = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-        doc.setFontSize(7.5)
-        doc.text(dateStr2, pageWidth - margin, 28, { align: 'right' })
-
-        // Price — large, left aligned below brand
-        if (form.price) {
-          doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
-          doc.text(form.price, margin, 30)
+        // Property details strip below header
+        if (form.price || form.type || form.beds) {
+          const details = [form.price, form.type, form.beds, form.sqft ? form.sqft + ' sq ft' : ''].filter(Boolean).join('  ·  ')
+          doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
+          doc.text(details, margin, y)
+          y += 8
         }
 
-        // Property details strip
-        const details = [form.type, form.beds, form.sqft ? form.sqft + ' sq ft' : ''].filter(Boolean).join('  ·  ')
-        doc.setTextColor(...textLight); doc.setFontSize(8); doc.setFont('helvetica', 'normal')
-        doc.text(details, margin, 37)
+        // Agent bar
+        if (brandVoice?.agentName || brandVoice?.phone) {
+          y = pdfAgentBar(doc, brandVoice, y)
+          y += 4
+        }
 
-        y = 50
-
-        // Agent info if available
-        y = pdfAgentBar(doc, brandVoice, y)
-        if (brandVoice?.agentName || brandVoice?.phone) y += 4
-
-        // MLS DESCRIPTION
-        y = addSectionTitle('MLS Description', y)
-        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
+        y = pdfSectionHeader(doc, 'MLS Description', y)
         y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
 
         y += 8; y = checkPageBreak(y)
-        y = addSectionTitle('Luxury MLS Version', y)
-        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
+        y = pdfSectionHeader(doc, 'Luxury MLS Version', y)
         y = addWrappedText(outputs.mls_luxury || '', margin, y, contentWidth)
 
         y += 8; y = checkPageBreak(y)
-        y = addSectionTitle('Email Blast', y)
-        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
+        y = pdfSectionHeader(doc, 'Email Blast', y)
         y = addWrappedText(outputs.email || '', margin, y, contentWidth)
 
-        pdfFooter(doc)
-        doc.save(`MLS-Sheet-${form.neighborhood || form.name || 'listing'}.pdf`)
+        pdfFooter(doc, brandVoice)
+        doc.save(`MLS-Sheet-${(form.neighborhood || form.name || 'listing').replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
 
       } else if (type === 'flyer') {
-        // DARK HEADER BANNER — 40px
-        doc.setFillColor(...dark)
-        doc.rect(0, 0, pageWidth, 40, 'F')
+        let y = pdfHeader(doc, 'Property Flyer', form.neighborhood || form.name || '')
 
-        // Brand: "Listing" white + "Whisperer" green
-        doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
-        doc.text('Listing', margin, 12)
-        const lw = doc.getTextWidth('Listing ')
-        doc.setTextColor(...green)
-        doc.text('Whisperer', margin + lw, 12)
-
-        // Center: PROPERTY FLYER
-        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textLight)
-        doc.text('PROPERTY FLYER', pageWidth / 2, 14, { align: 'center' })
-
-        // Right: JUST LISTED badge
-        doc.setFillColor(...green)
-        doc.roundedRect(pageWidth - margin - 28, 6, 28, 8, 2, 2, 'F')
-        doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
-        doc.text('JUST LISTED', pageWidth - margin - 14, 11.5, { align: 'center' })
-
-        // Accent line
-        doc.setFillColor(...green)
-        doc.rect(0, 40, pageWidth, 2, 'F')
-
-        y = 50
-
-        // Price — large, below header
-        doc.setFontSize(26); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textDark)
-        doc.text(form.price || 'Price Upon Request', pageWidth / 2, y + 12, { align: 'center' })
-        y += 16
+        // Price — large, centered
+        doc.setFontSize(24); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
+        doc.text(form.price || 'Price Upon Request', pageWidth / 2, y + 10, { align: 'center' })
+        y += 14
 
         // Address
         doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textMid)
-        doc.text(form.neighborhood || form.name || '', pageWidth / 2, y + 7, { align: 'center' })
-        y += 16
+        doc.text(form.neighborhood || form.name || '', pageWidth / 2, y + 5, { align: 'center' })
+        y += 12
 
         // Property specs bar
-        const specs = [
-          form.type,
-          form.beds,
-          form.sqft ? form.sqft + ' sq ft' : ''
-        ].filter(Boolean)
-
+        const specs = [form.type, form.beds, form.sqft ? form.sqft + ' sq ft' : ''].filter(Boolean)
         if (specs.length > 0) {
-          const specWidth = contentWidth / specs.length
+          const specWidth = (contentWidth - (specs.length - 1) * 4) / specs.length
           specs.forEach((spec, i) => {
-            const x = margin + (i * specWidth) + (specWidth / 2)
-            doc.setFillColor(...lightGray)
-            doc.roundedRect(margin + (i * specWidth) + 2, y - 4, specWidth - 4, 16, 2, 2, 'F')
-            doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textDark)
-            doc.text(spec, x, y + 5, { align: 'center' })
+            const x = margin + i * (specWidth + 4)
+            doc.setFillColor(...sectionBg)
+            doc.roundedRect(x, y - 3, specWidth, 14, 2, 2, 'F')
+            doc.setFillColor(...green)
+            doc.rect(x, y - 3, specWidth, 1.5, 'F')
+            doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textDark)
+            doc.text(spec, x + specWidth / 2, y + 6, { align: 'center' })
           })
-          y += 22
+          y += 18
         }
 
-        // Description
-        y = addSectionTitle('About This Home', y)
-        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
+        y = pdfSectionHeader(doc, 'About This Home', y)
         y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
 
-        // Features
         if (form.features) {
           y += 8; y = checkPageBreak(y)
-          y = addSectionTitle('Key Features', y)
+          y = pdfSectionHeader(doc, 'Key Features', y)
           const features = form.features.split(',').map((f: string) => f.trim()).filter(Boolean)
           doc.setFontSize(10); doc.setTextColor(...textDark)
           features.forEach((feature: string) => {
@@ -440,12 +365,13 @@ export default function Dashboard() {
           })
         }
 
-        // Agent card
-        y += 10
-        y = pdfAgentBar(doc, brandVoice, y)
+        if (brandVoice?.agentName || brandVoice?.phone) {
+          y += 8; y = checkPageBreak(y, 30)
+          pdfAgentBar(doc, brandVoice, y)
+        }
 
-        pdfFooter(doc)
-        doc.save(`Flyer-${form.neighborhood || form.name || 'listing'}.pdf`)
+        pdfFooter(doc, brandVoice)
+        doc.save(`Flyer-${(form.neighborhood || form.name || 'listing').replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
       }
     } catch(e: any) { alert('PDF error: ' + e.message) }
     setGeneratingPdf(false)

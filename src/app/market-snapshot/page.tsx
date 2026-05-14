@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
 import jsPDF from 'jspdf'
-import { pdfHeader, pdfSections } from '../lib/pdfStyles'
+import { pdfHeader, pdfSections, pdfStatCards, cleanPdfText } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -110,7 +110,25 @@ export default function MarketSnapshotPage() {
     if (!result) return
     const doc = new jsPDF()
     const area = form.neighborhood || form.state || 'Market Snapshot'
-    const y = pdfHeader(doc, 'Market Snapshot', area)
+    let y = pdfHeader(doc, 'Market Snapshot', area)
+
+    // Extract key stats from AI output
+    const combinedText = (result.market_summary || '') + ' ' + (result.price_trends || '')
+    const priceMatch = combinedText.match(/\$[\d,.]+[kKmM]?/)
+    const domMatch = combinedText.match(/\d+[-–]\d+\s*days?/i) || combinedText.match(/\d+\s*days?/i)
+    const condition = /seller['']?s\s+market/i.test(result.buyer_seller_assessment || '')
+      ? "Seller's Market"
+      : /buyer['']?s\s+market/i.test(result.buyer_seller_assessment || '')
+      ? "Buyer's Market"
+      : "Balanced Market"
+
+    y = pdfStatCards(doc, [
+      { label: 'Median Price', value: priceMatch ? priceMatch[0] : '—' },
+      { label: 'Days on Market', value: domMatch ? domMatch[0] : '—' },
+      { label: 'Market Condition', value: condition },
+    ], y)
+    y += 4
+
     pdfSections(doc, [
       { label: 'Market Summary', content: result.market_summary || '' },
       { label: 'Price Trends', content: result.price_trends || '' },
