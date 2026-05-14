@@ -46,7 +46,7 @@ function PrintContent() {
   ]
 
   return (
-    <div style={{ fontFamily: 'Georgia, "Times New Roman", serif', maxWidth: '760px', margin: '0 auto', padding: '24px 20px', color: '#1a1a2e', background: '#fff' }}>
+    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif', maxWidth: '760px', margin: '0 auto', padding: '24px 20px', color: '#1a1a2e', background: '#fff' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '2px solid #1D9E75', paddingBottom: '12px', marginBottom: '24px' }}>
         <div>
           <div style={{ fontSize: '16px', fontWeight: 700 }}>
