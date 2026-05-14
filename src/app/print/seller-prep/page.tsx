@@ -35,7 +35,11 @@ function PrintContent() {
     })
   }, [id])
 
-  useEffect(() => { if (record) setTimeout(() => window.print(), 500) }, [record])
+  useEffect(() => { 
+  if (record) {
+    document.fonts.ready.then(() => setTimeout(() => window.print(), 300))
+  }
+}, [record])
 
   if (loading) return <p style={{ padding: '2rem', textAlign: 'center', color: '#718096' }}>Preparing document…</p>
   if (!record) return <p style={{ padding: '2rem' }}>Record not found.</p>
