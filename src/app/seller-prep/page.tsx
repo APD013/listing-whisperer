@@ -25,6 +25,8 @@ export default function SellerPrepPage() {
   const [showComps, setShowComps] = useState(false)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null)
+  const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     address: '', city: '', state: '', neighborhood: '', type: 'Single family', beds: '', baths: '',
@@ -50,6 +52,8 @@ export default function SellerPrepPage() {
 
   useEffect(() => {
     trackEvent('tool_page_view', { tool: 'seller_prep' })
+    const wsId = new URLSearchParams(window.location.search).get('workspace')
+    if (wsId) setWorkspaceId(wsId)
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -72,6 +76,10 @@ export default function SellerPrepPage() {
         setPlanLoaded(true)
       }
       loadHistory(user.id)
+      if (wsId) {
+        const { data: ws } = await supabase.from('listing_workspaces').select('address').eq('id', wsId).single()
+        if (ws) setWorkspaceAddress(ws.address)
+      }
     }
     getUser()
   }, [])
@@ -97,6 +105,13 @@ export default function SellerPrepPage() {
           outputs: data.outputs
         })
         if (userId) loadHistory(userId)
+        if (workspaceId && data.outputs.meeting_outline) {
+          const { data: ws } = await supabase.from('listing_workspaces').select('assets').eq('id', workspaceId).single()
+          await supabase.from('listing_workspaces').update({
+            assets: { ...(ws?.assets || {}), seller_prep: data.outputs.meeting_outline },
+            updated_at: new Date().toISOString(),
+          }).eq('id', workspaceId)
+        }
       } else {
         alert('Error: ' + JSON.stringify(data))
       }
@@ -162,6 +177,16 @@ export default function SellerPrepPage() {
       <Navbar />
 
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1.5rem', position: 'relative', zIndex: 1 }}>
+
+        {workspaceId && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(29,158,117,0.08)', border: '1px solid rgba(29,158,117,0.2)', borderRadius: '10px', padding: '10px 16px', marginBottom: '1rem' }}>
+            <span>📁</span>
+            <span style={{ fontSize: '13px', fontWeight: '600', color: '#1D9E75' }}>
+              Saving to workspace{workspaceAddress ? `: ${workspaceAddress}` : ''}
+            </span>
+            <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', fontSize: '12px', color: '#1D9E75', textDecoration: 'none', fontWeight: '600' }}>View Workspace →</a>
+          </div>
+        )}
 
         {/* HERO */}
         <div style={{ background: 'linear-gradient(135deg,#8b5cf6,#6366f1)', borderRadius: '20px', padding: '2.5rem 2rem', marginBottom: '1.5rem', boxShadow: '0 0 60px rgba(139,92,246,0.25)', textAlign: 'center' }}>

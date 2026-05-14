@@ -55,6 +55,7 @@ export default function Dashboard() {
   const [nudgeDismissed, setNudgeDismissed] = useState(false)
   const [totalReminders, setTotalReminders] = useState<number | null>(null)
   const [showMoreTools, setShowMoreTools] = useState(false)
+  const [recentWorkspaces, setRecentWorkspaces] = useState<any[]>([])
 
   const [form, setForm] = useState({
     type: 'Single family', beds: '', baths: '', sqft: '', price: '',
@@ -135,6 +136,8 @@ export default function Dashboard() {
       setWorkspaceReminders(wsRemindersData ? wsRemindersData.length : 0)
       const { data: allRemindersData } = await supabase.from('reminders').select('id').eq('user_id', user.id)
       setTotalReminders(allRemindersData ? allRemindersData.length : 0)
+      const { data: wsData } = await supabase.from('listing_workspaces').select('id, address, status, assets, updated_at').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(3)
+      if (wsData) setRecentWorkspaces(wsData)
       if (sessionStorage.getItem('lw_nudge_dismissed')) setNudgeDismissed(true)
       const [{ data: actListings }, { data: actLeads }, { data: actVideoKits }] = await Promise.all([
         supabase.from('listings').select('name, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
@@ -675,6 +678,16 @@ export default function Dashboard() {
 
           <div style={{margin:'0.75rem 1.25rem',borderTop:'1px solid rgba(0,0,0,0.06)'}}/>
 
+          <a href="/workspaces"
+            style={{width:'100%',padding:'9px 1.25rem',display:'flex',alignItems:'center',gap:'9px',background:'transparent',color:'var(--lw-text-muted)',fontSize:'12px',fontWeight:'600',textDecoration:'none',borderLeft:'2px solid transparent',transition:'all 0.15s',marginBottom:'4px'}}
+            onMouseOver={e => {e.currentTarget.style.color='#1D9E75';e.currentTarget.style.borderLeftColor='#1D9E75';e.currentTarget.style.background='rgba(29,158,117,0.06)'}}
+            onMouseOut={e => {e.currentTarget.style.color='var(--lw-text-muted)';e.currentTarget.style.borderLeftColor='transparent';e.currentTarget.style.background='transparent'}}>
+            <span style={{fontSize:'13px'}}>📁</span>
+            My Workspaces
+          </a>
+
+          <div style={{margin:'0 1.25rem 0.5rem',borderTop:'1px solid rgba(0,0,0,0.06)'}}/>
+
           {sidebarSections.map(section => (
             <div key={section.key}>
               <button
@@ -957,6 +970,36 @@ export default function Dashboard() {
                 )}
               </div>
 
+              {/* RECENT WORKSPACES */}
+              <div style={{marginBottom:'2.5rem'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}}>
+                  <p style={{fontSize:'10px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:0}}>RECENT WORKSPACES</p>
+                  <a href="/workspaces" style={{fontSize:'11px',color:'#1D9E75',textDecoration:'none',fontWeight:'600'}}>View all →</a>
+                </div>
+                {recentWorkspaces.length === 0 ? (
+                  <div style={{padding:'12px 16px',background:'var(--lw-card)',borderRadius:'10px',border:'1px solid var(--lw-border)'}}>
+                    <a href="/workspaces" style={{fontSize:'13px',color:'#1D9E75',textDecoration:'none',fontWeight:'600'}}>Create your first listing workspace →</a>
+                  </div>
+                ) : (
+                  <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+                    {recentWorkspaces.map((ws: any) => {
+                      const wsStatusColor: Record<string,string> = { Active:'#1D9E75', Pending:'#f59e0b', Sold:'#6366f1', Cancelled:'#ef4444' }
+                      const sc = wsStatusColor[ws.status] || '#6b7280'
+                      const ac = ws.assets ? Object.values(ws.assets).filter((v: any) => v && String(v).trim()).length : 0
+                      return (
+                        <div key={ws.id} style={{display:'flex',alignItems:'center',gap:'10px',padding:'10px 14px',borderRadius:'10px',background:'var(--lw-card)',border:'1px solid var(--lw-border)'}}>
+                          <span style={{fontSize:'16px',flexShrink:0}}>📁</span>
+                          <span style={{fontSize:'13px',color:'var(--lw-text)',flex:1,fontWeight:'500'}}>{ws.address}</span>
+                          <span style={{fontSize:'10px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',background:`${sc}15`,color:sc,border:`1px solid ${sc}30`,flexShrink:0}}>{ws.status}</span>
+                          <span style={{fontSize:'11px',color:'var(--lw-text-muted)',flexShrink:0}}>{ac}/8</span>
+                          <a href={`/workspace/${ws.id}`} style={{fontSize:'11px',color:'#1D9E75',textDecoration:'none',fontWeight:'600',flexShrink:0}}>Open →</a>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
               {/* RECENT ACTIVITY */}
               <div style={{marginBottom:'2.5rem'}}>
                 <p style={{fontSize:'10px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 12px'}}>RECENT ACTIVITY</p>
@@ -985,6 +1028,7 @@ export default function Dashboard() {
                     { icon:'📋', title:'Seller Prep', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep' },
                     { icon:'👥', title:'Leads & Clients', desc:'Track your pipeline and manage client relationships', color:'#10b981', href:'/leads' },
                     { icon:'📩', title:'Follow-Up Assistant', desc:'Turn showings and meetings into follow-up emails', color:'#6366f1', href:'/follow-up' },
+                    { icon:'📁', title:'Listing Workspaces', desc:'All your listings in one place — copy, photos, follow-ups, and more', color:'#1D9E75', href:'/workspaces' },
                   ].map((item, i) => (
                     <a key={i} href={item.href}
                       style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',borderLeft:`3px solid ${item.color}`,padding:'1.75rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',position:'relative' as const}}
