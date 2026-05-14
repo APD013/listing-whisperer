@@ -27,6 +27,8 @@ export default function FollowUpAssistant() {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
+  const [workspaceAssets, setWorkspaceAssets] = useState<any>({})
+  const [sellerPrepOffer, setSellerPrepOffer] = useState<boolean | null>(null)
   const [form, setForm] = useState({
     contactName: '',
     contactType: 'Seller lead',
@@ -59,8 +61,12 @@ export default function FollowUpAssistant() {
         setUserId(user.id)
         loadHistory(user.id)
         if (wsId) {
-          const { data: ws } = await supabase.from('listing_workspaces').select('address').eq('id', wsId).single()
-          if (ws) setWorkspaceAddress(ws.address)
+          const { data: ws } = await supabase.from('listing_workspaces').select('*').eq('id', wsId).single()
+          if (ws) {
+            setWorkspaceAddress(ws.address)
+            setWorkspaceAssets(ws.assets || {})
+            setForm(prev => ({ ...prev, propertyAddress: ws.address || prev.propertyAddress }))
+          }
         }
       }
     }
@@ -174,6 +180,21 @@ export default function FollowUpAssistant() {
               Saving to workspace{workspaceAddress ? `: ${workspaceAddress}` : ''}
             </span>
             <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', fontSize: '12px', color: '#1D9E75', textDecoration: 'none', fontWeight: '600' }}>View Workspace →</a>
+          </div>
+        )}
+        {workspaceId && workspaceAssets?.seller_prep && sellerPrepOffer === null && (
+          <div style={{ background: 'rgba(29,158,117,0.08)', border: '1px solid rgba(29,158,117,0.2)', borderRadius: '10px', padding: '12px 16px', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+            <span style={{ fontSize: '13px', color: 'var(--lw-text)' }}>💬 Reference your seller prep notes in the key points?</span>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button onClick={() => { setForm(prev => ({ ...prev, keyPoints: `From seller prep: ${String(workspaceAssets.seller_prep).slice(0, 400)}` })); setSellerPrepOffer(true) }} style={{ padding: '6px 16px', background: '#1D9E75', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}>Yes</button>
+              <button onClick={() => setSellerPrepOffer(false)} style={{ padding: '6px 14px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}>No</button>
+            </div>
+          </div>
+        )}
+        {workspaceId && workspaceAssets?.follow_up && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '10px 16px', marginBottom: '1rem' }}>
+            <span>📋</span>
+            <span style={{ fontSize: '13px', fontWeight: '600', color: '#f59e0b' }}>This workspace already has Follow-Up content. Generate again to update it.</span>
           </div>
         )}
 

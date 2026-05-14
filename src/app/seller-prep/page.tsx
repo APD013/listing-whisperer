@@ -30,6 +30,7 @@ export default function SellerPrepPage() {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
+  const [workspaceAssets, setWorkspaceAssets] = useState<any>({})
 
   const [form, setForm] = useState({
     address: '', city: '', state: '', neighborhood: '', type: 'Single family', beds: '', baths: '',
@@ -80,8 +81,21 @@ export default function SellerPrepPage() {
       }
       loadHistory(user.id)
       if (wsId) {
-        const { data: ws } = await supabase.from('listing_workspaces').select('address').eq('id', wsId).single()
-        if (ws) setWorkspaceAddress(ws.address)
+        const { data: ws } = await supabase.from('listing_workspaces').select('*').eq('id', wsId).single()
+        if (ws) {
+          setWorkspaceAddress(ws.address)
+          setWorkspaceAssets(ws.assets || {})
+          setForm(prev => ({
+            ...prev,
+            address: ws.address || prev.address,
+            city: ws.city || prev.city,
+            state: ws.state || prev.state,
+            beds: ws.beds ? String(ws.beds) : prev.beds,
+            baths: ws.baths ? String(ws.baths) : prev.baths,
+            sqft: ws.sqft ? String(ws.sqft) : prev.sqft,
+            estimatedPrice: ws.price || prev.estimatedPrice,
+          }))
+        }
       }
     }
     getUser()
@@ -187,6 +201,12 @@ export default function SellerPrepPage() {
               Saving to workspace{workspaceAddress ? `: ${workspaceAddress}` : ''}
             </span>
             <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', fontSize: '12px', color: '#1D9E75', textDecoration: 'none', fontWeight: '600' }}>View Workspace →</a>
+          </div>
+        )}
+        {workspaceId && workspaceAssets?.seller_prep && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px', padding: '10px 16px', marginBottom: '1rem' }}>
+            <span>📋</span>
+            <span style={{ fontSize: '13px', fontWeight: '600', color: '#f59e0b' }}>This workspace already has Seller Prep notes. Generate again to update it.</span>
           </div>
         )}
 

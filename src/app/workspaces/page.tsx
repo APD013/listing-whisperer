@@ -20,10 +20,27 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 const TOTAL_ASSETS = 8
+const ASSET_KEYS = [
+  { key: 'mls_description', label: 'MLS Description' },
+  { key: 'social_posts', label: 'Social Posts' },
+  { key: 'launch_kit', label: 'Launch Kit' },
+  { key: 'seller_prep', label: 'Seller Prep' },
+  { key: 'open_house_kit', label: 'Open House Kit' },
+  { key: 'virtual_staging', label: 'Virtual Staging' },
+  { key: 'follow_up', label: 'Follow-Up' },
+  { key: 'price_drop_kit', label: 'Price Drop Kit' },
+]
+const FILTER_TABS = ['All', 'Active', 'Pending', 'Sold']
 
 function assetCount(assets: any) {
   if (!assets || typeof assets !== 'object') return 0
   return Object.values(assets).filter(v => v && String(v).trim().length > 0).length
+}
+
+function nextMissingAsset(assets: any): string | null {
+  if (!assets) return ASSET_KEYS[0].label
+  const missing = ASSET_KEYS.find(a => !assets[a.key] || !String(assets[a.key]).trim())
+  return missing ? missing.label : null
 }
 
 export default function WorkspacesPage() {
@@ -33,6 +50,7 @@ export default function WorkspacesPage() {
   const [loaded, setLoaded] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [activeFilter, setActiveFilter] = useState('All')
   const [form, setForm] = useState({
     address: '', city: '', state: '', propertyType: 'Single family',
     beds: '', baths: '', sqft: '', price: '', status: 'Active',
@@ -119,6 +137,33 @@ export default function WorkspacesPage() {
           </button>
         </div>
 
+        {/* Filter Tabs */}
+        {loaded && workspaces.length > 0 && (
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+            {FILTER_TABS.map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveFilter(tab)}
+                style={{
+                  padding: '7px 16px', borderRadius: '20px', border: '1px solid',
+                  borderColor: activeFilter === tab ? '#1D9E75' : 'var(--lw-border)',
+                  background: activeFilter === tab ? 'rgba(29,158,117,0.1)' : 'var(--lw-input)',
+                  color: activeFilter === tab ? '#1D9E75' : 'var(--lw-text-muted)',
+                  fontSize: '12px', fontWeight: activeFilter === tab ? '700' : '500',
+                  cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif',
+                }}
+              >
+                {tab}
+                {tab !== 'All' && (
+                  <span style={{ marginLeft: '5px', fontSize: '10px', opacity: 0.7 }}>
+                    {workspaces.filter(w => w.status === tab).length}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Workspace list */}
         {!loaded ? null : workspaces.length === 0 ? (
           <div style={{ ...styles.card, textAlign: 'center', padding: '3rem 2rem' }}>
@@ -132,46 +177,67 @@ export default function WorkspacesPage() {
               + New Workspace
             </button>
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {workspaces.map(ws => {
-              const count = assetCount(ws.assets)
-              const statusColor = STATUS_COLORS[ws.status] || '#6b7280'
-              return (
-                <div key={ws.id} style={{ ...styles.card, display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                  <div style={{ flex: 1, minWidth: '200px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--lw-text)' }}>{ws.address}</span>
-                      <span style={{ fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', background: `${statusColor}15`, color: statusColor, border: `1px solid ${statusColor}30` }}>{ws.status}</span>
+        ) : (() => {
+          const filtered = activeFilter === 'All' ? workspaces : workspaces.filter(w => w.status === activeFilter)
+          if (filtered.length === 0) return (
+            <div style={{ ...styles.card, textAlign: 'center', padding: '2rem', color: 'var(--lw-text-muted)', fontSize: '13px' }}>
+              No {activeFilter} workspaces.
+            </div>
+          )
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {filtered.map(ws => {
+                const count = assetCount(ws.assets)
+                const statusColor = STATUS_COLORS[ws.status] || '#6b7280'
+                const nextMissing = nextMissingAsset(ws.assets)
+                const pct = Math.round((count / TOTAL_ASSETS) * 100)
+                return (
+                  <div key={ws.id} style={{ ...styles.card, borderLeft: `3px solid ${statusColor}` }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                      <div style={{ flex: 1, minWidth: '200px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--lw-text)' }}>{ws.address}</span>
+                          <span style={{ fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '20px', background: `${statusColor}15`, color: statusColor, border: `1px solid ${statusColor}30` }}>{ws.status}</span>
+                        </div>
+                        <p style={{ margin: '0 0 8px', fontSize: '12px', color: 'var(--lw-text-muted)' }}>
+                          {[ws.city, ws.state, ws.property_type].filter(Boolean).join(' · ')}
+                          {ws.price && ` · ${ws.price}`}
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <div style={{ flex: 1, height: '5px', background: 'var(--lw-border)', borderRadius: '3px', overflow: 'hidden', maxWidth: '200px' }}>
+                            <div style={{ height: '100%', width: `${pct}%`, background: count === TOTAL_ASSETS ? 'linear-gradient(90deg,#d4af37,#b8962e)' : 'linear-gradient(90deg,#1D9E75,#085041)', borderRadius: '3px' }} />
+                          </div>
+                          <span style={{ fontSize: '11px', fontWeight: '600', color: count > 0 ? (count === TOTAL_ASSETS ? '#d4af37' : '#1D9E75') : 'var(--lw-text-muted)', flexShrink: 0 }}>
+                            {count === TOTAL_ASSETS ? '🎉 Complete' : `${count}/${TOTAL_ASSETS} assets`}
+                          </span>
+                        </div>
+                        {nextMissing && count < TOTAL_ASSETS && (
+                          <p style={{ margin: 0, fontSize: '11px', color: 'var(--lw-text-muted)' }}>
+                            Next: <span style={{ color: '#f59e0b', fontWeight: '600' }}>{nextMissing}</span>
+                          </p>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', flexShrink: 0, alignItems: 'center' }}>
+                        <a
+                          href={`/workspace/${ws.id}`}
+                          style={{ padding: '8px 18px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', fontWeight: '600' }}
+                        >
+                          Open →
+                        </a>
+                        <button
+                          onClick={() => handleDelete(ws.id)}
+                          style={{ padding: '8px 14px', background: 'var(--lw-input)', color: '#6b7280', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '12px', cursor: 'pointer' }}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                    <p style={{ margin: '0 0 4px', fontSize: '12px', color: 'var(--lw-text-muted)' }}>
-                      {[ws.city, ws.state, ws.property_type].filter(Boolean).join(' · ')}
-                      {(ws.beds || ws.baths) && ` · ${ws.beds || ''}${ws.beds && ws.baths ? '/' : ''}${ws.baths || ''}`}
-                    </p>
-                    <p style={{ margin: 0, fontSize: '11px', color: 'var(--lw-text-muted)' }}>
-                      <span style={{ color: count > 0 ? '#1D9E75' : 'var(--lw-text-muted)', fontWeight: count > 0 ? '600' : '400' }}>{count}/{TOTAL_ASSETS} assets</span>
-                      {' · '}Updated {new Date(ws.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </p>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                    <a
-                      href={`/workspace/${ws.id}`}
-                      style={{ padding: '8px 18px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', fontWeight: '600' }}
-                    >
-                      Open Workspace →
-                    </a>
-                    <button
-                      onClick={() => handleDelete(ws.id)}
-                      style={{ padding: '8px 14px', background: 'var(--lw-input)', color: '#6b7280', border: '1px solid var(--lw-border)', borderRadius: '8px', fontSize: '12px', cursor: 'pointer' }}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
+                )
+              })}
+            </div>
+          )
+        })()}
       </div>
 
       {/* CREATE MODAL */}

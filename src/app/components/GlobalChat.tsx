@@ -82,6 +82,7 @@ export default function GlobalChat() {
   const [isListening, setIsListening] = useState(false)
   const [voiceEnabled] = useState(false)
   const [avatarState, setAvatarState] = useState<'idle'|'listening'|'thinking'|'completed'>('idle')
+  const [activeWorkspace, setActiveWorkspace] = useState<any>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
   const prevShowChatRef = useRef(false)
@@ -119,6 +120,10 @@ export default function GlobalChat() {
       }
     }
     getUser()
+    try {
+      const ws = sessionStorage.getItem('lw_active_workspace')
+      if (ws) setActiveWorkspace(JSON.parse(ws))
+    } catch(e) {}
     const handleChatPrompt = (e: any) => {
       setShowChat(true)
       setInput(e.detail)
@@ -159,9 +164,22 @@ export default function GlobalChat() {
   useEffect(() => {
     if (showChat && !prevShowChatRef.current) {
       setAvatarState('idle')
+      try {
+        const ws = sessionStorage.getItem('lw_active_workspace')
+        if (ws) setActiveWorkspace(JSON.parse(ws))
+      } catch(e) {}
       setMessages(current => {
         if (current.length === 0) {
-          return [{ role: 'assistant', content: getPageGreeting(pathname), time: nowTime() }]
+          let greeting = getPageGreeting(pathname)
+          try {
+            const ws = sessionStorage.getItem('lw_active_workspace')
+            if (ws) {
+              const parsed = JSON.parse(ws)
+              const assetCount = Object.values(parsed.assets || {}).filter((v: any) => v && String(v).trim().length > 0).length
+              greeting = `Working on **${parsed.address}** (${assetCount}/8 assets done). ${greeting}`
+            }
+          } catch(e) {}
+          return [{ role: 'assistant', content: greeting, time: nowTime() }]
         }
         return current
       })
@@ -281,6 +299,16 @@ export default function GlobalChat() {
     setAvatarState('thinking')
 
     try {
+      let workspaceContext = ''
+      try {
+        const ws = sessionStorage.getItem('lw_active_workspace')
+        if (ws) {
+          const parsed = JSON.parse(ws)
+          const assetCount = Object.values(parsed.assets || {}).filter((v: any) => v && String(v).trim().length > 0).length
+          const completedAssets = Object.keys(parsed.assets || {}).filter(k => parsed.assets[k] && String(parsed.assets[k]).trim().length > 0)
+          workspaceContext = `Active workspace: ${parsed.address}${parsed.city ? ', ' + parsed.city : ''}${parsed.state ? ' ' + parsed.state : ''}. Assets complete (${assetCount}/8): ${completedAssets.join(', ') || 'none'}. Beds: ${parsed.beds || '?'}, Baths: ${parsed.baths || '?'}, Sqft: ${parsed.sqft || '?'}, Price: ${parsed.price || '?'}.`
+        }
+      } catch(e) {}
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -288,7 +316,8 @@ export default function GlobalChat() {
           messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
           currentPage: pathname,
           userId,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          workspaceContext,
         })
       })
       const data = await res.json()
@@ -507,7 +536,13 @@ export default function GlobalChat() {
               }} />
               <div>
                 <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--lw-text)', margin: '0', lineHeight: '1.3' }}>Listing Assistant</p>
-                <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '0' }}>Powered by AI · Real estate expert</p>
+                {activeWorkspace ? (
+                  <a href={`/workspace/${activeWorkspace.id}`} style={{ fontSize: '11px', color: '#1D9E75', margin: '0', textDecoration: 'none', fontWeight: '600', display: 'block' }}>
+                    📁 {activeWorkspace.address?.slice(0, 28)}{activeWorkspace.address?.length > 28 ? '…' : ''} · {Object.values(activeWorkspace.assets || {}).filter((v: any) => v && String(v).trim().length > 0).length}/8 assets
+                  </a>
+                ) : (
+                  <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '0' }}>Powered by AI · Real estate expert</p>
+                )}
               </div>
             </div>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>

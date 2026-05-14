@@ -58,7 +58,7 @@ const PAGES: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
-    const { messages, currentPage, userId, timezone } = await request.json()
+    const { messages, currentPage, userId, timezone, workspaceContext } = await request.json()
     const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || ''
 
     // INTENT DETECTION — Navigate
@@ -274,7 +274,8 @@ IMPORTANT RULES:
 - Treat casual or shorthand messages as real requests — "got fsbo wat do i say" means they want an FSBO script
 - Always end responses with one actionable next step or offer to customize further
 
-${currentPage ? `Agent is currently on: ${currentPage}. Give contextually relevant help.` : ''}`
+${currentPage ? `Agent is currently on: ${currentPage}. Give contextually relevant help.` : ''}
+${workspaceContext ? `\nActive listing workspace context: ${workspaceContext}` : ''}`
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',

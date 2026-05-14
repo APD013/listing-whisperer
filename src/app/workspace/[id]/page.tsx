@@ -2,6 +2,8 @@
 import { useState, useEffect, use } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import jsPDF from 'jspdf'
+import { pdfHeader, pdfSections } from '../../lib/pdfStyles'
 import Navbar from '../../components/Navbar'
 
 const supabase = createClient(
@@ -73,6 +75,18 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
       status: data.status || 'Active',
     })
     setLoaded(true)
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('lw_active_workspace', JSON.stringify({
+        id: data.id,
+        address: data.address,
+        assets: data.assets,
+        property_type: data.property_type,
+        beds: data.beds,
+        baths: data.baths,
+        sqft: data.sqft,
+        price: data.price,
+      }))
+    }
   }
 
   useEffect(() => {
@@ -115,6 +129,30 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
   const completedCount = workspace
     ? Object.values(workspace.assets || {}).filter((v: any) => v && String(v).trim().length > 0).length
     : 0
+
+  const getNextActions = (assets: any) => {
+    const actions: { label: string; desc: string; href: string; icon: string; priority: 'high' | 'medium' | 'low' }[] = []
+    if (!assets?.mls_description) actions.push({ label: 'Create MLS Description', desc: 'Generate listing copy for MLS and marketing', href: `/quick-listing?workspace=${id}`, icon: '🏠', priority: 'high' })
+    if (assets?.mls_description && !assets?.launch_kit) actions.push({ label: 'Build 7-Day Launch Kit', desc: 'Create a day-by-day marketing plan for launch', href: `/launch-kit?workspace=${id}`, icon: '🚀', priority: 'high' })
+    if (assets?.mls_description && !assets?.social_posts) actions.push({ label: 'Create Social Posts', desc: 'Generate a full week of social content', href: `/social-planner?workspace=${id}`, icon: '📱', priority: 'medium' })
+    if (!assets?.seller_prep) actions.push({ label: 'Prep Seller Meeting', desc: 'Talking points and objection responses', href: `/seller-prep?workspace=${id}`, icon: '📋', priority: 'medium' })
+    if (!assets?.virtual_staging) actions.push({ label: 'Stage Photos with AI', desc: 'Virtually stage empty rooms', href: `/virtual-staging?workspace=${id}`, icon: '🛋️', priority: 'low' })
+    if (!assets?.open_house_kit) actions.push({ label: 'Create Open House Kit', desc: 'Flyer, posts, and follow-up emails', href: `/open-house?workspace=${id}`, icon: '🏡', priority: 'low' })
+    return actions.slice(0, 3)
+  }
+
+  const downloadFullPackage = () => {
+    if (!workspace) return
+    const doc = new jsPDF()
+    const addr = workspace.address || 'Listing Package'
+    const y = pdfHeader(doc, 'Full Listing Package', addr)
+    const assets = workspace.assets || {}
+    const sections = ASSET_DEFINITIONS
+      .filter(a => assets[a.key])
+      .map(a => ({ label: a.label, content: String(assets[a.key]) }))
+    if (sections.length > 0) pdfSections(doc, sections, y, null)
+    doc.save(`ListingPackage-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
+  }
 
   if (!loaded) {
     return (
@@ -178,6 +216,24 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
           </div>
         </div>
 
+        {/* COMPLETION CELEBRATION */}
+        {completedCount === 8 && (
+          <div style={{ ...styles.card, background: 'linear-gradient(135deg,rgba(212,175,55,0.12),rgba(212,175,55,0.04))', border: '1px solid rgba(212,175,55,0.35)', borderLeft: '4px solid #d4af37' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <p style={{ margin: '0 0 4px', fontSize: '16px', fontWeight: '800', color: '#d4af37' }}>🎉 This listing workspace is complete!</p>
+                <p style={{ margin: 0, fontSize: '13px', color: 'var(--lw-text-muted)' }}>All 8 assets are ready. Download the full package to share with your seller.</p>
+              </div>
+              <button
+                onClick={downloadFullPackage}
+                style={{ padding: '10px 20px', background: 'linear-gradient(135deg,#d4af37,#b8962e)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' as const }}
+              >
+                ⬇ Download Full Listing Package
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* ASSETS */}
         <div style={styles.card}>
           <p style={styles.sectionHead}>Assets</p>
@@ -240,6 +296,45 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
             })}
           </div>
         </div>
+
+        {/* RECOMMENDED NEXT ACTIONS */}
+        {completedCount < 8 && (() => {
+          const actions = getNextActions(workspace.assets || {})
+          if (actions.length === 0) return null
+          const priorityStyle = (p: string) => ({
+            high: { color: '#1D9E75', bg: 'rgba(29,158,117,0.1)', border: 'rgba(29,158,117,0.2)' },
+            medium: { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)' },
+            low: { color: 'var(--lw-text-muted)', bg: 'var(--lw-input)', border: 'var(--lw-border)' },
+          }[p] || { color: 'var(--lw-text-muted)', bg: 'var(--lw-input)', border: 'var(--lw-border)' })
+          return (
+            <div style={styles.card}>
+              <p style={styles.sectionHead}>Recommended Next Actions</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {actions.map((action, i) => {
+                  const ps = priorityStyle(action.priority)
+                  return (
+                    <a
+                      key={i}
+                      href={action.href}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', textDecoration: 'none', gap: '12px' }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+                        <span style={{ fontSize: '18px', flexShrink: 0 }}>{action.icon}</span>
+                        <div>
+                          <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: '700', color: 'var(--lw-text)' }}>{action.label}</p>
+                          <p style={{ margin: 0, fontSize: '11px', color: 'var(--lw-text-muted)' }}>{action.desc}</p>
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '10px', fontWeight: '700', padding: '3px 9px', borderRadius: '20px', background: ps.bg, color: ps.color, border: `1px solid ${ps.border}`, flexShrink: 0, textTransform: 'uppercase' as const, letterSpacing: '0.4px' }}>
+                        {action.priority}
+                      </span>
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* NOTES */}
         <div style={styles.card}>

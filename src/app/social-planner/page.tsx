@@ -24,6 +24,8 @@ export default function SocialPlannerPage() {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
+  const [workspaceAssets, setWorkspaceAssets] = useState<any>({})
+  const [mlsOfferAccepted, setMlsOfferAccepted] = useState<boolean | null>(null)
   const [form, setForm] = useState({
     address: '',
     neighborhood: '',
@@ -48,8 +50,18 @@ export default function SocialPlannerPage() {
       if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
       else { setPlanLoaded(true) }
       if (wsId) {
-        const { data: ws } = await supabase.from('listing_workspaces').select('address').eq('id', wsId).single()
-        if (ws) setWorkspaceAddress(ws.address)
+        const { data: ws } = await supabase.from('listing_workspaces').select('*').eq('id', wsId).single()
+        if (ws) {
+          setWorkspaceAddress(ws.address)
+          setWorkspaceAssets(ws.assets || {})
+          setForm(prev => ({
+            ...prev,
+            address: ws.address || prev.address,
+            neighborhood: ws.address || prev.neighborhood,
+            price: ws.price || prev.price,
+            beds: ws.beds ? String(ws.beds) : prev.beds,
+          }))
+        }
       }
     }
     getUser()
@@ -114,6 +126,21 @@ export default function SocialPlannerPage() {
           <span style={{ fontSize: '16px' }}>📁</span>
           <span>Working in workspace: <strong>{workspaceAddress || workspaceId}</strong> — social posts will be saved automatically.</span>
           <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', color: '#1D9E75', fontWeight: '600', textDecoration: 'none', fontSize: '12px' }}>View Workspace →</a>
+        </div>
+      )}
+      {workspaceId && workspaceAssets?.mls_description && mlsOfferAccepted === null && (
+        <div style={{ background: 'rgba(29,158,117,0.08)', borderBottom: '1px solid rgba(29,158,117,0.2)', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', fontSize: '13px', color: 'var(--lw-text)' }}>
+          <span>💬 Use your saved MLS description as the base for this social calendar?</span>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button onClick={() => { setForm(prev => ({ ...prev, features: String(workspaceAssets.mls_description).slice(0, 600) })); setMlsOfferAccepted(true) }} style={{ padding: '6px 16px', background: '#1D9E75', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}>Yes</button>
+            <button onClick={() => setMlsOfferAccepted(false)} style={{ padding: '6px 14px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', border: '1px solid var(--lw-border)', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}>No</button>
+          </div>
+        </div>
+      )}
+      {workspaceId && workspaceAssets?.social_posts && (
+        <div style={{ background: 'rgba(245,158,11,0.08)', borderBottom: '1px solid rgba(245,158,11,0.2)', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+          <span>📋</span>
+          <span style={{ fontWeight: '600', color: '#f59e0b' }}>This workspace already has Social Posts. Generate again to update it.</span>
         </div>
       )}
 

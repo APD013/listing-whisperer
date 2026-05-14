@@ -19,6 +19,7 @@ export default function PriceDropKit() {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
+  const [workspaceAssets, setWorkspaceAssets] = useState<any>({})
   const [form, setForm] = useState({
     address: '',
     city: '',
@@ -45,8 +46,18 @@ export default function PriceDropKit() {
       if (user) {
         setUserId(user.id)
         if (wsId) {
-          const { data: ws } = await supabase.from('listing_workspaces').select('address').eq('id', wsId).single()
-          if (ws) setWorkspaceAddress(ws.address)
+          const { data: ws } = await supabase.from('listing_workspaces').select('*').eq('id', wsId).single()
+          if (ws) {
+            setWorkspaceAddress(ws.address)
+            setWorkspaceAssets(ws.assets || {})
+            setForm(prev => ({
+              ...prev,
+              address: ws.address || prev.address,
+              city: ws.city || prev.city,
+              state: ws.state || prev.state,
+              originalPrice: ws.price || prev.originalPrice,
+            }))
+          }
         }
       }
     }
@@ -107,6 +118,12 @@ export default function PriceDropKit() {
           <span style={{ fontSize: '16px' }}>📁</span>
           <span>Working in workspace: <strong>{workspaceAddress || workspaceId}</strong> — price drop kit will be saved automatically.</span>
           <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', color: '#1D9E75', fontWeight: '600', textDecoration: 'none', fontSize: '12px' }}>View Workspace →</a>
+        </div>
+      )}
+      {workspaceId && workspaceAssets?.price_drop_kit && (
+        <div style={{ background: 'rgba(245,158,11,0.08)', borderBottom: '1px solid rgba(245,158,11,0.2)', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+          <span>📋</span>
+          <span style={{ fontWeight: '600', color: '#f59e0b' }}>This workspace already has a Price Drop Kit. Generate again to update it.</span>
         </div>
       )}
 

@@ -68,6 +68,7 @@ export default function VirtualStagingPage() {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
+  const [workspaceAssets, setWorkspaceAssets] = useState<any>({})
 
   const loadHistory = async (uid: string) => {
     const { data } = await supabase
@@ -105,8 +106,11 @@ export default function VirtualStagingPage() {
       const wsId = params.get('workspace')
       if (wsId) {
         setWorkspaceId(wsId)
-        supabase.from('listing_workspaces').select('address').eq('id', wsId).single().then(({ data: ws }) => {
-          if (ws) setWorkspaceAddress(ws.address)
+        supabase.from('listing_workspaces').select('*').eq('id', wsId).single().then(({ data: ws }) => {
+          if (ws) {
+            setWorkspaceAddress(ws.address)
+            setWorkspaceAssets(ws.assets || {})
+          }
         })
       }
     }
@@ -239,6 +243,12 @@ export default function VirtualStagingPage() {
           <span style={{ fontSize: '16px' }}>📁</span>
           <span>Working in workspace: <strong>{workspaceAddress || workspaceId}</strong> — staging results will be saved automatically.</span>
           <a href={`/workspace/${workspaceId}`} style={{ marginLeft: 'auto', color: '#1D9E75', fontWeight: '600', textDecoration: 'none', fontSize: '12px' }}>View Workspace →</a>
+        </div>
+      )}
+      {workspaceId && workspaceAssets?.virtual_staging && (
+        <div style={{ background: 'rgba(245,158,11,0.08)', borderBottom: '1px solid rgba(245,158,11,0.2)', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+          <span>📋</span>
+          <span style={{ fontWeight: '600', color: '#f59e0b' }}>This workspace already has Virtual Staging results. Generate again to update.</span>
         </div>
       )}
 

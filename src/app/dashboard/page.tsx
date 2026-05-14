@@ -977,8 +977,10 @@ export default function Dashboard() {
                   <a href="/workspaces" style={{fontSize:'11px',color:'#1D9E75',textDecoration:'none',fontWeight:'600'}}>View all →</a>
                 </div>
                 {recentWorkspaces.length === 0 ? (
-                  <div style={{padding:'12px 16px',background:'var(--lw-card)',borderRadius:'10px',border:'1px solid var(--lw-border)'}}>
-                    <a href="/workspaces" style={{fontSize:'13px',color:'#1D9E75',textDecoration:'none',fontWeight:'600'}}>Create your first listing workspace →</a>
+                  <div style={{padding:'16px',background:'linear-gradient(135deg,rgba(29,158,117,0.05),rgba(29,158,117,0.02))',borderRadius:'12px',border:'1px solid rgba(29,158,117,0.15)'}}>
+                    <p style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 5px'}}>Start your first Listing Workspace</p>
+                    <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0 0 12px',lineHeight:'1.5'}}>Keep all your listing assets — MLS copy, social posts, launch kit, and more — in one place.</p>
+                    <a href="/workspaces" style={{display:'inline-block',padding:'8px 18px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'8px',fontSize:'12px',fontWeight:'700',textDecoration:'none'}}>Create Workspace →</a>
                   </div>
                 ) : (
                   <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
