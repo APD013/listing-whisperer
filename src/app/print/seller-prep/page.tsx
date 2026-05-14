@@ -21,7 +21,7 @@ function clean(text: string): string {
 const hStyle: React.CSSProperties = { background: '#f8fafb', borderLeft: '3px solid #1D9E75', padding: '6px 12px', marginBottom: '8px', borderRadius: '0 4px 4px 0' }
 const hLabel: React.CSSProperties = { fontSize: '9px', fontWeight: 700, color: '#1D9E75', textTransform: 'uppercase', letterSpacing: '0.6px' }
 const body: React.CSSProperties = { fontSize: '11px', lineHeight: 1.65, color: '#1a1a2e', whiteSpace: 'pre-wrap', padding: '0 4px', hyphens: 'none', overflowWrap: 'normal', wordBreak: 'normal' }
-const sectionWrap: React.CSSProperties = { marginBottom: '18px', pageBreakInside: 'avoid' }
+const sectionWrap: React.CSSProperties = { marginBottom: '18px' }
 
 function PrintContent() {
   const id = useSearchParams().get('id')
