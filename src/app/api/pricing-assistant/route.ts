@@ -15,6 +15,7 @@ export async function POST(request: Request) {
     const prompt = `You are an expert real estate pricing strategist helping a licensed real estate agent prepare for a seller listing appointment.
 
 Property Details:
+- Address: ${form.address || 'Not specified'}
 - Type: ${form.propertyType}
 - Beds: ${form.beds} | Baths: ${form.baths}
 - Square Footage: ${form.sqft}

@@ -20,6 +20,7 @@ export default function PricingAssistant() {
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
   const [form, setForm] = useState({
+    address: '',
     propertyType: 'Single family',
     beds: '',
     baths: '',
@@ -87,7 +88,7 @@ export default function PricingAssistant() {
         setResult(data.result)
         await supabase.from('pricing_reports_history').insert({
           user_id: userId,
-          address: form.neighborhood || form.city || 'Untitled',
+          address: form.address || form.neighborhood || form.city || 'Untitled',
           form_data: form,
           outputs: data.result
         })
@@ -102,7 +103,7 @@ export default function PricingAssistant() {
   const downloadPDF = () => {
     if (!result) return
     const doc = new jsPDF()
-    const addr = form.neighborhood || form.city || 'Untitled'
+    const addr = form.address || form.neighborhood || form.city || 'Untitled'
     let y = pdfHeader(doc, 'Pricing Strategy Report', addr)
     const priceSection = result.priceRange
       ? `Suggested List Price: ${result.priceRange}\n${result.confidence || ''}`
@@ -180,6 +181,11 @@ export default function PricingAssistant() {
         <AskAiHint hint="Not sure how to price it? Ask AI for a pricing strategy →" />
         <div id="pricing-form" style={{ ...styles.card, marginBottom: '1.5rem', border: '1px solid rgba(212,175,55,0.18)', boxShadow: '0 4px 32px rgba(212,175,55,0.08)' }}>
           <p style={{ fontSize: '11px', fontWeight: '700', color: '#d4af37', letterSpacing: '1px', margin: '0 0 16px', paddingBottom: '12px', borderBottom: '1px solid var(--lw-border)' }}>PROPERTY DETAILS</p>
+
+          <div style={{ marginBottom: '12px' }}>
+            <label style={styles.label}>Property Address</label>
+            <input placeholder="123 Main St, Newport Beach, CA" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} style={styles.input} />
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '16px' }}>
             <div>
