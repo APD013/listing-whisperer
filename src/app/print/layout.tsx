@@ -2,6 +2,7 @@ export default function PrintLayout({ children }: { children: React.ReactNode })
   return (
     <>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         html, body {
           background: #f8fafb !important;
           color: #1a1a2e !important;
@@ -21,6 +22,9 @@ export default function PrintLayout({ children }: { children: React.ReactNode })
         button[style*="position: fixed"],
         div[style*="position: fixed; bottom"] {
           display: none !important;
+        }
+        html, body, * {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
         }
         @media print {
           html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
