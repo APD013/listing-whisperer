@@ -14,11 +14,17 @@ export default function PrintLayout({ children }: { children: React.ReactNode })
           --lw-text-muted: #718096 !important;
           --lw-input: #f0f4f8 !important;
         }
-        [data-global-chat], [id*="global-chat"], [id*="globalchat"] {
+        [data-global-chat],
+        [id*="global-chat"],
+        [id*="globalchat"],
+        [class*="GlobalChat"],
+        button[style*="position: fixed"],
+        div[style*="position: fixed; bottom"] {
           display: none !important;
         }
         @media print {
-          html, body { background: white !important; }
+          html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+          [style*="position: fixed"], [style*="position:fixed"] { display: none !important; }
           .no-print { display: none !important; }
           @page { margin: 12mm; size: letter portrait; }
         }

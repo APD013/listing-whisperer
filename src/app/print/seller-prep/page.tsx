@@ -9,7 +9,13 @@ const supabase = createClient(
 )
 
 function clean(text: string): string {
-  return text.replace(/\[([^\]]+)\]/g, '').replace(/---+/g, '').replace(/\*\*/g, '').replace(/\n{3,}/g, '\n\n').trim()
+  return text
+    .replace(/\[([^\]]+)\]/g, '')
+    .replace(/---+/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/^Paragraph \d+:\s*/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
 const hStyle: React.CSSProperties = { background: '#f8fafb', borderLeft: '3px solid #1D9E75', padding: '6px 12px', marginBottom: '8px', borderRadius: '0 4px 4px 0' }
