@@ -1,8 +1,10 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
-
+import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
+import jsPDF from 'jspdf'
+import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,10 +12,13 @@ const supabase = createClient(
 )
 
 export default function ListingPresentation() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [history, setHistory] = useState<any[]>([])
+  const [historyLoaded, setHistoryLoaded] = useState(false)
   const [form, setForm] = useState({
     agentName: '', brokerage: '', phone: '', email: '',
     sellerName: '', propertyAddress: '', city: '', state: '', propertyType: 'Single family',
@@ -21,22 +26,33 @@ export default function ListingPresentation() {
     sellerGoals: '', timeframe: '', competition: '', agentExperience: '', uniqueValue: '',
   })
 
+  const loadHistory = async (uid: string) => {
+    const { data } = await supabase
+      .from('listing_presentations')
+      .select('id, address, created_at, outputs')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(10)
+    if (data) setHistory(data)
+    setHistoryLoaded(true)
+  }
+
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUserId(user.id)
-        const { data: profile } = await supabase
-          .from('profiles').select('full_name, brand_voice').eq('id', user.id).single()
-        if (profile?.full_name) setForm(prev => ({ ...prev, agentName: profile.full_name }))
-        if (profile?.brand_voice) {
-          try {
-            const bv = JSON.parse(profile.brand_voice)
-            if (bv.brokerage) setForm(prev => ({ ...prev, brokerage: bv.brokerage }))
-            if (bv.phone) setForm(prev => ({ ...prev, phone: bv.phone }))
-          } catch(e) {}
-        }
+      if (!user) { router.push('/login'); return }
+      setUserId(user.id)
+      const { data: profile } = await supabase
+        .from('profiles').select('full_name, brand_voice').eq('id', user.id).single()
+      if (profile?.full_name) setForm(prev => ({ ...prev, agentName: profile.full_name }))
+      if (profile?.brand_voice) {
+        try {
+          const bv = JSON.parse(profile.brand_voice)
+          if (bv.brokerage) setForm(prev => ({ ...prev, brokerage: bv.brokerage }))
+          if (bv.phone) setForm(prev => ({ ...prev, phone: bv.phone }))
+        } catch(e) {}
       }
+      loadHistory(user.id)
     }
     getUser()
   }, [])
@@ -58,10 +74,37 @@ export default function ListingPresentation() {
         body: JSON.stringify({ form, userId })
       })
       const data = await res.json()
-      if (data.result) setResult(data.result)
-      else alert('Error: ' + (data.error || 'Something went wrong'))
+      if (data.result) {
+        setResult(data.result)
+        await supabase.from('listing_presentations').insert({
+          user_id: userId,
+          address: form.propertyAddress || form.neighborhood || 'Untitled',
+          form_data: form,
+          outputs: data.result
+        })
+        if (userId) loadHistory(userId)
+      } else {
+        alert('Error: ' + (data.error || 'Something went wrong'))
+      }
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
+  }
+
+  const downloadPDF = () => {
+    if (!result) return
+    const doc = new jsPDF()
+    const addr = form.propertyAddress || form.neighborhood || 'Untitled'
+    const y = pdfHeader(doc, 'Listing Presentation Kit', addr)
+    pdfSections(doc, [
+      { label: 'Opening Statement', content: result.openingStatement || '' },
+      { label: 'Marketing Plan', content: result.marketingPlan || '' },
+      { label: 'Why List With Me', content: result.whyListWithMe || '' },
+      { label: 'Pricing Strategy', content: result.pricingStrategy || '' },
+      { label: 'Objection Responses', content: result.objectionHandling || '' },
+      { label: 'Closing Script', content: result.closingScript || '' },
+      { label: 'Follow-Up Plan', content: result.followUpPlan || '' },
+    ], y, { agentName: form.agentName, brokerage: form.brokerage, phone: form.phone })
+    doc.save(`ListingPresentation-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
   }
 
   const inputStyle = {
@@ -289,6 +332,10 @@ export default function ListingPresentation() {
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', paddingTop: '8px' }}>
               <a href="/seller-prep" style={{ padding: '10px 20px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '700' }}>📋 Open Seller Prep</a>
               <a href="/pricing-assistant" style={{ padding: '10px 20px', background: 'rgba(212,175,55,0.1)', color: '#d4af37', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', border: '1px solid rgba(212,175,55,0.3)', fontWeight: '600' }}>💲 Pricing Assistant</a>
+              <button onClick={downloadPDF}
+                style={{ padding: '10px 20px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', borderRadius: '10px', border: '1px solid rgba(29,158,117,0.2)', fontSize: '13px', cursor: 'pointer', fontWeight: '600' }}>
+                📄 Download PDF
+              </button>
               <button onClick={() => { setResult(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                 style={{ padding: '10px 20px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', borderRadius: '10px', border: '1px solid var(--lw-border)', fontSize: '13px', cursor: 'pointer', fontWeight: '600', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
                 ↺ New Presentation
@@ -296,6 +343,47 @@ export default function ListingPresentation() {
             </div>
           </div>
         )}
+
+        {/* PAST PRESENTATIONS */}
+        <div style={{ marginTop: '1.5rem' }}>
+          <p style={sectionHeadStyle}>Past Presentations</p>
+          {!historyLoaded ? null : history.length === 0 ? (
+            <div style={{ ...cardStyle, textAlign: 'center', color: 'var(--lw-text-muted)', fontSize: '13px', padding: '1.5rem' }}>
+              Your past presentations will appear here.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {history.map(item => (
+                <div key={item.id} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <p style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)' }}>{item.address}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'var(--lw-text-muted)' }}>
+                      {new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => { setResult(item.outputs); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                      style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '8px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', cursor: 'pointer', fontWeight: '500' }}
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Delete this presentation?')) return
+                        await supabase.from('listing_presentations').delete().eq('id', item.id)
+                        if (userId) loadHistory(userId)
+                      }}
+                      style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '8px', background: 'var(--lw-input)', color: '#6b7280', border: '1px solid var(--lw-border)', cursor: 'pointer' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
       </div>
     </main>

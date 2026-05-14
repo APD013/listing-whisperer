@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
-
 import Navbar from '../components/Navbar'
+import jsPDF from 'jspdf'
+import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,7 +17,8 @@ export default function PricingAssistant() {
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
-  const [pastReports, setPastReports] = useState<any[]>([])
+  const [history, setHistory] = useState<any[]>([])
+  const [historyLoaded, setHistoryLoaded] = useState(false)
   const [form, setForm] = useState({
     propertyType: 'Single family',
     beds: '',
@@ -31,19 +33,24 @@ export default function PricingAssistant() {
     notes: '',
   })
 
+  const loadHistory = async (uid: string) => {
+    const { data } = await supabase
+      .from('pricing_reports_history')
+      .select('id, address, created_at, outputs')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(10)
+    if (data) setHistory(data)
+    setHistoryLoaded(true)
+  }
+
   useEffect(() => {
     trackEvent('tool_page_view', { tool: 'pricing_assistant' })
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserId(user.id)
-        const { data: reports } = await supabase
-          .from('pricing_reports')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(5)
-        if (reports) setPastReports(reports)
+        loadHistory(user.id)
       }
     }
     getUser()
@@ -76,10 +83,39 @@ export default function PricingAssistant() {
         body: JSON.stringify({ form, userId })
       })
       const data = await res.json()
-      if (data.result) setResult(data.result)
-      else alert('Error: ' + (data.error || 'Something went wrong'))
+      if (data.result) {
+        setResult(data.result)
+        await supabase.from('pricing_reports_history').insert({
+          user_id: userId,
+          address: form.neighborhood || form.city || 'Untitled',
+          form_data: form,
+          outputs: data.result
+        })
+        if (userId) loadHistory(userId)
+      } else {
+        alert('Error: ' + (data.error || 'Something went wrong'))
+      }
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
+  }
+
+  const downloadPDF = () => {
+    if (!result) return
+    const doc = new jsPDF()
+    const addr = form.neighborhood || form.city || 'Untitled'
+    let y = pdfHeader(doc, 'Pricing Strategy Report', addr)
+    const priceSection = result.priceRange
+      ? `Suggested List Price: ${result.priceRange}\n${result.confidence || ''}`
+      : ''
+    pdfSections(doc, [
+      { label: 'Suggested Price Range', content: priceSection },
+      { label: 'Pricing Strategy', content: result.strategy || '' },
+      { label: 'Seller Talking Points', content: result.sellerTalkingPoints || '' },
+      { label: 'Key Pricing Factors', content: result.keyFactors || '' },
+      { label: 'Objection Responses', content: result.objectionResponses || '' },
+      { label: 'Market Positioning', content: result.marketPositioning || '' },
+    ], y)
+    doc.save(`PricingReport-${addr.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
   }
 
   const scrollToForm = () => {
@@ -284,30 +320,45 @@ export default function PricingAssistant() {
         )}
 
         {/* PAST REPORTS */}
-        {pastReports.length > 0 && !result && !loading && (
-          <div style={{ ...styles.card, marginBottom: '1.5rem' }}>
-            <p style={{ fontSize: '11px', fontWeight: '700', color: '#d4af37', letterSpacing: '1px', margin: '0 0 12px' }}>RECENT PRICING REPORTS</p>
+        <div style={{ marginTop: '1.5rem' }}>
+          <p style={sectionHeadStyle}>Past Reports</p>
+          {!historyLoaded ? null : history.length === 0 ? (
+            <div style={{ ...styles.card, textAlign: 'center', color: 'var(--lw-text-muted)', fontSize: '13px', padding: '1.5rem' }}>
+              Your past pricing reports will appear here.
+            </div>
+          ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {pastReports.map(report => (
-                <div key={report.id}
-                  onClick={() => setResult(report.full_report)}
-                  style={{ background: 'var(--lw-input)', borderRadius: '10px', border: '1px solid var(--lw-border)', padding: '0.875rem 1rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s' }}
-                  onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(212,175,55,0.25)'; e.currentTarget.style.background = 'rgba(212,175,55,0.04)' }}
-                  onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--lw-border)'; e.currentTarget.style.background = 'var(--lw-input)' }}>
+              {history.map(item => (
+                <div key={item.id} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <p style={{ margin: '0', fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)' }}>
-                      {report.neighborhood || report.property_type} · {report.price_range}
-                    </p>
-                    <p style={{ margin: '3px 0 0', fontSize: '11px', color: 'var(--lw-text-muted)' }}>
-                      {report.beds}bd / {report.baths}ba · {report.sqft} sqft · {new Date(report.created_at).toLocaleDateString()}
+                    <p style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)' }}>{item.address}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'var(--lw-text-muted)' }}>
+                      {new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#d4af37', fontWeight: '500' }}>View →</span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => { setResult(item.outputs); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                      style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '8px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', cursor: 'pointer', fontWeight: '500' }}
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Delete this report?')) return
+                        await supabase.from('pricing_reports_history').delete().eq('id', item.id)
+                        if (userId) loadHistory(userId)
+                      }}
+                      style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '8px', background: 'var(--lw-input)', color: '#6b7280', border: '1px solid var(--lw-border)', cursor: 'pointer' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* RESULTS */}
         {result && !loading && (
@@ -359,6 +410,10 @@ export default function PricingAssistant() {
               <a href="/seller-prep" style={{ padding: '10px 20px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '600', boxShadow: '0 0 20px rgba(29,158,117,0.3)' }}>
                 📋 Open Seller Prep
               </a>
+              <button onClick={downloadPDF}
+                style={{ padding: '10px 20px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', borderRadius: '10px', border: '1px solid rgba(29,158,117,0.2)', fontSize: '13px', cursor: 'pointer', fontWeight: '600' }}>
+                📄 Download PDF
+              </button>
               <button onClick={() => { setResult(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                 style={{ padding: '10px 20px', background: 'var(--lw-input)', color: 'var(--lw-text-muted)', borderRadius: '10px', border: '1px solid var(--lw-border)', fontSize: '13px', cursor: 'pointer' }}>
                 ↺ Run Again

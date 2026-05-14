@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTheme } from '../lib/theme'
 import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
 import jsPDF from 'jspdf'
+import { PDF_COLORS, pdfAgentBar, pdfSectionHeader, pdfFooter } from '../lib/pdfStyles'
 import OnboardingModal from '../components/OnboardingModal'
 import DashboardChecklist from '../components/DashboardChecklist'
 
@@ -280,12 +281,14 @@ export default function Dashboard() {
 
       const checkPageBreak = (yPos: number, needed: number = 30) => {
         if (yPos > pageHeight - needed) {
+          pdfFooter(doc)
           doc.addPage()
-          // Add header on new page
           doc.setFillColor(...dark)
           doc.rect(0, 0, pageWidth, 14, 'F')
-          doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
-          doc.text('ListingWhisperer', margin, 9)
+          doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
+          doc.text('Listing', margin, 9)
+          doc.setTextColor(...green)
+          doc.text('Whisperer', margin + doc.getTextWidth('Listing') + 1, 9)
           doc.setTextColor(...textLight); doc.setFont('helvetica', 'normal')
           doc.text(form.neighborhood || form.name || '', pageWidth - margin, 9, { align: 'right' })
           return 22
@@ -294,65 +297,50 @@ export default function Dashboard() {
       }
 
       const addSectionTitle = (title: string, yPos: number) => {
-        doc.setFillColor(...lightGray)
-        doc.roundedRect(margin, yPos - 4, contentWidth, 10, 1, 1, 'F')
-        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
-        doc.text(title.toUpperCase(), margin + 4, yPos + 2.5)
-        return yPos + 12
+        return pdfSectionHeader(doc, title, yPos)
       }
 
       if (type === 'mls') {
         // DARK HEADER BANNER
         doc.setFillColor(...dark)
-        doc.rect(0, 0, pageWidth, 36, 'F')
+        doc.rect(0, 0, pageWidth, 40, 'F')
         doc.setFillColor(...green)
-        doc.rect(0, 36, pageWidth, 2, 'F')
+        doc.rect(0, 40, pageWidth, 2, 'F')
 
-        // Brand name
-        doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
-        doc.text('Listing', margin, 18)
+        // Brand name: "Listing" white + "Whisperer" brand green
+        doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
+        doc.text('Listing', margin, 17)
         const listingWidth = doc.getTextWidth('Listing')
-        doc.setTextColor(...white)
-        doc.text('Whisperer', margin + listingWidth, 18)
+        doc.setTextColor(...green)
+        doc.text('Whisperer', margin + listingWidth + 1.5, 17)
 
-        // Price — big and bold
-        doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
-        doc.text(form.price || '', pageWidth - margin, 16, { align: 'right' })
+        // Center: doc type
+        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textLight)
+        doc.text('MLS MARKETING SHEET', pageWidth / 2, 17, { align: 'center' })
 
-        // Address/neighborhood
-        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(...green)
-        doc.text(form.neighborhood || form.name || '', margin, 28)
+        // Right: address/neighborhood + price
+        doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textLight)
+        doc.text(form.neighborhood || form.name || '', pageWidth - margin, 17, { align: 'right' })
+        const dateStr2 = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+        doc.setFontSize(7.5)
+        doc.text(dateStr2, pageWidth - margin, 28, { align: 'right' })
+
+        // Price — large, left aligned below brand
+        if (form.price) {
+          doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
+          doc.text(form.price, margin, 30)
+        }
 
         // Property details strip
         const details = [form.type, form.beds, form.sqft ? form.sqft + ' sq ft' : ''].filter(Boolean).join('  ·  ')
-        doc.setTextColor(180, 180, 180); doc.setFontSize(8)
-        doc.text(details, pageWidth - margin, 28, { align: 'right' })
+        doc.setTextColor(...textLight); doc.setFontSize(8); doc.setFont('helvetica', 'normal')
+        doc.text(details, margin, 37)
 
-        y = 46
+        y = 50
 
         // Agent info if available
-        const bv = brandVoice
-        if (bv.agentName || bv.phone) {
-          doc.setFillColor(240, 253, 248)
-          doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'F')
-          doc.setDrawColor(...green); doc.setLineWidth(0.3)
-          doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'S')
-          doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textDark)
-          doc.text(bv.agentName || '', margin + 4, y + 6)
-          if (bv.brokerage) {
-            doc.setFont('helvetica', 'normal'); doc.setTextColor(...textMid)
-            doc.text(bv.brokerage, margin + 4, y + 11)
-          }
-          if (bv.phone) {
-            doc.setTextColor(...green); doc.setFont('helvetica', 'bold')
-            doc.text(bv.phone, pageWidth - margin - 4, y + 6, { align: 'right' })
-          }
-          if (bv.website) {
-            doc.setFont('helvetica', 'normal'); doc.setTextColor(...textMid)
-            doc.text(bv.website, pageWidth - margin - 4, y + 11, { align: 'right' })
-          }
-          y += 20
-        }
+        y = pdfAgentBar(doc, brandVoice, y)
+        if (brandVoice?.agentName || brandVoice?.phone) y += 4
 
         // MLS DESCRIPTION
         y = addSectionTitle('MLS Description', y)
@@ -369,43 +357,46 @@ export default function Dashboard() {
         doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textDark)
         y = addWrappedText(outputs.email || '', margin, y, contentWidth)
 
-        // FOOTER
-        doc.setFillColor(...dark)
-        doc.rect(0, pageHeight - 12, pageWidth, 12, 'F')
-        doc.setFontSize(7); doc.setTextColor(...textLight); doc.setFont('helvetica', 'normal')
-        doc.text('Generated by ListingWhisperer.com — AI Assistant for Real Estate Agents', pageWidth / 2, pageHeight - 5, { align: 'center' })
-
+        pdfFooter(doc)
         doc.save(`MLS-Sheet-${form.neighborhood || form.name || 'listing'}.pdf`)
 
       } else if (type === 'flyer') {
-        // DARK HEADER BANNER
+        // DARK HEADER BANNER — 40px
         doc.setFillColor(...dark)
-        doc.rect(0, 0, pageWidth, 50, 'F')
-        doc.setFillColor(...green)
-        doc.rect(0, 50, pageWidth, 3, 'F')
+        doc.rect(0, 0, pageWidth, 40, 'F')
 
-        // Brand
-        doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(...green)
+        // Brand: "Listing" white + "Whisperer" green
+        doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
         doc.text('Listing', margin, 12)
-        const lw = doc.getTextWidth('Listing')
-        doc.setTextColor(...white)
+        const lw = doc.getTextWidth('Listing ')
+        doc.setTextColor(...green)
         doc.text('Whisperer', margin + lw, 12)
 
-        // JUST LISTED badge
+        // Center: PROPERTY FLYER
+        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textLight)
+        doc.text('PROPERTY FLYER', pageWidth / 2, 14, { align: 'center' })
+
+        // Right: JUST LISTED badge
         doc.setFillColor(...green)
         doc.roundedRect(pageWidth - margin - 28, 6, 28, 8, 2, 2, 'F')
         doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
         doc.text('JUST LISTED', pageWidth - margin - 14, 11.5, { align: 'center' })
 
-        // Price — huge
-        doc.setFontSize(28); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
-        doc.text(form.price || 'Price Upon Request', pageWidth / 2, 32, { align: 'center' })
+        // Accent line
+        doc.setFillColor(...green)
+        doc.rect(0, 40, pageWidth, 2, 'F')
+
+        y = 50
+
+        // Price — large, below header
+        doc.setFontSize(26); doc.setFont('helvetica', 'bold'); doc.setTextColor(...textDark)
+        doc.text(form.price || 'Price Upon Request', pageWidth / 2, y + 12, { align: 'center' })
+        y += 16
 
         // Address
-        doc.setFontSize(12); doc.setFont('helvetica', 'normal'); doc.setTextColor(180, 220, 200)
-        doc.text(form.neighborhood || form.name || '', pageWidth / 2, 42, { align: 'center' })
-
-        y = 62
+        doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor(...textMid)
+        doc.text(form.neighborhood || form.name || '', pageWidth / 2, y + 7, { align: 'center' })
+        y += 16
 
         // Property specs bar
         const specs = [
@@ -447,40 +438,11 @@ export default function Dashboard() {
         }
 
         // Agent card
-        const bv = brandVoice
-        if (bv.agentName || bv.phone) {
-          y += 10; y = checkPageBreak(y, 30)
-          doc.setFillColor(...dark)
-          doc.roundedRect(margin, y, contentWidth, 28, 3, 3, 'F')
-          doc.setFillColor(...green)
-          doc.roundedRect(margin, y, 4, 28, 2, 2, 'F')
+        y += 10
+        y = pdfAgentBar(doc, brandVoice, y)
 
-          doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(...white)
-          doc.text(bv.agentName || '', margin + 10, y + 10)
-          doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(...green)
-          doc.text(bv.brokerage || '', margin + 10, y + 17)
-          if (bv.phone) {
-            doc.setTextColor(...white); doc.setFont('helvetica', 'bold'); doc.setFontSize(11)
-            doc.text(bv.phone, pageWidth - margin - 4, y + 10, { align: 'right' })
-          }
-          if (bv.website) {
-            doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...green)
-            doc.text(bv.website, pageWidth - margin - 4, y + 17, { align: 'right' })
-          }
-          y += 34
-        }
-
-        // FOOTER
-        doc.setFillColor(...dark)
-        doc.rect(0, pageHeight - 12, pageWidth, 12, 'F')
-        doc.setFontSize(7); doc.setTextColor(...textLight); doc.setFont('helvetica', 'normal')
-        doc.text('Generated by ListingWhisperer.com — AI Assistant for Real Estate Agents', pageWidth / 2, pageHeight - 5, { align: 'center' })
-
+        pdfFooter(doc)
         doc.save(`Flyer-${form.neighborhood || form.name || 'listing'}.pdf`)
-        y += 42; y = addSectionTitle('About This Home', y)
-        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50)
-        y = addWrappedText(outputs.mls_standard || '', margin, y, contentWidth)
-        doc.save(`Flyer-${form.neighborhood || 'listing'}.pdf`)
       }
     } catch(e: any) { alert('PDF error: ' + e.message) }
     setGeneratingPdf(false)

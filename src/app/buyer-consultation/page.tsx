@@ -4,8 +4,9 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
-
 import Navbar from '../components/Navbar'
+import jsPDF from 'jspdf'
+import { pdfHeader, pdfSections } from '../lib/pdfStyles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,12 +22,25 @@ export default function BuyerConsultationPage() {
   const [outputs, setOutputs] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('consultation_outline')
   const [copied, setCopied] = useState(false)
+  const [history, setHistory] = useState<any[]>([])
+  const [historyLoaded, setHistoryLoaded] = useState(false)
 
   const [form, setForm] = useState({
     buyerName: '', budget: '', neighborhood: '', type: 'Single family',
     beds: '', baths: '', sqft: '', timeline: '', preApproval: 'Yes',
     mustHaves: '', dealBreakers: '', notes: '', agentName: '',
   })
+
+  const loadHistory = async (uid: string) => {
+    const { data } = await supabase
+      .from('buyer_consultations')
+      .select('id, contact_name, created_at, outputs')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(10)
+    if (data) setHistory(data)
+    setHistoryLoaded(true)
+  }
 
   useEffect(() => {
     trackEvent('tool_page_view', { tool: 'buyer_consultation' })
@@ -51,6 +65,7 @@ export default function BuyerConsultationPage() {
       } else {
         setPlanLoaded(true)
       }
+      loadHistory(user.id)
     }
     getUser()
   }, [])
@@ -69,11 +84,34 @@ export default function BuyerConsultationPage() {
         setOutputs(data.outputs)
         setActiveTab('consultation_outline')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
+        await supabase.from('buyer_consultations').insert({
+          user_id: userId,
+          contact_name: form.buyerName || 'Untitled',
+          form_data: form,
+          outputs: data.outputs
+        })
+        if (userId) loadHistory(userId)
       } else {
         alert('Error: ' + JSON.stringify(data))
       }
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
+  }
+
+  const downloadPDF = () => {
+    if (!outputs) return
+    const doc = new jsPDF()
+    const name = form.buyerName || 'Untitled'
+    const y = pdfHeader(doc, 'Buyer Consultation Kit', name)
+    pdfSections(doc, [
+      { label: 'Meeting Outline', content: outputs.consultation_outline || '' },
+      { label: 'Questions to Ask', content: outputs.questions_to_ask || '' },
+      { label: 'Needs Assessment', content: outputs.needs_assessment || '' },
+      { label: 'Financing Talk', content: outputs.financing_talking_points || '' },
+      { label: 'Search Strategy', content: outputs.property_search_strategy || '' },
+      { label: 'Follow-Up Email', content: outputs.followup_email || '' },
+    ], y, { agentName: form.agentName })
+    doc.save(`BuyerConsultation-${name.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`)
   }
 
   const tabs = [
@@ -321,6 +359,10 @@ export default function BuyerConsultationPage() {
               <a href="/dashboard" style={{ fontSize: '12px', padding: '8px 14px', borderRadius: '8px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', textDecoration: 'none', fontWeight: '500' }}>
                 🏠 Dashboard
               </a>
+              <button onClick={downloadPDF}
+                style={{ fontSize: '12px', padding: '8px 14px', borderRadius: '8px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', cursor: 'pointer', fontWeight: '500' }}>
+                📄 Download PDF
+              </button>
               <button onClick={() => setOutputs(null)}
                 style={{ fontSize: '12px', padding: '8px 14px', borderRadius: '8px', background: 'var(--lw-input)', color: '#6b7280', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
                 🔄 New Consultation Kit
@@ -328,6 +370,51 @@ export default function BuyerConsultationPage() {
             </div>
           </div>
         )}
+
+        {/* PAST CONSULTATIONS */}
+        <div style={{ marginTop: '1.5rem' }}>
+          <p style={sectionHeadStyle}>Past Consultations</p>
+          {!historyLoaded ? null : history.length === 0 ? (
+            <div style={{ ...cardStyle, textAlign: 'center', color: 'var(--lw-text-muted)', fontSize: '13px', padding: '1.5rem' }}>
+              Your past consultations will appear here.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {history.map(item => (
+                <div key={item.id} style={{ background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <p style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)' }}>{item.contact_name}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'var(--lw-text-muted)' }}>
+                      {new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => {
+                        setOutputs(item.outputs)
+                        setActiveTab('consultation_outline')
+                        setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
+                      }}
+                      style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '8px', background: 'rgba(29,158,117,0.1)', color: '#1D9E75', border: '1px solid rgba(29,158,117,0.2)', cursor: 'pointer', fontWeight: '500' }}
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Delete this consultation?')) return
+                        await supabase.from('buyer_consultations').delete().eq('id', item.id)
+                        if (userId) loadHistory(userId)
+                      }}
+                      style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '8px', background: 'var(--lw-input)', color: '#6b7280', border: '1px solid var(--lw-border)', cursor: 'pointer' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
       </div>
     </main>
