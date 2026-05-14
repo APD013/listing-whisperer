@@ -23,8 +23,8 @@ export default function PrintLayout({ children }: { children: React.ReactNode })
         div[style*="position: fixed; bottom"] {
           display: none !important;
         }
-        html, body, * {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        html, body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         @media print {
           html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
