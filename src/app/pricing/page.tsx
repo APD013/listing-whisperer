@@ -143,7 +143,7 @@ export default function PricingPage() {
           {[
             {q:'Is the free trial really free?',a:'Yes. You get 24 hours of full Pro access with unlimited listings — no credit card required. After your trial expires, Pro is $20/month.'},
             {q:'What\'s included in Pro?',a:'Everything — unlimited listings, all AI tools, virtual staging (3/month), seller prep, pricing assistant, open house kit, follow-up assistant, launch kit, brand voice memory, leads CRM, listing performance tracker, and more.'},
-            {q:'What is Virtual Staging?',a:'Virtual Staging lets you upload a photo of an empty room and get back a fully furnished, professionally staged version in seconds. Pro includes 3 stagings per month. Additional credits are available as add-ons.'},
+            {q:'What is Virtual Staging?',a:'Virtual Staging lets you upload a photo of an empty room and get back a fully furnished, professionally staged version in under 2 minutes. Pro includes 3 stagings per month. Additional credits are available as add-ons.'},
             {q:'Can I use the discount code WELCOME50?',a:'Yes! Enter code WELCOME50 at checkout for 50% off your first Pro month.'},
             {q:'Can I cancel Pro anytime?',a:'Yes. No contracts. Cancel anytime from your account settings. You keep Pro access until the end of your billing period.'},
             {q:'What happens after my free trial?',a:'After 24 hours, you can upgrade to Pro for $20/month. Your listing history and settings are always saved.'},

@@ -63,7 +63,7 @@ const FAQ_SECTIONS = [
       },
       {
         q: 'What is Virtual Staging?',
-        a: 'Upload an empty room photo, choose a style, and get a professionally staged version in seconds. Pro includes 3 per month.',
+        a: 'Upload an empty room photo, choose a style, and get a professionally staged version in under 2 minutes. Pro includes 3 per month.',
       },
       {
         q: 'What is Call Capture?',

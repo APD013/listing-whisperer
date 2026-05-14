@@ -95,7 +95,7 @@ export default function Home() {
           From one listing photo to a full marketing campaign.
         </h1>
         <p style={{fontSize:'1.125rem',color:'#555',maxWidth:'560px',margin:'0 auto 1rem',lineHeight:'1.75'}}>
-          Descriptions, captions, emails, follow-ups, open house content, and more — in seconds. Built for real estate agents.
+          Descriptions, captions, emails, follow-ups, open house content, and more — in minutes, not hours. Built for real estate agents.
         </p>
         <div style={{display:'inline-flex',alignItems:'center',gap:'8px',background:'#0d1117',borderRadius:'30px',padding:'8px 18px',marginBottom:'0.5rem',border:'1px solid rgba(29,158,117,0.3)'}}>
           <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',boxShadow:'0 0 8px rgba(29,158,117,0.8)',animation:'pulse 2s infinite'}}/>
@@ -295,7 +295,7 @@ export default function Home() {
               {icon:'🎤',title:'Seller Prep & Presentation',desc:'Meeting outlines, pricing strategy, objection handling, and a shareable agent portfolio.'},
               {icon:'📋',title:'Follow-Up & Lead Management',desc:'CRM, follow-up scripts, referral requests, reminders, and open house tools.'},
               {icon:'📞',title:'Call Capture',desc:'Record client calls, auto-transcribe, extract lead details, and log directly to your CRM. Pro only.'},
-              {icon:'🛋️',title:'Virtual Staging',desc:'Transform empty rooms into beautifully furnished spaces in seconds. Perfect for listings.'},
+              {icon:'🛋️',title:'Virtual Staging',desc:'Transform empty rooms into beautifully furnished spaces in under 2 minutes. Perfect for listings.'},
             ].map(({icon,title,desc}) => (
               <div key={title} style={{background:'#f8fafc',borderRadius:'16px',padding:'1.75rem',border:'1px solid #eee',transition:'all 0.2s'}}
                 onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.boxShadow='0 4px 20px rgba(29,158,117,0.1)'}}

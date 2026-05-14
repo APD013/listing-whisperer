@@ -772,7 +772,7 @@ export default function Dashboard() {
                 <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 16px'}}>WHAT DO YOU NEED TO DO RIGHT NOW?</p>
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'14px'}}>
                   {[
-                    { icon:'🏠', label:'Start a Listing', desc:'Create a full listing from photos and notes in seconds', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
+                    { icon:'🏠', label:'Start a Listing', desc:'Create a full listing from photos and notes in minutes', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
                     { icon:'📋', label:'Prep a Meeting', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep', tooltip:'Use this before your next listing appointment' },
                     { icon:'✦', label:'Ask AI', desc:'Get instant answers to any real estate question', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() }, tooltip:'Ask about pricing, strategy, follow-ups, or anything real estate' },
                     { icon:'👥', label:'Follow Up a Lead', desc:'Turn conversations into signed clients', color:'#f59e0b', href:'/leads' },
@@ -975,7 +975,7 @@ export default function Dashboard() {
                 {/* TIER 1 — HERO TOOLS */}
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))',gap:'14px',marginBottom:'2.5rem'}}>
                   {[
-                    { icon:'⚡', title:'Quick Listing', desc:'Generate a full listing from a few details in seconds', color:'#1D9E75', href:'/quick-listing', badge:'START HERE' },
+                    { icon:'⚡', title:'Quick Listing', desc:'Generate a full listing from a few details in minutes', color:'#1D9E75', href:'/quick-listing', badge:'START HERE' },
                     { icon:'📋', title:'Seller Prep', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep' },
                     { icon:'👥', title:'Leads & Clients', desc:'Track your pipeline and manage client relationships', color:'#10b981', href:'/leads' },
                     { icon:'📩', title:'Follow-Up Assistant', desc:'Turn showings and meetings into follow-up emails', color:'#6366f1', href:'/follow-up' },

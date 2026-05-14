@@ -401,7 +401,7 @@ function SettingsContent() {
 
             <div style={{ display: 'flex', gap: '8px' }}>
               <a
-                href={`mailto:?subject=Try Listing Whisperer&body=I've been using Listing Whisperer to generate listing marketing in seconds. Try it free: https://listingwhisperer.com/signup?ref=${referralCode}`}
+                href={`mailto:?subject=Try Listing Whisperer&body=I've been using Listing Whisperer to generate listing marketing in minutes. Try it free: https://listingwhisperer.com/signup?ref=${referralCode}`}
                 style={{ flex: 1, padding: '11px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '13px', fontWeight: '600', color: 'var(--lw-text)', textDecoration: 'none', textAlign: 'center' as const }}>
                 📧 Share via Email
               </a>

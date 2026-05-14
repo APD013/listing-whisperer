@@ -33,7 +33,7 @@ export default function OnboardingModal() {
     {
       icon: '🏠',
       title: 'Create Listing Marketing',
-      desc: 'Turn 1 photo into full listing content in seconds',
+      desc: 'Turn 1 photo into full listing content in minutes',
       href: '/quick-listing',
       highlighted: true,
     },

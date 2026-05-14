@@ -624,7 +624,7 @@ export const guides: Guide[] = [
         id: 'listing-copy',
         heading: 'Using AI for Listing Descriptions and Marketing Copy',
         paragraphs: [
-          'Listing descriptions are one of the highest-value and most time-consuming writing tasks agents face. An AI tool trained on real estate copy can produce a strong first draft in seconds based on the property details you enter — saving 20 to 30 minutes per listing that adds up fast across a year of transactions.',
+          'Listing descriptions are one of the highest-value and most time-consuming writing tasks agents face. An AI tool trained on real estate copy can produce a strong first draft in minutes based on the property details you enter — saving 20 to 30 minutes per listing that adds up fast across a year of transactions.',
           'The best practice is to use AI as a starting point, then personalize. Add the details only you know from the walk-through: the way the backyard transitions to a greenbelt, the unusual quiet for such a central location, the original craftsman details the renovation carefully preserved. These specifics are what elevate a good AI draft into a great listing description.',
           'Beyond MLS descriptions, AI can generate every copy format a listing needs: Instagram captions, Facebook posts, email subject lines, neighborhood bio text, and open house invitation copy. Writing all of those from scratch for every listing is the kind of repetitive work that AI eliminates — freeing you to serve your clients.',
         ],
@@ -633,7 +633,7 @@ export const guides: Guide[] = [
         id: 'social-content',
         heading: 'AI for Social Media and Content Creation',
         paragraphs: [
-          'Consistent social media presence is one of the biggest challenges agents face, and it\'s where AI provides some of its most immediate value. Instead of staring at a blank caption for ten minutes after posting a listing photo, AI generates five caption variations in seconds. You pick the best one, add a personal tweak, and you\'re done.',
+          'Consistent social media presence is one of the biggest challenges agents face, and it\'s where AI provides some of its most immediate value. Instead of staring at a blank caption for ten minutes after posting a listing photo, AI generates five caption variations in minutes. You pick the best one, add a personal tweak, and you\'re done.',
           'AI helps with the educational content that builds your brand over time. A market update post, a reel script about what to look for at an open house, a neighborhood spotlight — these take time to write from scratch. With AI, you describe what you want, review and personalize the output, and publish content that would have taken an hour in fifteen minutes.',
           'Content planning is another area where AI adds value. Rather than deciding week-to-week what to post, use AI to generate a full month\'s content calendar in a single planning session — mixing listings, education, market updates, and personal brand moments. Consistency and strategy replace reactive, sporadic posting.',
         ],

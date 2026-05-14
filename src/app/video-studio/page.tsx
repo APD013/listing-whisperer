@@ -21,9 +21,9 @@ const outputs = [
 ]
 
 const exampleOutputs = [
-  { icon: '📝', label: '8-Second Script', text: 'New listing ready in seconds — your real estate AI turns photos into posts, captions, and video prompts.' },
+  { icon: '📝', label: '8-Second Script', text: 'New listing ready in minutes — your real estate AI turns photos into posts, captions, and video prompts.' },
   { icon: '📌', label: 'Cover Text', text: '1 Photo → Full Listing Video' },
-  { icon: '📱', label: 'Caption', text: 'Marketing a listing should not take hours. Listing Whisperer helps agents turn property photos and notes into ready-to-use social content in seconds.' },
+  { icon: '📱', label: 'Caption', text: 'Marketing a listing should not take hours. Listing Whisperer helps agents turn property photos and notes into ready-to-use social content in minutes.' },
   { icon: '#️⃣', label: 'Hashtags', text: '#RealEstateMarketing #ListingAgent #RealtorTools #AIForRealEstate' },
   { icon: '🎬', label: 'Motion Prompt', text: 'Cinematic vertical real estate video from listing photo. Subtle handheld camera movement, natural lighting, smooth push-in motion, professional social media pacing. No text on screen.' },
   { icon: '🎵', label: 'Audio Direction', text: 'Upbeat, clean, confident background music with a modern real estate marketing feel.' },
@@ -216,7 +216,7 @@ export default function VideoStudioPage() {
             🎬 Video Studio
           </h1>
           <p style={{ fontSize: '1.15rem', fontWeight: '700', color: '#fff', marginBottom: '10px', lineHeight: '1.4' }}>
-            Create scroll-stopping real estate videos in seconds.
+            Create scroll-stopping real estate videos in minutes.
           </p>
           <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', marginBottom: '18px', lineHeight: '1.7', maxWidth: '540px', margin: '0 auto 18px' }}>
             Turn one listing photo and a few notes into a complete TikTok, Reels, or Shorts ad kit — without writing scripts, captions, or prompts yourself.

@@ -262,7 +262,7 @@ export default function QuickListingPage() {
                 QUICK LISTING
               </div>
               <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>
-                📸 Create full listing marketing in seconds.
+                📸 Create full listing marketing in minutes.
               </h1>
               <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: '1.7', maxWidth: '480px', margin: '0 auto 18px' }}>
                 Upload a photo, add a few notes — get a complete listing kit instantly.

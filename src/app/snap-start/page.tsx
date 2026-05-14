@@ -180,7 +180,7 @@ export default function SnapStartPage() {
                 SNAP &amp; START
               </div>
               <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#fff', marginBottom: '10px', letterSpacing: '-0.03em', lineHeight: '1.2' }}>
-                📸 Start a listing from your phone in seconds.
+                📸 Start a listing from your phone in minutes.
               </h1>
               <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: '1.7', maxWidth: '480px', margin: '0 auto 18px' }}>
                 On-site at a property? Snap a photo and let us handle the rest.

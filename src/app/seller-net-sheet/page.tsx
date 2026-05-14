@@ -93,7 +93,7 @@ export default function SellerNetSheetPage() {
         <div style={{background:'linear-gradient(135deg,#1D9E75,#085041)',borderRadius:'20px',padding:'2.5rem 2rem',marginBottom:'1.5rem',boxShadow:'0 0 60px rgba(29,158,117,0.25)',textAlign:'center'}}>
           <div style={{display:'inline-block',background:'rgba(255,255,255,0.15)',borderRadius:'20px',padding:'4px 14px',fontSize:'11px',fontWeight:'700',color:'rgba(255,255,255,0.9)',letterSpacing:'1px',marginBottom:'14px'}}>NET SHEET CALCULATOR</div>
           <h1 style={{fontSize:'2rem',fontWeight:'800',color:'#fff',marginBottom:'10px',letterSpacing:'-0.03em',lineHeight:'1.2'}}>Show your seller the real numbers.</h1>
-          <p style={{fontSize:'14px',color:'rgba(255,255,255,0.88)',lineHeight:'1.7',maxWidth:'500px',margin:'0 auto 18px'}}>A live, accurate net proceeds estimate — built in seconds, printable in one click.</p>
+          <p style={{fontSize:'14px',color:'rgba(255,255,255,0.88)',lineHeight:'1.7',maxWidth:'500px',margin:'0 auto 18px'}}>A live, accurate net proceeds estimate — built in minutes, printable in one click.</p>
           <button onClick={() => document.getElementById('net-sheet-form')?.scrollIntoView({ behavior: 'smooth' })}
             style={{background:'rgba(255,255,255,0.2)',border:'1.5px solid rgba(255,255,255,0.5)',color:'#fff',borderRadius:'10px',padding:'11px 28px',fontSize:'14px',fontWeight:'700',cursor:'pointer',backdropFilter:'blur(4px)'}}>
             Calculate Now →

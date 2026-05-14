@@ -283,7 +283,7 @@ export default function VirtualStagingPage() {
             Virtual Staging
           </h1>
           <p style={{ fontSize: '15px', opacity: 0.88, maxWidth: '520px', margin: '0 auto', lineHeight: '1.6' }}>
-            Transform empty rooms into beautifully furnished spaces in seconds. Upload a photo, choose a style, get stunning results.
+            Transform empty rooms into beautifully furnished spaces in under 2 minutes. Upload a photo, choose a style, get stunning results.
           </p>
         </div>
 
