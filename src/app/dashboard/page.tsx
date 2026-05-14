@@ -850,6 +850,7 @@ export default function Dashboard() {
                     { icon:'📋', label:'Prep a Meeting', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep', tooltip:'Use this before your next listing appointment' },
                     { icon:'✦', label:'Ask AI', desc:'Get instant answers to any real estate question', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() }, tooltip:'Ask about pricing, strategy, follow-ups, or anything real estate' },
                     { icon:'👥', label:'Follow Up a Lead', desc:'Turn conversations into signed clients', color:'#f59e0b', href:'/leads' },
+                    { icon:'📁', label:'My Workspaces', desc:'All your listing assets in one place — copy, photos, follow-ups, and more', color:'#1D9E75', href:'/workspaces' },
                   ].map((item, i) => (
                     item.href ? (
                       <a key={i} href={item.href}
