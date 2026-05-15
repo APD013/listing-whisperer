@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '../lib/theme'
-import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick } from '../lib/analytics'
+import { trackDashboardView, trackListingCreated, trackOutputCopied, trackUpgradeClick, trackPurchase } from '../lib/analytics'
 import jsPDF from 'jspdf'
 import { PDF_COLORS, pdfHeader, pdfAgentBar, pdfSectionHeader, pdfFooter, cleanPdfText } from '../lib/pdfStyles'
 import OnboardingModal from '../components/OnboardingModal'
@@ -151,7 +151,7 @@ export default function Dashboard() {
       ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 5)
       setRecentActivity(allActivity)
 
-      if (upgraded) setPlan('pro')
+      if (upgraded) { setPlan('pro'); trackPurchase('pro') }
 
       // scroll restore handled by separate useEffect
 
@@ -1558,7 +1558,7 @@ export default function Dashboard() {
                     <p key={f} style={{fontSize:'12px',color:'#a8f0d4',margin:'0'}}>✅ {f}</p>
                   ))}
                 </div>
-                <a href="/pricing" style={{display:'block',textAlign:'center',padding:'12px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',textDecoration:'none',fontSize:'14px',fontWeight:'700',boxShadow:'0 0 20px rgba(29,158,117,0.3)'}}>Upgrade to Pro — $20/mo</a>
+                <a href="/pricing" onClick={() => trackUpgradeClick('trial_ended_modal', plan)} style={{display:'block',textAlign:'center',padding:'12px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',textDecoration:'none',fontSize:'14px',fontWeight:'700',boxShadow:'0 0 20px rgba(29,158,117,0.3)'}}>Upgrade to Pro — $20/mo</a>
               </div>
             </div>
             <p style={{fontSize:'12px',color:'#444'}}>Use code <strong style={{color:'#d4af37'}}>WELCOME50</strong> for 50% off your first month</p>

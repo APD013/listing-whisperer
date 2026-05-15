@@ -15,7 +15,7 @@ export default function PricingPage() {
   const router = useRouter()
 
   useEffect(() => {
-    trackEvent('pricing_page_view')
+    trackEvent('pricing_viewed')
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) setUserId(user.id)

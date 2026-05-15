@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 import Navbar from '../components/Navbar'
+import { trackUpgradeClick } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -154,7 +155,7 @@ export default function FollowUpSequencePage() {
           <p style={{ fontSize: '14px', color: 'var(--lw-text-muted)', marginBottom: '1.5rem', lineHeight: '1.7' }}>
             Follow-Up Sequence Generator is a Pro-only feature. Upgrade to turn every interaction into a personalized multi-touchpoint follow-up sequence.
           </p>
-          <a href="/pricing" style={{ display: 'block', padding: '14px', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700', boxShadow: '0 4px 20px rgba(99,102,241,0.3)', marginBottom: '12px' }}>
+          <a href="/pricing" onClick={() => trackUpgradeClick('follow_up_sequence', 'starter')} style={{ display: 'block', padding: '14px', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700', boxShadow: '0 4px 20px rgba(99,102,241,0.3)', marginBottom: '12px' }}>
             Upgrade to Pro — $20/mo
           </a>
           <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Back to Dashboard</a>

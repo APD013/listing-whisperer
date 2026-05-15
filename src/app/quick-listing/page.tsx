@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
-import { trackEvent } from '../lib/analytics'
+import { trackEvent, trackListingCreated } from '../lib/analytics'
 import Navbar from '../components/Navbar'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
@@ -169,6 +169,7 @@ export default function QuickListingPage() {
       if (data.outputs) {
         setOutputs(data.outputs)
         setStep('results')
+        trackListingCreated(plan, answers.neighborhood || answers.city || '')
         const { data: saved } = await supabase.from('quick_listings').insert({
           user_id: userId,
           address: answers.neighborhood || answers.city || 'Untitled',

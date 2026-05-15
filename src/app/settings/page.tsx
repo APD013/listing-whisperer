@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import Navbar from '../components/Navbar'
+import { trackUpgradeClick } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -183,7 +184,7 @@ function SettingsContent() {
               </p>
             </div>
             {plan === 'starter' && (
-              <a href="/pricing" style={{ padding: '10px 18px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '700', boxShadow: '0 4px 16px rgba(29,158,117,0.3)' }}>
+              <a href="/pricing" onClick={() => trackUpgradeClick('settings', plan)} style={{ padding: '10px 18px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '13px', fontWeight: '700', boxShadow: '0 4px 16px rgba(29,158,117,0.3)' }}>
                 Upgrade to Pro
               </a>
             )}

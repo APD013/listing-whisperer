@@ -1,5 +1,21 @@
 // Listing Whisperer - GA4 Analytics Utility
 // Fires custom events to Google Analytics 4
+// GA4 Measurement ID: G-50NE5KHLE3 (initialized in src/app/layout.tsx)
+
+// Canonical funnel event names
+export type EventName =
+  | 'signup_started'
+  | 'signup_completed'
+  | 'listing_created'
+  | 'virtual_stage_started'
+  | 'virtual_stage_completed'
+  | 'ai_chat_opened'
+  | 'ai_chat_message_sent'
+  | 'launch_kit_created'
+  | 'pricing_viewed'
+  | 'upgrade_click'
+  | 'checkout_started'
+  | 'purchase'
 
 declare global {
   interface Window {
@@ -156,5 +172,46 @@ export function trackCTAClick(ctaName: string, location: string) {
   trackEvent('cta_click', {
     cta_name: ctaName,
     click_location: location,
+  })
+}
+
+// 11. Virtual Staging
+export function trackVirtualStageStarted(roomType: string, designStyle: string) {
+  trackEvent('virtual_stage_started', {
+    room_type: roomType,
+    design_style: designStyle,
+  })
+}
+
+export function trackVirtualStageCompleted(roomType: string, designStyle: string) {
+  trackEvent('virtual_stage_completed', {
+    room_type: roomType,
+    design_style: designStyle,
+  })
+}
+
+// 12. AI Chat
+export function trackAiChatOpened(page: string) {
+  trackEvent('ai_chat_opened', { page })
+}
+
+export function trackAiChatMessageSent(page: string) {
+  trackEvent('ai_chat_message_sent', { page })
+}
+
+// 13. Launch Kit Created
+export function trackLaunchKitCreated(plan: string, neighborhood: string) {
+  trackEvent('launch_kit_created', {
+    user_status: plan,
+    neighborhood,
+  })
+}
+
+// 14. Purchase (fires on Stripe success redirect)
+export function trackPurchase(plan: string) {
+  trackEvent('purchase', {
+    user_status: plan,
+    value: 20,
+    currency: 'USD',
   })
 }

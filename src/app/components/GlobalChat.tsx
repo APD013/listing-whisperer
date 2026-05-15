@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../lib/supabase'
+import { trackAiChatOpened, trackAiChatMessageSent } from '../lib/analytics'
 
 const CALL_CAPTURE_ENABLED = true
 
@@ -163,6 +164,7 @@ export default function GlobalChat() {
 
   useEffect(() => {
     if (showChat && !prevShowChatRef.current) {
+      trackAiChatOpened(pathname)
       setAvatarState('idle')
       try {
         const ws = sessionStorage.getItem('lw_active_workspace')
@@ -291,6 +293,10 @@ export default function GlobalChat() {
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return
+    if (!sessionStorage.getItem('lw_chat_tracked')) {
+      trackAiChatMessageSent(pathname)
+      sessionStorage.setItem('lw_chat_tracked', '1')
+    }
     const userMessage: Message = { role: 'user', content: input, time: nowTime() }
     const updatedMessages = [...messages, userMessage]
     setMessages(updatedMessages)

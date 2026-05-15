@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { saveToWorkspace } from '../lib/workspace'
+import { trackVirtualStageStarted, trackVirtualStageCompleted } from '../lib/analytics'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
 
@@ -148,6 +149,7 @@ export default function VirtualStagingPage() {
     setLoading(true)
     setError(null)
     setResults([])
+    trackVirtualStageStarted(roomType, designStyle)
     try {
       const res = await fetch('/api/virtual-staging', {
         method: 'POST',
@@ -161,6 +163,7 @@ export default function VirtualStagingPage() {
         setError(data.error)
       } else {
         setResults(data.images)
+        trackVirtualStageCompleted(roomType, designStyle)
         setCredits(data.creditsRemaining)
         if (userId) loadHistory(userId)
         if (workspaceId) {

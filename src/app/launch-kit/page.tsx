@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
-import { trackEvent } from '../lib/analytics'
+import { trackEvent, trackLaunchKitCreated } from '../lib/analytics'
 import Navbar from '../components/Navbar'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
@@ -103,6 +103,7 @@ export default function LaunchKitPage() {
       if (data.plan) {
         setLaunchPlan(data.plan)
         setActiveTab('day1')
+        trackLaunchKitCreated(plan, form.neighborhood || form.city || '')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
         const { data: saved } = await supabase.from('launch_kits').insert({
           user_id: userId,
