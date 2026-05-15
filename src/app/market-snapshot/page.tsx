@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -22,6 +25,7 @@ export default function MarketSnapshotPage() {
   const router = useRouter()
   const [authReady, setAuthReady] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<SnapshotResult | null>(null)
   const [error, setError] = useState('')
@@ -58,6 +62,7 @@ export default function MarketSnapshotPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       setAuthReady(true)
       loadHistory(user.id)
     }
@@ -83,6 +88,7 @@ export default function MarketSnapshotPage() {
       try { data = JSON.parse(raw) } catch { setError('Raw error: ' + raw.slice(0, 200)); setLoading(false); return }
       if (data.result) {
         setResult(data.result)
+        if (isDemo) markDemoGenerationUsed('market-snapshot')
         const { data: saved } = await supabase.from('market_snapshots').insert({
           user_id: userId,
           neighborhood: form.neighborhood || form.state || 'Untitled',
@@ -128,6 +134,13 @@ export default function MarketSnapshotPage() {
     <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: '40px', height: '40px', border: '3px solid rgba(29,158,117,0.3)', borderTop: '3px solid #1D9E75', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+    </div>
+  )
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'market-snapshot') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
     </div>
   )
 

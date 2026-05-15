@@ -4,6 +4,9 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -13,6 +16,7 @@ export default function ReferralRequestPage() {
   const router = useRouter()
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
+  const [isDemo, setIsDemo] = useState(false)
   const [loading, setLoading] = useState(false)
   const [output, setOutput] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
@@ -33,6 +37,7 @@ export default function ReferralRequestPage() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: profile } = await supabase
         .from('profiles').select('plan, brand_voice, full_name').eq('id', user.id).single()
       if (profile) {
@@ -87,6 +92,7 @@ Generate 4 scripts and return ONLY a JSON object with no other text:
       } catch(e) {
         setOutput({ email_script: text, text_script: '', phone_script: '', linkedin_post: '' })
       }
+      if (isDemo) markDemoGenerationUsed('referral-request')
       trackEvent('referral_request_generated', { relationship: form.relationship })
     } catch(e) {
       alert('Something went wrong. Please try again.')
@@ -128,6 +134,12 @@ Generate 4 scripts and return ONLY a JSON object with no other text:
       <div style={{ width: '40px', height: '40px', border: '3px solid rgba(29,158,117,0.3)', borderTop: '3px solid #1D9E75', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
+  )
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'referral-request') return (
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </main>
   )
 
   return (

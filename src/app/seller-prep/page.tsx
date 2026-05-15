@@ -8,6 +8,9 @@ import Navbar from '../components/Navbar'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -16,6 +19,7 @@ const supabase = createClient(
 export default function SellerPrepPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -61,6 +65,7 @@ export default function SellerPrepPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: profile } = await supabase
         .from('profiles')
         .select('plan, brand_voice')
@@ -112,6 +117,7 @@ export default function SellerPrepPage() {
       const data = await res.json()
       if (data.outputs) {
         setOutputs(data.outputs)
+        if (isDemo) markDemoGenerationUsed('seller-prep')
         setActiveTab('meeting_outline')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
         const { data: saved } = await supabase.from('seller_preps').insert({
@@ -168,6 +174,13 @@ export default function SellerPrepPage() {
   const scrollToForm = () => {
     document.getElementById('seller-form')?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'seller-prep') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

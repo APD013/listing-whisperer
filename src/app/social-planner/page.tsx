@@ -7,6 +7,9 @@ import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -15,6 +18,7 @@ const supabase = createClient(
 export default function SocialPlannerPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -45,6 +49,7 @@ export default function SocialPlannerPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: profile } = await supabase
         .from('profiles').select('plan').eq('id', user.id).single()
       if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
@@ -79,6 +84,7 @@ export default function SocialPlannerPage() {
       const data = await res.json()
       if (data.calendar) {
         setCalendar(data.calendar)
+        if (isDemo) markDemoGenerationUsed('social-planner')
         setActiveDay(0)
         setTimeout(() => document.getElementById('calendar')?.scrollIntoView({ behavior: 'smooth' }), 100)
         if (workspaceId) {
@@ -112,6 +118,13 @@ export default function SocialPlannerPage() {
   const labelStyle = { fontSize: '11px', fontWeight: '600' as const, color: 'var(--lw-text-muted)', display: 'block' as const, marginBottom: '5px', letterSpacing: '0.5px', textTransform: 'uppercase' as const }
   const cardStyle = { background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', marginBottom: '1rem' }
   const sectionHeadStyle = { fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)', letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px' }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'social-planner') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

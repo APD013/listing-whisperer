@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -14,6 +17,7 @@ export default function NeighborhoodBioPage() {
   const router = useRouter()
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
+  const [isDemo, setIsDemo] = useState(false)
   const [neighborhood, setNeighborhood] = useState('')
   const [city, setCity] = useState('')
   const [highlights, setHighlights] = useState('')
@@ -29,6 +33,7 @@ export default function NeighborhoodBioPage() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: profile } = await supabase
         .from('profiles').select('plan').eq('id', user.id).single()
       if (profile) setPlan(profile.plan || 'starter')
@@ -89,6 +94,7 @@ Format it as 3-4 engaging paragraphs. Make it sound like it was written by a loc
       })
       const data = await res.json()
       setOutput(data.message || '')
+      if (isDemo) markDemoGenerationUsed('neighborhood-bio')
       trackEvent('neighborhood_bio_generated', { neighborhood, tone })
     } catch(e) {
       setOutput('Something went wrong. Please try again.')
@@ -125,6 +131,12 @@ Format it as 3-4 engaging paragraphs. Make it sound like it was written by a loc
       <div style={{ width: '40px', height: '40px', border: '3px solid rgba(29,158,117,0.3)', borderTop: '3px solid #1D9E75', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
+  )
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'neighborhood-bio') return (
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </main>
   )
 
   return (

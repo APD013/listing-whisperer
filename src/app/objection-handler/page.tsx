@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -29,6 +32,7 @@ export default function ObjectionHandlerPage() {
   const router = useRouter()
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
+  const [isDemo, setIsDemo] = useState(false)
   const [objection, setObjection] = useState('')
   const [context, setContext] = useState('')
   const [loading, setLoading] = useState(false)
@@ -41,6 +45,7 @@ export default function ObjectionHandlerPage() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: profile } = await supabase
         .from('profiles').select('plan').eq('id', user.id).single()
       if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
@@ -62,6 +67,7 @@ export default function ObjectionHandlerPage() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
+        if (isDemo) markDemoGenerationUsed('objection-handler')
         setHistory(prev => [{objection, result: data.result}, ...prev.slice(0, 4)])
         setTimeout(() => document.getElementById('result')?.scrollIntoView({ behavior: 'smooth' }), 100)
       } else {
@@ -78,6 +84,12 @@ export default function ObjectionHandlerPage() {
     fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)',
     letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px',
   }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'objection-handler') return (
+    <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </main>
+  )
 
   return (
     <main style={{minHeight:'100vh',background:'var(--lw-bg)',fontFamily:"var(--font-plus-jakarta), sans-serif"}}>

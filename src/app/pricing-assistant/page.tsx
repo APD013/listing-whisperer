@@ -5,6 +5,9 @@ import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -15,6 +18,7 @@ export default function PricingAssistant() {
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
@@ -50,6 +54,7 @@ export default function PricingAssistant() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
         loadHistory(user.id)
       }
     }
@@ -85,6 +90,7 @@ export default function PricingAssistant() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
+        if (isDemo) markDemoGenerationUsed('pricing-assistant')
         const { data: saved } = await supabase.from('pricing_reports_history').insert({
           user_id: userId,
           address: form.address || form.neighborhood || form.city || 'Untitled',
@@ -108,6 +114,13 @@ export default function PricingAssistant() {
   const scrollToForm = () => {
     document.getElementById('pricing-form')?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'pricing-assistant') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={styles.page}>

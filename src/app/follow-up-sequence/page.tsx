@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 import { trackUpgradeClick } from '../lib/analytics'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -17,6 +20,7 @@ export default function FollowUpSequencePage() {
   const [planLoaded, setPlanLoaded] = useState(false)
   const [brandVoice, setBrandVoice] = useState<any>({})
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [history, setHistory] = useState<any[]>([])
   const [showHistory, setShowHistory] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -35,6 +39,7 @@ export default function FollowUpSequencePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: seqs } = await supabase
         .from('follow_up_sequences')
         .select('*')
@@ -89,6 +94,7 @@ export default function FollowUpSequencePage() {
       const data = await res.json()
       if (data.sequence) {
         setSequence(data.sequence)
+        if (isDemo) markDemoGenerationUsed('follow-up-sequence')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
       } else {
         alert('Error: ' + (data.error || 'Unknown error'))
@@ -163,6 +169,13 @@ export default function FollowUpSequencePage() {
       </main>
     )
   }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'follow-up-sequence') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

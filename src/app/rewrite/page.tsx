@@ -6,6 +6,9 @@ import { trackRewriteUsed, trackUpgradeClick, trackEvent } from '../lib/analytic
 
 import Navbar from '../components/Navbar'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -14,6 +17,7 @@ const supabase = createClient(
 export default function RewritePage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [listing, setListing] = useState('')
   const [style, setStyle] = useState('Professional and compelling')
   const [outputs, setOutputs] = useState<any>(null)
@@ -30,6 +34,7 @@ export default function RewritePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       trackEvent('rewrite_page_view')
       const { data: profile } = await supabase
         .from('profiles').select('rewrites_used, plan').eq('id', user.id).single()
@@ -57,6 +62,7 @@ export default function RewritePage() {
       if (data.error === 'REWRITE_LIMIT_REACHED') { router.push('/pricing'); return }
       if (data.outputs) {
         setOutputs(data.outputs)
+        if (isDemo) markDemoGenerationUsed('rewrite')
         setActiveTab('standard')
         setRewritesUsed(prev => prev + 1)
         trackRewriteUsed(plan)
@@ -81,6 +87,13 @@ export default function RewritePage() {
   const inputStyle = { width: '100%', padding: '12px 14px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', fontSize: '14px', fontWeight: '500' as const, color: 'var(--lw-text)', boxSizing: 'border-box' as const, outline: 'none', fontFamily: 'var(--font-plus-jakarta), sans-serif' }
   const cardStyle = { background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: '1rem' }
   const sectionHeadStyle = { fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)', letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px' }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'rewrite') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

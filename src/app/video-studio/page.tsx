@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 import { trackUpgradeClick } from '../lib/analytics'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -36,6 +39,7 @@ export default function VideoStudioPage() {
   const [planLoaded, setPlanLoaded] = useState(false)
   const [brandVoice, setBrandVoice] = useState<any>({})
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [history, setHistory] = useState<any[]>([])
   const [showHistory, setShowHistory] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -73,6 +77,7 @@ export default function VideoStudioPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: kits } = await supabase.from('video_kits').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20)
       if (kits) setHistory(kits)
       const { data: profile } = await supabase
@@ -122,6 +127,7 @@ export default function VideoStudioPage() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
+        if (isDemo) markDemoGenerationUsed('video-studio')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
       } else {
         alert('Error: ' + (data.error || 'Unknown error'))
@@ -196,6 +202,13 @@ export default function VideoStudioPage() {
       </main>
     )
   }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'video-studio') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

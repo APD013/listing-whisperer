@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 import { trackUpgradeClick } from '../lib/analytics'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -25,6 +28,7 @@ export default function ListingRescuePage() {
   const [planLoaded, setPlanLoaded] = useState(false)
   const [brandVoice, setBrandVoice] = useState<any>({})
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
@@ -79,6 +83,7 @@ export default function ListingRescuePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: profile } = await supabase
         .from('profiles')
         .select('plan, brand_voice')
@@ -140,6 +145,7 @@ export default function ListingRescuePage() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
+        if (isDemo) markDemoGenerationUsed('listing-rescue')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
         const { data: saved } = await supabase.from('listing_rescues_history').insert({
           user_id: userId,
@@ -228,6 +234,13 @@ export default function ListingRescuePage() {
       </main>
     )
   }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'listing-rescue') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

@@ -4,8 +4,10 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { saveToWorkspace } from '../lib/workspace'
 import { trackVirtualStageStarted, trackVirtualStageCompleted, trackEvent } from '../lib/analytics'
+import { isDemoUser } from '../lib/demoMode'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
+import DemoLockedCard from '../components/DemoLockedCard'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -52,6 +54,7 @@ type StagingRecord = {
 export default function VirtualStagingPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -86,6 +89,7 @@ export default function VirtualStagingPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) { setIsDemo(true); return }
       loadHistory(user.id)
 
       const { data: profile } = await supabase
@@ -238,6 +242,13 @@ export default function VirtualStagingPage() {
     marginBottom: '6px',
     display: 'block',
   }
+
+  if (isDemo) return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="paid_feature" toolName="Virtual Staging" />
+    </div>
+  )
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

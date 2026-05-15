@@ -4,6 +4,9 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -15,6 +18,7 @@ export default function ListingPresentation() {
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [history, setHistory] = useState<any[]>([])
   const [historyLoaded, setHistoryLoaded] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
@@ -41,6 +45,7 @@ export default function ListingPresentation() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: profile } = await supabase
         .from('profiles').select('full_name, brand_voice').eq('id', user.id).single()
       if (profile?.full_name) setForm(prev => ({ ...prev, agentName: profile.full_name }))
@@ -75,6 +80,7 @@ export default function ListingPresentation() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
+        if (isDemo) markDemoGenerationUsed('listing-presentation')
         const { data: saved } = await supabase.from('listing_presentations').insert({
           user_id: userId,
           address: form.propertyAddress || form.neighborhood || 'Untitled',
@@ -118,6 +124,13 @@ export default function ListingPresentation() {
   const scrollToForm = () => {
     document.getElementById('presentation-form')?.scrollIntoView({ behavior: 'smooth' })
   }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'listing-presentation') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>

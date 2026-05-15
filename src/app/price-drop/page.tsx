@@ -6,6 +6,9 @@ import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -16,6 +19,7 @@ export default function PriceDropKit() {
   const [result, setResult] = useState<any>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [workspaceId, setWorkspaceId] = useState<string | null>(null)
   const [workspaceAddress, setWorkspaceAddress] = useState<string | null>(null)
   const [workspaceToast, setWorkspaceToast] = useState<string | null>(null)
@@ -45,6 +49,7 @@ export default function PriceDropKit() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserId(user.id)
+        if (isDemoUser(user)) setIsDemo(true)
         if (wsId) {
           const { data: ws } = await supabase.from('listing_workspaces').select('*').eq('id', wsId).single()
           if (ws) {
@@ -95,6 +100,7 @@ export default function PriceDropKit() {
       const data = await res.json()
       if (data.result) {
         setResult(data.result)
+        if (isDemo) markDemoGenerationUsed('price-drop')
         if (workspaceId) {
           await saveToWorkspace(workspaceId, 'price_drop_kit', data.result.mlsUpdate || JSON.stringify(data.result).slice(0, 500))
           const toast = `✅ Saved to ${workspaceAddress || 'workspace'}`
@@ -105,6 +111,13 @@ export default function PriceDropKit() {
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
   }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'price-drop') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <div style={styles.page}>

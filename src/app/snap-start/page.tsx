@@ -6,6 +6,9 @@ import { trackEvent } from '../lib/analytics'
 
 import Navbar from '../components/Navbar'
 
+import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
+import DemoLockedCard from '../components/DemoLockedCard'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -14,6 +17,7 @@ const supabase = createClient(
 export default function SnapStartPage() {
   const router = useRouter()
   const [userId, setUserId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
   const [plan, setPlan] = useState('starter')
   const [planLoaded, setPlanLoaded] = useState(false)
   const [step, setStep] = useState<'upload' | 'confirm' | 'results'>('upload')
@@ -41,6 +45,7 @@ export default function SnapStartPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUserId(user.id)
+      if (isDemoUser(user)) setIsDemo(true)
       const { data: profile } = await supabase
         .from('profiles').select('plan').eq('id', user.id).single()
       if (profile) { setPlan(profile.plan || 'starter'); setPlanLoaded(true) }
@@ -140,6 +145,7 @@ export default function SnapStartPage() {
       if (data.error === 'LIMIT_REACHED') { router.push('/pricing'); return }
       if (data.outputs) {
         setOutputs(data.outputs)
+        if (isDemo) markDemoGenerationUsed('snap-start')
         setStep('results')
         setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
       }
@@ -160,6 +166,13 @@ export default function SnapStartPage() {
   const labelStyle = { fontSize: '11px', fontWeight: '600' as const, color: 'var(--lw-text-muted)', display: 'block' as const, marginBottom: '5px', letterSpacing: '0.5px', textTransform: 'uppercase' as const }
   const cardStyle = { background: 'var(--lw-card)', borderRadius: '16px', border: '1px solid var(--lw-border)', padding: '1.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', marginBottom: '1rem' }
   const sectionHeadStyle = { fontSize: '11px', fontWeight: '700' as const, color: 'var(--lw-text-muted)', letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: '12px' }
+
+  if (isDemo && hasUsedDemoGeneration() && getDemoGenerationTool() !== 'snap-start') return (
+    <div style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      <Navbar />
+      <DemoLockedCard reason="limit_reached" usedTool={getDemoGenerationTool()} />
+    </div>
+  )
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
