@@ -78,7 +78,7 @@ export default function Home() {
         <div style={{fontSize:'18px',fontWeight:'700'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <div style={{display:'flex',gap:'16px',alignItems:'center'}}>
           <a href="#features" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Features</a>
-          <a href="#pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
+          <a href="/pricing" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Pricing</a>
           <a href="/learn" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Free Guides</a>
           <a href="/login" style={{fontSize:'14px',color:'#555',textDecoration:'none'}}>Sign In</a>
           <a href="/signup" style={{fontSize:'13px',background:'#1D9E75',color:'#fff',padding:'8px 16px',borderRadius:'8px',textDecoration:'none',fontWeight:'600',whiteSpace:'nowrap',boxShadow:'0 2px 8px rgba(29,158,117,0.3)'}}>Start Free — No Credit Card</a>
@@ -659,7 +659,7 @@ export default function Home() {
       <footer style={{padding:'2rem',textAlign:'center',borderTop:'1px solid #eee',background:'#fff'}}>
         <div style={{fontSize:'16px',fontWeight:'700',marginBottom:'8px'}}>Listing<span style={{color:'#1D9E75'}}>Whisperer</span></div>
         <p style={{fontSize:'13px',color:'#aaa',marginBottom:'8px'}}>The AI assistant for real estate agents. Before the appointment, on-site, and at launch.</p>
-        <p style={{fontSize:'13px',color:'#aaa'}}>© 2026 Listing Whisperer · <a href="/login" style={{color:'#aaa'}}>Sign In</a> · <a href="/signup" style={{color:'#aaa'}}>Start Free — No Credit Card</a> · <a href="#pricing" style={{color:'#aaa'}}>Pricing</a> · <a href="/faq" style={{color:'#aaa'}}>FAQ</a> · <a href="/contact" style={{color:'#aaa'}}>Contact Us</a> · <a href="/terms" style={{color:'#aaa'}}>Terms</a> · <a href="/privacy" style={{color:'#aaa'}}>Privacy</a></p>
+        <p style={{fontSize:'13px',color:'#aaa'}}>© 2026 Listing Whisperer · <a href="/login" style={{color:'#aaa'}}>Sign In</a> · <a href="/signup" style={{color:'#aaa'}}>Start Free — No Credit Card</a> · <a href="/pricing" style={{color:'#aaa'}}>Pricing</a> · <a href="/faq" style={{color:'#aaa'}}>FAQ</a> · <a href="/contact" style={{color:'#aaa'}}>Contact Us</a> · <a href="/terms" style={{color:'#aaa'}}>Terms</a> · <a href="/privacy" style={{color:'#aaa'}}>Privacy</a></p>
       </footer>
 
     </main>
