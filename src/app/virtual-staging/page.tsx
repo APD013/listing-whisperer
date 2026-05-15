@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { saveToWorkspace } from '../lib/workspace'
-import { trackVirtualStageStarted, trackVirtualStageCompleted } from '../lib/analytics'
+import { trackVirtualStageStarted, trackVirtualStageCompleted, trackEvent } from '../lib/analytics'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
 
@@ -189,8 +189,10 @@ export default function VirtualStagingPage() {
         body: JSON.stringify({ priceId, userId })
       })
       const data = await res.json()
-      if (data.url) window.location.href = data.url
-      else alert('Error: ' + (data.error || 'Could not create checkout session'))
+      if (data.url) {
+        trackEvent('checkout_started', { source: 'virtual_staging_credits' })
+        window.location.href = data.url
+      } else alert('Error: ' + (data.error || 'Could not create checkout session'))
     } catch (e: any) {
       alert('Error: ' + e.message)
     }

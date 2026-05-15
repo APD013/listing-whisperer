@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { trackUpgradeClick, trackCheckoutStarted, trackEvent } from '../lib/analytics'
+import { trackUpgradeClick, trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,7 +24,6 @@ export default function PricingPage() {
   }, [])
 
   const handleCheckout = async (priceId: string, mode: string, label: string) => {
-    trackCheckoutStarted(mode)
     trackUpgradeClick(label, mode)
     setLoading(label)
     try {
@@ -34,7 +33,10 @@ export default function PricingPage() {
         body: JSON.stringify({ priceId, mode, userId }),
       })
       const data = await res.json()
-      if (data.url) window.location.href = data.url
+      if (data.url) {
+        trackEvent('checkout_started', { source: 'pricing_page', plan: label, value: 20, currency: 'USD' })
+        window.location.href = data.url
+      }
     } catch (err) { console.error(err) }
     setLoading(null)
   }

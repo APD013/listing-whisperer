@@ -40,6 +40,8 @@ export default function SignupPage() {
       if (error) { setMessage(error.message); setLoading(false); return }
       if (!data.user) { setMessage('Account could not be created. Please try again.'); setLoading(false); return }
 
+      trackSignupCompleted(data.user.id)
+
       if (refCode && data.user) {
         try {
           await supabase.rpc('handle_referral', { referral_code_used: refCode, new_user_id: data.user.id })
@@ -64,7 +66,6 @@ export default function SignupPage() {
         }
       }
 
-      trackSignupCompleted('new_user')
       window.location.href = '/dashboard'
     } catch(e: any) {
       setMessage('Something went wrong. Please try again.')
