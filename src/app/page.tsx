@@ -107,7 +107,7 @@ export default function Home() {
         <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'1rem'}}>
           <a href="/signup" onClick={() => trackCTAClick('hero_cta', 'homepage')}
             style={{background:'#1D9E75',color:'#fff',padding:'15px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 20px rgba(29,158,117,0.35)',transition:'all 0.2s'}}>
-            Start Free — 24 Hours of Pro →
+            Start Free — 7 Days of Pro →
           </a>
           <a href="#examples"
             style={{background:'#fff',color:'#111',padding:'15px 32px',borderRadius:'10px',textDecoration:'none',fontWeight:'500',fontSize:'16px',border:'1px solid #ddd'}}>

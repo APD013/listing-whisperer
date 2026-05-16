@@ -15,7 +15,23 @@
       "Bash(grep -r \"resend\\\\|Resend\\\\|nodemailer\\\\|sendgrid\" --include=\"*.ts\" --include=\"*.tsx\" -l)",
       "Bash(ls src/app/api/)",
       "Bash(npm run *)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(sed -n \"58,63p\" D:/listing-whisperer/listing-whisperer/src/app/follow-up/page.tsx)",
+      "Bash(sed -n \"44,49p\" D:/listing-whisperer/listing-whisperer/src/app/open-house/page.tsx)",
+      "Bash(sed -n \"45,50p\" D:/listing-whisperer/listing-whisperer/src/app/price-drop/page.tsx)",
+      "Bash(sed -n \"57,63p\" D:/listing-whisperer/listing-whisperer/src/app/market-snapshot/page.tsx)",
+      "Bash(sed -n \"49,54p\" D:/listing-whisperer/listing-whisperer/src/app/social-planner/page.tsx)",
+      "Bash(sed -n \"105,112p\" D:/listing-whisperer/listing-whisperer/src/app/postcard-copy/page.tsx)",
+      "Bash(sed -n \"84,92p\" D:/listing-whisperer/listing-whisperer/src/app/referral-request/page.tsx)",
+      "Bash(sed -n \"89,95p\" D:/listing-whisperer/listing-whisperer/src/app/neighborhood-bio/page.tsx)",
+      "Bash(sed -n \"62,68p\" D:/listing-whisperer/listing-whisperer/src/app/objection-handler/page.tsx)",
+      "Bash(sed -n \"105,115p\" D:/listing-whisperer/listing-whisperer/src/app/postcard-copy/page.tsx)",
+      "Bash(sed -n \"86,96p\" D:/listing-whisperer/listing-whisperer/src/app/referral-request/page.tsx)",
+      "Bash(sed -n \"93,100p\" D:/listing-whisperer/listing-whisperer/src/app/neighborhood-bio/page.tsx)",
+      "Bash(sed -n \"108,120p\" D:/listing-whisperer/listing-whisperer/src/app/postcard-copy/page.tsx)",
+      "Bash(sed -n \"91,105p\" D:/listing-whisperer/listing-whisperer/src/app/referral-request/page.tsx)",
+      "Bash(Get-ChildItem -Path \"D:\\\\listing-whisperer\\\\listing-whisperer\\\\src\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }
