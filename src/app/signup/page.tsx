@@ -104,11 +104,11 @@ export default function SignupPage() {
             </p>
             <div style={{ background: 'rgba(29,158,117,0.06)', border: '1px solid rgba(29,158,117,0.2)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '12px', color: '#1D9E75', margin: 0, lineHeight: '1.9', fontWeight: '500' }}>
-                ✓ 24 hours of full Pro access<br />
+                ✓ 7 days of full Pro access<br />
                 ✓ Unlimited listings in your trial<br />
                 ✓ All AI assistant tools unlocked<br />
                 ✓ No credit card required
-                {refCode && <><br />✓ <strong>Referral bonus — 24 hours of Pro free!</strong></>}
+                {refCode && <><br />✓ <strong>Referral bonus — 7 days of Pro free!</strong></>}
               </p>
             </div>
             <a href="/login" style={{ display: 'block', padding: '13px', background: 'linear-gradient(135deg,#1D9E75,#085041)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700', boxShadow: '0 4px 16px rgba(29,158,117,0.3)' }}>
@@ -119,11 +119,11 @@ export default function SignupPage() {
           <div style={{ background: 'var(--lw-card)', borderRadius: '20px', border: '1px solid var(--lw-border)', padding: '2rem', boxShadow: '0 8px 40px rgba(0,0,0,0.08)' }}>
 
             <h1 style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--lw-text)', margin: '0 0 6px', letterSpacing: '-0.02em' }}>Create your account</h1>
-            <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '0 0 1.25rem' }}>24 hours of Pro free · No credit card required</p>
+            <p style={{ fontSize: '13px', color: 'var(--lw-text-muted)', margin: '0 0 1.25rem' }}>7 days of Pro free · No credit card required</p>
 
             {/* FEATURE PILLS */}
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-              {['24hr Pro trial', 'Unlimited listings', 'All AI tools', 'No credit card'].map(f => (
+              {['7-day Pro trial', 'Unlimited listings', 'All AI tools', 'No credit card'].map(f => (
                 <span key={f} style={{ fontSize: '11px', fontWeight: '600', background: 'rgba(29,158,117,0.08)', color: '#1D9E75', padding: '3px 10px', borderRadius: '20px', border: '1px solid rgba(29,158,117,0.2)' }}>✓ {f}</span>
               ))}
             </div>

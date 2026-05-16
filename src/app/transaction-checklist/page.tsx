@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
+import ToolHandoff from '../components/ToolHandoff'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -340,6 +342,10 @@ export default function TransactionChecklistPage() {
           </button>
         </div>
 
+        <ToolHandoff from="transaction-checklist" handoffs={[
+          { emoji: '⏰', text: 'Set reminders for deadlines', cta: 'Reminders', href: '/reminders' },
+          { emoji: '👥', text: 'Track your clients & leads', cta: 'Leads & CRM', href: '/leads' },
+        ]} />
         <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
           <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Back to Dashboard</a>
         </div>

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 import { trackUpgradeClick } from '../lib/analytics'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
@@ -540,6 +541,10 @@ export default function ListingRescuePage() {
                 🔄 New Rescue
               </button>
             </div>
+            <ToolHandoff from="listing-rescue" handoffs={[
+              { emoji: '🚀', text: 'Build launch marketing', cta: 'Launch Kit', href: '/launch-kit' },
+              { emoji: '📉', text: 'Prepare a price drop kit', cta: 'Price Drop', href: '/price-drop' },
+            ]} />
           </div>
         )}
 

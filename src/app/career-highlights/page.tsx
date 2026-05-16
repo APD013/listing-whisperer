@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -284,6 +285,10 @@ export default function CareerHighlightsPage() {
           </div>
         )}
 
+        <ToolHandoff from="career-highlights" handoffs={[
+          { emoji: '🌟', text: 'Showcase your full portfolio', cta: 'Agent Portfolio', href: '/agent-portfolio' },
+          { emoji: '🙋', text: 'Ask happy clients for referrals', cta: 'Referral Request', href: '/referral-request' },
+        ]} />
         <div style={{ textAlign: 'center', marginTop: '2rem', paddingBottom: '2rem' }}>
           <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Back to Dashboard</a>
         </div>

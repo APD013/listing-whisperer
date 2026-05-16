@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -269,6 +270,10 @@ export default function ListingPerformancePage() {
             </div>
           </div>
         )}
+        <ToolHandoff from="listing-performance" handoffs={[
+          { emoji: '🚀', text: 'Build your full launch kit', cta: 'Launch Kit', href: '/launch-kit' },
+          { emoji: '📉', text: 'Prepare a price drop kit', cta: 'Price Drop', href: '/price-drop' },
+        ]} />
       </div>
     </main>
   )

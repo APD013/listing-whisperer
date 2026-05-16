@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     }
 
     const now = new Date()
-    const in2Hours = new Date(now.getTime() + 2 * 60 * 60 * 1000)
+    const in24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
 
     // Get profiles with trial_ends_at
@@ -47,23 +47,23 @@ export async function GET(request: Request) {
       const trialEnds = new Date(profile.trial_ends_at)
       const name = profile.full_name?.split(' ')[0] || 'there'
 
-      // TRIAL ENDING SOON — expires within 2 hours
+      // TRIAL ENDING SOON — expires within 24 hours
       if (
         trialEnds > now &&
-        trialEnds < in2Hours &&
+        trialEnds < in24Hours &&
         !profile.trial_ending_email_sent
       ) {
         await sendEmail(
           profile.email,
-          '⏰ Your Listing Whisperer trial ends soon',
+          '⏰ Your Listing Whisperer trial ends tomorrow',
           `
           <div style="font-family: Inter, sans-serif; max-width: 560px; margin: 0 auto; padding: 2rem; background: #ffffff;">
             <div style="text-align: center; margin-bottom: 2rem;">
               <h1 style="font-size: 24px; font-weight: 700; color: #111;">Listing<span style="color: #1D9E75;">Whisperer</span></h1>
             </div>
-            <h2 style="font-size: 20px; font-weight: 700; color: #111; margin-bottom: 1rem;">Hey ${name}, your trial ends in 2 hours ⏰</h2>
+            <h2 style="font-size: 20px; font-weight: 700; color: #111; margin-bottom: 1rem;">Hey ${name}, your trial ends tomorrow ⏰</h2>
             <p style="font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 1.5rem;">
-              Your 24-hour Pro trial is almost up. Don't lose access to your AI assistant, scripts, seller prep tools, and everything else you've been using.
+              Your 7-day Pro trial is almost up. Don't lose access to your AI assistant, scripts, seller prep tools, and everything else you've been using.
             </p>
             <div style="background: #f0fdf8; border: 1px solid #bbf0d9; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
               <p style="font-size: 14px; color: #085041; font-weight: 700; margin: 0 0 10px;">Everything you keep with Pro:</p>
@@ -103,7 +103,7 @@ export async function GET(request: Request) {
             </div>
             <h2 style="font-size: 20px; font-weight: 700; color: #111; margin-bottom: 1rem;">Hey ${name}, your trial has ended 🔒</h2>
             <p style="font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 1.5rem;">
-              Your 24-hour Pro trial has expired. Upgrade now to keep using your AI assistant, scripts, seller prep, and all your tools — just $20/month.
+              Your 7-day Pro trial has expired. Upgrade now to keep using your AI assistant, scripts, seller prep, and all your tools — just $20/month.
             </p>
             <div style="background: #f0fdf8; border: 1px solid #bbf0d9; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
               <p style="font-size: 14px; color: #085041; font-weight: 700; margin: 0 0 10px;">What you get with Pro:</p>

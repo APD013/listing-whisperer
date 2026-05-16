@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
+import ToolHandoff from '../components/ToolHandoff'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -245,6 +246,10 @@ export default function SellerNetSheetPage() {
           </button>
         )}
 
+        <ToolHandoff from="seller-net-sheet" handoffs={[
+          { emoji: '📊', text: 'Build your listing presentation', cta: 'Listing Presentation', href: '/listing-presentation' },
+          { emoji: '🧮', text: 'Calculate commission splits', cta: 'Commission Calculator', href: '/commission-calculator' },
+        ]} />
         <div style={{textAlign:'center'}}>
           <a href="/dashboard" style={{fontSize:'13px',color:'var(--lw-text-muted)',textDecoration:'none'}}>← Back to Dashboard</a>
         </div>

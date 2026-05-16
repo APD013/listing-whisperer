@@ -6,6 +6,7 @@ import { trackEvent, trackListingCreated } from '../lib/analytics'
 import Navbar from '../components/Navbar'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
+import ToolHandoff from '../components/ToolHandoff'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -545,6 +546,10 @@ export default function QuickListingPage() {
                   onSaved={addr => { const t = `✅ Saved to ${addr} workspace`; setWorkspaceToast(t); setTimeout(() => setWorkspaceToast(null), 3500) }}
                 />
               )}
+              <ToolHandoff from="quick-listing" handoffs={[
+                { emoji: '🛋️', text: 'Virtually stage a room photo', cta: 'Stage Photos', href: '/virtual-staging' },
+                { emoji: '🚀', text: 'Build your full launch kit', cta: 'Launch Kit', href: '/launch-kit' },
+              ]} />
             </div>
           </div>
         )}

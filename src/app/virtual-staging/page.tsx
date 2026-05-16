@@ -7,6 +7,7 @@ import { trackVirtualStageStarted, trackVirtualStageCompleted, trackEvent } from
 import { isDemoUser } from '../lib/demoMode'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 import DemoLockedCard from '../components/DemoLockedCard'
 
 const supabase = createClient(
@@ -516,6 +517,10 @@ export default function VirtualStagingPage() {
                 />
               </div>
             )}
+            <ToolHandoff from="virtual-staging" handoffs={[
+              { emoji: '📝', text: 'Generate listing copy from photos', cta: 'Quick Listing', href: '/quick-listing' },
+              { emoji: '📣', text: 'Build your full launch kit', cta: 'Launch Kit', href: '/launch-kit' },
+            ]} />
           </div>
         )}
 

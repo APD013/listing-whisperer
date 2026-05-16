@@ -6,6 +6,7 @@ import { trackEvent, trackLaunchKitCreated } from '../lib/analytics'
 import Navbar from '../components/Navbar'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
+import ToolHandoff from '../components/ToolHandoff'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -392,6 +393,10 @@ export default function LaunchKitPage() {
               onSaved={addr => { const t = `✅ Saved to ${addr} workspace`; setWorkspaceToast(t); setTimeout(() => setWorkspaceToast(null), 3500) }}
             />
           )}
+          <ToolHandoff from="launch-kit" handoffs={[
+            { emoji: '👥', text: 'Track your clients & leads', cta: 'Leads & CRM', href: '/leads' },
+            { emoji: '⏰', text: 'Send follow-up emails', cta: 'Follow-Up', href: '/follow-up' },
+          ]} />
           </>
         )}
 

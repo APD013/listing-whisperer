@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
+import ToolHandoff from '../components/ToolHandoff'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -293,6 +294,9 @@ export default function CommissionCalculatorPage() {
           </button>
         )}
 
+        <ToolHandoff from="commission-calculator" handoffs={[
+          { emoji: '💵', text: 'Calculate seller net proceeds', cta: 'Seller Net Sheet', href: '/seller-net-sheet' },
+        ]} />
         <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
           <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Back to Dashboard</a>
         </div>

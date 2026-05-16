@@ -21,7 +21,7 @@ const FAQ_SECTIONS = [
       },
       {
         q: 'Is there a free trial?',
-        a: 'Yes. 24 hours of full Pro access, no credit card required.',
+        a: 'Yes. 7 days of full Pro access, no credit card required.',
       },
     ],
   },

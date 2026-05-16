@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 import { trackUpgradeClick } from '../lib/analytics'
 
 const supabase = createClient(
@@ -255,6 +256,10 @@ export default function PortfolioSetupPage() {
           </div>
         </div>
 
+        <ToolHandoff from="agent-portfolio" handoffs={[
+          { emoji: '🏆', text: 'Highlight your best deals', cta: 'Career Highlights', href: '/career-highlights' },
+          { emoji: '🙋', text: 'Ask happy clients for referrals', cta: 'Referral Request', href: '/referral-request' },
+        ]} />
         <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
           <a href="/dashboard" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--lw-text-muted)', textDecoration: 'none' }}>← Back to Dashboard</a>
         </div>

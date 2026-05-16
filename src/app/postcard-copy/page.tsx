@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -350,6 +351,10 @@ Generate 4 sections and return ONLY a JSON object with no other text:
               style={{ padding: '11px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', color: 'var(--lw-text-muted)', fontSize: '13px', cursor: 'pointer', fontWeight: '600', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
               ↺ Generate New Postcard
             </button>
+            <ToolHandoff from="postcard-copy" handoffs={[
+              { emoji: '📱', text: 'Get social media variations', cta: 'Social Planner', href: '/social-planner' },
+              { emoji: '📧', text: 'Send a follow-up email', cta: 'Follow-Up', href: '/follow-up' },
+            ]} />
           </div>
         )}
       </div>

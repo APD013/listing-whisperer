@@ -50,11 +50,11 @@ export default function Home() {
             <div style={{fontSize:'3rem',marginBottom:'1rem'}}>🎁</div>
             <h2 style={{fontSize:'1.5rem',fontWeight:'700',color:'#f0f0f0',marginBottom:'8px'}}>Wait — don't leave empty handed!</h2>
             <p style={{fontSize:'14px',color:'#6b7280',marginBottom:'1.5rem',lineHeight:'1.7'}}>
-              Get <strong style={{color:'#1D9E75'}}>24 hours of full Pro access free</strong> — no credit card required. Generate your first listing in 60 seconds.
+              Get <strong style={{color:'#1D9E75'}}>7 days of full Pro access free</strong> — no credit card required. Generate your first listing in 60 seconds.
             </p>
             <div style={{background:'rgba(29,158,117,0.1)',border:'1px solid rgba(29,158,117,0.2)',borderRadius:'10px',padding:'1rem',marginBottom:'1.5rem'}}>
               <p style={{fontSize:'13px',color:'#1D9E75',margin:'0',lineHeight:'1.8'}}>
-                ✓ Unlimited listings for 24 hours<br/>
+                ✓ Unlimited listings for 7 days<br/>
                 ✓ 11 copy formats per listing<br/>
                 ✓ Seller meeting prep<br/>
                 ✓ No credit card needed
@@ -407,7 +407,7 @@ export default function Home() {
               style={{display:'inline-block',background:'linear-gradient(135deg,#ef4444,#b91c1c)',color:'#fff',padding:'14px 36px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'15px',boxShadow:'0 4px 24px rgba(239,68,68,0.3)',marginBottom:'12px'}}>
               Try Call Capture Free →
             </a>
-            <p style={{fontSize:'12px',color:'#aaa',margin:'0'}}>Available on Pro plan · 24 hour free trial · No credit card</p>
+            <p style={{fontSize:'12px',color:'#aaa',margin:'0'}}>Available on Pro plan · 7-day free trial · No credit card</p>
           </div>
         </div>
       </section>
@@ -557,16 +557,16 @@ export default function Home() {
       {/* PRICING */}
       <section id="pricing" style={{padding:'5rem 2rem',maxWidth:'760px',margin:'0 auto',textAlign:'center'}}>
         <h2 style={{fontSize:'2rem',fontWeight:'700',marginBottom:'0.5rem',letterSpacing:'-0.3px'}}>Simple, honest pricing</h2>
-        <p style={{color:'#777',marginBottom:'0.5rem',fontSize:'15px'}}>Try free for 24 hours — then go Pro for $20/month.</p>
+        <p style={{color:'#777',marginBottom:'0.5rem',fontSize:'15px'}}>Try free for 7 days — then go Pro for $20/month.</p>
         <p style={{color:'#aaa',fontSize:'13px',marginBottom:'3.5rem'}}>No credit card required to start free.</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(2, 1fr)',gap:'1.5rem',maxWidth:'600px',margin:'0 auto'}}>
           <div style={{background:'#fff',borderRadius:'16px',padding:'2rem',border:'1px solid #eee',textAlign:'left'}}>
             <h3 style={{fontSize:'18px',fontWeight:'700',marginBottom:'4px'}}>Free Trial</h3>
             <p style={{color:'#aaa',fontSize:'13px',marginBottom:'1rem'}}>No credit card required</p>
             <p style={{fontSize:'2.5rem',fontWeight:'800',marginBottom:'4px',letterSpacing:'-1px'}}>$0</p>
-            <p style={{fontSize:'12px',color:'#bbb',marginBottom:'1.5rem'}}>24 hours of full Pro access</p>
+            <p style={{fontSize:'12px',color:'#bbb',marginBottom:'1.5rem'}}>7 days of full Pro access</p>
             <ul style={{fontSize:'14px',color:'#555',lineHeight:'2.2',paddingLeft:'0',listStyle:'none',marginBottom:'1.5rem'}}>
-              <li>✅ 24 hours of Pro access</li>
+              <li>✅ 7 days of Pro access</li>
               <li>✅ Unlimited listings during trial</li>
               <li>✅ All 11 copy formats</li>
               <li>✅ All AI assistant tools</li>
@@ -621,7 +621,7 @@ export default function Home() {
         <div style={{maxWidth:'620px',margin:'0 auto'}}>
           <h2 style={{textAlign:'center',fontSize:'2rem',fontWeight:'700',marginBottom:'3.5rem',letterSpacing:'-0.3px'}}>Frequently asked questions</h2>
           {[
-            {q:'Is this really free to start?',a:'Yes. You get 24 hours of full Pro access — unlimited listings completely free — no credit card required. After your trial, Pro is $20/month with unlimited listings and all features.'},
+            {q:'Is this really free to start?',a:'Yes. You get 7 days of full Pro access — unlimited listings completely free — no credit card required. After your trial, Pro is $20/month with unlimited listings and all features.'},
             {q:'What formats does it generate?',a:'MLS standard, Luxury MLS, Instagram captions, Facebook post, Email blast, Open house announcement, Video script, SMS, Flyer, Price Drop, and SEO copy — all from one set of notes.'},
             {q:'What is Seller Meeting Prep?',a:'Before your listing appointment, Listing Whisperer generates a complete meeting outline, talking points, questions to ask the seller, and a follow-up email — so you walk in fully prepared.'},
             {q:'What is Snap & Start?',a:'On your phone or tablet, upload property photos on-site. Our AI detects visible features, you confirm the details, and generate your first draft before you leave the property.'},
@@ -647,7 +647,7 @@ export default function Home() {
         <p style={{fontSize:'16px',color:'#085041',fontWeight:'600',maxWidth:'560px',margin:'0 auto 1.25rem',lineHeight:'1.7',fontStyle:'italic'}}>
           "From listing appointment to closing — Listing Whisperer handles the marketing, so you can focus on the clients."
         </p>
-        <p style={{fontSize:'15px',color:'#555',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 24 hours of full Pro access, unlimited listings. No credit card needed.</p>
+        <p style={{fontSize:'15px',color:'#555',maxWidth:'420px',margin:'0 auto 2rem'}}>Start free — 7 days of full Pro access, unlimited listings. No credit card needed.</p>
         <a href="/signup" onClick={() => trackCTAClick('bottom_cta', 'homepage')}
           style={{display:'inline-block',background:'#1D9E75',color:'#fff',padding:'16px 40px',borderRadius:'10px',textDecoration:'none',fontWeight:'700',fontSize:'16px',boxShadow:'0 4px 24px rgba(29,158,117,0.35)'}}>
           Start Free — No Credit Card

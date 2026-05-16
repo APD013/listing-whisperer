@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -370,6 +371,10 @@ export default function BuyerConsultationPage() {
                 🔄 New Consultation Kit
               </button>
             </div>
+            <ToolHandoff from="buyer-consultation" handoffs={[
+              { emoji: '⏰', text: 'Set up a follow-up sequence', cta: 'Follow-Up Sequence', href: '/follow-up-sequence' },
+              { emoji: '🏘️', text: 'Build a neighborhood bio', cta: 'Neighborhood Bio', href: '/neighborhood-bio' },
+            ]} />
           </div>
         )}
 

@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
-
+import ToolHandoff from '../components/ToolHandoff'
 import Navbar from '../components/Navbar'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
@@ -497,6 +497,10 @@ export default function SnapStartPage() {
                 🔄 New Snap & Start
               </button>
             </div>
+            <ToolHandoff from="snap-start" handoffs={[
+              { emoji: '📝', text: 'Generate full listing copy', cta: 'Quick Listing', href: '/quick-listing' },
+              { emoji: '🛋️', text: 'Virtually stage a room photo', cta: 'Virtual Staging', href: '/virtual-staging' },
+            ]} />
           </div>
         )}
       </div>

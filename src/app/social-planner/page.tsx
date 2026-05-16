@@ -6,6 +6,7 @@ import { trackEvent } from '../lib/analytics'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -367,6 +368,10 @@ export default function SocialPlannerPage() {
                 }}
               />
             )}
+            <ToolHandoff from="social-planner" handoffs={[
+              { emoji: '🚀', text: 'Build your full launch kit', cta: 'Launch Kit', href: '/launch-kit' },
+              { emoji: '👥', text: 'Track your clients & leads', cta: 'Leads & CRM', href: '/leads' },
+            ]} />
           </div>
         )}
       </div>

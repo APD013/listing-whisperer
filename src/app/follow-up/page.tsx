@@ -6,6 +6,7 @@ import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -422,6 +423,10 @@ export default function FollowUpAssistant() {
                 onSaved={addr => { const t = `✅ Saved to ${addr} workspace`; setWorkspaceToast(t); setTimeout(() => setWorkspaceToast(null), 3500) }}
               />
             )}
+            <ToolHandoff from="follow-up" handoffs={[
+              { emoji: '⏰', text: 'Build a full follow-up sequence', cta: 'Follow-Up Sequence', href: '/follow-up-sequence' },
+              { emoji: '👥', text: 'Track your clients & leads', cta: 'Leads & CRM', href: '/leads' },
+            ]} />
           </div>
         )}
 

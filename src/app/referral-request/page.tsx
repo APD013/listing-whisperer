@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -303,6 +304,9 @@ Generate 4 scripts and return ONLY a JSON object with no other text:
               style={{ padding: '11px', background: 'var(--lw-input)', border: '1px solid var(--lw-border)', borderRadius: '10px', color: 'var(--lw-text-muted)', fontSize: '13px', cursor: 'pointer', fontWeight: '600', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
               ↺ Generate New Request
             </button>
+            <ToolHandoff from="referral-request" handoffs={[
+              { emoji: '👥', text: 'Track your clients & leads', cta: 'Leads & CRM', href: '/leads' },
+            ]} />
           </div>
         )}
       </div>

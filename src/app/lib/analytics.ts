@@ -16,6 +16,8 @@ export type EventName =
   | 'upgrade_click'
   | 'checkout_started'
   | 'purchase'
+  | 'tool_handoff_clicked'
+  | 'lead_status_changed'
 
 declare global {
   interface Window {

@@ -5,6 +5,7 @@ import { trackEvent } from '../lib/analytics'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -330,6 +331,10 @@ export default function OpenHouseKit() {
                 }}
               />
             )}
+            <ToolHandoff from="open-house" handoffs={[
+              { emoji: '📋', text: 'Collect visitor sign-ins', cta: 'Open House Sign-In', href: '/open-house-signin' },
+              { emoji: '🚀', text: 'Build your full launch kit', cta: 'Launch Kit', href: '/launch-kit' },
+            ]} />
           </div>
         )}
       </div>

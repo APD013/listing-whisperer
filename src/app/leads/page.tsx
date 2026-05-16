@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 import Navbar from '../components/Navbar'
+import { trackEvent } from '../lib/analytics'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,6 +38,8 @@ export default function LeadsPage() {
   const [composeMessage, setComposeMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [statusPopoverId, setStatusPopoverId] = useState<string | null>(null)
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null)
 
   const emptyForm = {
     name: '', phone: '', email: '', address: '',
@@ -122,6 +125,21 @@ export default function LeadsPage() {
     setTimeout(() => setToast(null), 3500)
   }
 
+  const updateLeadStatus = async (lead: any, newStatus: string) => {
+    const oldStatus = lead.status
+    setStatusPopoverId(null)
+    setUpdatingStatusId(lead.id)
+    setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status: newStatus } : l))
+    const { error } = await supabase.from('leads').update({ status: newStatus }).eq('id', lead.id)
+    if (error) {
+      setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status: oldStatus } : l))
+      showToast('Failed to update status')
+    } else {
+      trackEvent('lead_status_changed', { from: oldStatus, to: newStatus })
+    }
+    setUpdatingStatusId(null)
+  }
+
   const sendBulkMessage = async () => {
     if (!composeSubject.trim() || !composeMessage.trim()) return
     const ids = Array.from(selectedIds)
@@ -166,6 +184,9 @@ export default function LeadsPage() {
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--lw-bg)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+      {statusPopoverId && (
+        <div onClick={() => setStatusPopoverId(null)} style={{ position: 'fixed', inset: 0, zIndex: 99 }} />
+      )}
 
       <Navbar />
 
@@ -279,9 +300,26 @@ export default function LeadsPage() {
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', flexWrap: 'wrap' }}>
                       <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--lw-text)', margin: 0 }}>{lead.name}</h3>
-                      <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 10px', borderRadius: '20px', background: `${STATUS_COLORS[lead.status]}18`, color: STATUS_COLORS[lead.status], border: `1px solid ${STATUS_COLORS[lead.status]}35` }}>
-                        {lead.status}
-                      </span>
+                      <div style={{ position: 'relative' }}>
+                        {statusPopoverId === lead.id && (
+                          <div onClick={(e) => e.stopPropagation()}
+                            style={{ position: 'absolute', top: '100%', left: 0, zIndex: 100, background: 'var(--lw-card)', border: '1px solid var(--lw-border)', borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', padding: '6px', minWidth: '164px', marginTop: '4px' }}>
+                            {STATUS_OPTIONS.map(s => (
+                              <button key={s}
+                                onClick={() => updateLeadStatus(lead, s)}
+                                style={{ display: 'block', width: '100%', padding: '7px 12px', background: lead.status === s ? `${STATUS_COLORS[s]}15` : 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', textAlign: 'left', fontSize: '12px', fontWeight: lead.status === s ? '700' : '500', color: lead.status === s ? STATUS_COLORS[s] : 'var(--lw-text)', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+                                {s}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setStatusPopoverId(prev => prev === lead.id ? null : lead.id) }}
+                          disabled={updatingStatusId === lead.id}
+                          style={{ fontSize: '11px', fontWeight: '700', padding: '3px 10px', borderRadius: '20px', background: `${STATUS_COLORS[lead.status]}18`, color: STATUS_COLORS[lead.status], border: `1px solid ${STATUS_COLORS[lead.status]}35`, cursor: 'pointer', fontFamily: 'var(--font-plus-jakarta), sans-serif' }}>
+                          {updatingStatusId === lead.id ? '...' : lead.status}
+                        </button>
+                      </div>
                       {lead.source === 'call_capture' && (
                         <span style={{ fontSize: '10px', fontWeight: '700', padding: '3px 8px', borderRadius: '20px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
                           📞 Call Capture

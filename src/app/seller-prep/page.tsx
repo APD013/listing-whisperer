@@ -7,6 +7,7 @@ import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -483,6 +484,10 @@ export default function SellerPrepPage() {
               onSaved={addr => { const t = `✅ Saved to ${addr} workspace`; setWorkspaceToast(t); setTimeout(() => setWorkspaceToast(null), 3500) }}
             />
           )}
+          <ToolHandoff from="seller-prep" handoffs={[
+            { emoji: '💰', text: 'Price the listing strategically', cta: 'Pricing Assistant', href: '/pricing-assistant' },
+            { emoji: '🛡️', text: 'Handle seller objections', cta: 'Objection Handler', href: '/objection-handler' },
+          ]} />
           </>
         )}
 

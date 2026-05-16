@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
+import ToolHandoff from '../components/ToolHandoff'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -118,6 +120,12 @@ export default function OpenHouseSignInHome() {
             </div>
             <p style={{ fontSize: '11px', color: 'var(--lw-text-muted)', margin: '10px 0 0', textAlign: 'center' as const }}>Share this link or open it on a tablet at your open house</p>
           </div>
+        )}
+        {url && (
+          <ToolHandoff from="open-house-signin" handoffs={[
+            { emoji: '⏰', text: 'Set up a follow-up sequence', cta: 'Follow-Up Sequence', href: '/follow-up-sequence' },
+            { emoji: '👥', text: 'Track your clients & leads', cta: 'Leads & CRM', href: '/leads' },
+          ]} />
         )}
       </div>
     </div>

@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 import { trackUpgradeClick } from '../lib/analytics'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
@@ -468,6 +469,10 @@ export default function FollowUpSequencePage() {
                 </div>
               </div>
             )}
+            <ToolHandoff from="follow-up-sequence" handoffs={[
+              { emoji: '⏰', text: 'Set reminders for each touchpoint', cta: 'Reminders', href: '/reminders' },
+              { emoji: '👥', text: 'Track your clients & leads', cta: 'Leads & CRM', href: '/leads' },
+            ]} />
           </div>
         )}
 

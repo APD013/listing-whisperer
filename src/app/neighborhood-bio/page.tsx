@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
+import ToolHandoff from '../components/ToolHandoff'
 import AskAiHint from '../components/AskAiHint'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
@@ -283,6 +284,12 @@ Format it as 3-4 engaging paragraphs. Make it sound like it was written by a loc
             </div>
             <p style={{ fontSize: '14px', lineHeight: '1.9', color: 'var(--lw-text)', whiteSpace: 'pre-wrap', margin: 0 }}>{output}</p>
           </div>
+        )}
+        {output && (
+          <ToolHandoff from="neighborhood-bio" handoffs={[
+            { emoji: '🤝', text: 'Prepare for buyer consultation', cta: 'Buyer Consultation', href: '/buyer-consultation' },
+            { emoji: '📊', text: 'Build listing presentation', cta: 'Listing Presentation', href: '/listing-presentation' },
+          ]} />
         )}
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>

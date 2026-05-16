@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackRewriteUsed, trackUpgradeClick, trackEvent } from '../lib/analytics'
+import ToolHandoff from '../components/ToolHandoff'
 
 import Navbar from '../components/Navbar'
 
@@ -284,6 +285,10 @@ export default function RewritePage() {
                 </button>
               </div>
             </div>
+            <ToolHandoff from="rewrite" handoffs={[
+              { emoji: '🚀', text: 'Build launch marketing', cta: 'Launch Kit', href: '/launch-kit' },
+              { emoji: '📱', text: 'Get social variations', cta: 'Social Planner', href: '/social-planner' },
+            ]} />
           </div>
         )}
       </div>

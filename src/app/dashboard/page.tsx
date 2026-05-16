@@ -667,7 +667,7 @@ export default function Dashboard() {
           )}
           {plan === 'starter' && (
             <div style={{fontSize:'10px',color:'#2a2a2a',textAlign:'center',marginBottom:'8px'}}>
-              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : '✅ 24 hours of Pro — unlimited listings'}
+              {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} remaining` : '✅ 7 days of Pro — unlimited listings'}
             </div>
           )}
           <div style={{display:'flex',justifyContent:'center',gap:'10px'}}>
@@ -758,7 +758,7 @@ export default function Dashboard() {
                       onMouseOut={e => e.currentTarget.style.borderColor='rgba(255,255,255,0.06)'}>
                       <div>
                         <div style={{fontSize:'11px',fontWeight:'600',color:'#d0d0d0'}}>
-                          {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} left` : '✅ 24 hours unlimited'}
+                          {listingCredits > 0 ? `${listingCredits} credit${listingCredits > 1 ? 's' : ''} left` : '✅ 7 days unlimited'}
                         </div>
                         <div style={{fontSize:'10px',color:'#1D9E75',marginTop:'2px',fontWeight:'500'}}>Upgrade to Pro →</div>
                       </div>
@@ -1239,7 +1239,7 @@ export default function Dashboard() {
                     <span style={{fontSize:'1.5rem'}}>🎁</span>
                     <div>
                       <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share Listing Whisperer — you both get a reward!</p>
-                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 24 hours of Pro free · You get 25% off your next month</p>
+                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 7 days of Pro free · You get 25% off your next month</p>
                     </div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>

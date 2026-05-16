@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -342,6 +343,10 @@ export default function ListingPresentation() {
                 ↺ New Presentation
               </button>
             </div>
+            <ToolHandoff from="listing-presentation" handoffs={[
+              { emoji: '🛡️', text: 'Handle seller objections', cta: 'Objection Handler', href: '/objection-handler' },
+              { emoji: '📝', text: 'Generate listing copy', cta: 'Quick Listing', href: '/quick-listing' },
+            ]} />
           </div>
         )}
 

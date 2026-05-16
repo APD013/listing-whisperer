@@ -99,7 +99,7 @@ export default function TermsOfService() {
             <div id="trial" style={{...styles.card}}>
               <h2 style={{fontSize:'16px',fontWeight:'700',color:'#1D9E75',margin:'0 0 12px'}}>4. Free Trial</h2>
               <p style={{fontSize:'14px',color:'#8b8fa8',lineHeight:'1.8',margin:'0'}}>
-                We offer a 24-hour free trial that includes full Pro access and up to 2 listings at no charge. No credit card is required to start your trial. The free trial is available once per person and once per household. Creating multiple accounts to obtain additional free trials is prohibited and may result in account termination. After your trial expires, continued use of Pro features requires a paid subscription.
+                We offer a 7-day free trial that includes full Pro access and up to 2 listings at no charge. No credit card is required to start your trial. The free trial is available once per person and once per household. Creating multiple accounts to obtain additional free trials is prohibited and may result in account termination. After your trial expires, continued use of Pro features requires a paid subscription.
               </p>
             </div>
 

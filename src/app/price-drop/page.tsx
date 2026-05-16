@@ -5,6 +5,7 @@ import { trackEvent } from '../lib/analytics'
 import { saveToWorkspace } from '../lib/workspace'
 import SaveToWorkspace from '../components/SaveToWorkspace'
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -328,6 +329,10 @@ export default function PriceDropKit() {
                 }}
               />
             )}
+            <ToolHandoff from="price-drop" handoffs={[
+              { emoji: '🚀', text: 'Build launch marketing', cta: 'Launch Kit', href: '/launch-kit' },
+              { emoji: '⏰', text: 'Set up follow-up sequence', cta: 'Follow-Up Sequence', href: '/follow-up-sequence' },
+            ]} />
           </div>
         )}
       </div>

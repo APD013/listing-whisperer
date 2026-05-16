@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 import { trackUpgradeClick } from '../lib/analytics'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
@@ -523,6 +524,10 @@ export default function VideoStudioPage() {
                 </div>
               </div>
             )}
+            <ToolHandoff from="video-studio" handoffs={[
+              { emoji: '🚀', text: 'Build your full launch kit', cta: 'Launch Kit', href: '/launch-kit' },
+              { emoji: '📱', text: 'Schedule social posts', cta: 'Social Planner', href: '/social-planner' },
+            ]} />
           </div>
         )}
 

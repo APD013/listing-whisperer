@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
 import Navbar from '../components/Navbar'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -424,6 +425,10 @@ export default function PricingAssistant() {
                 ↺ Run Again
               </button>
             </div>
+            <ToolHandoff from="pricing-assistant" handoffs={[
+              { emoji: '📊', text: 'Build your listing presentation', cta: 'Listing Presentation', href: '/listing-presentation' },
+              { emoji: '💵', text: 'Calculate seller net proceeds', cta: 'Seller Net Sheet', href: '/seller-net-sheet' },
+            ]} />
           </div>
         )}
 

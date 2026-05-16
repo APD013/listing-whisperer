@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { trackEvent } from '../lib/analytics'
 import AskAiHint from '../components/AskAiHint'
+import ToolHandoff from '../components/ToolHandoff'
 
 import { isDemoUser, hasUsedDemoGeneration, getDemoGenerationTool, markDemoGenerationUsed } from '../lib/demoMode'
 import DemoLockedCard from '../components/DemoLockedCard'
@@ -248,6 +249,10 @@ export default function ObjectionHandlerPage() {
                 📋 Seller Prep
               </a>
             </div>
+            <ToolHandoff from="objection-handler" handoffs={[
+              { emoji: '📊', text: 'Build your listing presentation', cta: 'Listing Presentation', href: '/listing-presentation' },
+              { emoji: '🤝', text: 'Prepare for seller meeting', cta: 'Seller Prep', href: '/seller-prep' },
+            ]} />
           </div>
         )}
 
