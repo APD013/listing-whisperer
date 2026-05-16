@@ -969,116 +969,114 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* TOOL TIERS */}
+              {/* QUICK ACTIONS + WORKSPACE SECTIONS */}
               <div id="all-tools" style={{marginBottom:'3rem'}}>
 
-                {/* TIER 1 — HERO TOOLS */}
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))',gap:'14px',marginBottom:'2.5rem'}}>
+                {/* QUICK ACTIONS */}
+                <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 16px'}}>QUICK ACTIONS</p>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'14px',marginBottom:'3rem'}}>
                   {[
-                    { icon:'⚡', title:'Quick Listing', desc:'Generate a full listing from a few details in minutes', color:'#1D9E75', href:'/quick-listing', badge:'START HERE' },
-                    { icon:'📋', title:'Seller Prep', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep' },
-                    { icon:'👥', title:'Leads & Clients', desc:'Track your pipeline and manage client relationships', color:'#10b981', href:'/leads' },
-                    { icon:'📩', title:'Follow-Up Assistant', desc:'Turn showings and meetings into follow-up emails', color:'#6366f1', href:'/follow-up' },
-                    { icon:'📁', title:'Listing Workspaces', desc:'All your listings in one place — copy, photos, follow-ups, and more', color:'#1D9E75', href:'/workspaces' },
+                    { icon:'📝', title:'Create New Listing', desc:'Generate full marketing copy from notes', color:'#1D9E75', href:'/quick-listing' },
+                    { icon:'🛋️', title:'Stage Photos', desc:'Transform empty rooms in under 2 minutes', color:'#8b5cf6', href:'/virtual-staging' },
+                    { icon:'🤝', title:'Prep for Seller Meeting', desc:'Listing appointment package', color:'#f59e0b', href:'/seller-prep' },
+                    { icon:'📞', title:'Follow Up With Leads', desc:'Re-engage your pipeline', color:'#6366f1', href:'/follow-up' },
                   ].map((item, i) => (
                     <a key={i} href={item.href}
-                      style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',borderLeft:`3px solid ${item.color}`,padding:'1.75rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',position:'relative' as const}}
-                      onMouseOver={e => {e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow=`0 12px 36px ${item.color}25`}}
-                      onMouseOut={e => {e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)'}}>
-                      {item.badge && (
-                        <div style={{position:'absolute',top:'14px',right:'14px',background:'#1D9E75',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px'}}>
-                          {item.badge}
-                        </div>
-                      )}
-                      <div style={{width:'48px',height:'48px',borderRadius:'14px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'24px',marginBottom:'16px'}}>
-                        {item.icon}
-                      </div>
+                      style={{background:`linear-gradient(135deg,${item.color}12,${item.color}06)`,borderRadius:'16px',border:`1px solid ${item.color}30`,padding:'1.75rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}
+                      onMouseOver={e => {e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow=`0 12px 36px ${item.color}25`;e.currentTarget.style.borderColor=`${item.color}60`}}
+                      onMouseOut={e => {e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 2px 12px rgba(0,0,0,0.06)';e.currentTarget.style.borderColor=`${item.color}30`}}>
+                      <div style={{width:'52px',height:'52px',borderRadius:'14px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'26px',marginBottom:'16px'}}>{item.icon}</div>
                       <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 8px'}}>{item.title}</p>
                       <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',lineHeight:'1.6'}}>{item.desc}</p>
                     </a>
                   ))}
                 </div>
 
-                {/* TIER 2 — CORE TOOLS */}
-                <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 14px'}}>CORE TOOLS</p>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px',marginBottom:'1.75rem'}}>
-                  {([
-                    { icon:'✨', title:'New Listing', desc:'Create a full listing from scratch', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
-                    { icon:'🎯', title:'Listing Presentation', desc:'Build a winning listing presentation', color:'#8b5cf6', href:'/listing-presentation' },
-                    { icon:'🚀', title:'Launch Plan', desc:'7-day marketing rollout strategy', color:'#f59e0b', href:'/launch-kit' },
-                    { icon:'📅', title:'Social Planner', desc:'7-day social media content calendar', color:'#e1306c', href:'/social-planner' },
-                    { icon:'🏡', title:'Open House Kit', desc:'Flyer, posts, and follow-up emails', color:'#10b981', href:'/open-house' },
-                    { icon:'⏰', title:'Reminders', desc:'Never miss a follow-up or deadline', color:'#f59e0b', href:'/reminders' },
-                    { icon:'💲', title:'Pricing Assistant', desc:'Sharpen your pricing strategy', color:'#8b5cf6', href:'/pricing-assistant' },
-                    { icon:'📊', title:'Market Snapshot', desc:'Generate instant market reports', color:'#6366f1', href:'/market-snapshot' },
-                    { icon:'🎬', title:'Video Studio', desc:'Turn one listing photo into a complete video ad kit', color:'#e1306c', href:'/video-studio', pro:true },
-                    { icon:'🛋️', title:'Virtual Staging', desc:'Transform empty rooms into beautifully furnished spaces', color:'#8b5cf6', href:'/virtual-staging', pro:true },
-                  ] as any[]).map((item, i) => (
-                    item.href ? (
-                      <a key={i} href={item.href}
-                        style={{background:'var(--lw-card)',borderRadius:'13px',border:'1px solid var(--lw-border)',padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:isDark?'none':'0 2px 8px rgba(0,0,0,0.06)',position:'relative' as const}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor=`${item.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px ${item.color}20`}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=isDark?'none':'0 2px 8px rgba(0,0,0,0.06)'}}>
-                        {item.pro && <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#d4af37,#a07c20)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px'}}>PRO</div>}
-                        <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${item.color}12`,border:`1px solid ${item.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{item.icon}</div>
-                        <div style={{fontSize:'13px',fontWeight:'700',color:isDark?'#e0e0e0':'#111318',marginBottom:'4px'}}>{item.title}</div>
-                        <div style={{fontSize:'11px',color:isDark?'#6b7280':'#5a6172',lineHeight:'1.55'}}>{item.desc}</div>
-                      </a>
-                    ) : (
-                      <div key={i} onClick={item.action}
-                        style={{background:`linear-gradient(135deg,${item.color}0e,${item.color}05)`,borderRadius:'13px',border:`1px solid ${item.color}22`,padding:'1.25rem',cursor:'pointer',transition:'all 0.18s'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor=`${item.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px ${item.color}20`}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor=`${item.color}22`;e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
-                        <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${item.color}15`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{item.icon}</div>
-                        <div style={{fontSize:'13px',fontWeight:'700',color:isDark?'#e0e0e0':'#111318',marginBottom:'4px'}}>{item.title}</div>
-                        <div style={{fontSize:'11px',color:isDark?'#6b7280':'#5a6172',lineHeight:'1.55'}}>{item.desc}</div>
-                        <div style={{marginTop:'8px',fontSize:'11px',fontWeight:'600',color:item.color}}>Start now →</div>
-                      </div>
-                    )
-                  ))}
-                </div>
-
-                {/* TIER 3 — MORE TOOLS (collapsed) */}
-                {showMoreTools && (
-                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px',marginBottom:'1.25rem'}}>
-                    {[
-                      { icon:'🏠', title:'Buyer Consultation', desc:'Prepare for any buyer meeting', color:'#8b5cf6', href:'/buyer-consultation' },
-                      { icon:'🏆', title:'Agent Portfolio', desc:'Showcase your track record and wins', color:'#d4af37', href:'/agent-portfolio' },
-                      { icon:'⭐', title:'Career Highlights', desc:'Your stats and success story', color:'#f59e0b', href:'/career-highlights' },
-                      { icon:'🚨', title:'Listing Rescue', desc:'Revive a stale listing with fresh copy', color:'#ef4444', href:'/listing-rescue' },
-                      { icon:'📸', title:'Snap & Start', desc:'Start a listing from a photo', color:'#1D9E75', href:'/snap-start' },
-                      { icon:'✍️', title:'Rewrite Listing', desc:'Polish and improve existing copy', color:'#6366f1', href:'/rewrite' },
-                      { icon:'🖼️', title:'Photo Library', desc:'Organize your listing photos', color:'#10b981', href:'/photos' },
-                      { icon:'💰', title:'Price Drop Kit', desc:'Price improvement announcement suite', color:'#ef4444', href:'/price-drop' },
-                      { icon:'📬', title:'Postcard Copy', desc:'Just Listed & Just Sold postcards', color:'#6366f1', href:'/postcard-copy' },
-                      { icon:'🤝', title:'Referral Request', desc:'Turn every closing into your next listing', color:'#10b981', href:'/referral-request' },
-                      { icon:'📋', title:'Open House Sign-In', desc:'Tablet-friendly visitor sign-in sheet', color:'#1D9E75', href:'/open-house-signin' },
-                      { icon:'✅', title:'Transaction Checklist', desc:'Track every step from listing to closing', color:'#1D9E75', href:'/transaction-checklist' },
-                      { icon:'💰', title:'Seller Net Sheet', desc:'Estimate seller proceeds before closing', color:'#1D9E75', href:'/seller-net-sheet' },
-                      { icon:'🧮', title:'Commission Calculator', desc:'Calculate your real take-home', color:'#d4af37', href:'/commission-calculator' },
-                      { icon:'🛡️', title:'Objection Handler', desc:'Turn any objection into a confident response', color:'#8b5cf6', href:'/objection-handler' },
-                      { icon:'🏘️', title:'Neighborhood Bio', desc:'Compelling neighborhood descriptions', color:'#1D9E75', href:'/neighborhood-bio' },
-                      { icon:'🔄', title:'Follow-Up Sequence', desc:'Complete follow-up sequence for any lead', color:'#6366f1', href:'/follow-up-sequence' },
-                    ].map((item, i) => (
-                      <a key={i} href={item.href}
-                        style={{background:'var(--lw-card)',borderRadius:'13px',border:'1px solid var(--lw-border)',padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:isDark?'none':'0 2px 8px rgba(0,0,0,0.06)'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor=`${item.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px ${item.color}20`}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=isDark?'none':'0 2px 8px rgba(0,0,0,0.06)'}}>
-                        <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${item.color}12`,border:`1px solid ${item.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{item.icon}</div>
-                        <div style={{fontSize:'13px',fontWeight:'700',color:isDark?'#e0e0e0':'#111318',marginBottom:'4px'}}>{item.title}</div>
-                        <div style={{fontSize:'11px',color:isDark?'#6b7280':'#5a6172',lineHeight:'1.55'}}>{item.desc}</div>
-                      </a>
-                    ))}
+                {/* WORKSPACE SECTIONS */}
+                {([
+                  {
+                    emoji: '🏆', title: 'Win the Listing', tagline: 'Get hired and prepped for every seller appointment',
+                    color: '#8b5cf6',
+                    tools: [
+                      { icon:'📋', title:'Seller Prep', desc:'Prepare for your listing appointment', href:'/seller-prep' },
+                      { icon:'💲', title:'Pricing Assistant', desc:'Get a data-backed price range and strategy', href:'/pricing-assistant' },
+                      { icon:'🎯', title:'Listing Presentation', desc:'Build your full seller appointment deck', href:'/listing-presentation' },
+                      { icon:'📊', title:'Market Snapshot', desc:'Instant market analysis for any neighborhood', href:'/market-snapshot' },
+                      { icon:'🛡️', title:'Objection Handler', desc:'Turn any objection into a confident response', href:'/objection-handler' },
+                      { icon:'💰', title:'Seller Net Sheet', desc:'Estimate seller proceeds before closing', href:'/seller-net-sheet' },
+                      { icon:'🧮', title:'Commission Calculator', desc:'Calculate your real take-home after splits', href:'/commission-calculator' },
+                    ]
+                  },
+                  {
+                    emoji: '🏗️', title: 'Build the Listing', tagline: 'Turn property notes and photos into ready-to-publish marketing',
+                    color: '#1D9E75',
+                    tools: [
+                      { icon:'⚡', title:'Quick Listing', desc:'Faster manual start, fewer inputs', href:'/quick-listing' },
+                      { icon:'📸', title:'Snap & Start', desc:'On-site? Start from photos instantly', href:'/snap-start' },
+                      { icon:'✍️', title:'Rewrite', desc:'Polish and improve existing copy', href:'/rewrite' },
+                      { icon:'🖼️', title:'Photos', desc:'Manage your saved property photos', href:'/photos' },
+                      { icon:'🛋️', title:'Virtual Staging', desc:'Transform empty rooms into furnished spaces', href:'/virtual-staging', pro:true },
+                    ]
+                  },
+                  {
+                    emoji: '📣', title: 'Launch & Market', tagline: 'Get every listing in front of the right buyers',
+                    color: '#f59e0b',
+                    tools: [
+                      { icon:'🚀', title:'Launch Kit', desc:'7-day marketing rollout strategy', href:'/launch-kit' },
+                      { icon:'🏡', title:'Open House', desc:'Flyer, posts, and follow-up emails', href:'/open-house' },
+                      { icon:'📋', title:'Open House Sign-In', desc:'Tablet-friendly visitor sign-in sheet', href:'/open-house-signin' },
+                      { icon:'💰', title:'Price Drop', desc:'Price improvement announcement suite', href:'/price-drop' },
+                      { icon:'📬', title:'Postcard Copy', desc:'Just Listed & Just Sold postcard copy', href:'/postcard-copy' },
+                      { icon:'📅', title:'Social Planner', desc:'7-day social media content calendar', href:'/social-planner' },
+                      { icon:'🎬', title:'Video Studio', desc:'Turn one photo into a complete video ad kit', href:'/video-studio', pro:true },
+                      { icon:'🏘️', title:'Neighborhood Bio', desc:'Compelling neighborhood descriptions instantly', href:'/neighborhood-bio' },
+                    ]
+                  },
+                  {
+                    emoji: '🤝', title: 'Manage Clients', tagline: 'Track buyers, leads, and active transactions',
+                    color: '#10b981',
+                    tools: [
+                      { icon:'🏠', title:'Buyer Consultation', desc:'Prepare for your buyer appointments', href:'/buyer-consultation' },
+                      { icon:'📩', title:'Follow-Up', desc:'Post-meeting and post-showing emails', href:'/follow-up' },
+                      { icon:'🔄', title:'Follow-Up Sequence', desc:'Complete follow-up sequence for any lead', href:'/follow-up-sequence' },
+                      { icon:'✅', title:'Transaction Checklist', desc:'Track every step from listing to closing', href:'/transaction-checklist' },
+                      { icon:'👥', title:'Leads / CRM', desc:'Track your pipeline and contacts', href:'/leads' },
+                      { icon:'🚨', title:'Listing Rescue', desc:'Diagnose why your listing is sitting', href:'/listing-rescue' },
+                    ]
+                  },
+                  {
+                    emoji: '✨', title: 'Your Brand', tagline: 'Build the agent presence that wins repeat business',
+                    color: '#d4af37',
+                    tools: [
+                      { icon:'🏆', title:'Agent Portfolio', desc:'Your shareable listing portfolio page', href:'/agent-portfolio' },
+                      { icon:'⭐', title:'Career Highlights', desc:'Capture your favorite closing moments forever', href:'/career-highlights' },
+                      { icon:'🤝', title:'Referral Request', desc:'Turn every closing into your next listing', href:'/referral-request' },
+                      { icon:'📈', title:'Listing Performance', desc:'Track days on market, price changes, and more', href:'/listing-performance' },
+                    ]
+                  },
+                ] as Array<{emoji:string;title:string;tagline:string;color:string;tools:Array<{icon:string;title:string;desc:string;href:string;pro?:boolean}>}>).map((section, si) => (
+                  <div key={si} style={{marginBottom:'40px'}}>
+                    <div style={{marginBottom:'18px'}}>
+                      <h2 style={{fontSize:'18px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 5px',letterSpacing:'-0.2px'}}>
+                        {section.emoji} {section.title}
+                      </h2>
+                      <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',fontWeight:'400'}}>{section.tagline}</p>
+                    </div>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))',gap:'12px'}}>
+                      {section.tools.map((item, i) => (
+                        <a key={i} href={item.href}
+                          style={{background:'var(--lw-card)',borderRadius:'13px',border:'1px solid var(--lw-border)',padding:'1.25rem',textDecoration:'none',display:'block',transition:'all 0.18s',boxShadow:isDark?'none':'0 2px 8px rgba(0,0,0,0.06)',position:'relative' as const}}
+                          onMouseOver={e => {e.currentTarget.style.borderColor=`${section.color}50`;e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 28px ${section.color}20`}}
+                          onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow=isDark?'none':'0 2px 8px rgba(0,0,0,0.06)'}}>
+                          {item.pro && <div style={{position:'absolute',top:'10px',right:'10px',background:'linear-gradient(135deg,#d4af37,#a07c20)',color:'#fff',fontSize:'9px',fontWeight:'700',padding:'2px 8px',borderRadius:'20px',letterSpacing:'0.5px'}}>PRO</div>}
+                          <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${section.color}12`,border:`1px solid ${section.color}20`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'19px',marginBottom:'12px'}}>{item.icon}</div>
+                          <div style={{fontSize:'13px',fontWeight:'700',color:isDark?'#e0e0e0':'#111318',marginBottom:'4px'}}>{item.title}</div>
+                          <div style={{fontSize:'11px',color:isDark?'#6b7280':'#5a6172',lineHeight:'1.55'}}>{item.desc}</div>
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                )}
-                <div style={{textAlign:'center',marginBottom:'1rem'}}>
-                  <button onClick={() => setShowMoreTools(v => !v)}
-                    style={{padding:'9px 22px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'20px',color:'var(--lw-text-muted)',fontSize:'13px',fontWeight:'600',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif',transition:'all 0.15s'}}
-                    onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.color='#1D9E75'}}
-                    onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.color='var(--lw-text-muted)'}}>
-                    {showMoreTools ? 'Show less ↑' : 'Show more tools ↓'}
-                  </button>
-                </div>
+                ))}
 
               </div>
 
