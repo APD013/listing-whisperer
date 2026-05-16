@@ -1025,11 +1025,11 @@ export default function Dashboard() {
                       { icon:'🚀', title:'Launch Kit', desc:'7-day marketing rollout strategy', href:'/launch-kit' },
                       { icon:'🏡', title:'Open House', desc:'Flyer, posts, and follow-up emails', href:'/open-house' },
                       { icon:'📋', title:'Open House Sign-In', desc:'Tablet-friendly visitor sign-in sheet', href:'/open-house-signin' },
-                      { icon:'💰', title:'Price Drop', desc:'Price improvement announcement suite', href:'/price-drop' },
                       { icon:'📬', title:'Postcard Copy', desc:'Just Listed & Just Sold postcard copy', href:'/postcard-copy' },
                       { icon:'📅', title:'Social Planner', desc:'7-day social media content calendar', href:'/social-planner' },
                       { icon:'🎬', title:'Video Studio', desc:'Turn one photo into a complete video ad kit', href:'/video-studio', pro:true },
                       { icon:'🏘️', title:'Neighborhood Bio', desc:'Compelling neighborhood descriptions instantly', href:'/neighborhood-bio' },
+                      { icon:'💰', title:'Price Drop', desc:'Price improvement announcement suite', href:'/price-drop' },
                     ]
                   },
                   {
