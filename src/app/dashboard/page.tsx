@@ -40,13 +40,9 @@ export default function Dashboard() {
   const [showReferralBanner, setShowReferralBanner] = useState(false)
   const [dueReminders, setDueReminders] = useState<any[]>([])
   const [showReminderPopup, setShowReminderPopup] = useState(false)
-  const [showChat, setShowChat] = useState(false)
   const [currentListingId, setCurrentListingId] = useState<string | null>(null)
   const [listingNameInput, setListingNameInput] = useState('')
-  const [chatMessages, setChatMessages] = useState<{role:string,content:string}[]>([])
-  const [chatInput, setChatInput] = useState('')
-  const [chatLoading, setChatLoading] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<Record<string,boolean>>({'win':true,'build':true,'launch':true,'manage':true})
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<Record<string,boolean>>({'win':true,'build':true,'launch':true,'manage':true,'brand':true})
   const [leads, setLeads] = useState<any[]>([])
   const [workspaceListing, setWorkspaceListing] = useState<any>(null)
   const [workspaceLeads, setWorkspaceLeads] = useState<number>(0)
@@ -186,7 +182,7 @@ export default function Dashboard() {
 
   const generate = async () => {
     if (!form.features && !form.neighborhood) { alert('Please fill in at least the neighborhood and features!'); return }
-    if (plan === 'starter' && listingCredits <= 0 && new Date() > new Date((trialEndsAt || ''))) { setShowUpgradeModal(true); return }
+    if (plan === 'starter' && listingCredits <= 0 && (!trialEndsAt || new Date() > new Date(trialEndsAt))) { setShowUpgradeModal(true); return }
     setLoading(true)
     setOutputs(null)
     try {
@@ -213,29 +209,6 @@ export default function Dashboard() {
       }
     } catch(e: any) { alert('Error: ' + e.message) }
     setLoading(false)
-  }
-
-  const sendChatMessage = async () => {
-    if (!chatInput.trim() || chatLoading) return
-    const userMessage = { role: 'user', content: chatInput }
-    const updatedMessages = [...chatMessages, userMessage]
-    setChatMessages(updatedMessages)
-    setChatInput('')
-    setChatLoading(true)
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updatedMessages })
-      })
-      const data = await res.json()
-      if (data.message) {
-        setChatMessages([...updatedMessages, { role: 'assistant', content: data.message }])
-      }
-    } catch(e: any) {
-      setChatMessages([...updatedMessages, { role: 'assistant', content: 'Sorry, something went wrong. Please try again.' }])
-    }
-    setChatLoading(false)
   }
 
   const handleCopy = (key: string, text: string) => {
@@ -424,115 +397,62 @@ export default function Dashboard() {
     return new Date(dateStr).toLocaleDateString()
   }
 
-  const buckets = [
-    {
-      label: 'WIN THE LISTING',
-      color: '#8b5cf6',
-      cards: [
-        { icon: '📋', title: 'Seller Prep', desc: 'Prepare for your listing appointment', color: '#8b5cf6', href: '/seller-prep', priority: true },
-        { icon: '🏠', title: 'Buyer Consultation', desc: 'Prepare for your buyer appointments', color: '#6366f1', href: '/buyer-consultation' },
-        { icon: '💲', title: 'Pricing Assistant', desc: 'Get a data-backed price range and strategy', color: '#d4af37', href: '/pricing-assistant' },
-        { icon: '📊', title: 'Market Snapshot', desc: 'Instant market analysis for any neighborhood', color: '#1D9E75', href: '/market-snapshot' },
-        { icon: '🎯', title: 'Listing Presentation', desc: 'Build your full seller appointment deck', color: '#a78bfa', href: '/listing-presentation' },
-        { icon: '🏆', title: 'Agent Portfolio', desc: 'Your shareable listing portfolio page', color: '#d4af37', href: '/agent-portfolio' },
-        { icon: '⭐', title: 'Career Highlights', desc: 'Capture your favorite closing moments forever', color: '#f59e0b', href: '/career-highlights' },
-        { icon: '🚨', title: 'Listing Rescue', desc: 'Diagnose why your listing is sitting and get a complete rescue plan', color: '#ef4444', href: '/listing-rescue' },
-      ]
-    },
-    {
-      label: 'BUILD THE LISTING',
-      color: '#1D9E75',
-      cards: [
-        { icon: '✨', title: 'New Listing', desc: 'Full guided form → 11 marketing formats', color: '#1D9E75', action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) } },
-        { icon: '⚡', title: 'Quick Listing', desc: 'Faster manual start, fewer inputs', color: '#d4af37', href: '/quick-listing', popular: true, startHere: true, tooltip: 'Upload 1 photo → generate full listing marketing', priority: true },
-        { icon: '📸', title: 'Snap & Start', desc: 'On-site? Start from photos instantly', color: '#e1306c', href: '/snap-start' },
-        { icon: '✍️', title: 'Rewrite Listing', desc: 'Polish and improve existing copy', color: '#6366f1', href: '/rewrite' },
-        { icon: '🖼️', title: 'Photo Library', desc: 'Manage your saved property photos', color: '#f97316', href: '/photos' },
-      ]
-    },
-    {
-      label: 'LAUNCH THE LISTING',
-      color: '#f59e0b',
-      cards: [
-        { icon: '🚀', title: 'Launch Plan', desc: '7-day marketing rollout strategy', color: '#f59e0b', href: '/launch-kit' },
-        { icon: '📅', title: 'Social Planner', desc: '7-day social media content calendar', color: '#e1306c', href: '/social-planner' },
-        { icon: '🏡', title: 'Open House Kit', desc: 'Flyer, posts, and follow-up emails', color: '#10b981', href: '/open-house' },
-        { icon: '📋', title: 'Open House Sign-In', desc: 'Tablet-friendly visitor sign-in sheet', color: '#1D9E75', href: '/open-house-signin' },
-        { icon: '💰', title: 'Price Drop Kit', desc: 'Price improvement announcement suite', color: '#ef4444', href: '/price-drop' },
-        { icon: '📬', title: 'Postcard Copy', desc: 'Just Listed & Just Sold postcard copy generator', color: '#6366f1', href: '/postcard-copy' },
-        { icon: '🎬', title: 'Video Studio', desc: 'Turn one listing photo into a complete video ad kit', color: '#e1306c', href: '/video-studio', pro: true },
-        { icon: '🤝', title: 'Referral Request', desc: 'Turn every closing into your next listing', color: '#10b981', href: '/referral-request' },
-      ]
-    },
-    {
-      label: 'MANAGE THE RELATIONSHIP',
-      color: '#10b981',
-      cards: [
-        { icon: '✅', title: 'Transaction Checklist', desc: 'Track every step from listing to closing', color: '#1D9E75', href: '/transaction-checklist' },
-        { icon: '⏰', title: 'Reminders', desc: 'Never miss a follow-up or deadline', color: '#f59e0b', href: '/reminders' },
-        { icon: '👥', title: 'Leads & Clients', desc: 'Track your pipeline and contacts', color: '#10b981', href: '/leads' },
-        { icon: '📈', title: 'Listing Performance', desc: 'Track days on market, price changes, showings, and offers', color: '#1D9E75', href: '/listing-performance' },
-        { icon: '📩', title: 'Follow-Up Assistant', desc: 'Post-meeting and post-showing emails', color: '#6366f1', href: '/follow-up', priority: true },
-        { icon: '💰', title: 'Seller Net Sheet', desc: 'Estimate seller proceeds before closing', color: '#1D9E75', href: '/seller-net-sheet' },
-        { icon: '🧮', title: 'Commission Calculator', desc: 'Calculate your real take-home after splits and fees', color: '#d4af37', href: '/commission-calculator' },
-        { icon: '🛡️', title: 'Objection Handler', desc: 'Turn any objection into a confident response', color: '#8b5cf6', href: '/objection-handler' },
-        { icon: '🏘️', title: 'Neighborhood Bio', desc: 'Generate compelling neighborhood descriptions instantly', color: '#1D9E75', href: '/neighborhood-bio' },
-        { icon: '🔄', title: 'Follow-Up Sequence', desc: 'Generate a complete follow-up sequence for any lead', color: '#6366f1', href: '/follow-up-sequence', priority: true },
-      ]
-    },
-  ]
-
   const sidebarSections: Array<{key:string;label:string;color:string;items:Array<{icon:string;label:string;href?:string;action?:()=>void}>}> = [
     {
       key: 'win', label: 'Win the Listing', color: '#8b5cf6',
       items: [
         { href: '/seller-prep', icon: '📋', label: 'Seller Prep' },
-        { href: '/buyer-consultation', icon: '🏠', label: 'Buyer Consultation' },
         { href: '/pricing-assistant', icon: '💲', label: 'Pricing Assistant' },
-        { href: '/market-snapshot', icon: '📊', label: 'Market Snapshot' },
         { href: '/listing-presentation', icon: '🎯', label: 'Listing Presentation' },
-        { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
-        { href: '/career-highlights', icon: '⭐', label: 'Career Highlights' },
-        { href: '/listing-rescue', icon: '🚨', label: 'Listing Rescue' },
+        { href: '/market-snapshot', icon: '📊', label: 'Market Snapshot' },
+        { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
+        { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
+        { href: '/commission-calculator', icon: '🧮', label: 'Commission Calculator' },
       ]
     },
     {
       key: 'build', label: 'Build the Listing', color: '#1D9E75',
       items: [
-        { action: () => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}); setSidebarOpen(false) }, icon: '✨', label: 'New Listing' },
+        { href: '/workspaces', icon: '📁', label: 'Listing Workspaces' },
         { href: '/quick-listing', icon: '⚡', label: 'Quick Listing' },
         { href: '/snap-start', icon: '📸', label: 'Snap & Start' },
         { href: '/rewrite', icon: '✍️', label: 'Rewrite' },
-        { href: '/photos', icon: '🖼️', label: 'Photo Library' },
+        { href: '/photos', icon: '🖼️', label: 'Photos' },
         { href: '/virtual-staging', icon: '🛋️', label: 'Virtual Staging' },
       ]
     },
     {
-      key: 'launch', label: 'Launch the Listing', color: '#f59e0b',
+      key: 'launch', label: 'Launch & Market', color: '#f59e0b',
       items: [
-        { href: '/launch-kit', icon: '🚀', label: 'Launch Plan' },
-        { href: '/social-planner', icon: '📅', label: 'Social Planner' },
-        { href: '/open-house', icon: '🏡', label: 'Open House Kit' },
+        { href: '/launch-kit', icon: '🚀', label: 'Launch Kit' },
+        { href: '/open-house', icon: '🏡', label: 'Open House' },
         { href: '/open-house-signin', icon: '📋', label: 'Open House Sign-In' },
-        { href: '/price-drop', icon: '💰', label: 'Price Drop Kit' },
         { href: '/postcard-copy', icon: '📬', label: 'Postcard Copy' },
+        { href: '/social-planner', icon: '📅', label: 'Social Planner' },
         { href: '/video-studio', icon: '🎬', label: 'Video Studio' },
-        { href: '/referral-request', icon: '🤝', label: 'Referral Request' },
+        { href: '/neighborhood-bio', icon: '🏘️', label: 'Neighborhood Bio' },
+        { href: '/price-drop', icon: '💰', label: 'Price Drop' },
       ]
     },
     {
-      key: 'manage', label: 'Manage the Relationship', color: '#10b981',
+      key: 'manage', label: 'Manage Clients', color: '#10b981',
       items: [
-        { href: '/transaction-checklist', icon: '✅', label: 'Transaction Checklist' },
-        { href: '/reminders', icon: '⏰', label: 'Reminders' },
-        { href: '/leads', icon: '👥', label: 'Leads & Clients' },
-        { href: '/listing-performance', icon: '📈', label: 'Listing Performance' },
-        { href: '/follow-up', icon: '📩', label: 'Follow-Up Assistant' },
-        { href: '/seller-net-sheet', icon: '💰', label: 'Seller Net Sheet' },
-        { href: '/commission-calculator', icon: '🧮', label: 'Commission Calculator' },
-        { href: '/objection-handler', icon: '🛡️', label: 'Objection Handler' },
-        { href: '/neighborhood-bio', icon: '🏘️', label: 'Neighborhood Bio' },
+        { href: '/buyer-consultation', icon: '🏠', label: 'Buyer Consultation' },
+        { href: '/follow-up', icon: '📩', label: 'Follow-Up' },
         { href: '/follow-up-sequence', icon: '🔄', label: 'Follow-Up Sequence' },
+        { href: '/reminders', icon: '⏰', label: 'Reminders' },
+        { href: '/transaction-checklist', icon: '✅', label: 'Transaction Checklist' },
+        { href: '/leads', icon: '👥', label: 'Leads / CRM' },
+        { href: '/listing-rescue', icon: '🚨', label: 'Listing Rescue' },
+      ]
+    },
+    {
+      key: 'brand', label: 'Your Brand', color: '#d4af37',
+      items: [
+        { href: '/agent-portfolio', icon: '🏆', label: 'Agent Portfolio' },
+        { href: '/career-highlights', icon: '⭐', label: 'Career Highlights' },
+        { href: '/referral-request', icon: '🤝', label: 'Referral Request' },
+        { href: '/listing-performance', icon: '📈', label: 'Listing Performance' },
       ]
     },
   ]
@@ -571,7 +491,7 @@ export default function Dashboard() {
               {planLoaded && plan === 'pro' ? (
                 <div style={{fontSize:'10px',marginTop:'3px',fontWeight:'600'}}>
                   <span style={{color:'#1D9E75'}}>Listing</span>
-                  <span style={{color:'#6b7280'}}>Whisperer</span>
+                  <span style={{color:'var(--lw-text-muted)'}}>Whisperer</span>
                   <span style={{color:'#d4af37'}}>Pro</span>
                 </div>
               ) : (
@@ -733,9 +653,6 @@ export default function Dashboard() {
                     <h1 style={{fontSize:'2rem',fontWeight:'700',color: isDark ? '#f0f0f0' : '#111318',margin:'0 0 8px',letterSpacing:'-0.5px'}}>
                       {greeting}{firstName ? `, ${firstName}` : ''} 👋
                     </h1>
-                    <p style={{fontSize:'15px',color: isDark ? '#8b8fa8' : '#5a6172',margin:'0',fontWeight:'400'}}>
-                      What would you like to do today?
-                    </p>
                   </div>
 
                   {planLoaded && plan === 'pro' && (
@@ -743,11 +660,11 @@ export default function Dashboard() {
                       <div style={{width:'30px',height:'30px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px',boxShadow:'0 0 12px rgba(29,158,117,0.3)'}}>✦</div>
                       <div>
                         <div style={{fontSize:'12px',fontWeight:'700',letterSpacing:'0.2px'}}>
-                          <span style={{color:'#e8e8e8'}}>Listing</span>
+                          <span style={{color:'var(--lw-text)'}}>Listing</span>
                           <span style={{color:'#1D9E75'}}>Whisperer</span>
                           <span style={{color:'#d4af37'}}>Pro</span>
                         </div>
-                        <div style={{fontSize:'10px',color:'#333',marginTop:'2px'}}>Unlimited access · All features</div>
+                        <div style={{fontSize:'10px',color:'var(--lw-text-muted)',marginTop:'2px'}}>Unlimited access · All features</div>
                       </div>
                     </div>
                   )}
@@ -767,67 +684,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* ACTION-FIRST SECTION */}
-              <div style={{marginBottom:'3rem'}}>
-                <p style={{fontSize:'11px',fontWeight:'700',color:'var(--lw-text-muted)',letterSpacing:'1.2px',margin:'0 0 16px'}}>WHAT DO YOU NEED TO DO RIGHT NOW?</p>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:'14px'}}>
-                  {[
-                    { icon:'🏠', label:'Start a Listing', desc:'Create a full listing from photos and notes in minutes', color:'#1D9E75', action: () => { setActivePage('generate'); window.scrollTo({top:0,behavior:'smooth'}) } },
-                    { icon:'📋', label:'Prep a Meeting', desc:'Walk into your next appointment fully prepared', color:'#8b5cf6', href:'/seller-prep', tooltip:'Use this before your next listing appointment' },
-                    { icon:'✦', label:'Ask AI', desc:'Get instant answers to any real estate question', color:'#6366f1', action: () => { const btn = document.querySelector('[data-chat-toggle]') as HTMLElement; btn?.click() }, tooltip:'Ask about pricing, strategy, follow-ups, or anything real estate' },
-                    { icon:'👥', label:'Follow Up a Lead', desc:'Turn conversations into signed clients', color:'#f59e0b', href:'/leads' },
-                    { icon:'📁', label:'My Workspaces', desc:'All your listing assets in one place — copy, photos, follow-ups, and more', color:'#1D9E75', href:'/workspaces' },
-                  ].map((item, i) => (
-                    item.href ? (
-                      <a key={i} href={item.href}
-                        title={(item as any).tooltip || undefined}
-                        style={{display:'block',background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem',textDecoration:'none',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:'pointer'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 8px 32px ${item.color}22`;e.currentTarget.style.transform='translateY(-2px)'}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';e.currentTarget.style.transform='translateY(0)'}}>
-                        <div style={{width:'46px',height:'46px',borderRadius:'13px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',marginBottom:'14px'}}>{item.icon}</div>
-                        <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 7px'}}>{item.label}</p>
-                        <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',lineHeight:'1.6',fontWeight:'400'}}>{item.desc}</p>
-                      </a>
-                    ) : (
-                      <div key={i}
-                        onClick={item.action}
-                        title={(item as any).tooltip || undefined}
-                        style={{background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem',transition:'all 0.18s',boxShadow:'0 2px 10px rgba(0,0,0,0.05)',cursor:'pointer'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor=item.color;e.currentTarget.style.boxShadow=`0 8px 32px ${item.color}22`;e.currentTarget.style.transform='translateY(-2px)'}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';e.currentTarget.style.transform='translateY(0)'}}>
-                        <div style={{width:'46px',height:'46px',borderRadius:'13px',background:`${item.color}18`,border:`1px solid ${item.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',marginBottom:'14px'}}>{item.icon}</div>
-                        <p style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 7px'}}>{item.label}</p>
-                        <p style={{fontSize:'13px',color:'var(--lw-text-muted)',margin:'0',lineHeight:'1.6',fontWeight:'400'}}>{item.desc}</p>
-                      </div>
-                    )
-                  ))}
-                </div>
-
-                <div style={{marginTop:'14px',display:'flex',flexWrap:'wrap',gap:'8px',alignItems:'center'}}>
-                  <span style={{fontSize:'11px',color:'var(--lw-text-muted)',fontWeight:'600',flexShrink:0}}>Try asking:</span>
-                  {[
-                    'How should I price this listing?',
-                    'What do I say to a hesitant seller?',
-                    'Create a follow-up text after a showing',
-                    'What should I do next with this lead?',
-                  ].map(prompt => (
-                    <button key={prompt}
-                      onClick={() => window.dispatchEvent(new CustomEvent('lw-chat-prompt', { detail: prompt }))}
-                      style={{padding:'5px 13px',borderRadius:'20px',border:'1px solid var(--lw-border)',background:'var(--lw-input)',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif',transition:'all 0.15s'}}
-                      onMouseOver={e => {e.currentTarget.style.borderColor='#6366f1';e.currentTarget.style.color='#6366f1';e.currentTarget.style.background='rgba(99,102,241,0.06)'}}
-                      onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.color='var(--lw-text-muted)';e.currentTarget.style.background='var(--lw-input)'}}>
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-
-                <div style={{textAlign:'center',marginTop:'22px'}}>
-                  <button onClick={() => document.getElementById('all-tools')?.scrollIntoView({behavior:'smooth'})}
-                    style={{padding:'10px 24px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'20px',color:'var(--lw-text-muted)',fontSize:'13px',fontWeight:'600',cursor:'pointer',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>
-                    Browse All Tools ↓
-                  </button>
-                </div>
-              </div>
 
               {/* TODAY'S WORKSPACE */}
               <div style={{marginBottom:'2.5rem',background:'var(--lw-card)',borderRadius:'16px',border:'1px solid var(--lw-border)',padding:'1.5rem'}}>
@@ -1148,13 +1004,13 @@ export default function Dashboard() {
           {activePage === 'generate' && (
             <div style={{maxWidth:'680px'}}>
               <div style={{marginBottom:'1.5rem',display:'flex',alignItems:'center',gap:'12px'}}>
-                <button onClick={() => setActivePage('home')} style={{background:'none',border:'none',color:'#444',fontSize:'13px',cursor:'pointer',padding:'0'}}>← Home</button>
+                <button onClick={() => setActivePage('home')} style={{background:'none',border:'none',color:'var(--lw-text-muted)',fontSize:'13px',cursor:'pointer',padding:'0'}}>← Home</button>
                 <h1 style={{fontSize:'1.25rem',fontWeight:'700',color:'var(--lw-text)',margin:'0'}}>New Listing</h1>
                 <span style={{background:'rgba(29,158,117,0.15)',color:'#1D9E75',fontSize:'11px',fontWeight:'600',padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.3)'}}>11 formats</span>
               </div>
 
               <div style={{...styles.card, marginBottom:'1rem'}}>
-                <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 16px',paddingBottom:'12px',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>PROPERTY DETAILS</p>
+                <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 16px',paddingBottom:'12px',borderBottom:'1px solid var(--lw-border)'}}>PROPERTY DETAILS</p>
                 <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))',gap:'12px',marginBottom:'12px'}}>
                   <div><label style={styles.label}>Listing name</label><input placeholder="123 Oak Street" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Type</label><select value={form.type} onChange={e => setForm({...form, type: e.target.value})} style={styles.select}><option>Single family</option><option>Condo</option><option>Townhome</option><option>Luxury estate</option><option>Multi-family</option></select></div>
@@ -1164,16 +1020,16 @@ export default function Dashboard() {
                   <div><label style={styles.label}>Price</label><input placeholder="$899,000" value={form.price} onChange={e => setForm({...form, price: e.target.value})} style={styles.input}/></div>
                   <div><label style={styles.label}>Neighborhood</label><input placeholder="Newport Beach, CA" value={form.neighborhood} onChange={e => setForm({...form, neighborhood: e.target.value})} style={styles.input}/></div>
                 </div>
-                <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'16px',marginBottom:'12px'}}>
+                <div style={{borderTop:'1px solid var(--lw-border)',paddingTop:'16px',marginBottom:'12px'}}>
                   <p style={{fontSize:'11px',fontWeight:'700',color:'#1D9E75',letterSpacing:'1px',margin:'0 0 12px'}}>FEATURES & MARKETING</p>
                   <label style={styles.label}>Key features</label>
                   <input placeholder="Ocean views, chef's kitchen, spa bath..." value={form.features} onChange={e => setForm({...form, features: e.target.value})} style={{...styles.input, marginBottom:'8px'}}/>
                   <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'12px'}}>
                     {["Ocean views","Chef's kitchen","Spa bath","3-car garage","Solar panels","Pool","Open floor plan","Natural light","Updated finishes","Smart home","Walk-in closet","Outdoor entertaining"].map(chip => (
                       <button key={chip} onClick={() => { const current = form.features; if (!current.toLowerCase().includes(chip.toLowerCase())) setForm({...form, features: current ? current + ', ' + chip : chip}) }}
-                        style={{padding:'3px 10px',borderRadius:'20px',border:'1px solid rgba(255,255,255,0.08)',background:'rgba(0,0,0,0.2)',color:'#6b7280',fontSize:'11px',cursor:'pointer'}}
+                        style={{padding:'3px 10px',borderRadius:'20px',border:'1px solid var(--lw-border)',background:'var(--lw-input)',color:'var(--lw-text-muted)',fontSize:'11px',cursor:'pointer'}}
                         onMouseOver={e => {e.currentTarget.style.borderColor='#1D9E75';e.currentTarget.style.color='#1D9E75'}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='rgba(255,255,255,0.08)';e.currentTarget.style.color='#6b7280'}}>+ {chip}</button>
+                        onMouseOut={e => {e.currentTarget.style.borderColor='var(--lw-border)';e.currentTarget.style.color='var(--lw-text-muted)'}}>+ {chip}</button>
                     ))}
                   </div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
@@ -1181,7 +1037,7 @@ export default function Dashboard() {
                     <div><label style={styles.label}>Target buyer</label><select value={form.buyer} onChange={e => setForm({...form, buyer: e.target.value})} style={styles.select}><option>Move-up families</option><option>Luxury buyers</option><option>First-time buyers</option><option>Investors</option><option>Downsizers</option></select></div>
                   </div>
                 </div>
-                <div style={{borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'16px'}}>
+                <div style={{borderTop:'1px solid var(--lw-border)',paddingTop:'16px'}}>
                   <label style={styles.label}>Additional notes</label>
                   <textarea placeholder="Seller story, open house date, urgency..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} style={{...styles.input, minHeight:'60px', resize:'vertical' as const, marginBottom:'16px'}}/>
                   <button onClick={generate} disabled={loading} style={{width:'100%',padding:'15px',background: loading ? '#085041' : 'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',border:'none',borderRadius:'10px',fontSize:'15px',fontWeight:'700',cursor: loading ? 'not-allowed' : 'pointer',boxShadow: loading ? 'none' : '0 0 30px rgba(29,158,117,0.3)',transition:'all 0.2s'}}>
@@ -1195,17 +1051,17 @@ export default function Dashboard() {
                   <style>{`
                     @keyframes shimmer { 0% { background-position: -800px 0 } 100% { background-position: 800px 0 } }
                     @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
-                    .skeleton { background: linear-gradient(90deg, #1a1d2e 25%, #22263a 50%, #1a1d2e 75%); background-size: 800px 100%; animation: shimmer 1.5s infinite linear; border-radius: 6px; }
+                    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%); background-size: 800px 100%; animation: shimmer 1.5s infinite linear; border-radius: 6px; }
                   `}</style>
                   <div style={{...styles.card, padding:'1.25rem 1.5rem', marginBottom:'1rem', display:'flex', alignItems:'center', gap:'12px'}}>
                     <div style={{display:'flex',gap:'4px'}}>{[0,1,2].map(i => <div key={i} style={{width:'8px',height:'8px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>)}</div>
-                    <p style={{color:'#f0f0f0',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>{loadingSteps[loadingStep]}</p>
+                    <p style={{color:'var(--lw-text)',fontWeight:'600',fontSize:'13px',margin:'0',flex:1}}>{loadingSteps[loadingStep]}</p>
                     <span style={{fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>{Math.round(((loadingStep + 1) / loadingSteps.length) * 100)}%</span>
                   </div>
-                  <div style={{background:'rgba(0,0,0,0.2)',borderRadius:'8px',height:'3px',marginBottom:'1.5rem',overflow:'hidden'}}>
+                  <div style={{background:'var(--lw-input)',borderRadius:'8px',height:'3px',marginBottom:'1.5rem',overflow:'hidden'}}>
                     <div style={{height:'100%',background:'linear-gradient(90deg,#1D9E75,#085041)',borderRadius:'8px',width:`${((loadingStep + 1) / loadingSteps.length) * 100}%`,transition:'width 0.5s ease'}}/>
                   </div>
-                  <div style={{background:'linear-gradient(135deg,#1e2235,#232840)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.15)',padding:'2rem',marginBottom:'1rem'}}>
+                  <div style={{background:'var(--lw-card)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.15)',padding:'2rem',marginBottom:'1rem'}}>
                     <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'1.5rem'}}>
                       <div className="skeleton" style={{width:'42px',height:'42px',borderRadius:'10px',flexShrink:0}}/>
                       <div style={{flex:1}}><div className="skeleton" style={{height:'14px',width:'140px',marginBottom:'8px'}}/><div className="skeleton" style={{height:'11px',width:'200px'}}/></div>
@@ -1215,7 +1071,7 @@ export default function Dashboard() {
                   </div>
                   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
                     {[1,2,3,4,5,6].map(i => (
-                      <div key={i} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.06)',padding:'1.25rem'}}>
+                      <div key={i} style={{background:'var(--lw-card)',borderRadius:'14px',border:'1px solid var(--lw-border)',padding:'1.25rem'}}>
                         <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
                           <div className="skeleton" style={{width:'32px',height:'32px',borderRadius:'8px',flexShrink:0}}/>
                           <div style={{flex:1}}><div className="skeleton" style={{height:'12px',width:'100px',marginBottom:'6px'}}/><div className="skeleton" style={{height:'10px',width:'60px'}}/></div>
@@ -1238,12 +1094,12 @@ export default function Dashboard() {
                   <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                     <span style={{fontSize:'1.5rem'}}>🎁</span>
                     <div>
-                      <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0 0 3px'}}>Share Listing Whisperer — you both get a reward!</p>
-                      <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>They get 7 days of Pro free · You get 25% off your next month</p>
+                      <p style={{fontSize:'13px',fontWeight:'700',color:'var(--lw-text)',margin:'0 0 3px'}}>Share Listing Whisperer — you both get a reward!</p>
+                      <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0'}}>They get 7 days of Pro free · You get 25% off your next month</p>
                     </div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
-                    <div style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>listingwhisperer.com/signup?ref={referralCode}</div>
+                    <div style={{background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',padding:'7px 12px',fontSize:'12px',color:'#1D9E75',fontWeight:'600'}}>listingwhisperer.com/signup?ref={referralCode}</div>
                     <button onClick={() => { navigator.clipboard.writeText(`https://listingwhisperer.com/signup?ref=${referralCode}`); setReferralCopied(true); setTimeout(() => setReferralCopied(false), 2000) }}
                       style={{padding:'7px 16px',borderRadius:'8px',border:'1px solid',fontSize:'12px',cursor:'pointer',fontWeight:'600',background: referralCopied ? '#1D9E75' : 'rgba(29,158,117,0.15)',color: referralCopied ? '#fff' : '#1D9E75',borderColor: referralCopied ? '#1D9E75' : 'rgba(29,158,117,0.3)'}}>
                       {referralCopied ? '✓ Copied!' : '📋 Copy Link'}
@@ -1293,29 +1149,29 @@ export default function Dashboard() {
                   </div>
                   <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
                     <button onClick={() => setActivePage('history')} style={{padding:'8px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontWeight:'600',fontFamily:'var(--font-plus-jakarta),sans-serif'}}>← All Listings</button>
-                    <button onClick={() => handleDownloadPdf('mls')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
-                    <button onClick={() => handleDownloadPdf('flyer')} style={{padding:'8px 16px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'#8b8fa8',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>🏠 Flyer PDF</button>
+                    <button onClick={() => handleDownloadPdf('mls')} style={{padding:'8px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>📄 MLS PDF</button>
+                    <button onClick={() => handleDownloadPdf('flyer')} style={{padding:'8px 16px',background:'var(--lw-input)',border:'1px solid var(--lw-border)',borderRadius:'8px',color:'var(--lw-text-muted)',fontSize:'12px',cursor:'pointer',fontWeight:'500'}}>🏠 Flyer PDF</button>
                     <button onClick={() => { setActivePage('generate'); setOutputs(null); setCurrentListingId(null); setForm({type:'Single family',beds:'',baths:'',sqft:'',price:'',neighborhood:'',features:'',tone:'Professional',buyer:'Move-up families',notes:'',name:''}) }} style={{padding:'8px 16px',background:'rgba(29,158,117,0.15)',border:'1px solid rgba(29,158,117,0.3)',borderRadius:'8px',color:'#1D9E75',fontSize:'12px',cursor:'pointer',fontWeight:'600'}}>+ New Listing</button>
                   </div>
                 </div>
               </div>
 
-              <div style={{background:'linear-gradient(135deg,#1e2235,#232840)',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.25)',padding:'2rem',marginBottom:'1.5rem',boxShadow:'0 8px 32px rgba(0,0,0,0.4)'}}>
+              <div style={{background:'var(--lw-card)',borderRadius:'20px',border:'1px solid var(--lw-accent)',padding:'2rem',marginBottom:'1.5rem',boxShadow:'0 4px 16px rgba(0,0,0,0.08)'}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'1rem',flexWrap:'wrap',gap:'12px'}}>
                   <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                     <div style={{width:'42px',height:'42px',background:'linear-gradient(135deg,rgba(212,175,55,0.2),rgba(212,175,55,0.05))',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px',border:'1px solid rgba(212,175,55,0.2)'}}>🏠</div>
                     <div>
                       <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                        <span style={{fontSize:'15px',fontWeight:'700',color:'#f0f0f0'}}>{outputCards.find(c => c.key === featuredKey)?.label || 'MLS Description'}</span>
+                        <span style={{fontSize:'15px',fontWeight:'700',color:'var(--lw-text)'}}>{outputCards.find(c => c.key === featuredKey)?.label || 'MLS Description'}</span>
                         <span style={{fontSize:'10px',fontWeight:'700',color:'#d4af37',background:'rgba(212,175,55,0.1)',padding:'2px 8px',borderRadius:'20px',border:'1px solid rgba(212,175,55,0.2)'}}>{outputCards.find(c => c.key === featuredKey)?.label || 'MLS Description'}</span>
                       </div>
-                      <span style={{fontSize:'11px',color:'#6b7280'}}>Primary listing copy — MLS ready</span>
+                      <span style={{fontSize:'11px',color:'var(--lw-text-muted)'}}>Primary listing copy — MLS ready</span>
                     </div>
                   </div>
                   <div style={{display:'flex',gap:'8px'}}>
                     {featuredKey !== 'mls_standard' && (
                       <button onClick={() => setFeaturedKey('mls_standard')}
-                        style={{padding:'8px 16px',borderRadius:'8px',border:'1px solid rgba(255,255,255,0.1)',fontSize:'12px',cursor:'pointer',fontWeight:'500',background:'rgba(255,255,255,0.05)',color:'#6b7280'}}>
+                        style={{padding:'8px 16px',borderRadius:'8px',border:'1px solid var(--lw-border)',fontSize:'12px',cursor:'pointer',fontWeight:'500',background:'var(--lw-input)',color:'var(--lw-text-muted)'}}>
                         ↩ Reset
                       </button>
                     )}
@@ -1325,7 +1181,7 @@ export default function Dashboard() {
                     </button>
                   </div>
                 </div>
-                <p style={{fontSize:'15px',lineHeight:'1.9',color:'#e8e8e8',margin:'0',borderTop:'1px solid rgba(255,255,255,0.06)',paddingTop:'1rem',whiteSpace:'pre-wrap'}}>{outputs[featuredKey] || ''}</p>
+                <p style={{fontSize:'15px',lineHeight:'1.9',color:'var(--lw-text)',margin:'0',borderTop:'1px solid var(--lw-border)',paddingTop:'1rem',whiteSpace:'pre-wrap'}}>{outputs[featuredKey] || ''}</p>
               </div>
 
               {[
@@ -1340,23 +1196,23 @@ export default function Dashboard() {
                   </p>
                   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))',gap:'12px'}}>
                     {section.cards.map((card: any) => (
-                      <div key={card.key} style={{background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.07)',padding:'1.25rem',transition:'all 0.2s'}}
+                      <div key={card.key} style={{background:'var(--lw-card)',borderRadius:'14px',border:'1px solid var(--lw-border)',padding:'1.25rem',transition:'all 0.2s'}}
                         onMouseOver={e => (e.currentTarget.style.borderColor = `${card.color}30`)}
-                        onMouseOut={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}>
+                        onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--lw-border)')}>
                         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px'}}>
                           <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
                             <span style={{fontSize:'16px'}}>{card.icon}</span>
                             <div>
-                              <div style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0'}}>{card.label}</div>
-                              {card.desc && <div style={{fontSize:'10px',color:'#555'}}>{card.desc}</div>}
+                              <div style={{fontSize:'13px',fontWeight:'600',color:'var(--lw-text)'}}>{card.label}</div>
+                              {card.desc && <div style={{fontSize:'10px',color:'var(--lw-text-muted)'}}>{card.desc}</div>}
                             </div>
                           </div>
                           <span style={{fontSize:'10px',fontWeight:'600',color:card.color,background:`${card.color}15`,padding:'2px 8px',borderRadius:'20px',border:`1px solid ${card.color}30`}}>READY</span>
                         </div>
-                        <p style={{fontSize:'12px',color:'#6b7280',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{outputs[card.key] || ''}</p>
+                        <p style={{fontSize:'12px',color:'var(--lw-text-muted)',lineHeight:'1.7',margin:'0 0 12px',display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{outputs[card.key] || ''}</p>
                         <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
                           <button onClick={() => handleCopy(card.key, outputs[card.key] || '')}
-                            style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'rgba(0,0,0,0.2)',color: copied === card.key ? '#fff' : '#6b7280',borderColor: copied === card.key ? card.color : 'rgba(255,255,255,0.08)'}}>
+                            style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid',fontSize:'11px',cursor:'pointer',fontWeight:'500',background: copied === card.key ? card.color : 'var(--lw-input)',color: copied === card.key ? '#fff' : 'var(--lw-text-muted)',borderColor: copied === card.key ? card.color : 'var(--lw-border)'}}>
                             {copied === card.key ? '✓ Copied!' : '📋 Copy'}
                           </button>
                           <button onClick={() => { setFeaturedKey(card.key); window.scrollTo({top:0,behavior:'smooth'}) }}
@@ -1364,7 +1220,7 @@ export default function Dashboard() {
                             {featuredKey === card.key ? '✓ Previewing' : '↑ Set as Main Preview'}
                           </button>
                           {card.platform === 'facebook' && (<><button onClick={() => handleShare('facebook', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(24,119,242,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(24,119,242,0.1)',color:'#1877f2'}}>Facebook</button><button onClick={() => handleShare('linkedin', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(10,102,194,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(10,102,194,0.1)',color:'#0a66c2'}}>LinkedIn</button></>)}
-                          {card.platform === 'instagram' && (<div><button onClick={() => handleCopy(card.key+'_ig', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(225,48,108,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(225,48,108,0.1)',color:'#e1306c'}}>Copy for Instagram</button><p style={{fontSize:'10px',color:'#444',margin:'3px 0 0'}}>Instagram requires manual posting</p></div>)}
+                          {card.platform === 'instagram' && (<div><button onClick={() => handleCopy(card.key+'_ig', outputs[card.key] || '')} style={{padding:'5px 10px',borderRadius:'6px',border:'1px solid rgba(225,48,108,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(225,48,108,0.1)',color:'#e1306c'}}>Copy for Instagram</button><p style={{fontSize:'10px',color:'var(--lw-text-muted)',margin:'3px 0 0'}}>Instagram requires manual posting</p></div>)}
                           {card.key === 'flyer' && (<button onClick={() => handleDownloadPdf('flyer')} style={{padding:'5px 14px',borderRadius:'6px',border:'1px solid rgba(249,115,22,0.3)',fontSize:'11px',cursor:'pointer',background:'rgba(249,115,22,0.1)',color:'#f97316',fontWeight:'500'}}>📥 Download PDF</button>)}
                         </div>
                       </div>
@@ -1375,12 +1231,12 @@ export default function Dashboard() {
 
               <div style={{background:'linear-gradient(135deg,rgba(29,158,117,0.08),rgba(8,80,65,0.05))',borderRadius:'16px',border:'1px solid rgba(29,158,117,0.15)',padding:'1.5rem',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
                 <div>
-                  <p style={{fontSize:'14px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 4px'}}>Ready to launch this listing?</p>
-                  <p style={{fontSize:'12px',color:'#6b7280',margin:'0'}}>Generate a 7-day marketing plan or improve existing copy.</p>
+                  <p style={{fontSize:'14px',fontWeight:'600',color:'var(--lw-text)',margin:'0 0 4px'}}>Ready to launch this listing?</p>
+                  <p style={{fontSize:'12px',color:'var(--lw-text-muted)',margin:'0'}}>Generate a 7-day marketing plan or improve existing copy.</p>
                 </div>
                 <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
                   <a href="/launch-kit" style={{padding:'10px 20px',background:'linear-gradient(135deg,#1D9E75,#085041)',color:'#fff',borderRadius:'10px',textDecoration:'none',fontSize:'13px',fontWeight:'600',boxShadow:'0 0 20px rgba(29,158,117,0.3)'}}>🚀 7-Day Launch Kit</a>
-                  <a href="/rewrite" style={{padding:'10px 20px',background:'rgba(0,0,0,0.2)',color:'#8b8fa8',borderRadius:'10px',textDecoration:'none',fontSize:'13px',border:'1px solid rgba(255,255,255,0.08)'}}>✨ Rewrite & Improve</a>
+                  <a href="/rewrite" style={{padding:'10px 20px',background:'var(--lw-input)',color:'var(--lw-text-muted)',borderRadius:'10px',textDecoration:'none',fontSize:'13px',border:'1px solid var(--lw-border)'}}>✨ Rewrite & Improve</a>
                 </div>
               </div>
             </div>
@@ -1474,70 +1330,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* CHAT WIDGET MOVED TO GLOBAL LAYOUT */}
-      <div style={{display:'none'}}>
-        {showChat && (
-          <div style={{position:'absolute',bottom:'70px',right:'0',width:'360px',height:'500px',background:'linear-gradient(135deg,#1a1d2e,#1e2235)',borderRadius:'20px',border:'1px solid rgba(29,158,117,0.25)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-            <div style={{padding:'1rem 1.25rem',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',justifyContent:'space-between',alignItems:'center',background:'rgba(0,0,0,0.2)'}}>
-              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                <div style={{width:'32px',height:'32px',borderRadius:'8px',background:'linear-gradient(135deg,#1D9E75,#085041)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>✦</div>
-                <div>
-                  <p style={{fontSize:'13px',fontWeight:'700',color:'#f0f0f0',margin:'0'}}>Listing Whisperer AI</p>
-                  <p style={{fontSize:'10px',color:'#1D9E75',margin:'0'}}>Real estate assistant</p>
-                </div>
-              </div>
-              <button onClick={() => setShowChat(false)} style={{background:'none',border:'none',color:'#555',fontSize:'18px',cursor:'pointer'}}>✕</button>
-            </div>
-            <div style={{flex:1,overflowY:'auto',padding:'1rem',display:'flex',flexDirection:'column',gap:'10px'}}>
-              {chatMessages.length === 0 && (
-                <div style={{textAlign:'center',padding:'2rem 1rem'}}>
-                  <div style={{fontSize:'2rem',marginBottom:'8px'}}>✦</div>
-                  <p style={{fontSize:'13px',fontWeight:'600',color:'#f0f0f0',margin:'0 0 6px'}}>How can I help you?</p>
-                  <p style={{fontSize:'12px',color:'#5a5f72',margin:'0 0 1.5rem'}}>Ask me anything about real estate or how to use Listing Whisperer</p>
-                  <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                    {['How do I use Snap & Start?','How should I price this listing?','What is the 7-Day Launch Kit?','How do I handle a lowball offer?'].map(q => (
-                      <button key={q} onClick={() => setChatInput(q)}
-                        style={{padding:'8px 12px',background:'rgba(29,158,117,0.08)',border:'1px solid rgba(29,158,117,0.15)',borderRadius:'8px',color:'#8b8fa8',fontSize:'11px',cursor:'pointer',textAlign:'left',transition:'all 0.15s'}}
-                        onMouseOver={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.4)';e.currentTarget.style.color='#1D9E75'}}
-                        onMouseOut={e => {e.currentTarget.style.borderColor='rgba(29,158,117,0.15)';e.currentTarget.style.color='#8b8fa8'}}>
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {chatMessages.map((msg, i) => (
-                <div key={i} style={{display:'flex',justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'}}>
-                  <div style={{maxWidth:'85%',padding:'10px 14px',borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',background: msg.role === 'user' ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',border: msg.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.07)',fontSize:'13px',lineHeight:'1.6',color:'#f0f0f0',whiteSpace:'pre-wrap'}}>
-                    {msg.content}
-                  </div>
-                </div>
-              ))}
-              {chatLoading && (
-                <div style={{display:'flex',justifyContent:'flex-start'}}>
-                  <div style={{padding:'10px 14px',borderRadius:'14px 14px 14px 4px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.07)',display:'flex',gap:'4px',alignItems:'center'}}>
-                    {[0,1,2].map(i => <div key={i} style={{width:'6px',height:'6px',borderRadius:'50%',background:'#1D9E75',animation:`pulse-dot 1.2s ${i*0.2}s infinite`}}/>)}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div style={{padding:'0.875rem',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',gap:'8px'}}>
-              <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChatMessage()} placeholder="Ask anything..."
-                style={{flex:1,padding:'10px 14px',background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'10px',fontSize:'13px',color:'#f0f0f0',outline:'none'}}/>
-              <button onClick={sendChatMessage} disabled={chatLoading || !chatInput.trim()}
-                style={{width:'40px',height:'40px',borderRadius:'10px',background: chatInput.trim() ? 'linear-gradient(135deg,#1D9E75,#085041)' : 'rgba(255,255,255,0.05)',border:'none',color:'#fff',fontSize:'16px',cursor: chatInput.trim() ? 'pointer' : 'not-allowed',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                ↑
-              </button>
-            </div>
-          </div>
-        )}
-        <button onClick={() => setShowChat(!showChat)}
-          style={{width:'56px',height:'56px',borderRadius:'50%',background:'linear-gradient(135deg,#1D9E75,#085041)',border:'none',color:'#fff',fontSize:'24px',cursor:'pointer',boxShadow:'0 4px 20px rgba(29,158,117,0.4)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s'}}
-          onMouseOver={e => e.currentTarget.style.transform='scale(1.1)'}
-          onMouseOut={e => e.currentTarget.style.transform='scale(1)'}>
-          {showChat ? '✕' : '✦'}
-        </button>
-      </div>
 
       {/* UPGRADE MODAL */}
       {showUpgradeModal && (
