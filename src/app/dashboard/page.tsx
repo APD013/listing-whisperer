@@ -1011,6 +1011,7 @@ export default function Dashboard() {
                     emoji: '🏗️', title: 'Build the Listing', tagline: 'Turn property notes and photos into ready-to-publish marketing',
                     color: '#1D9E75',
                     tools: [
+                      { icon:'📁', title:'Listing Workspaces', desc:'All your listing assets in one place', href:'/workspaces' },
                       { icon:'⚡', title:'Quick Listing', desc:'Faster manual start, fewer inputs', href:'/quick-listing' },
                       { icon:'📸', title:'Snap & Start', desc:'On-site? Start from photos instantly', href:'/snap-start' },
                       { icon:'✍️', title:'Rewrite', desc:'Polish and improve existing copy', href:'/rewrite' },
@@ -1039,6 +1040,7 @@ export default function Dashboard() {
                       { icon:'🏠', title:'Buyer Consultation', desc:'Prepare for your buyer appointments', href:'/buyer-consultation' },
                       { icon:'📩', title:'Follow-Up', desc:'Post-meeting and post-showing emails', href:'/follow-up' },
                       { icon:'🔄', title:'Follow-Up Sequence', desc:'Complete follow-up sequence for any lead', href:'/follow-up-sequence' },
+                      { icon:'⏰', title:'Reminders', desc:'Never miss a follow-up or deadline', href:'/reminders' },
                       { icon:'✅', title:'Transaction Checklist', desc:'Track every step from listing to closing', href:'/transaction-checklist' },
                       { icon:'👥', title:'Leads / CRM', desc:'Track your pipeline and contacts', href:'/leads' },
                       { icon:'🚨', title:'Listing Rescue', desc:'Diagnose why your listing is sitting', href:'/listing-rescue' },
